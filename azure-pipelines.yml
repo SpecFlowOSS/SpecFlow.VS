@@ -1,0 +1,79 @@
+trigger:
+- master
+
+pool:
+  name: Hosted VS2017
+  demands:
+  - msbuild
+  - visualstudio
+  - vstest
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Debug'
+
+steps:
+- task: NuGetToolInstaller@0
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet restore'
+  inputs:
+    command: restore
+
+- task: VSBuild@1
+  displayName: 'Build Solution'
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployExtension=false /nowarn:VSTHRD010'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  displayName: 'Run Unit Tests'
+  inputs:
+    testAssemblyVer2: |
+     **\$(buildConfiguration)\**\*tests*.dll
+     !**\obj\**
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  displayName: 'Run SpecFlow Scenarios'
+  inputs:
+    testAssemblyVer2: |
+     **\$(buildConfiguration)\**\*specs*.dll
+     !**\obj\**
+    otherConsoleOptions: '/platform:x64'
+    testRunTitle: 'Deveroom Specs'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    rerunFailedTests: true
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(system.defaultworkingdirectory)'
+    Contents: '**\bin\$(buildConfiguration)\**'
+    TargetFolder: '$(build.artifactstagingdirectory)\drop'
+  condition: succeededOrFailed()
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(system.defaultworkingdirectory)'
+    Contents: '**\bin\$(buildConfiguration)\**\*.vsix'
+    TargetFolder: '$(build.artifactstagingdirectory)\vsix'
+    flattenFolders: true
+  condition: succeededOrFailed()
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)\drop'
+  condition: succeededOrFailed()
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: vsix'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)\vsix'
+    ArtifactName: vsix
+  condition: succeededOrFailed()

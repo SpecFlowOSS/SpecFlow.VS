@@ -73,6 +73,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Dev", "Deveroom.VisualStudio.Dev\Deveroom.VisualStudio.Dev.csproj", "{17DD8701-E404-4343-AA04-61FC11CEDE72}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repo", "Repo", "{31ACD27E-7410-40B8-8E7D-3C0E787C0814}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems*{0ca5992a-e95e-472f-90cf-36be75a6cede}*SharedItemsImports = 13
