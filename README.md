@@ -4,6 +4,8 @@ Many BDD teams working on formulating scenarios aim to produce a real living doc
 
 Deveroom is a feature file editing tool in Visual Studio, developed by the creator of SpecFlow.
 
+[![Build Status](https://dev.azure.com/specsolutions/deveroom-visualstudio/_apis/build/status/specsolutions.deveroom-visualstudio?branchName=master)](https://dev.azure.com/specsolutions/deveroom-visualstudio/_build/latest?definitionId=4&branchName=master)
+
 ## Update 24th April 2019: Deveroom is going to be open sourced!
 
 I am really happy to announce that
