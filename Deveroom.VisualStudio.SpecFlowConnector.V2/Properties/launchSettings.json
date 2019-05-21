@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Deveroom.VisualStudio.SpecFlowConnector": {
+      "commandName": "Project",
+      "commandLineArgs": "discovery \"W:\\Trainings\\BddWithSpecFlow\\BddWithSpecFlow.GeekPizza.REST.NetCore\\BddWithSpecFlow.GeekPizza.Specs\\bin\\Debug\\netcoreapp2.1\\BddWithSpecFlow.GeekPizza.Specs.dll\" \"W:\\Trainings\\BddWithSpecFlow\\BddWithSpecFlow.GeekPizza.REST.NetCore\\BddWithSpecFlow.GeekPizza.Specs\\specflow.json\""
+    }
+  }
+}

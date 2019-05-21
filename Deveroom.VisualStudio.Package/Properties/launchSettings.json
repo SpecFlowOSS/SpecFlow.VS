@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Visual Studio": {
+      "commandName": "Executable",
+      "executablePath": "%VSAPPIDDIR%devenv.exe",
+      "commandLineArgs": "/rootsuffix Exp"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net452</TargetFramework>
+    <AssemblyName>deveroom-specflow-v1</AssemblyName>
+    <Configurations>Debug;Release;Debug_x86;Release_x86</Configurations>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
+    <RootNamespace>Deveroom.VisualStudio.SpecFlowConnector</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug_x86' OR '$(Configuration)' == 'Release_x86' ">
+    <AssemblyName>deveroom-specflow-v1.x86</AssemblyName>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dnlib" Version="3.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="SpecFlow" Version="2.3.2" />
+    <PackageReference Include="SpecFlow.CustomPlugin" Version="2.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ISymWrapper" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" 
+          Condition=" '$(Configuration)' != 'Debug_x86' AND '$(Configuration)' != 'Release_x86' ">
+    <Exec Command="del $(TargetDir)TechTalk.*&#xD;&#xA;del $(TargetDir)Gherkin.*" />
+    
+    <Exec Command="&quot;$(MSBuildBinPath)\msbuild.exe&quot; /p:Configuration=$(Configuration)_x86&#xD;&#xA;copy $(ProjectDir)bin\$(Configuration)_x86\$(TargetFramework)\$(RuntimeIdentifier)\deveroom-specflow-v1.*  $(TargetDir)" Condition=" '$(PlatformTarget)' == 'anycpu' " />
+  </Target>
+
+  <Import Project="..\Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems" Label="Shared" />
+
+  <Import Project="..\Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.projitems" Label="Shared" />
+
+</Project>

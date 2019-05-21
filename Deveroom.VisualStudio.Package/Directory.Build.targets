@@ -1,0 +1,13 @@
+<Project>
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets')" />
+
+  <PropertyGroup>
+    <GetVsixSourceItemsDependsOn>$(GetVsixSourceItemsDependsOn);ResolveAdditionalDeveroomDependencies</GetVsixSourceItemsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="ResolveAdditionalDeveroomDependencies">
+    <ItemGroup>
+      <AddModules Include="$(OutputPath)%(AdditionalDeveroomDependencies.Filename)%(AdditionalDeveroomDependencies.Extension)" />
+    </ItemGroup>
+  </Target>
+</Project>

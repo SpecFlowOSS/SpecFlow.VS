@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Gherkin" Version="6.0.0" />
+    <PackageReference Include="System.IO.Abstractions" Version="4.2.10" />
+    <PackageReference Include="Microsoft.Composition" Version="1.0.31" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+
+    <PackageReference Include="Microsoft.VisualStudio.Text.Data" Version="15.6.27740" />
+    <PackageReference Include="Microsoft.VisualStudio.Text.Logic" Version="15.6.27740" />
+    <PackageReference Include="Microsoft.VisualStudio.Text.UI.Wpf" Version="15.6.27740" />
+    <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="15.6.27740" />
+    <PackageReference Include="Microsoft.VisualStudio.Editor" Version="15.6.27740" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.7.27703" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems" Label="Shared" />
+
+</Project>

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Deveroom.VisualStudio.UI\Deveroom.VisualStudio.UI.csproj" />
+    <ProjectReference Include="..\Deveroom.VisualStudio\Deveroom.VisualStudio.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Deveroom.VisualStudio.UI">
+    <Style x:Key="VsDialogButton" TargetType="{x:Type Button}">
+        <Style.Setters>
+            <Setter Property="Padding" Value="8,0,8,2" />
+            <Setter Property="MinWidth" Value="75" />
+            <Setter Property="Height" Value="23" />
+            <Setter Property="Margin" Value="6,0,0,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Background" Value="#ECECF0" />
+            <Setter Property="BorderBrush" Value="#ACACAC" />
+        </Style.Setters>
+    </Style>
+    <Style x:Key="VsDialogUpperPart" TargetType="{x:Type Border}">
+        <Style.Setters>
+            <Setter Property="Background" Value="#ECECF0" />
+        </Style.Setters>
+    </Style>
+    <Style x:Key="VsDialogLowerPart" TargetType="{x:Type Border}">
+        <Style.Setters>
+            <Setter Property="Background" Value="#F5F5F5" />
+        </Style.Setters>
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,15 @@
+﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.24">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
+
+    <UseWPF>true</UseWPF>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>Deveroom.VisualStudio.UI.Tester.App</StartupObject>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\Deveroom.VisualStudio.UI\Deveroom.VisualStudio.UI.csproj" />
+  </ItemGroup>
+</Project>

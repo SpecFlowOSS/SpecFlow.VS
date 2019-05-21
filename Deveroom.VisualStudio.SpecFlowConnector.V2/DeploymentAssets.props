@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <DeploymentV2OutputDir>$(MSBuildThisFileDirectory)bin\$(Configuration)\netcoreapp2.1\publish</DeploymentV2OutputDir>
+    <DeploymentV2TargetDir>Connectors\V2</DeploymentV2TargetDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(DeploymentV2OutputDir)\**\*.*">
+      <Link>$(DeploymentV2TargetDir)\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <Visible>False</Visible>
+      <VSIXSubPath>$(DeploymentV2TargetDir)\%(RecursiveDir)</VSIXSubPath>
+    </Content>
+  </ItemGroup>
+</Project>
