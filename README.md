@@ -1,4 +1,4 @@
-# Deveroom - a Visual Studio extension by the creator of SpecFlow
+# Deveroom - a Visual Studio extension for SpecFlow
 
 Many BDD teams working on formulating scenarios aim to produce a real living documentation, in this activity a feature file editor can be a great help as it saves typing, time and energy.
 
@@ -33,7 +33,7 @@ In order to install Deveroom, open your Visual Studio, select "Tools / Extension
 
 ## Contributing
 
-All contributors are welcome! More information about development and testing guidelines is coming soon.
+All contributors are welcome! More information about development and testing guidelines are coming soon.
 
 ## Important Blog Entries
 
