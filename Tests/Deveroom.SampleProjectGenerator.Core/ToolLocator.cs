@@ -60,9 +60,11 @@ namespace Deveroom.SampleProjectGenerator
                 case ExternalTools.MsBuild:
                     var editions = new[] {"Community", "Professional", "Enterprise"};
                     var versions = new[] {"2017", "2019"};
+                    var msBuildVersions = new[] {"Current", "15.0"};
                     foreach (var version in versions)
                         foreach (var edition in editions)
-                            yield return Environment.ExpandEnvironmentVariables($@"%ProgramFiles(x86)%\Microsoft Visual Studio\{version}\{edition}\MSBuild\15.0\Bin");
+                            foreach (var msBuildVersion in msBuildVersions)
+                                yield return Environment.ExpandEnvironmentVariables($@"%ProgramFiles(x86)%\Microsoft Visual Studio\{version}\{edition}\MSBuild\{msBuildVersion}\Bin");
                     break;
             }
         }

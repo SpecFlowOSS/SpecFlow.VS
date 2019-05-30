@@ -3,6 +3,7 @@
     <TargetFramework>net461</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
+    <VsEditorAssembliesLocation Condition="'$(VsEditorAssembliesLocation)' == ''">$(DevEnvDir)</VsEditorAssembliesLocation>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,10 +23,10 @@
 
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.Platform.VSEditor">
-      <HintPath>$(DevEnvDir)CommonExtensions\Microsoft\Editor\Microsoft.VisualStudio.Platform.VSEditor.dll</HintPath>
+      <HintPath>$(VsEditorAssembliesLocation)CommonExtensions\Microsoft\Editor\Microsoft.VisualStudio.Platform.VSEditor.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Text.Internal">
-      <HintPath>$(DevEnvDir)PrivateAssemblies\Microsoft.VisualStudio.Text.Internal.dll</HintPath>
+      <HintPath>$(VsEditorAssembliesLocation)PrivateAssemblies\Microsoft.VisualStudio.Text.Internal.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
