@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Package", "Deveroom.VisualStudio.Package\Deveroom.VisualStudio.Package.csproj", "{00920A0A-A73C-487F-BC41-9B92F2F0EBD7}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{73BEBCB3-7CC
 	ProjectSection(SolutionItems) = preProject
 		doc\AssetsAndEvents.md = doc\AssetsAndEvents.md
 		Changelog.md = Changelog.md
+		CONTRIBUTION.md = CONTRIBUTION.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow19Connector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow19Connector.Tests\Deveroom.VisualStudio.SpecFlow19Connector.Tests.csproj", "{71474D25-09C0-424B-8FAF-62F0B73FA6BD}"
