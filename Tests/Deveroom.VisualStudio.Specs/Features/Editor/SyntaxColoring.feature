@@ -273,13 +273,13 @@ Scenario: Highlights data table
 				| 7.1     | floating point |
 			When I calculate the results
 		"""
-	Then all DataTable section should be highlighted as
+	Then all DataTable section should be highlighted as, DataTableHeader should be highlighted as
 		"""
 		Feature: Addition
 		Scenario: Add two numbers
 			Given the operands entered
-		{DataTable}		| operand | type           |
-				| 42      | integer        |
+	       {DataTableHeader}| operand | type           |{/DataTableHeader}
+		     {DataTable}| 42      | integer        |
 				| 7.1     | floating point |{/DataTable}
 			When I calculate the results
 		"""
