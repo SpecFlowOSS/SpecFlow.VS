@@ -21,6 +21,7 @@ namespace Deveroom.VisualStudio.Editor.Classification
             { DeveroomTagTypes.UndefinedStep, DeveroomClassifications.UndefinedStep },
             { DeveroomTagTypes.StepParameter, DeveroomClassifications.StepPatameter },
             { DeveroomTagTypes.ScenarioOutlinePlaceholder, DeveroomClassifications.ScenarioOutlinePlaceholder },
+            { DeveroomTagTypes.DataTableHeader, DeveroomClassifications.DataTableHeader },
         };
 
         private readonly IClassificationTypeRegistryService _classificationTypeRegistry;

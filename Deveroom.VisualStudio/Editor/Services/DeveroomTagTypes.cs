@@ -23,5 +23,6 @@ namespace Deveroom.VisualStudio.Editor.Services
         public const string DocString = nameof(DocString);
         public const string ParserError = nameof(ParserError);
         public const string Document = nameof(Document);
+        public const string DataTableHeader = nameof(DataTableHeader);
     }
 }

@@ -13,6 +13,7 @@ namespace Deveroom.VisualStudio.Editor.Classification
         public const string Comment = "deveroom.comment";
         public const string DocString = "deveroom.doc_string";
         public const string DataTable = "deveroom.data_table";
+        public const string DataTableHeader = "deveroom.data_table_header";
 
         public const string UndefinedStep = "deveroom.undefined_step";
         public const string StepPatameter = "deveroom.step_parameter";
@@ -124,6 +125,26 @@ namespace Deveroom.VisualStudio.Editor.Classification
             public GherkinDataTableClassificationFormat()
             {
                 this.DisplayName = "Deveroom Data Table";
+            }
+        }
+
+
+        [Export]
+        [Name(DataTableHeader)]
+        [BaseDefinition(DataTable)]
+        private static ClassificationTypeDefinition _dataTableHeaderClassificationTypeDefinition;
+
+        [Export(typeof(EditorFormatDefinition))]
+        [ClassificationType(ClassificationTypeNames = DataTableHeader)]
+        [Name(DataTableHeader)]
+        [UserVisible(true)]
+        [Order(Before = Priority.Default)]
+        internal sealed class GherkinDataTableHeaderClassificationFormat : ClassificationFormatDefinition
+        {
+            public GherkinDataTableHeaderClassificationFormat()
+            {
+                this.DisplayName = "Deveroom Data Table Header";
+                this.IsItalic = true;
             }
         }
 

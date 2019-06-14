@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -116,11 +115,16 @@ namespace Deveroom.VisualStudio.Editor.Services
 
                     if (step.Argument is DataTable dataTable)
                     {
-                        stepTag.AddChild(
-                            new DeveroomTag(DeveroomTagTypes.DataTable,
-                                GetBlockSpan(fileSnapshot, dataTable.Rows.First().Location,
-                                    dataTable.Rows.Last().Location.Line),
-                                dataTable));
+                        var dataTableBlockTag = new DeveroomTag(DeveroomTagTypes.DataTable,
+                            GetBlockSpan(fileSnapshot, dataTable.Rows.First().Location,
+                                dataTable.Rows.Last().Location.Line),
+                            dataTable);
+                        stepTag.AddChild(dataTableBlockTag);
+                        var dataTableHeader = dataTable.Rows.FirstOrDefault();
+                        if (dataTableHeader != null)
+                        {
+                            TagRowCells(fileSnapshot, dataTableHeader, dataTableBlockTag, DeveroomTagTypes.DataTableHeader);
+                        }
                     }
                     else if (step.Argument is DocString docString)
                     {
@@ -177,18 +181,23 @@ namespace Deveroom.VisualStudio.Editor.Services
                             GetExamplesLastLine(scenarioOutlineExample), scenarioDefinitionTag);
                         if (scenarioOutlineExample.TableHeader != null)
                         {
-                            foreach (var cell in scenarioOutlineExample.TableHeader.Cells)
-                            {
-                                examplesBlockTag.AddChild(new DeveroomTag(DeveroomTagTypes.ScenarioOutlinePlaceholder,
-                                    GetSpan(fileSnapshot, cell.Location, cell.Value.Length, offset: 0),
-                                    cell));
-                            }
+                            TagRowCells(fileSnapshot, scenarioOutlineExample.TableHeader, examplesBlockTag, DeveroomTagTypes.ScenarioOutlinePlaceholder);
                         }
                     }
                 }
             }
 
             return featureTag;
+        }
+
+        private void TagRowCells(ITextSnapshot fileSnapshot, TableRow row, DeveroomTag parentTag, string tagType)
+        {
+            foreach (var cell in row.Cells)
+            {
+                parentTag.AddChild(new DeveroomTag(tagType,
+                    GetSpan(fileSnapshot, cell.Location, cell.Value.Length),
+                    cell));
+            }
         }
 
         private void AddParameterTags(ITextSnapshot fileSnapshot, ParameterMatch parameterMatch, DeveroomTag stepTag, Step step)
