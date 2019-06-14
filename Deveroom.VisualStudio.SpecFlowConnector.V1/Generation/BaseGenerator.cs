@@ -12,30 +12,24 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Generation
     {
         public string Generate(string projectFolder, string configFilePath, string targetExtension, string featureFilePath, string targetNamespace, string projectDefaultNamespace, bool saveResultToFile)
         {
-            ITestGeneratorFactory testGeneratorFactory = new TestGeneratorFactory();
-            var projectSettings = new ProjectSettings(); //TODO: load settings
-            projectSettings.ConfigurationHolder =  configFilePath == null ? new SpecFlowConfigurationHolder() 
-                : CreateConfigHolder(configFilePath);
-            projectSettings.ProjectFolder = projectFolder;
-            projectSettings.ProjectPlatformSettings.Language = targetExtension == ".cs"
-                ? GenerationTargetLanguage.CSharp
-                : GenerationTargetLanguage.VB;
-            projectSettings.DefaultNamespace = projectDefaultNamespace;
-            var generationSettings = new GenerationSettings
-            {
-                CheckUpToDate = false,
-                WriteResultToFile = saveResultToFile
-            };
-            using (var generator = testGeneratorFactory.CreateGenerator(projectSettings))
+            using (var generator = CreateGenerator(projectFolder, configFilePath, targetExtension, projectDefaultNamespace))
             {
                 var featureFileInput =
-                    new FeatureFileInput(FileSystemHelper.GetRelativePath(featureFilePath, projectFolder));
-                featureFileInput.CustomNamespace = targetNamespace;
+                    new FeatureFileInput(FileSystemHelper.GetRelativePath(featureFilePath, projectFolder))
+                    {
+                        CustomNamespace = targetNamespace
+                    };
+
+                var generationSettings = new GenerationSettings
+                {
+                    CheckUpToDate = false,
+                    WriteResultToFile = saveResultToFile
+                };
                 var result = generator.GenerateTestFile(featureFileInput, generationSettings);
                 var connectorResult = new GenerationResult();
                 if (result.Success)
                 {
-                    connectorResult.FeatureFileCodeBehind = new FeatureFileCodeBehind()
+                    connectorResult.FeatureFileCodeBehind = new FeatureFileCodeBehind
                     {
                         FeatureFilePath = featureFilePath,
                         Content = result.GeneratedTestCode
@@ -50,6 +44,21 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Generation
                 var resultJson = JsonSerialization.SerializeObject(connectorResult);
                 return resultJson;
             }
+        }
+
+        protected virtual ITestGenerator CreateGenerator(string projectFolder, string configFilePath, string targetExtension, string projectDefaultNamespace)
+        {
+            ITestGeneratorFactory testGeneratorFactory = new TestGeneratorFactory();
+            var projectSettings = new ProjectSettings(); //TODO: load settings
+            projectSettings.ConfigurationHolder = configFilePath == null ? new SpecFlowConfigurationHolder()
+                : CreateConfigHolder(configFilePath);
+            projectSettings.ProjectFolder = projectFolder;
+            projectSettings.ProjectPlatformSettings.Language = targetExtension == ".cs"
+                ? GenerationTargetLanguage.CSharp
+                : GenerationTargetLanguage.VB;
+            projectSettings.DefaultNamespace = projectDefaultNamespace;
+
+            return testGeneratorFactory.CreateGenerator(projectSettings);
         }
 
         protected abstract SpecFlowConfigurationHolder CreateConfigHolder(string configFilePath);
