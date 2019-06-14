@@ -131,7 +131,7 @@ namespace Deveroom.VisualStudio.Editor.Classification
 
         [Export]
         [Name(DataTableHeader)]
-        [BaseDefinition("string")]
+        [BaseDefinition(DataTable)]
         private static ClassificationTypeDefinition _dataTableHeaderClassificationTypeDefinition;
 
         [Export(typeof(EditorFormatDefinition))]
@@ -144,7 +144,7 @@ namespace Deveroom.VisualStudio.Editor.Classification
             public GherkinDataTableHeaderClassificationFormat()
             {
                 this.DisplayName = "Deveroom Data Table Header";
-                this.ForegroundColor = Colors.White;
+                this.IsItalic = true;
             }
         }
 
