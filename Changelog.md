@@ -6,6 +6,7 @@ New features:
 
 Bug fixes:
 
+* Regenerate Feature.cs file comes back as error if there is a space in the project path (Issue #34)
 * Deveroom might call BeforeTestRun event during binding discovery with SpecFlow v3 on .NET Framework (Issue #27)
 
 # v1.2.1 - 2019-04-24

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Deveroom.VisualStudio.Common;
 
@@ -184,9 +185,13 @@ namespace Deveroom.VisualStudio
             if (string.IsNullOrEmpty(arg))
                 return "\"\"";
 
-            if (arg.Contains(' ') && !arg.StartsWith("\""))
-                return "\"" + arg + "\"";
-            return arg;
+            if (!arg.Contains(' ') || arg.StartsWith("\""))
+                return arg;
+
+            //source: https://stackoverflow.com/a/12364234/26530
+            string value = Regex.Replace(arg, @"(\\*)" + "\"", @"$1\$0");
+            value = Regex.Replace(value, @"^(.*\s.*?)(\\*)$", "\"$1$2$2\"", RegexOptions.Singleline);
+            return value;
         }
     }
 }
