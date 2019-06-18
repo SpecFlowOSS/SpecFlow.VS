@@ -105,9 +105,8 @@ namespace Deveroom.VisualStudio.Editor.Services.Parser
                         cell = "";
                         startPos = pos;
                     }
-                    else if (c == GherkinLanguageConstants.TABLE_CELL_ESCAPE_CHAR)
+                    else if (c == GherkinLanguageConstants.TABLE_CELL_ESCAPE_CHAR && rowEnum.MoveNext())
                     {
-                        rowEnum.MoveNext();
                         pos++;
                         c = rowEnum.Current;
                         if (c == GherkinLanguageConstants.TABLE_CELL_NEWLINE_ESCAPE)

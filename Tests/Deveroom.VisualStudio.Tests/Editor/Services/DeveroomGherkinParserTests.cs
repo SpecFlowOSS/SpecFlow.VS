@@ -27,7 +27,7 @@ Feature: Addition
         }
 
         [Fact]
-        public void Should_tolerate_backslash_in_DataTable()
+        public void Should_tolerate_backslash_at_end_of_line_in_DataTable()
         {
             var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
                 new Mock<IMonitoringService>().Object);

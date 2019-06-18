@@ -6,6 +6,7 @@ New features:
 
 Bug fixes:
 
+* Editor should tolerate backslash at the end of the line in a DataTable (Issue #39)
 * Regenerate Feature.cs file comes back as error if there is a space in the project path (Issue #34)
 * Deveroom might call BeforeTestRun event during binding discovery with SpecFlow v3 on .NET Framework (Issue #27)
 
