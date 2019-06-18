@@ -61,16 +61,3 @@ Scenario: Highlights semantic errors
 		{ParserError}Scenario: Add two numbers{/ParserError}
 			When I press add
 		"""
-
-Scenario: Highlights top of the file on "Unexpected end of file" syntax error
-	Given there is a SpecFlow project scope
-	When the following feature file is opened in the editor
-		"""
-		Feature: Addition
-		@tag
-		"""
-	Then all DefinitionLineKeyword section should be highlighted as
-		"""
-		{DefinitionLineKeyword}Feature:{/DefinitionLineKeyword} Addition
-		@tag
-		"""
