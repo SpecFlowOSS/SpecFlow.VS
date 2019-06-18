@@ -73,7 +73,7 @@ namespace Deveroom.VisualStudio.Editor.Services.Parser
 
         public DeveroomGherkinDocument Parse(TextReader featureFileReader, string sourceFilePath)
         {
-            var tokenScanner = (ITokenScanner)new TokenScanner(featureFileReader);
+            var tokenScanner = (ITokenScanner)new HotfixTokenScanner(featureFileReader);
             var tokenMatcher = new TokenMatcher(DialectProvider);
             _astBuilder = new DeveroomGherkinAstBuilder(sourceFilePath, () => tokenMatcher.CurrentDialect);
 
