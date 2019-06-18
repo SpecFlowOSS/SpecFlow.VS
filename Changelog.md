@@ -1,5 +1,9 @@
 # vNext
 
+New features:
+
+* Higlight DataTable headers (Issue #31)
+
 Bug fixes:
 
 * Deveroom might call BeforeTestRun event during binding discovery with SpecFlow v3 on .NET Framework (Issue #27)
