@@ -23,7 +23,7 @@ namespace Deveroom.VisualStudio.Editor.Commands
         {
             public readonly int Line;
             public readonly int Column;
-            public int? Cell;
+            public readonly int? Cell;
 
             public bool IsUnknown => Cell == null;
             public bool IsBeforeFirstCell => Cell == null;
@@ -60,13 +60,15 @@ namespace Deveroom.VisualStudio.Editor.Commands
             if (!(dataTableTag?.Data is IHasRows hasRows))
                 return false;
 
+            var currentText = dataTableTag.Span.GetText();
+            if (IsEscapedPipeTyped(currentText, textView.Caret.Position.BufferPosition))
+                return false;
+
             var indent = GetIndent(textView.TextSnapshot, hasRows);
             var newLine = GetNewLine(textView);
 
             var caretPosition = GetCaretPosition(textView.Caret.Position, hasRows);
-
             var formattedTableText = GetFormattedTableText(hasRows, indent, newLine, caretPosition, textView.TextSnapshot, out var newCaretLineColumn);
-            var currentText = dataTableTag.Span.GetText();
             if (currentText.Equals(formattedTableText))
                 return false;
 
@@ -80,6 +82,20 @@ namespace Deveroom.VisualStudio.Editor.Commands
 
             RestoreCaretPosition(textView, caretPosition, newCaretLineColumn);
             return true;
+        }
+
+        private bool IsEscapedPipeTyped(string currentText, SnapshotPoint positionBufferPosition)
+        {
+            positionBufferPosition = positionBufferPosition.Subtract(1);
+            int backslashCount = 0;
+            while (positionBufferPosition.Position > 0)
+            {
+                positionBufferPosition = positionBufferPosition.Subtract(1);
+                if (positionBufferPosition.GetChar() != '\\')
+                    break;
+                backslashCount++;
+            }
+            return backslashCount % 2 == 1;
         }
 
         private string GetNewLine(IWpfTextView textView)
@@ -198,6 +214,15 @@ namespace Deveroom.VisualStudio.Editor.Commands
                     result.Append(new string(' ', PADDING_LENGHT));
                     result.Append('|');
                 }
+
+                var lineText = textSnapshot.GetLineFromLineNumber(nextLine - 1).GetText();
+                var unfinishedCell = GetUnfinishedCell(lineText);
+                if (unfinishedCell != null)
+                {
+                    result.Append(' ');
+                    result.Append(unfinishedCell);
+                }
+
                 result.Append(newLine);
                 nextLine++;
             }
@@ -206,6 +231,18 @@ namespace Deveroom.VisualStudio.Editor.Commands
             newCaretLinePosition = CalculateNewCaretLinePosition(caretPosition, widths, indent);
 
             return result.ToString();
+        }
+
+        private static string GetUnfinishedCell(string lineText)
+        {
+            var match = Regex.Match(lineText, @"(?<!\\)(\\\\)*\|(?<remaining>.*?)$", RegexOptions.RightToLeft);
+            string unfinishedCell = null;
+            if (match.Success && !string.IsNullOrWhiteSpace(match.Groups["remaining"].Value))
+            {
+                unfinishedCell = match.Groups["remaining"].Value.Trim();
+            }
+
+            return unfinishedCell;
         }
 
         private int[] GetWidths(IHasRows hasRows)

@@ -134,14 +134,14 @@ namespace Deveroom.VisualStudio.Tests.Editor.Commands
         public void Should_not_format_data_table_when_masked_pipe_typed_of_an_incomplete_table()
         {
             var command = CreateSUT();
-            var inputText = _unformattedText.Replace(-2, @"c\n\|     |", " x\\"); // remove last cell
+            var inputText = _unformattedText.Replace(-2, @"c\n\|     |", @" x\"); // remove last cell
 
             var textView = CreateTextView(inputText);
             inputText.MoveCaretTo(textView, -2, -1);
 
             textView.SimulateType(command, '|');
 
-            Assert.Equal(inputText.ToString(), textView.TextSnapshot.GetText());
+            Assert.Equal(inputText.ToString().Replace(@"x\", @"x\|"), textView.TextSnapshot.GetText());
         }
 
         [Theory]
