@@ -15,3 +15,17 @@ Examples:
 	| line-v2.1 | v2.1.0  |
 	| line-v2.0 | v2.0.0  |
 	| line-v1.9 | v1.9.0  |
+
+Scenario Outline: Discover bindings from different SpecFlow v3 versions for .NET Core
+	Given there is a simple SpecFlow project for <version>
+	And the project format is new
+	And the target framework is netcoreapp2.1
+	And the project is built
+	When the binding discovery performed
+	Then the discovery succeeds with several step definitions
+Examples: 
+	| version       |
+	| v3.0.161-beta |
+	| v3.0.188      |
+	| v3.0.213      |
+	| v3.0.220      |
