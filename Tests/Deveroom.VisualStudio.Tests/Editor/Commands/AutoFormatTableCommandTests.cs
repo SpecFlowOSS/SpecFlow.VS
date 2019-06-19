@@ -1,4 +1,5 @@
 ﻿using System;
+using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.Editor.Commands;
 using Deveroom.VisualStudio.VsxStubs;
 using Deveroom.VisualStudio.VsxStubs.ProjectSystem;
@@ -7,9 +8,8 @@ using Xunit.Abstractions;
 
 namespace Deveroom.VisualStudio.Tests.Editor.Commands
 {
-    public class FormatTableCommandTests
+    public class AutoFormatTableCommandTests
     {
-        private readonly ITestOutputHelper _testOutputHelper;
         private readonly StubIdeScope _ideScope;
 
         private readonly TestText _unformattedText = new TestText(
@@ -29,9 +29,8 @@ namespace Deveroom.VisualStudio.Tests.Editor.Commands
             @"    | qu\\   | c\n\| |",
             @"");
 
-        public FormatTableCommandTests(ITestOutputHelper testOutputHelper)
+        public AutoFormatTableCommandTests(ITestOutputHelper testOutputHelper)
         {
-            _testOutputHelper = testOutputHelper;
             _ideScope = new StubIdeScope(testOutputHelper);
         }
 
@@ -90,6 +89,61 @@ namespace Deveroom.VisualStudio.Tests.Editor.Commands
             Assert.Equal(expectedText.ToString(), textView.TextSnapshot.GetText());
         }
 
+        [Fact]
+        public void Should_not_remove_unfinished_cells_when_formattig_table()
+        {
+            var command = CreateSUT();
+            var inputText = new TestText(
+                @"Feature: foo",
+                @"Scenario: bar",
+                @"Given table",  
+                @"    | foo |    bar  ",
+                @"    | foo  |  bar baz  ",
+                @"    | foo   ",
+                @"    |   ",
+                @"    | foo   |    ",
+                @"    | foo   | \|   ",
+                @"    | foo   | \|",
+                @"    | foo   | bar \\|   ",
+                @"    | foo   | bar ",
+                @"");
+
+            var textView = CreateTextView(inputText);
+            inputText.MoveCaretTo(textView, -2, -1);
+
+            textView.SimulateType(command, '|');
+
+            var expectedText = new TestText(
+                @"Feature: foo",
+                @"Scenario: bar",
+                @"Given table",
+                @"    | foo | bar",
+                @"    | foo | bar baz",
+                @"    | foo",
+                @"    |",
+                @"    | foo |",
+                @"    | foo | \|",
+                @"    | foo | \|",
+                @"    | foo | bar \\ |",
+                @"    | foo | bar    |",
+                @"");
+            Assert.Equal(expectedText.ToString(), textView.TextSnapshot.GetText());
+        }
+
+        [Fact]
+        public void Should_not_format_data_table_when_masked_pipe_typed_of_an_incomplete_table()
+        {
+            var command = CreateSUT();
+            var inputText = _unformattedText.Replace(-2, @"c\n\|     |", " x\\"); // remove last cell
+
+            var textView = CreateTextView(inputText);
+            inputText.MoveCaretTo(textView, -2, -1);
+
+            textView.SimulateType(command, '|');
+
+            Assert.Equal(inputText.ToString(), textView.TextSnapshot.GetText());
+        }
+
         [Theory]
         [InlineData("beginning of line", "", "")]
         [InlineData("before first cell", "  ", "  ")]
@@ -102,7 +156,7 @@ namespace Deveroom.VisualStudio.Tests.Editor.Commands
         [InlineData("end of line", null, null)]
         public void Position_cursor_after_formatting(string test, string caretColonStr, string expectedCaretColonStr)
         {
-            Console.WriteLine($"running: {test}");
+            _ideScope.Logger.LogInfo($"running: {test}");
             var caretColon = caretColonStr?.Length ?? -1;
             var expectedCaretColon = expectedCaretColonStr?.Length ?? -1;
 
