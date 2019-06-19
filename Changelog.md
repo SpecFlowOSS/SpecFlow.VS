@@ -6,6 +6,7 @@ New features:
 
 Bug fixes:
 
+* Unable to discover step definitions for SpecFlow v3.0.220 (Issue #38)
 * Table autoformat removes unfinished cells at the end (Issue #40)
 * Editor should tolerate backslash at the end of the line in a DataTable (Issue #39)
 * Regenerate Feature.cs file comes back as error if there is a space in the project path (Issue #34)

@@ -25,29 +25,12 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
             var connectorFolder = Path.GetDirectoryName(typeof(ConsoleRunner).Assembly.GetLocalCodeBase());
             Debug.Assert(connectorFolder != null);
 
-            var specFlowVersion = GetSpecFlowVersion();
-            var discovererType = typeof(SpecFlowV3000Discoverer);
-            if (specFlowVersion != null)
-                switch (specFlowVersion.FileMajorPart * 1000 + specFlowVersion.FileMinorPart * 10)
-                {
-                    case 3000:
-                        discovererType = typeof(SpecFlowV3000Discoverer);
-                        break;
-                }
-
-            using (var discoverer = new ReflectionSpecFlowDiscoverer(loadContext, discovererType))
+            using (var discoverer = new ReflectionSpecFlowDiscoverer(loadContext, 
+                typeof(VersionSelectorDiscoverer)))
             {
                 var testAssembly = loadContext.LoadFromAssemblyPath(_options.AssemblyFilePath);
                 return discoverer.Discover(testAssembly, _options.AssemblyFilePath, _options.ConfigFilePath);
             }
-        }
-
-        private FileVersionInfo GetSpecFlowVersion()
-        {
-            //TODO: find a better way, because for .NET Core the dependencies are typically not in the output folder. Idea: check 'deps.json' file, or plugins, like 'TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll'
-            var specFlowAssemblyPath = Path.Combine(_options.TargetFolder, "TechTalk.SpecFlow.dll");
-            var fileVersionInfo = File.Exists(specFlowAssemblyPath) ? FileVersionInfo.GetVersionInfo(specFlowAssemblyPath) : null;
-            return fileVersionInfo;
         }
     }
 }

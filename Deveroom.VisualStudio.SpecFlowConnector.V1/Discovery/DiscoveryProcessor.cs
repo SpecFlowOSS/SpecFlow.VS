@@ -39,7 +39,9 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
                             discovererType = typeof(SpecFlowV2010Discoverer);
                             break;
                         case 3000:
-                            discovererType = typeof(SpecFlowV3000Discoverer);
+                            discovererType = specFlowVersion.FileBuildPart >= 220 ? 
+                                typeof(SpecFlowV3000P220Discoverer) : 
+                                typeof(SpecFlowV3000Discoverer);
                             break;
                     }
 
