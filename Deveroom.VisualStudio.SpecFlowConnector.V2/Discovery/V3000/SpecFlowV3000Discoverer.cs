@@ -1,31 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
-using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.Bindings;
+using BoDi;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
 
 namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V3000
 {
-    public class SpecFlowV3000Discoverer : BaseDiscoverer
+    public class SpecFlowV3000Discoverer : SpecFlowV3000P220Discoverer
     {
-        protected override IBindingRegistry GetBindingRegistry(Assembly testAssembly, string configFilePath)
+        protected override IObjectContainer CreateGlobalContainer(IConfigurationLoader configurationLoader, Assembly testAssembly)
         {
-            IConfigurationLoader configurationLoader = new SpecFlow21ConfigurationLoader(configFilePath);
-            var globalContainer =
-                new ContainerBuilder(new NoInvokeDependencyProvider()).CreateGlobalContainer(
-                    new DefaultRuntimeConfigurationProvider(configurationLoader));
-            var testRunnerManager = (TestRunnerManager)globalContainer.Resolve<ITestRunnerManager>();
-            testRunnerManager.Initialize(testAssembly);
-            testRunnerManager.CreateTestRunner(0);
+            // We need to call the CreateGlobalContainer through reflection because the interface has been changed in V3.0.220.
 
-            return globalContainer.Resolve<IBindingRegistry>();
-        }
-
-        protected override IEnumerable<IStepDefinitionBinding> GetStepDefinitions(IBindingRegistry bindingRegistry)
-        {
-            return bindingRegistry.GetStepDefinitions();
+            var containerBuilder = new ContainerBuilder(new NoInvokeDependencyProvider());
+            var configurationProvider = new DefaultRuntimeConfigurationProvider(configurationLoader);
+            
+            //var globalContainer = containerBuilder.CreateGlobalContainer(
+            //        new DefaultRuntimeConfigurationProvider(configurationLoader));
+            var globalContainer = containerBuilder.ReflectionCallMethod<object>(nameof(ContainerBuilder.CreateGlobalContainer), configurationProvider);
+            return (IObjectContainer)globalContainer;
         }
     }
 }

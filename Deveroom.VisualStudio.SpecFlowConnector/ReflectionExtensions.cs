@@ -79,5 +79,21 @@ namespace Deveroom.VisualStudio.SpecFlowConnector
                 throw new ArgumentException($"Cannot find constructor on type {type.FullName}");
             return (T)constructorInfo.Invoke(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.CreateInstance, null, args, null);
         }
+
+        //BoDi
+
+        public static T Resolve<T>(object container)
+        {
+            return container.ReflectionCallMethod<T>(nameof(BoDi.IObjectContainer.Resolve),
+                new[] { typeof(Type), typeof(string) },
+                typeof(T), null);
+        }
+
+        public static void RegisterTypeAs<TType, TInterface>(object container) where TType : class, TInterface
+        {
+            container.ReflectionCallMethod(nameof(BoDi.IObjectContainer.RegisterTypeAs),
+                new[] { typeof(Type), typeof(Type) },
+                typeof(TType), typeof(TInterface));
+        }
     }
 }

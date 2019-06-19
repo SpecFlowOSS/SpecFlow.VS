@@ -11,9 +11,9 @@ namespace Deveroom.VisualStudio.SpecFlow30NetCoreConnector.Tests
 {
     public class SpecFlowV3000DiscovererNetCoreTests
     {
-        private SpecFlowV3000P220Discoverer CreateSut()
+        private SpecFlowV3000Discoverer CreateSut()
         {
-            var stubDiscoverer = new SpecFlowV3000P220Discoverer();
+            var stubDiscoverer = new SpecFlowV3000Discoverer();
             return stubDiscoverer;
         }
 
@@ -22,7 +22,7 @@ namespace Deveroom.VisualStudio.SpecFlow30NetCoreConnector.Tests
             return Assembly.GetExecutingAssembly().Location;
         }
 
-        private DiscoveryResult PerformDiscover(SpecFlowV3000P220Discoverer sut)
+        private DiscoveryResult PerformDiscover(SpecFlowV3000Discoverer sut)
         {
             var testAssemblyPath = GetTestAssemblyPath();
             var testAssembly = Assembly.LoadFrom(testAssemblyPath);

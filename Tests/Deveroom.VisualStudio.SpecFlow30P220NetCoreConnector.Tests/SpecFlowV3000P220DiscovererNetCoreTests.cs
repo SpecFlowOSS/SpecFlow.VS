@@ -7,13 +7,13 @@ using FluentAssertions;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Deveroom.VisualStudio.SpecFlow30NetCoreConnector.Tests
+namespace Deveroom.VisualStudio.SpecFlow30P220NetCoreConnector.Tests
 {
-    public class SpecFlowV3000DiscovererNetCoreTests
+    public class SpecFlowV3000P220DiscovererNetCoreTests
     {
-        private SpecFlowV3000Discoverer CreateSut()
+        private SpecFlowV3000P220Discoverer CreateSut()
         {
-            var stubDiscoverer = new SpecFlowV3000Discoverer();
+            var stubDiscoverer = new SpecFlowV3000P220Discoverer();
             return stubDiscoverer;
         }
 
@@ -22,7 +22,7 @@ namespace Deveroom.VisualStudio.SpecFlow30NetCoreConnector.Tests
             return Assembly.GetExecutingAssembly().Location;
         }
 
-        private DiscoveryResult PerformDiscover(SpecFlowV3000Discoverer sut)
+        private DiscoveryResult PerformDiscover(SpecFlowV3000P220Discoverer sut)
         {
             var testAssemblyPath = GetTestAssemblyPath();
             var testAssembly = Assembly.LoadFrom(testAssemblyPath);
