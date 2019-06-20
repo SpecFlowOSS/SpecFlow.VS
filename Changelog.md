@@ -1,4 +1,6 @@
-# vNext
+# v1.3.0 - 2019-06-20
+
+This is the first open-source release from GitHub: https://github.com/specsolutions/deveroom-visualstudio
 
 New features:
 
