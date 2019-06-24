@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using Deveroom.VisualStudio.Common;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V3000;
+using McMaster.NETCore.Plugins;
 
 namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
 {
@@ -17,7 +17,7 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
 
         public string Process()
         {
-            var loadContext = LoadContextHelper.CreateLoadContext(_options.AssemblyFilePath);
+            var loadContext = PluginLoader.CreateFromAssemblyFile(_options.AssemblyFilePath, PluginLoaderOptions.IncludeCompileLibraries);
             var targetFolder = Path.GetDirectoryName(_options.AssemblyFilePath);
             if (targetFolder == null)
                 return null;
@@ -28,7 +28,7 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
             using (var discoverer = new ReflectionSpecFlowDiscoverer(loadContext, 
                 typeof(VersionSelectorDiscoverer)))
             {
-                var testAssembly = loadContext.LoadFromAssemblyPath(_options.AssemblyFilePath);
+                var testAssembly = loadContext.LoadDefaultAssembly();
                 return discoverer.Discover(testAssembly, _options.AssemblyFilePath, _options.ConfigFilePath);
             }
         }

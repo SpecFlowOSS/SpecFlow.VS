@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="dnlib" Version="3.2.0" />
-    <PackageReference Include="McMaster.NETCore.Plugins" Version="0.2.4" />
+    <PackageReference Include="DeveroomFix.McMaster.NETCore.Plugins" Version="0.2.4-hotfix1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="SpecFlow" Version="3.0.220" />

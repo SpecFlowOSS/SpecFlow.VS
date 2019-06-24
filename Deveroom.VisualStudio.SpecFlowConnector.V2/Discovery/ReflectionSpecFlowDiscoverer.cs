@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using System.Runtime.Loader;
+using McMaster.NETCore.Plugins;
 
 namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
 {
@@ -8,16 +8,11 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
     {
         private readonly object _discovererObj;
 
-        public ReflectionSpecFlowDiscoverer(AssemblyLoadContext loadContext, Type discovererType)
+        public ReflectionSpecFlowDiscoverer(PluginLoader pluginLoader, Type discovererType)
         {
-            var discovererAssembly = loadContext.LoadFromAssemblyPath(discovererType.Assembly.Location);
+            var discovererAssembly = pluginLoader.LoadAssemblyFromPath(discovererType.Assembly.Location);
             var discovererRemoteType = discovererAssembly.GetType(discovererType.FullName);
             _discovererObj = Activator.CreateInstance(discovererRemoteType);
-        }
-
-        public ReflectionSpecFlowDiscoverer(object discovererObj)
-        {
-            _discovererObj = discovererObj;
         }
 
         public string Discover(Assembly testAssembly, string testAssemblyPath, string configFilePath)

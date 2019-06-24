@@ -16,10 +16,16 @@ variables:
 steps:
 - task: NuGetToolInstaller@0
 
+- powershell: >-
+    (gc 'NuGet.config') -replace 'LocalNuGetFeed', '..\s\LocalNuGetFeed' | Out-File -Encoding UTF8 'NuGet.config'
+  displayName: 'Fix NuGet.config'
+
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet restore'
+  displayName: 'dotnet restore (with NuGet.config)'
   inputs:
     command: restore
+    feedsToUse: config
+    nugetConfigPath: NuGet.config
 
 - task: VSBuild@1
   displayName: 'Build Solution'
@@ -59,6 +65,13 @@ steps:
 
 - task: CopyFiles@2
   inputs:
+    SourceFolder: 'd:\a\1\Nuget'
+    Contents: '**'
+    TargetFolder: '$(build.artifactstagingdirectory)\drop\NuGet'
+  condition: succeededOrFailed()
+
+- task: CopyFiles@2
+  inputs:
     SourceFolder: '$(system.defaultworkingdirectory)'
     Contents: '**\bin\$(buildConfiguration)\**\*.vsix'
     TargetFolder: '$(build.artifactstagingdirectory)\vsix'
@@ -70,7 +83,7 @@ steps:
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)\drop'
   condition: succeededOrFailed()
-
+ 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: vsix'
   inputs:
