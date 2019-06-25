@@ -474,6 +474,14 @@ namespace Deveroom.VisualStudio.VsxStubs
             return new Tuple<int, int>(line.LineNumber, pos.Position - line.Start.Position);
         }
 
+        public void SimulateTypeText(DeveroomEditorTypeCharCommandBase command, string text)
+        {
+            foreach (var ch in text)
+            {
+                SimulateType(command, ch);
+            }
+        }
+
         public void SimulateType(DeveroomEditorTypeCharCommandBase command, char c)
         {
             var caretPosition = Caret.Position.BufferPosition.Position;

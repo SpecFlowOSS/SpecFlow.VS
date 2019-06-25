@@ -33,7 +33,7 @@ namespace Deveroom.VisualStudio.Editor.Completions.Infrastructure
             if (applicableTo == null)
                 return;
 
-            completionSets.Add(new ContainsFilteredCompletionSet(
+            completionSets.Add(new WordContainsFilteredCompletionSet(
                 _name,
                 _name,
                 applicableTo,

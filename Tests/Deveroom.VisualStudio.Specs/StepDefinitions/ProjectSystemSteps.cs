@@ -265,6 +265,7 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
                     break;
                 }
                 case "Complete":
+                case "Filter Completion":
                 {
                     EnsureStubCompletionBroker();
                     var command = new CompleteCommand(_ideScope,
@@ -273,7 +274,7 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
                     if (parameter == null)
                         command.PreExec(_wpfTextView, commandTargetKey ?? command.Targets.First());
                     else
-                        _wpfTextView.SimulateType(command, parameter[0]);
+                        _wpfTextView.SimulateTypeText(command, parameter);
                     break;
                 }
                 default:
@@ -530,6 +531,7 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
         }
 
         [Then(@"a completion list should pop up with the following items")]
+        [Then(@"a completion list should list the following items")]
         public void ThenACompletionListShouldPopUpWithTheFollowingItems(Table expectedItemsTable)
         {
             CheckCompletions(expectedItemsTable);
