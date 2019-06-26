@@ -149,3 +149,16 @@ Scenario: Completion list is shown when the first letter is typed in a line
 		| Scenario Outline:  |
 		| Scenario Template: |
 
+Scenario: A short description is shown for each keyword
+	Given there is a SpecFlow project scope
+	And the following feature file in the editor
+		"""
+		Feature: Addition
+		Scenario: Add two numbers
+		  {caret}
+		"""
+	And the "Complete" command is being invoked
+	When I invoke the "Filter Completion" command by typing "Giv"
+	Then a completion list should pop up with the following keyword items
+		| item  | description                             |
+		| Given | Describes the context for the behaviour |

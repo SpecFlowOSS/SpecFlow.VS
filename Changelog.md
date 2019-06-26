@@ -1,5 +1,9 @@
 # vNext
 
+New features:
+
+* Provide documentation in autocompletion of keywords (Issue #3)
+
 Improvements:
 
 * Step completion should use word containment for filtering the list (Issue #28)

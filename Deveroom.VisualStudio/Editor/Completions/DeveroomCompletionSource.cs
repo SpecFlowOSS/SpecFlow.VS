@@ -116,45 +116,59 @@ namespace Deveroom.VisualStudio.Editor.Completions
                 switch (expectedToken)
                 {
                     case TokenType.FeatureLine:
-                        AddCompletions(completions, dialect.FeatureKeywords, ": ");
+                        AddCompletions(completions, dialect.FeatureKeywords, ": ", "Introduces the feature being described");
                         break;
                     //TODO: add this for Rule support
                     //case TokenType.RuleLine:
-                    //    AddCompletions(completions, dialect.RuleKeywords, ": ");
+                    //    AddCompletions(completions, dialect.RuleKeywords, ": ", "Describes a business rule illustrated by the subsequent scenarios");
                     //    break;
                     case TokenType.BackgroundLine:
-                        AddCompletions(completions, dialect.BackgroundKeywords, ": ");
+                        AddCompletions(completions, dialect.BackgroundKeywords, ": ", "Describes context common to all scenarios in this feature file");
                         break;
                     case TokenType.ScenarioLine:
-                        AddCompletions(completions, dialect.ScenarioKeywords, ": ");
-                        AddCompletions(completions, dialect.ScenarioOutlineKeywords, ": ");
+                        AddCompletions(completions, dialect.ScenarioKeywords, ": ", "Illustrates a single system behaviour");
+                        AddCompletions(completions, dialect.ScenarioOutlineKeywords, ": ", "A template for generating several, similar scenarios");
                         break;
                     case TokenType.ExamplesLine:
-                        AddCompletions(completions, dialect.ExamplesKeywords, ": ");
+                        AddCompletions(completions, dialect.ExamplesKeywords, ": ", "A table of data used in conjunction with a scenario outline");
                         break;
                     case TokenType.StepLine:
-                        AddCompletions(completions, dialect.StepKeywords);
+                        AddCompletions(completions, RemoveBulletKeyword(dialect.GivenStepKeywords), description: "Describes the context for the behaviour");
+                        AddCompletions(completions, RemoveBulletKeyword(dialect.WhenStepKeywords), description: "Describes the action that initiates the behaviour");
+                        AddCompletions(completions, RemoveBulletKeyword(dialect.ThenStepKeywords), description: "Describes the expected outcome");
+                        AddCompletions(completions, dialect.AndStepKeywords, description: "Used to combine steps in a readable format");
+                        AddCompletions(completions, RemoveBulletKeyword(dialect.ButStepKeywords), description: "Used to combine steps in a readable format");
                         break;
                     case TokenType.DocStringSeparator:
-                        completions.Add(new Completion("\"\"\""));
-                        completions.Add(new Completion("```"));
+                        AddCompletions(completions, new[] { "\"\"\"", "```" }, description: "Doc-string separator: Provides multi-line text parameter for the step");
                         break;
                     case TokenType.TableRow:
-                        completions.Add(new Completion("| "));
+                        AddCompletions(completions, new[] { "| " }, description: "Data table and examples table cell separator");
                         break;
                     case TokenType.Language:
-                        completions.Add(new Completion("#language: "));
+                        AddCompletions(completions, new[] { "#language: " }, description: "Specifies the language of the feature file");
                         break;
                     case TokenType.TagLine:
-                        completions.Add(new Completion("@tag1 "));
+                        AddCompletions(completions, new []{ "@tag1 " }, description: "Labels a scenario, a feature or an examples block");
                         break;
                 }
             }
         }
 
-        private void AddCompletions(List<Completion> completions, string[] keywords, string postfix = "")
+        private IEnumerable<string> RemoveBulletKeyword(string[] keywords)
         {
-            completions.AddRange(keywords.Select(keyword => new Completion(keyword + postfix)));
+            return keywords.Where(k => !k.StartsWith("*"));
+        }
+
+        private void AddCompletions(List<Completion> completions, IEnumerable<string> keywords, string postfix = "", string description = null)
+        {
+            completions.AddRange(keywords.Select(keyword =>
+            {
+                var completion = new Completion(keyword + postfix);
+                if (description != null)
+                    completion.Description = description;
+                return completion;
+            }));
         }
 
         private GherkinDialect GetDefaultDialect()

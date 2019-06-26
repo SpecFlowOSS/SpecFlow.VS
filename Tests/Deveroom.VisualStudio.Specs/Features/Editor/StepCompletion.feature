@@ -98,8 +98,8 @@ Scenario Outline: Filters completion list
 		  Given {caret}
 		"""
 	And the initial binding discovery is performed
-	When I invoke the "Complete" command
-	And I invoke the "Filter Completion" command by typing "<filter text>"
+	And the "Complete" command is being invoked
+	When I invoke the "Filter Completion" command by typing "<filter text>"
 	Then a completion list should list the following items
 		| item            |
 		| <matching item> |

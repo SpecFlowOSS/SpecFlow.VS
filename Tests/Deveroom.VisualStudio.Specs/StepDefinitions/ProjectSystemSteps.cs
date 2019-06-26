@@ -210,6 +210,7 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
             PerformCommand(commandName, typedText);
         }
 
+        [Given(@"the command ""(.*)"" has been invoked")]
         [When(@"I invoke the ""(.*)"" command")]
         public void WhenIInvokeTheCommand(string commandName)
         {
@@ -549,15 +550,14 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
             CheckCompletions(expectedItemsTable, t => t.All(c => !char.IsLetter(c)));
         }
 
-
         private void CheckCompletions(Table expectedItemsTable, Func<string, bool> filter = null)
         {
             _completionBroker.Should().NotBeNull();
-            var actualCompletionTexts = _completionBroker.Completions.Select(c => c.InsertionText.Trim())
-                .Where(filter ?? (_ => true)).ToArray();
-            var expectedCompletionTexts = expectedItemsTable.Rows.Select(r => r.Values.First());
+            var actualCompletions = _completionBroker.Completions
+                .Where(c => filter?.Invoke(c.InsertionText) ?? true)
+                .Select(c => new {Item = c.InsertionText.Trim(), c.Description});
 
-            actualCompletionTexts.Should().BeEquivalentTo(expectedCompletionTexts);
+            expectedItemsTable.CompareToSet(actualCompletions, false);
         }
     }
 }
