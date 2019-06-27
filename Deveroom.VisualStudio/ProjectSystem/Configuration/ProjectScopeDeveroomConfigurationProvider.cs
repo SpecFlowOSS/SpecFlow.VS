@@ -83,18 +83,22 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
 
         private IEnumerable<ConfigSource> GetConfigSources()
         {
-            var jsonSource = GetSpecFlowConfigFilePath(SpecFlowJsonConfigFileName);
+            var jsonSource = GetProjectConfigFilePath(SpecFlowJsonConfigFileName);
             if (jsonSource != null)
                 yield return jsonSource;
             else
             {
-                var appConfigSource = GetSpecFlowConfigFilePath(SpecFlowAppConfigFileName);
+                var appConfigSource = GetProjectConfigFilePath(SpecFlowAppConfigFileName);
                 if (appConfigSource != null)
                     yield return appConfigSource;
             }
+
+            var deveroomConfigSource = GetProjectConfigFilePath(DeveroomConfigurationLoader.DefaultConfigFileName);
+            if (deveroomConfigSource != null)
+                yield return deveroomConfigSource;
         }
 
-        private ConfigSource GetSpecFlowConfigFilePath(string fileName)
+        private ConfigSource GetProjectConfigFilePath(string fileName)
         {
             try
             {
@@ -122,17 +126,20 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
                 try
                 {
                     var fileName = Path.GetFileName(configSource.FilePath);
-                    if ("App.config".Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    if (SpecFlowAppConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
                     {
                         LoadFromSpecFlowXmlConfig(configSource.FilePath, configuration);
                     }
 
-                    if ("specflow.json".Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    if (SpecFlowJsonConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
                     {
                         LoadFromSpecFlowJsonConfig(configSource.FilePath, configuration);
                     }
 
-                    //TODO: load deveroom config
+                    if (DeveroomConfigurationLoader.DefaultConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        LoadFromDeveroomConfig(configSource.FilePath, configuration);
+                    }
 
                     loadedSources.Add(configSource);
                 }
@@ -146,6 +153,13 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
                 configuration.ConfigurationChangeTime = loadedSources.Max(cs => cs.LastChangeTime);
 
             return new ConfigCache(configuration, loadedSources.ToArray());
+        }
+
+        private void LoadFromDeveroomConfig(string configSourceFilePath, DeveroomConfiguration configuration)
+        {
+            Logger.LogVerbose($"Loading Deveroom config from '{configSourceFilePath}'");
+            var loader = new DeveroomConfigurationLoader();
+            loader.Update(configSourceFilePath, configuration);
         }
 
         private string XPathEvaluateAttribute(XDocument doc, string xpath)

@@ -6,6 +6,8 @@ namespace Deveroom.VisualStudio.Configuration
     {
         public DateTime ConfigurationChangeTime { get; set; } = DateTime.MinValue;
 
+        public string ConfigurationBaseFolder { get; set; }
+
         public ProcessorArchitectureSetting ProcessorArchitecture { get; set; } = ProcessorArchitectureSetting.UseSystem;
         public bool DebugConnector { get; set; } = false;
         public string DefaultFeatureLanguage { get; set; } = "en-US";
