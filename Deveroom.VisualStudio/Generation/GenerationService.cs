@@ -29,10 +29,10 @@ namespace Deveroom.VisualStudio.Generation
         {
             try
             {
-                if (projectSettings.SpecFlowPackage.InstallPath == null)
+                var specFlowToolsFolder = projectSettings.SpecFlowGeneratorFolder;
+                if (specFlowToolsFolder == null)
                     throw new InvalidOperationException("Unable to generate feature-file code behind, the SpecFlow NuGet package folder could not be detected.");
 
-                var specFlowToolsFolder = Path.Combine(projectSettings.SpecFlowPackage.InstallPath, "tools");
                 if (!_projectScope.IdeScope.FileSystem.Directory.Exists(specFlowToolsFolder))
                     _projectScope.IdeScope.Actions.ShowProblem($"Unable to find SpecFlow tools folder: '{specFlowToolsFolder}'. Build solution to ensure that all packages are restored. The feature file has to be re-generated (e.g. by saving) after the packages have been restored.");
                 return specFlowToolsFolder;

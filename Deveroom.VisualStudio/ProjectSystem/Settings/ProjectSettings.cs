@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace Deveroom.VisualStudio.ProjectSystem.Settings
 {
@@ -31,9 +32,16 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
         public bool DesignTimeFeatureFileGenerationEnabled => SpecFlowProjectTraits.HasFlag(SpecFlowProjectTraits.DesignTimeFeatureFileGeneration);
         public bool HasDesignTimeGenerationReplacement => SpecFlowProjectTraits.HasFlag(SpecFlowProjectTraits.MsBuildGeneration) || SpecFlowProjectTraits.HasFlag(SpecFlowProjectTraits.XUnitAdapter);
 
+        public string SpecFlowGeneratorFolder =>
+            SpecFlowPackage?.InstallPath == null
+                ? null
+                : Path.Combine(SpecFlowPackage.InstallPath, "tools");
+
+        public NuGetVersion SpecFlowVersion => SpecFlowPackage?.Version;
+
         public string GetSpecFlowVersionLabel()
         {
-            return SpecFlowPackage?.Version?.ToString() ?? "n/a";
+            return SpecFlowVersion?.ToString() ?? "n/a";
         }
 
         public string GetShortLabel()
