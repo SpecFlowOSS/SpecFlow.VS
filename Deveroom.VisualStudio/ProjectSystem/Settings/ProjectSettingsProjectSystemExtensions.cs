@@ -10,7 +10,7 @@
 
         public static ProjectSettingsProvider GetProjectSettingsProvider(this IProjectScope projectScope)
         {
-            return projectScope.Properties.GetOrCreateSingletonProperty(() => new ProjectSettingsProvider(projectScope));
+            return projectScope.Properties.GetOrCreateSingletonProperty(() => new ProjectSettingsProvider(projectScope, new SpecFlowProjectSettingsProvider(projectScope)));
         }
     }
 }

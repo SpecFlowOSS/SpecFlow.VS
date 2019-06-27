@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
@@ -14,6 +12,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
     public class ProjectSettingsProvider : IDisposable
     {
         private readonly IProjectScope _projectScope;
+        private readonly SpecFlowProjectSettingsProvider _specFlowProjectSettingsProvider;
         private ProjectSettings _projectSettings;
 
         public const int MAX_RETRY_COUNT = 5;
@@ -30,9 +29,10 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             remove => WeakEventManager<ProjectSettingsProvider, EventArgs>.RemoveHandler(this, nameof(SettingsInitialized), value);
         }
 
-        public ProjectSettingsProvider([NotNull] IProjectScope projectScope)
+        public ProjectSettingsProvider([NotNull] IProjectScope projectScope, [NotNull] SpecFlowProjectSettingsProvider specFlowProjectSettingsProvider)
         {
             _projectScope = projectScope ?? throw new ArgumentNullException(nameof(projectScope));
+            _specFlowProjectSettingsProvider = specFlowProjectSettingsProvider ?? throw new ArgumentNullException(nameof(specFlowProjectSettingsProvider));
             InitializeProjectSettings();
 
             _projectScope.GetDeveroomConfigurationProvider().WeakConfigurationChanged += OnConfigurationChanged;
@@ -134,7 +134,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             var packageReferences = _projectScope.PackageReferences;
             var isInvalid = packageReferences == null;
 
-            var specFlowSettings = GetSpecFlowSettings(packageReferences);
+            var specFlowSettings = _specFlowProjectSettingsProvider.GetSpecFlowSettings(packageReferences);
             var hasFeatureFiles = (featureFileCount ?? 0) > 0;
             var kind = GetKind(isInvalid, specFlowSettings != null, hasFeatureFiles);
 
@@ -166,58 +166,6 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             return hasFeatureFiles
                 ? DeveroomProjectKind.SpecFlowTestProject
                 : DeveroomProjectKind.SpecFlowLibProject;
-        }
-
-        private SpecFlowSettings GetSpecFlowSettings(IEnumerable<NuGetPackageReference> packageReferences)
-        {
-            var specFlowPackage = GetSpecFlowPackage(_projectScope, packageReferences, out var specFlowProjectTraits);
-            if (specFlowPackage == null)
-                return null;
-            var specFlowVersion = specFlowPackage.Version;
-            var specFlowGeneratorFolder = specFlowPackage.InstallPath == null
-                ? null
-                : Path.Combine(specFlowPackage.InstallPath, "tools");
-
-            return CreateSpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder);
-        }
-
-        private SpecFlowSettings CreateSpecFlowSettings(NuGetVersion specFlowVersion, SpecFlowProjectTraits specFlowProjectTraits, string specFlowGeneratorFolder)
-        {
-            var configFilePath = GetSpecFlowConfigFilePath(_projectScope);
-
-            if (specFlowVersion.Version < new Version(3, 0) &&
-                !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.MsBuildGeneration) &&
-                !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.XUnitAdapter))
-                specFlowProjectTraits |= SpecFlowProjectTraits.DesignTimeFeatureFileGeneration;
-
-            return new SpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder, configFilePath);
-        }
-
-        private NuGetPackageReference GetSpecFlowPackage(IProjectScope projectScope, IEnumerable<NuGetPackageReference> packageReferences, out SpecFlowProjectTraits specFlowProjectTraits)
-        {
-            specFlowProjectTraits = SpecFlowProjectTraits.None;
-            if (packageReferences == null)
-                return null;
-            var packageReferencesArray = packageReferences.ToArray();
-            var detector = new SpecFlowPackageDetector(projectScope.IdeScope.FileSystem);
-            var specFlowPackage = detector.GetSpecFlowPackage(packageReferencesArray);
-            if (specFlowPackage != null)
-            {
-                if (detector.IsMsBuildGenerationEnabled(packageReferencesArray))
-                    specFlowProjectTraits |= SpecFlowProjectTraits.MsBuildGeneration;
-                if (detector.IsXUnitAdapterEnabled(packageReferencesArray))
-                    specFlowProjectTraits |= SpecFlowProjectTraits.XUnitAdapter;
-            }
-
-            return specFlowPackage;
-        }
-
-        private string GetSpecFlowConfigFilePath(IProjectScope projectScope)
-        {
-            var projectFolder = projectScope.ProjectFolder;
-            var fileSystem = projectScope.IdeScope.FileSystem;
-            return fileSystem.GetFilePathIfExists(Path.Combine(projectFolder, ProjectScopeDeveroomConfigurationProvider.SpecFlowJsonConfigFileName)) ??
-                   fileSystem.GetFilePathIfExists(Path.Combine(projectFolder, ProjectScopeDeveroomConfigurationProvider.SpecFlowAppConfigFileName));
         }
 
         public void Dispose()
