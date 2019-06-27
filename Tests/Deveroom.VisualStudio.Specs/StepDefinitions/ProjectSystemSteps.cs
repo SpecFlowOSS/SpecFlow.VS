@@ -210,7 +210,7 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
             PerformCommand(commandName, typedText);
         }
 
-        [Given(@"the command ""(.*)"" has been invoked")]
+        [Given(@"the ""(.*)"" command has been invoked")]
         [When(@"I invoke the ""(.*)"" command")]
         public void WhenIInvokeTheCommand(string commandName)
         {
