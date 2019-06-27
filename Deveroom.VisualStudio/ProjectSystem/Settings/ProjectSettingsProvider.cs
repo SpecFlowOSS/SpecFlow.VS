@@ -134,33 +134,29 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             var packageReferences = _projectScope.PackageReferences;
             var isInvalid = packageReferences == null;
 
-            var specFlowPackage = GetSpecFlowPackage(_projectScope, packageReferences, out var specFlowProjectTraits);
-            var specFlowVersion = specFlowPackage?.Version;
-            var specFlowGeneratorFolder = specFlowPackage?.InstallPath == null
-                    ? null
-                    : Path.Combine(specFlowPackage.InstallPath, "tools");
+            var specFlowSettings = GetSpecFlowSettings(packageReferences);
             var hasFeatureFiles = (featureFileCount ?? 0) > 0;
-            var kind = GetKind(isInvalid, specFlowPackage, hasFeatureFiles);
+            var kind = GetKind(isInvalid, specFlowSettings != null, hasFeatureFiles);
 
             var settings = new ProjectSettings(
                 kind,
                 _projectScope.OutputAssemblyPath,
                 _projectScope.TargetFrameworkMoniker,
                 _projectScope.DefaultNamespace,
-                specFlowVersion, 
-                specFlowGeneratorFolder,
+                specFlowSettings?.Version, 
+                specFlowSettings?.SpecFlowGeneratorFolder,
                 GetSpecFlowConfigFilePath(_projectScope),
-                specFlowProjectTraits);
+                specFlowSettings?.Traits ?? SpecFlowProjectTraits.None);
 
             return settings;
         }
 
-        private DeveroomProjectKind GetKind(bool isInvalid, NuGetPackageReference specFlowPackage, bool hasFeatureFiles)
+        private DeveroomProjectKind GetKind(bool isInvalid, bool isSpecFlowProject, bool hasFeatureFiles)
         {
             if (isInvalid)
                 return DeveroomProjectKind.Uninitialized;
 
-            if (specFlowPackage == null)
+            if (!isSpecFlowProject)
             {
                 return hasFeatureFiles
                     ? DeveroomProjectKind.FeatureFileContainerProject
@@ -170,6 +166,29 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             return hasFeatureFiles
                 ? DeveroomProjectKind.SpecFlowTestProject
                 : DeveroomProjectKind.SpecFlowLibProject;
+        }
+
+        private SpecFlowSettings GetSpecFlowSettings(IEnumerable<NuGetPackageReference> packageReferences)
+        {
+            var specFlowPackage = GetSpecFlowPackage(_projectScope, packageReferences, out var specFlowProjectTraits);
+            if (specFlowPackage == null)
+                return null;
+            var specFlowVersion = specFlowPackage.Version;
+            var specFlowGeneratorFolder = specFlowPackage.InstallPath == null
+                ? null
+                : Path.Combine(specFlowPackage.InstallPath, "tools");
+
+            return CreateSpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder);
+        }
+
+        private SpecFlowSettings CreateSpecFlowSettings(NuGetVersion specFlowVersion, SpecFlowProjectTraits specFlowProjectTraits, string specFlowGeneratorFolder)
+        {
+            if (specFlowVersion.Version < new Version(3, 0) &&
+                !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.MsBuildGeneration) &&
+                !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.XUnitAdapter))
+                specFlowProjectTraits |= SpecFlowProjectTraits.DesignTimeFeatureFileGeneration;
+
+            return new SpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder);
         }
 
         private NuGetPackageReference GetSpecFlowPackage(IProjectScope projectScope, IEnumerable<NuGetPackageReference> packageReferences, out SpecFlowProjectTraits specFlowProjectTraits)
@@ -186,11 +205,6 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
                     specFlowProjectTraits |= SpecFlowProjectTraits.MsBuildGeneration;
                 if (detector.IsXUnitAdapterEnabled(packageReferencesArray))
                     specFlowProjectTraits |= SpecFlowProjectTraits.XUnitAdapter;
-
-                if (specFlowPackage.Version.Version < new Version(3, 0) &&
-                    !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.MsBuildGeneration) &&
-                    !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.XUnitAdapter))
-                    specFlowProjectTraits |= SpecFlowProjectTraits.DesignTimeFeatureFileGeneration;
             }
 
             return specFlowPackage;
