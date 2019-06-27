@@ -144,8 +144,8 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
                 _projectScope.TargetFrameworkMoniker,
                 _projectScope.DefaultNamespace,
                 specFlowSettings?.Version, 
-                specFlowSettings?.SpecFlowGeneratorFolder,
-                GetSpecFlowConfigFilePath(_projectScope),
+                specFlowSettings?.GeneratorFolder,
+                specFlowSettings?.ConfigFilePath,
                 specFlowSettings?.Traits ?? SpecFlowProjectTraits.None);
 
             return settings;
@@ -183,12 +183,14 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
 
         private SpecFlowSettings CreateSpecFlowSettings(NuGetVersion specFlowVersion, SpecFlowProjectTraits specFlowProjectTraits, string specFlowGeneratorFolder)
         {
+            var configFilePath = GetSpecFlowConfigFilePath(_projectScope);
+
             if (specFlowVersion.Version < new Version(3, 0) &&
                 !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.MsBuildGeneration) &&
                 !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.XUnitAdapter))
                 specFlowProjectTraits |= SpecFlowProjectTraits.DesignTimeFeatureFileGeneration;
 
-            return new SpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder);
+            return new SpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder, configFilePath);
         }
 
         private NuGetPackageReference GetSpecFlowPackage(IProjectScope projectScope, IEnumerable<NuGetPackageReference> packageReferences, out SpecFlowProjectTraits specFlowProjectTraits)

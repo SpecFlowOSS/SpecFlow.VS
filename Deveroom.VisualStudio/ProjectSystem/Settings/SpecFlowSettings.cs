@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Deveroom.VisualStudio.ProjectSystem.Settings
 {
@@ -10,13 +7,15 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
     {
         public NuGetVersion Version { get; }
         public SpecFlowProjectTraits Traits { get; }
-        public string SpecFlowGeneratorFolder { get; }
+        public string GeneratorFolder { get; }
+        public string ConfigFilePath { get; }
 
-        public SpecFlowSettings(NuGetVersion version, SpecFlowProjectTraits traits, string specFlowGeneratorFolder)
+        public SpecFlowSettings(NuGetVersion version, SpecFlowProjectTraits traits, string generatorFolder, string configFilePath)
         {
             Version = version;
             Traits = traits;
-            SpecFlowGeneratorFolder = specFlowGeneratorFolder;
+            GeneratorFolder = generatorFolder;
+            ConfigFilePath = configFilePath;
         }
     }
 }
