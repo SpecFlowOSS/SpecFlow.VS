@@ -53,7 +53,7 @@ namespace Deveroom.VisualStudio.Editor.Services.Parser
         private DeveroomGherkinDocument GetResultOfInvalid()
         {
             // trying to "finish" open nodes by sending dummy <endrule> messages up to 5 levels of nesting
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 10; i++)
             {
                 var result = GetResult();
                 if (result != null)

@@ -61,5 +61,23 @@ Scenario: Add two numbers
             gherkinDocument.Should().NotBeNull();
             result.Should().BeFalse();
         }
+
+        [Fact]
+        public void Should_provide_parse_result_when_file_ends_with_open_docstring()
+        {
+            var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
+                new Mock<IMonitoringService>().Object);
+
+            var result = sut.ParseAndCollectErrors(@"
+Feature: Addition
+Scenario: Add two numbers
+  Given I have added
+    ```
+",
+                new DeveroomNullLogger(), out var gherkinDocument, out var errors);
+            gherkinDocument.Should().NotBeNull();
+            result.Should().BeFalse();
+        }
+
     }
 }

@@ -8,6 +8,10 @@ Improvements:
 
 * Step completion should use word containment for filtering the list (Issue #28)
 
+Bug fixes:
+
+* Editor: No syntax coloring when the file ends with doc-string open (Issue #6)
+
 # v1.3.0 - 2019-06-20
 
 This is the first open-source release from GitHub: https://github.com/specsolutions/deveroom-visualstudio
