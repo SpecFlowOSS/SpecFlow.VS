@@ -135,6 +135,10 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             var isInvalid = packageReferences == null;
 
             var specFlowPackage = GetSpecFlowPackage(_projectScope, packageReferences, out var specFlowProjectTraits);
+            var specFlowVersion = specFlowPackage?.Version;
+            var specFlowGeneratorFolder = specFlowPackage?.InstallPath == null
+                    ? null
+                    : Path.Combine(specFlowPackage.InstallPath, "tools");
             var hasFeatureFiles = (featureFileCount ?? 0) > 0;
             var kind = GetKind(isInvalid, specFlowPackage, hasFeatureFiles);
 
@@ -143,7 +147,8 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
                 _projectScope.OutputAssemblyPath,
                 _projectScope.TargetFrameworkMoniker,
                 _projectScope.DefaultNamespace,
-                specFlowPackage,
+                specFlowVersion, 
+                specFlowGeneratorFolder,
                 GetSpecFlowConfigFilePath(_projectScope),
                 specFlowProjectTraits);
 

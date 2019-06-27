@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 namespace Deveroom.VisualStudio.ProjectSystem.Settings
 {
@@ -9,18 +8,20 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
         public string TargetFrameworkMoniker { get; }
         public string OutputAssemblyPath { get; }
         public string DefaultNamespace { get; }
-        public NuGetPackageReference SpecFlowPackage { get; }
+        public NuGetVersion SpecFlowVersion { get; }
+        public string SpecFlowGeneratorFolder { get; }
         public string SpecFlowConfigFilePath { get; }
         public SpecFlowProjectTraits SpecFlowProjectTraits { get; }
 
         public ProjectSettings(DeveroomProjectKind kind, string outputAssemblyPath, string targetFrameworkMoniker, string defaultNamespace,
-            NuGetPackageReference specFlowPackage, string specFlowConfigFilePath, SpecFlowProjectTraits specFlowProjectTraits)
+            NuGetVersion specFlowVersion, string specFlowGeneratorFolder, string specFlowConfigFilePath, SpecFlowProjectTraits specFlowProjectTraits)
         {
             Kind = kind;
             TargetFrameworkMoniker = targetFrameworkMoniker;
             OutputAssemblyPath = outputAssemblyPath;
             DefaultNamespace = defaultNamespace;
-            SpecFlowPackage = specFlowPackage;
+            SpecFlowVersion = specFlowVersion;
+            SpecFlowGeneratorFolder = specFlowGeneratorFolder;
             SpecFlowConfigFilePath = specFlowConfigFilePath;
             SpecFlowProjectTraits = specFlowProjectTraits;
         }
@@ -31,13 +32,6 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
         public bool IsSpecFlowProject => IsSpecFlowTestProject || IsSpecFlowLibProject;
         public bool DesignTimeFeatureFileGenerationEnabled => SpecFlowProjectTraits.HasFlag(SpecFlowProjectTraits.DesignTimeFeatureFileGeneration);
         public bool HasDesignTimeGenerationReplacement => SpecFlowProjectTraits.HasFlag(SpecFlowProjectTraits.MsBuildGeneration) || SpecFlowProjectTraits.HasFlag(SpecFlowProjectTraits.XUnitAdapter);
-
-        public string SpecFlowGeneratorFolder =>
-            SpecFlowPackage?.InstallPath == null
-                ? null
-                : Path.Combine(SpecFlowPackage.InstallPath, "tools");
-
-        public NuGetVersion SpecFlowVersion => SpecFlowPackage?.Version;
 
         public string GetSpecFlowVersionLabel()
         {
@@ -56,14 +50,14 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
 
         protected bool Equals(ProjectSettings other)
         {
-            return Kind == other.Kind && string.Equals(TargetFrameworkMoniker, other.TargetFrameworkMoniker) && string.Equals(OutputAssemblyPath, other.OutputAssemblyPath) && string.Equals(DefaultNamespace, other.DefaultNamespace) && Equals(SpecFlowPackage, other.SpecFlowPackage) && string.Equals(SpecFlowConfigFilePath, other.SpecFlowConfigFilePath) && SpecFlowProjectTraits == other.SpecFlowProjectTraits;
+            return Kind == other.Kind && string.Equals(TargetFrameworkMoniker, other.TargetFrameworkMoniker) && string.Equals(OutputAssemblyPath, other.OutputAssemblyPath) && string.Equals(DefaultNamespace, other.DefaultNamespace) && Equals(SpecFlowVersion, other.SpecFlowVersion) && string.Equals(SpecFlowGeneratorFolder, other.SpecFlowGeneratorFolder) && string.Equals(SpecFlowConfigFilePath, other.SpecFlowConfigFilePath) && SpecFlowProjectTraits == other.SpecFlowProjectTraits;
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((ProjectSettings) obj);
         }
 
@@ -75,7 +69,8 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
                 hashCode = (hashCode * 397) ^ (TargetFrameworkMoniker != null ? TargetFrameworkMoniker.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (OutputAssemblyPath != null ? OutputAssemblyPath.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (DefaultNamespace != null ? DefaultNamespace.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (SpecFlowPackage != null ? SpecFlowPackage.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (SpecFlowVersion != null ? SpecFlowVersion.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (SpecFlowGeneratorFolder != null ? SpecFlowGeneratorFolder.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (SpecFlowConfigFilePath != null ? SpecFlowConfigFilePath.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (int) SpecFlowProjectTraits;
                 return hashCode;
