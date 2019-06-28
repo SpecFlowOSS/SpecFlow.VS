@@ -3,7 +3,7 @@
     <TargetFramework>net461</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
-    <VsEditorAssembliesLocation Condition="'$(VsEditorAssembliesLocation)' == ''">$(DevEnvDir)</VsEditorAssembliesLocation>
+    <VsEditorAssembliesLocation Condition="'$(VsEditorAssembliesLocation)' == ''">..\ExternalTestDependencies\VS\</VsEditorAssembliesLocation>
   </PropertyGroup>
 
   <ItemGroup>
