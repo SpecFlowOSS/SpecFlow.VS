@@ -78,7 +78,8 @@ namespace Deveroom.VisualStudio.Configuration
 
             config.ConfigurationBaseFolder = configFolder;
 
-            //config....FilePath = EnsureFullPath(config, c => c.....FilePath);
+            config.SpecFlow.ConfigFilePath = EnsureFullPath(config, c => c.SpecFlow.ConfigFilePath);
+            config.SpecFlow.GeneratorFolder = EnsureFullPath(config, c => c.SpecFlow.GeneratorFolder, isFolder: true);
         }
 
         private string ExpandEnvironmentVariables(string value)

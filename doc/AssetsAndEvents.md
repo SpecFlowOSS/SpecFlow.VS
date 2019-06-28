@@ -111,7 +111,7 @@ The project settings is checked and loaded
 * After build (IdeScope.ProjectsBuilt)
 * In case when the first feature file of a project is opened in the editor. In this case 
   the DeveroomTagger manually refreshes the project settings (kind changes to 
-  SpecFlow Test Project from SpecFlow Lib Project), so that the users should need 
+  SpecFlow Test Project from SpecFlow Lib Project), so that the users should not need 
   to make a build. (The binding registry is also checked.)
 
 ### Handling Load Errors

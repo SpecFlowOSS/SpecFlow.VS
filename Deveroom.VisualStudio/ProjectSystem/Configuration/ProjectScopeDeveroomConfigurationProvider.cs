@@ -152,6 +152,16 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
             if (loadedSources.Any())
                 configuration.ConfigurationChangeTime = loadedSources.Max(cs => cs.LastChangeTime);
 
+            try
+            {
+                configuration.CheckConfiguration();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogVerboseException(MonitoringService, ex, "Configuration error, using default config");
+                configuration = new DeveroomConfiguration();
+            }
+
             return new ConfigCache(configuration, loadedSources.ToArray());
         }
 

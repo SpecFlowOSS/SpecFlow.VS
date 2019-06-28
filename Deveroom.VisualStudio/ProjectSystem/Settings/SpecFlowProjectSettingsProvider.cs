@@ -25,7 +25,22 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
 
         private SpecFlowSettings GetSpecFlowSettingsFromConfig()
         {
-            return null; //TODO
+            var configuration = _projectScope.GetDeveroomConfiguration();
+            if (!configuration.SpecFlow.IsSpecFlowProject)
+                return null;
+
+            var traits = SpecFlowProjectTraits.None;
+            foreach (var specFlowTrait in configuration.SpecFlow.Traits)
+            {
+                traits |= specFlowTrait;
+            }
+
+            //TODO: handle partial config
+            return new SpecFlowSettings(
+                new NuGetVersion(configuration.SpecFlow.Version), 
+                traits,
+                configuration.SpecFlow.GeneratorFolder,
+                configuration.SpecFlow.ConfigFilePath);
         }
 
         private SpecFlowSettings GetSpecFlowSettingsFromPackages(IEnumerable<NuGetPackageReference> packageReferences)
