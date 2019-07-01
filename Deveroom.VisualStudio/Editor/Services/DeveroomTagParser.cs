@@ -233,7 +233,8 @@ namespace Deveroom.VisualStudio.Editor.Services
                 {
                     blockTag.AddChild(
                         new DeveroomTag(DeveroomTagTypes.Tag,
-                            GetTextSpan(fileSnapshot, gherkinTag.Location, gherkinTag.Name)));
+                            GetTextSpan(fileSnapshot, gherkinTag.Location, gherkinTag.Name), 
+                            gherkinTag));
                 }
             }
 
