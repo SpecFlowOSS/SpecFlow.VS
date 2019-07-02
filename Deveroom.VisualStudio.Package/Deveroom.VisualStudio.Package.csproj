@@ -81,6 +81,7 @@
     <AdditionalDeveroomDependencies Include="Utf8Json.dll" />
     <AdditionalDeveroomDependencies Include="System.Threading.Tasks.Extensions.dll" />
     <AdditionalDeveroomDependencies Include="System.IO.Abstractions.dll" />
+    <AdditionalDeveroomDependencies Include="Equ.dll" />
   </ItemGroup>
 
   <Import Project="..\Deveroom.VisualStudio.SpecFlowConnector.V1\DeploymentAssets.props" />
