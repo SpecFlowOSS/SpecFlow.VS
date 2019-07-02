@@ -145,6 +145,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
                 }
                 catch (Exception ex)
                 {
+                    Logger.LogWarning($"Unable to load configuration from '{configSource.FilePath}': {ex.Message}");
                     Logger.LogVerboseException(MonitoringService, ex, "Unable to load configuration");
                 }
             }
