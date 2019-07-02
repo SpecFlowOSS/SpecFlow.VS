@@ -12,6 +12,7 @@ Improvements:
 Bug fixes:
 
 * Editor: No syntax coloring when the file ends with doc-string open (Issue #6)
+* Default language is not detected for SpecFlow v3 from specflow.json config file
 
 # v1.3.0 - 2019-06-20
 

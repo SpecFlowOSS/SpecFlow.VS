@@ -194,10 +194,20 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
         {
             var fileContent = FileSystem.File.ReadAllText(configSourceFilePath);
             var configDoc = JObject.Parse(fileContent);
-            var featureLang = (string)configDoc["specFlow"]?["language"]?["feature"];
+
+            var v2ConfigRoot = configDoc["specFlow"];
+            if (v2ConfigRoot != null)
+                UpdateFromJsonConfigRoot(v2ConfigRoot, configuration);
+
+            UpdateFromJsonConfigRoot(configDoc, configuration);
+        }
+
+        private static void UpdateFromJsonConfigRoot(JToken jsonConfigRoot, DeveroomConfiguration configuration)
+        {
+            var featureLang = (string) jsonConfigRoot["language"]?["feature"];
             if (featureLang != null)
                 configuration.DefaultFeatureLanguage = featureLang;
-            var bindingCulture = (string)configDoc["specFlow"]?["bindingCulture"]?["name"];
+            var bindingCulture = (string) jsonConfigRoot["bindingCulture"]?["name"];
             if (bindingCulture != null)
                 configuration.ConfiguredBindingCulture = bindingCulture;
         }
