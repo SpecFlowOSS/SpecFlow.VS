@@ -7,7 +7,7 @@ namespace Deveroom.VisualStudio.Configuration
 {
     public class SpecFlowConfiguration: MemberwiseEquatable<SpecFlowConfiguration>
     {
-        public bool IsSpecFlowProject { get; set; }
+        public bool? IsSpecFlowProject { get; set; }
 
         public string Version { get; set; }
         public string GeneratorFolder { get; set; }

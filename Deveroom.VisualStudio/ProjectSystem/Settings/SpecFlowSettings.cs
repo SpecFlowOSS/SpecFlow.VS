@@ -5,10 +5,15 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
 {
     public class SpecFlowSettings
     {
-        public NuGetVersion Version { get; }
-        public SpecFlowProjectTraits Traits { get; }
-        public string GeneratorFolder { get; }
-        public string ConfigFilePath { get; }
+        public NuGetVersion Version { get; set; }
+        public SpecFlowProjectTraits Traits { get; set; }
+        public string GeneratorFolder { get; set; }
+        public string ConfigFilePath { get; set; }
+
+        public SpecFlowSettings()
+        {
+            Traits = SpecFlowProjectTraits.None;
+        }
 
         public SpecFlowSettings(NuGetVersion version, SpecFlowProjectTraits traits, string generatorFolder, string configFilePath)
         {

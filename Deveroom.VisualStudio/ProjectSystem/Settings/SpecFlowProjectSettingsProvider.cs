@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Deveroom.VisualStudio.Annotations;
@@ -18,29 +19,38 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
 
         public SpecFlowSettings GetSpecFlowSettings(IEnumerable<NuGetPackageReference> packageReferences)
         {
-            return
-                GetSpecFlowSettingsFromConfig() ??
-                GetSpecFlowSettingsFromPackages(packageReferences);
+            var specFlowSettings =
+                GetSpecFlowSettingsFromPackages(packageReferences) ??
+                GetSpecFlowSettingsFromOutputFolder();
+
+            return UpdateSpecFlowSettingsFromConfig(specFlowSettings);
         }
 
-        private SpecFlowSettings GetSpecFlowSettingsFromConfig()
+        private SpecFlowSettings UpdateSpecFlowSettingsFromConfig(SpecFlowSettings specFlowSettings)
         {
             var configuration = _projectScope.GetDeveroomConfiguration();
-            if (!configuration.SpecFlow.IsSpecFlowProject)
+            if (configuration.SpecFlow.IsSpecFlowProject == null)
+                return specFlowSettings;
+
+            if (!configuration.SpecFlow.IsSpecFlowProject.Value)
                 return null;
 
-            var traits = SpecFlowProjectTraits.None;
-            foreach (var specFlowTrait in configuration.SpecFlow.Traits)
-            {
-                traits |= specFlowTrait;
-            }
+            specFlowSettings = specFlowSettings ?? new SpecFlowSettings();
 
-            //TODO: handle partial config
-            return new SpecFlowSettings(
-                new NuGetVersion(configuration.SpecFlow.Version), 
-                traits,
-                configuration.SpecFlow.GeneratorFolder,
-                configuration.SpecFlow.ConfigFilePath);
+            if (configuration.SpecFlow.Traits.Length > 0)
+                foreach (var specFlowTrait in configuration.SpecFlow.Traits)
+                    specFlowSettings.Traits |= specFlowTrait;
+
+            if (configuration.SpecFlow.Version != null)
+                specFlowSettings.Version = new NuGetVersion(configuration.SpecFlow.Version);
+
+            if (configuration.SpecFlow.GeneratorFolder != null)
+                specFlowSettings.GeneratorFolder = configuration.SpecFlow.GeneratorFolder;
+
+            if (configuration.SpecFlow.ConfigFilePath != null)
+                specFlowSettings.ConfigFilePath = configuration.SpecFlow.ConfigFilePath;
+
+            return specFlowSettings;
         }
 
         private SpecFlowSettings GetSpecFlowSettingsFromPackages(IEnumerable<NuGetPackageReference> packageReferences)
@@ -54,6 +64,31 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
                 : Path.Combine(specFlowPackage.InstallPath, "tools");
 
             return CreateSpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder);
+        }
+
+        private SpecFlowSettings GetSpecFlowSettingsFromOutputFolder()
+        {
+            var outputAssemblyPath = _projectScope.OutputAssemblyPath;
+            if (outputAssemblyPath == null)
+                return null;
+            var outputFolder = Path.GetDirectoryName(_projectScope.OutputAssemblyPath);
+            if (outputFolder == null)
+                return null;
+
+            var specFlowVersion = GetSpecFlowVersion(outputFolder);
+            if (specFlowVersion == null)
+                return null;
+
+            var specFlowNuGetVersion = new NuGetVersion($"{specFlowVersion.FileMajorPart}.{specFlowVersion.FileMinorPart}.{specFlowVersion.FileBuildPart}");
+
+            return CreateSpecFlowSettings(specFlowNuGetVersion, SpecFlowProjectTraits.None, null);
+        }
+
+        private FileVersionInfo GetSpecFlowVersion(string outputFolder)
+        {
+            var specFlowAssemblyPath = Path.Combine(outputFolder, "TechTalk.SpecFlow.dll");
+            var fileVersionInfo = File.Exists(specFlowAssemblyPath) ? FileVersionInfo.GetVersionInfo(specFlowAssemblyPath) : null;
+            return fileVersionInfo;
         }
 
         private SpecFlowSettings CreateSpecFlowSettings(NuGetVersion specFlowVersion, SpecFlowProjectTraits specFlowProjectTraits, string specFlowGeneratorFolder)
