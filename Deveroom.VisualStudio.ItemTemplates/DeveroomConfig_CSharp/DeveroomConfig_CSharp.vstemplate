@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <DefaultName>deveroom.json</DefaultName>
+    <Name>Deveroom configuration file</Name>
+    <Description>A json file containing Deveroom configuration settings. Place it in the project or solution root.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <Icon>Deveroom-Icon.ico</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem>deveroom.json</ProjectItem>
+  </TemplateContent>
+</VSTemplate>

@@ -16,6 +16,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <VSTemplate Include="DeveroomConfig_CSharp\DeveroomConfig_CSharp.vstemplate">
+      <OutputSubPath>Deveroom</OutputSubPath>
+    </VSTemplate>
     <VSTemplate Include="FeatureFile_CSharp\FeatureFile_CSharp.vstemplate">
       <OutputSubPath>Deveroom</OutputSubPath>
     </VSTemplate>
