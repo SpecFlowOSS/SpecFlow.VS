@@ -29,16 +29,17 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
         {
             var specFlowVersion = GetSpecFlowVersion();
 
-            var discovererType = typeof(SpecFlowV3000Discoverer);
+            var discovererType = typeof(SpecFlowV3000P220Discoverer); // assume recent version
             if (specFlowVersion != null)
-                switch (specFlowVersion.FileMajorPart * 1000 + specFlowVersion.FileMinorPart * 10)
-                {
-                    case 3000:
-                        discovererType = specFlowVersion.FileBuildPart >= 220 ?
-                            typeof(SpecFlowV3000P220Discoverer) :
-                            typeof(SpecFlowV3000Discoverer);
-                        break;
-                }
+            {
+                var versionNumber =
+                    ((specFlowVersion.FileMajorPart * 100) + specFlowVersion.FileMinorPart) * 1000 + specFlowVersion.FileBuildPart;
+
+                if (versionNumber >= 3_00_220)
+                    discovererType = typeof(SpecFlowV3000P220Discoverer);
+                else if (versionNumber >= 3_00_000)
+                    discovererType = typeof(SpecFlowV3000Discoverer);
+            }
 
             return (ISpecFlowDiscoverer)Activator.CreateInstance(discovererType);
         }
