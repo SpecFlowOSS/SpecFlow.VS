@@ -6,9 +6,9 @@ using TechTalk.SpecFlow.Bindings;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
 
-namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V3000
+namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30
 {
-    public class SpecFlowV3000P220Discoverer : RemotingBaseDiscoverer
+    public class SpecFlowV30P220Discoverer : RemotingBaseDiscoverer
     {
         protected override IBindingRegistry GetBindingRegistry(Assembly testAssembly, string configFilePath)
         {

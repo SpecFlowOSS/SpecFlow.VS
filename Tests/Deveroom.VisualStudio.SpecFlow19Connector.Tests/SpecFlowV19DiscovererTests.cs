@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V2020;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V19;
 using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using FluentAssertions;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Deveroom.VisualStudio.SpecFlow22Connector.Tests
+namespace Deveroom.VisualStudio.SpecFlow19Connector.Tests
 {
-    public class SpecFlowV2020DiscovererTests
+    public class SpecFlowV19DiscovererTests
     {
-        private SpecFlowV2020Discoverer CreateSut()
+        private SpecFlowV19Discoverer CreateSut()
         {
-            var stubDiscoverer = new SpecFlowV2020Discoverer();
+            var stubDiscoverer = new SpecFlowV19Discoverer();
             return stubDiscoverer;
         }
 
@@ -22,7 +22,7 @@ namespace Deveroom.VisualStudio.SpecFlow22Connector.Tests
             return Assembly.GetExecutingAssembly().Location;
         }
 
-        private DiscoveryResult PerformDiscover(SpecFlowV2020Discoverer sut)
+        private DiscoveryResult PerformDiscover(SpecFlowV19Discoverer sut)
         {
             var testAssemblyPath = GetTestAssemblyPath();
             var testAssembly = Assembly.LoadFrom(testAssemblyPath);

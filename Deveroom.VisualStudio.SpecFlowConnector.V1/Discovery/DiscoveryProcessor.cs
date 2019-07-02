@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using Deveroom.VisualStudio.SpecFlowConnector.AppDomainHelper;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V1090;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V2000;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V2010;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V2020;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V3000;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V19;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V20;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V21;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V22;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30;
 
 namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
 {
@@ -25,24 +25,24 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
                 var appDomain = new AppDomainManager(_options.AssemblyFilePath, _options.ConfigFilePath, false, null);
 
                 var specFlowVersion = GetSpecFlowVersion();
-                var discovererType = typeof(SpecFlowV3000P220Discoverer); // assume recent version
+                var discovererType = typeof(SpecFlowV30P220Discoverer); // assume recent version
                 if (specFlowVersion != null)
                 {
                     var versionNumber =
                         ((specFlowVersion.FileMajorPart * 100) + specFlowVersion.FileMinorPart) * 1000 + specFlowVersion.FileBuildPart;
 
                     if (versionNumber >= 3_00_220)
-                        discovererType = typeof(SpecFlowV3000P220Discoverer);
+                        discovererType = typeof(SpecFlowV30P220Discoverer);
                     else if (versionNumber >= 3_00_000)
-                        discovererType = typeof(SpecFlowV3000Discoverer);
+                        discovererType = typeof(SpecFlowV30Discoverer);
                     else if (versionNumber >= 2_02_000)
-                        discovererType = typeof(SpecFlowV2020Discoverer);
+                        discovererType = typeof(SpecFlowV22Discoverer);
                     else if (versionNumber >= 2_01_000)
-                        discovererType = typeof(SpecFlowV2010Discoverer);
+                        discovererType = typeof(SpecFlowV21Discoverer);
                     else if (versionNumber >= 2_00_000)
-                        discovererType = typeof(SpecFlowV2000Discoverer);
+                        discovererType = typeof(SpecFlowV20Discoverer);
                     else if (versionNumber >= 1_09_000)
-                        discovererType = typeof(SpecFlowV1090Discoverer);
+                        discovererType = typeof(SpecFlowV19Discoverer);
                 }
 
                 appDomain.CreateObjectFrom<AssemblyHelper>(typeof(AssemblyHelper).Assembly.Location, typeof(AssemblyHelper).FullName, _options.TargetFolder);

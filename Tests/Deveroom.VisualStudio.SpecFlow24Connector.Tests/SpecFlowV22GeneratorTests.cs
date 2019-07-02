@@ -4,16 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Deveroom.VisualStudio.SpecFlowConnector.Generation.V2020;
+using Deveroom.VisualStudio.SpecFlowConnector.Generation.V22;
 using FluentAssertions;
 using TechTalk.SpecFlow.Generator.Interfaces;
 using Xunit;
 
 namespace Deveroom.VisualStudio.SpecFlow24Connector.Tests
 {
-    public class SpecFlowV2020GeneratorTests
+    public class SpecFlowV22GeneratorTests
     {
-        class TestableSpecFlowV2020Generator : SpecFlowV2020Generator
+        class TestableSpecFlowV22Generator : SpecFlowV22Generator
         {
             public ITestGenerator TestableCreateGenerator(string projectFolder, string configFilePath, string targetExtension, string projectDefaultNamespace)
             {
@@ -24,7 +24,7 @@ namespace Deveroom.VisualStudio.SpecFlow24Connector.Tests
         [Fact]
         public void Can_create_generator_with_JSON_config_file()
         {
-            var sut = new TestableSpecFlowV2020Generator();
+            var sut = new TestableSpecFlowV22Generator();
 
             var configFilePath = Path.Combine(Path.GetTempPath(), GetType().Name + ".specflow.v2.json");
             File.WriteAllText(configFilePath, @"{
@@ -39,7 +39,7 @@ namespace Deveroom.VisualStudio.SpecFlow24Connector.Tests
         [Fact]
         public void Tolerates_V3_style_JSON_config_file()
         {
-            var sut = new TestableSpecFlowV2020Generator();
+            var sut = new TestableSpecFlowV22Generator();
 
             var configFilePath = Path.Combine(Path.GetTempPath(), GetType().Name + ".specflow.v3.json");
             File.WriteAllText(configFilePath, @"{}");

@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V1090;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V21;
 using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using FluentAssertions;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Deveroom.VisualStudio.SpecFlow19Connector.Tests
+namespace Deveroom.VisualStudio.SpecFlow21Connector.Tests
 {
-    public class SpecFlowV1090DiscovererTests
+    public class SpecFlowV21DiscovererTests
     {
-        private SpecFlowV1090Discoverer CreateSut()
+        private SpecFlowV21Discoverer CreateSut()
         {
-            var stubDiscoverer = new SpecFlowV1090Discoverer();
+            var stubDiscoverer = new SpecFlowV21Discoverer();
             return stubDiscoverer;
         }
 
@@ -22,7 +22,7 @@ namespace Deveroom.VisualStudio.SpecFlow19Connector.Tests
             return Assembly.GetExecutingAssembly().Location;
         }
 
-        private DiscoveryResult PerformDiscover(SpecFlowV1090Discoverer sut)
+        private DiscoveryResult PerformDiscover(SpecFlowV21Discoverer sut)
         {
             var testAssemblyPath = GetTestAssemblyPath();
             var testAssembly = Assembly.LoadFrom(testAssemblyPath);

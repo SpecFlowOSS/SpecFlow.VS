@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V3000;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30;
 using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using FluentAssertions;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Deveroom.VisualStudio.SpecFlow30P220NetFwConnector.Tests
+namespace Deveroom.VisualStudio.SpecFlow30P220NetCoreConnector.Tests
 {
-    public class SpecFlowV3000P220DiscovererTests
+    public class SpecFlowV30P220DiscovererNetCoreTests
     {
-        private SpecFlowV3000P220Discoverer CreateSut()
+        private SpecFlowV30P220Discoverer CreateSut()
         {
-            var stubDiscoverer = new SpecFlowV3000P220Discoverer();
+            var stubDiscoverer = new SpecFlowV30P220Discoverer();
             return stubDiscoverer;
         }
 
@@ -22,7 +22,7 @@ namespace Deveroom.VisualStudio.SpecFlow30P220NetFwConnector.Tests
             return Assembly.GetExecutingAssembly().Location;
         }
 
-        private DiscoveryResult PerformDiscover(SpecFlowV3000P220Discoverer sut)
+        private DiscoveryResult PerformDiscover(SpecFlowV30P220Discoverer sut)
         {
             var testAssemblyPath = GetTestAssemblyPath();
             var testAssembly = Assembly.LoadFrom(testAssemblyPath);

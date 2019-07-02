@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,9 +8,9 @@ using TechTalk.SpecFlow.Bindings;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
 
-namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V1090
+namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V20
 {
-    public class SpecFlowV1090Discoverer : RemotingBaseDiscoverer
+    public class SpecFlowV20Discoverer : RemotingBaseDiscoverer
     {
         protected override IBindingRegistry GetBindingRegistry(Assembly testAssembly, string configFilePath)
         {
@@ -18,16 +19,22 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V1090
             return testExecutionEngine.ReflectionGetField<IBindingRegistry>("bindingRegistry");
         }
 
-        private ITestRunner CreateTestRunner(Assembly testAssembly)
+        private static ITestRunner CreateTestRunner(Assembly testAssembly)
         {
-            // IObjectContainer container = TestRunContainerBuilder.CreateContainer((IRuntimeConfigurationProvider)null);
-            IObjectContainer container = typeof(ITestRunner).Assembly
-                .GetType("TechTalk.SpecFlow.Infrastructure.TestRunContainerBuilder", true)
-                .ReflectionCallStaticMethod<IObjectContainer>("CreateContainer",
-                    new[] {typeof(IRuntimeConfigurationProvider)}, new object[] {null});
+            var testRunContainerBuilderType = typeof(ITestRunner).Assembly
+                .GetType("TechTalk.SpecFlow.Infrastructure.TestRunContainerBuilder", true);
+            var testRunContainerBuilder =
+                testRunContainerBuilderType.ReflectionCreateInstance<object>(
+                    new[] { typeof(IDefaultDependencyProvider) }, new object[] {null});
+            IObjectContainer container = testRunContainerBuilder.ReflectionCallMethod<IObjectContainer>(
+                "CreateContainer", new[] {typeof(IRuntimeConfigurationProvider)}, new object[] {null});
+
             // reset IBindingInvoker to avoid invoking hooks (Issue #27) 
             container.RegisterTypeAs<NoInvokeDependencyProvider.NullBindingInvoker, IBindingInvoker>();
-            return container.Resolve<ITestRunnerFactory>().Create(testAssembly);
+
+            var testRunnerManager = container.Resolve<ITestRunnerManager>();
+            testRunnerManager.Initialize(testAssembly);
+            return testRunnerManager.GetTestRunner(0);
         }
 
         protected override IEnumerable<IStepDefinitionBinding> GetStepDefinitions(IBindingRegistry bindingRegistry)

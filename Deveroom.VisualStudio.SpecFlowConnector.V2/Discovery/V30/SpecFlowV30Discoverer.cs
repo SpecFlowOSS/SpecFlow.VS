@@ -4,9 +4,9 @@ using BoDi;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
 
-namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V3000
+namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30
 {
-    public class SpecFlowV3000Discoverer : SpecFlowV3000P220Discoverer
+    public class SpecFlowV30Discoverer : SpecFlowV30P220Discoverer
     {
         protected override IObjectContainer CreateGlobalContainer(IConfigurationLoader configurationLoader, Assembly testAssembly)
         {

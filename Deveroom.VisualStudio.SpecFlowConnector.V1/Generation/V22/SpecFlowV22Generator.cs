@@ -5,9 +5,9 @@ using Newtonsoft.Json.Linq;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Generator.Interfaces;
 
-namespace Deveroom.VisualStudio.SpecFlowConnector.Generation.V2020
+namespace Deveroom.VisualStudio.SpecFlowConnector.Generation.V22
 {
-    public class SpecFlowV2020Generator : BaseGenerator
+    public class SpecFlowV22Generator : BaseGenerator
     {
         protected override SpecFlowConfigurationHolder CreateConfigHolder(string configFilePath)
         {

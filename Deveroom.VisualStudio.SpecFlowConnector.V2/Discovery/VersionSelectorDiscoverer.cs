@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V3000;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30;
 using TechTalk.SpecFlow;
 
 namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
@@ -29,16 +29,16 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
         {
             var specFlowVersion = GetSpecFlowVersion();
 
-            var discovererType = typeof(SpecFlowV3000P220Discoverer); // assume recent version
+            var discovererType = typeof(SpecFlowV30P220Discoverer); // assume recent version
             if (specFlowVersion != null)
             {
                 var versionNumber =
                     ((specFlowVersion.FileMajorPart * 100) + specFlowVersion.FileMinorPart) * 1000 + specFlowVersion.FileBuildPart;
 
                 if (versionNumber >= 3_00_220)
-                    discovererType = typeof(SpecFlowV3000P220Discoverer);
+                    discovererType = typeof(SpecFlowV30P220Discoverer);
                 else if (versionNumber >= 3_00_000)
-                    discovererType = typeof(SpecFlowV3000Discoverer);
+                    discovererType = typeof(SpecFlowV30Discoverer);
             }
 
             return (ISpecFlowDiscoverer)Activator.CreateInstance(discovererType);
