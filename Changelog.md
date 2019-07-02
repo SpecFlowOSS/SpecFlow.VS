@@ -8,6 +8,7 @@ Improvements:
 
 * Step completion should use word containment for filtering the list (Issue #28)
 * Display warning on config load error
+* Improved error handling for code-behind generation
 
 Bug fixes:
 

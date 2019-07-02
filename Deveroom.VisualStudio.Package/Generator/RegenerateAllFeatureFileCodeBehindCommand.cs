@@ -5,6 +5,7 @@ using System.Linq;
 using Deveroom.VisualStudio.Common;
 using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.Editor.Commands;
+using Deveroom.VisualStudio.Generation;
 using Deveroom.VisualStudio.ProjectSystem;
 using Deveroom.VisualStudio.ProjectSystem.Settings;
 using EnvDTE;
@@ -84,6 +85,13 @@ namespace Deveroom.VisualStudio.Generator
         {
             var project = GetSingleSelectedProject();
             if (project == null)
+                return;
+
+            var projectScope = _vsIdeScope.GetProjectScope(project);
+            if (projectScope == null)
+                return;
+
+            if (!GenerationService.CheckSpecFlowToolsFolder(projectScope))
                 return;
 
             foreach (var featureFileItem in GetFeatureFileItems(project))

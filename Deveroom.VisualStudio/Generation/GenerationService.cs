@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using Deveroom.VisualStudio.Common;
 using Deveroom.VisualStudio.Connectors;
 using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.Monitoring;
@@ -25,21 +23,38 @@ namespace Deveroom.VisualStudio.Generation
             _logger = projectScope.IdeScope.Logger;
         }
 
-        private string GetSpecFlowToolsFolderSafe(ProjectSettings projectSettings)
+        public static bool CheckSpecFlowToolsFolder(IProjectScope projectScope)
         {
+            var toolsFolder = GetSpecFlowToolsFolderSafe(projectScope, projectScope.GetProjectSettings(), out _);
+            return toolsFolder != null;
+        }
+
+        private static string GetSpecFlowToolsFolderSafe(IProjectScope projectScope, ProjectSettings projectSettings, out string toolsFolderErrorMessage)
+        {
+            toolsFolderErrorMessage = null;
             try
             {
                 var specFlowToolsFolder = projectSettings.SpecFlowGeneratorFolder;
-                if (specFlowToolsFolder == null)
-                    throw new InvalidOperationException("Unable to generate feature-file code behind, the SpecFlow NuGet package folder could not be detected.");
+                if (string.IsNullOrEmpty(specFlowToolsFolder))
+                {
+                    projectScope.IdeScope.Actions.ShowProblem($"Unable to generate feature-file code behind, because SpecFlow NuGet package folder could not be detected. For configuring SpecFlow tools folder manually, check http://speclink.me/devrsftools.");
+                    toolsFolderErrorMessage = "Folder is not configured. See http://speclink.me/devrsftools for details.";
+                    return null;
+                }
 
-                if (!_projectScope.IdeScope.FileSystem.Directory.Exists(specFlowToolsFolder))
-                    _projectScope.IdeScope.Actions.ShowProblem($"Unable to find SpecFlow tools folder: '{specFlowToolsFolder}'. Build solution to ensure that all packages are restored. The feature file has to be re-generated (e.g. by saving) after the packages have been restored.");
+                if (!projectScope.IdeScope.FileSystem.Directory.Exists(specFlowToolsFolder))
+                {
+                    projectScope.IdeScope.Actions.ShowProblem($"Unable to find SpecFlow tools folder: '{specFlowToolsFolder}'. Build solution to ensure that all packages are restored. The feature file has to be re-generated (e.g. by saving) after the packages have been restored.");
+                    toolsFolderErrorMessage = "Folder does not exist";
+                    return null;
+                }
+
                 return specFlowToolsFolder;
             }
             catch (Exception ex)
             {
-                _logger.LogException(MonitoringService, ex);
+                projectScope.IdeScope.Logger.LogException(projectScope.IdeScope.MonitoringService, ex);
+                toolsFolderErrorMessage = ex.Message;
                 return null;
             }
         }
@@ -47,7 +62,9 @@ namespace Deveroom.VisualStudio.Generation
         public GenerationResult GenerateFeatureFile(string featureFilePath, string targetExtension, string targetNamespace)
         {
             var projectSettings = _projectScope.GetProjectSettings();
-            var specFlowToolsFolder = GetSpecFlowToolsFolderSafe(projectSettings);
+            var specFlowToolsFolder = GetSpecFlowToolsFolderSafe(_projectScope, projectSettings, out var toolsFolderErrorMessage);
+            if (specFlowToolsFolder == null)
+                return CreateErrorResult(featureFilePath, $"Unable to use SpecFlow tools folder '{projectSettings.SpecFlowGeneratorFolder}': {toolsFolderErrorMessage}");
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -64,11 +81,7 @@ namespace Deveroom.VisualStudio.Generation
                 if (result.IsFailed)
                 {
                     _logger.LogWarning(result.ErrorMessage);
-                    result.FeatureFileCodeBehind = new FeatureFileCodeBehind()
-                    {
-                        FeatureFilePath = featureFilePath,
-                        Content = GetErrorContent(result.ErrorMessage)
-                    };
+                    SetErrorContent(featureFilePath, result);
                     _logger.LogVerbose(() => result.FeatureFileCodeBehind.Content);
                 }
                 else
@@ -82,13 +95,32 @@ namespace Deveroom.VisualStudio.Generation
             catch (Exception ex)
             {
                 _logger.LogException(MonitoringService, ex);
-                return null;
+                return CreateErrorResult(featureFilePath, ex.Message);
             }
             finally
             {
                 stopwatch.Stop();
                 _logger.LogVerbose($"Generation: {stopwatch.ElapsedMilliseconds} ms");
             }
+        }
+
+        private GenerationResult CreateErrorResult(string featureFilePath, string errorMessage)
+        {
+            var result = new GenerationResult
+            {
+                ErrorMessage = errorMessage
+            };
+            SetErrorContent(featureFilePath, result);
+            return result;
+        }
+
+        private void SetErrorContent(string featureFilePath, GenerationResult result)
+        {
+            result.FeatureFileCodeBehind = new FeatureFileCodeBehind()
+            {
+                FeatureFilePath = featureFilePath,
+                Content = GetErrorContent(result.ErrorMessage)
+            };
         }
 
         private string GetErrorContent(string resultErrorMessage)
