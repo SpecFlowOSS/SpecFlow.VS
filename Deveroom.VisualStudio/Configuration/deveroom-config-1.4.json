@@ -6,6 +6,9 @@
     "specFlow": {
       "$ref": "#/definitions/SpecFlow"
     },
+    "traceability": {
+      "$ref": "#/definitions/Traceability"
+    },
     "$schema": {
       "type": "string"
     }
@@ -39,6 +42,34 @@
           "type": "array",
           "items": {
             "enum": [ "None", "MsBuildGeneration", "XUnitAdapter", "DesignTimeFeatureFileGeneration" ]
+          }
+        }
+      }
+    },
+
+    "Traceability": {
+      "description": "Settings for traceability of scenarios, see http://speclink.me/deveroomtraceability for details.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tagLinks": {
+          "description": "List of tags patterns that should be converted to an external URL",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "description": "Tag pattern configuration",
+            "additionalProperties": false,
+            "properties": {
+              "tagPattern": {
+                "description": "A regular expression that matches to the tag name (without leading '@' sign). The identifier of the artifacts should be matched with a named regex group. E.g. 'issue\\\\:(?<id>\\\\d+)'. ",
+                "type": "string"
+              },
+              "urlTemplate": {
+                "description": "An URL template to generate the external link. It can contain parameters in an '{paramName}' format, where 'paramName' refers to the regular expression group name in the 'tagPattern'. E.g. 'https://github.com/me/my-project/issues/{id}'",
+                "type": "string"
+              }
+            },
+            "required": [ "tagPattern", "urlTemplate" ]
           }
         }
       }

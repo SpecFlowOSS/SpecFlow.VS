@@ -7,6 +7,9 @@ New features:
   * see http://speclink.me/deveroomsfassref for details
 * Deveroom configuration file support
   * see http://speclink.me/deveroomconfig for details
+* Allow opening artifacts related to scenarios in browser, based on configured 
+  tags that match to a specific pattern.
+  * see http://speclink.me/deveroomtraceability for details
 
 Improvements:
 
