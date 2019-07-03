@@ -173,7 +173,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
         {
             Logger.LogVerbose($"Loading Deveroom config from '{configSourceFilePath}'");
             var loader = new DeveroomConfigurationLoader();
-            loader.Update(configSourceFilePath, configuration);
+            loader.Update(configuration, configSourceFilePath);
         }
 
         private string XPathEvaluateAttribute(XDocument doc, string xpath)

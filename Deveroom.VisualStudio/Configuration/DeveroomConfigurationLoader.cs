@@ -62,11 +62,11 @@ namespace Deveroom.VisualStudio.Configuration
         public DeveroomConfiguration Load(string configFilePath)
         {
             var config = new DeveroomConfiguration();
-            Update(configFilePath, config);
+            Update(config, configFilePath);
             return config;
         }
 
-        public void Update(string configFilePath, DeveroomConfiguration config)
+        public void Update(DeveroomConfiguration config, string configFilePath)
         {
             if (!File.Exists(configFilePath))
                 throw new DeveroomConfigurationException($"The specified config file '{configFilePath}' does not exist.");
@@ -74,7 +74,12 @@ namespace Deveroom.VisualStudio.Configuration
                 throw new DeveroomConfigurationException($"The specified config file '{configFilePath}' does not contain a folder.");
 
             var jsonString = File.ReadAllText(configFilePath);
-            _configDeserializer.Populate(jsonString, config);
+            Update(config, jsonString, configFolder);
+        }
+
+        public void Update(DeveroomConfiguration config, string configFileContent, string configFolder)
+        {
+            _configDeserializer.Populate(configFileContent, config);
 
             config.ConfigurationBaseFolder = configFolder;
 
