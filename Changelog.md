@@ -3,15 +3,15 @@
 New features:
 
 * Provide documentation in autocompletion of keywords (Issue #3)
-* Support projects with SpecFlow assembly references (non-NuGet) (Issue #14)
-  * see http://speclink.me/deveroomsfassref for details
-* Deveroom configuration file support
-  * see http://speclink.me/deveroomconfig for details
+* Support projects with SpecFlow assembly references (non-NuGet). 
+  See http://speclink.me/deveroomsfassref for details. (Issue #14)
+* Deveroom configuration file support.
+  See http://speclink.me/deveroomconfig for details.
 * Allow opening artifacts related to scenarios in browser, based on configured 
   tags that match to a specific pattern (automatically recognizes 
   [SpecSync for Azure DevOps](https://www.specsolutions.eu/services/specsync/) tags
   and configurable for others).
-  * see http://speclink.me/deveroomtraceability for details
+  See http://speclink.me/deveroomtraceability for details.
 
 Improvements:
 
