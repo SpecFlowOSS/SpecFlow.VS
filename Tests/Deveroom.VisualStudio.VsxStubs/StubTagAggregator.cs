@@ -45,7 +45,13 @@ namespace Deveroom.VisualStudio.VsxStubs
 
         public IEnumerable<IMappingTagSpan<T>> GetTags(NormalizedSnapshotSpanCollection snapshotSpans)
         {
-            throw new NotImplementedException();
+            foreach (var snapshotSpan in snapshotSpans)
+            {
+                foreach (var mappingTagSpan in GetTags(snapshotSpan))
+                {
+                    yield return mappingTagSpan;
+                }
+            }
         }
     }
 }

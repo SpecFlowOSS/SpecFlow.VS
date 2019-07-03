@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Deveroom.VisualStudio.Configuration;
 using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.Discovery;
 using Deveroom.VisualStudio.Editor.Commands;
@@ -11,6 +12,7 @@ using Deveroom.VisualStudio.Editor.Commands.Infrastructure;
 using Deveroom.VisualStudio.Editor.Completions;
 using Deveroom.VisualStudio.Editor.Completions.Infrastructure;
 using Deveroom.VisualStudio.Editor.Services;
+using Deveroom.VisualStudio.Editor.Traceability;
 using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using Deveroom.VisualStudio.Specs.Support;
 using Deveroom.VisualStudio.UI.ViewModels;
@@ -20,6 +22,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Tagging;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using Xunit;
@@ -106,6 +109,14 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
                 }
             }
             _projectScope.DeveroomConfiguration.ConfigurationChangeTime = DateTime.Now;
+        }
+
+        [Given(@"the project configuration file contains")]
+        public void GivenTheProjectConfigurationFileContains(string jsonSnippet)
+        {
+            string configFileContent = "{" + jsonSnippet + "}";
+            var configLoader = new DeveroomConfigurationLoader();
+            configLoader.Update(_projectScope.DeveroomConfiguration, configFileContent, _projectScope.ProjectFolder);
         }
 
         [When(@"a new step definition is added to the project as:")]
@@ -325,10 +336,21 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
             var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer);
             if (tagger != null)
             {
-                var spans = new NormalizedSnapshotSpanCollection(new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length));
-                return tagger.GetTags(spans).Select(t => t.Tag);
+                return GetVsTagSpans<DeveroomTag, DeveroomTagger>(textView, tagger).Select(t => t.Tag);
             }
             return Enumerable.Empty<DeveroomTag>();
+        }
+
+        private IEnumerable<ITagSpan<TTag>> GetVsTagSpans<TTag>(IWpfTextView textView, ITaggerProvider taggerProvider) where TTag: ITag
+        {
+            var tagger = taggerProvider.CreateTagger<TTag>(textView.TextBuffer);
+            return GetVsTagSpans<TTag, ITagger<TTag>>(textView, tagger);
+        }
+
+        private IEnumerable<ITagSpan<TTag>> GetVsTagSpans<TTag, TTagger>(IWpfTextView textView, TTagger tagger) where TTag : ITag where TTagger : ITagger<TTag>
+        {
+            var spans = new NormalizedSnapshotSpanCollection(new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length));
+            return tagger.GetTags(spans);
         }
 
         [Then(@"all section of types (.*) should be highlighted as")]
@@ -354,6 +376,14 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
         public void ThenTheStepKeywordsShouldBeHighlightedAs(string keywordType, string expectedContent)
         {
             ThenAllSectionOfTypesShouldBeHighlightedAs(new[] {keywordType}, expectedContent);
+        }
+
+        [Then(@"the tag links should target to the following URLs")]
+        public void ThenTheTagLinksShouldTargetToTheFollowingURLs(Table expectedTagLinksTable)
+        {
+            var tagSpans = GetVsTagSpans<UrlTag>(_wpfTextView, new DeveroomUrlTaggerProvider(new StubBufferTagAggregatorFactoryService(_ideScope))).ToArray();
+            var actualTagLinks = tagSpans.Select(t => new {Tag = t.Span.GetText(), URL = t.Tag.Url.ToString()});
+            expectedTagLinksTable.CompareToSet(actualTagLinks);
         }
 
         [Then(@"the source file of the ""(.*)"" ""(.*)"" step definition is opened")]
