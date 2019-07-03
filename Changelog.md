@@ -1,4 +1,4 @@
-# vNext
+# v1.4.0 - 2019-07-03
 
 New features:
 
