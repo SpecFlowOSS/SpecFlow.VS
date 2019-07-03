@@ -1,4 +1,4 @@
-﻿@wip
+﻿@doc:Traceability
 Feature: Scenario traceability
 
 Allow opening artifacts related to scenarios in browser, based on configured 

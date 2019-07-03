@@ -1,0 +1,19 @@
+{
+  "$schema": "http://schemas.specsolutions.eu/deveroom-config-latest.json",
+
+  // See configuration options and samples at http://speclink.me/deveroomconfig
+  // or use the auto-complete feature of your IDE to discover configuration options.
+
+  "traceability": {
+    "tagLinks": [
+      {
+        "tagPattern": "issue\\:(?<id>\\d+)",
+        "urlTemplate": "https://github.com/specsolutions/deveroom-visualstudio/issues/{id}"
+      },
+      {
+        "tagPattern": "doc\\:(?<title>\\w+)",
+        "urlTemplate": "https://github.com/specsolutions/deveroom-visualstudio/wiki/{title}"
+      }
+    ]
+  }
+}
