@@ -10,6 +10,7 @@ Deveroom is a feature file editing tool in Visual Studio, developed by the creat
 * Twitter: [@SpecSol_BDD](https://twitter.com/SpecSol_BDD)
 * Issues: https://github.com/specsolutions/deveroom-visualstudio/issues
 * Blog: http://gasparnagy.com/tag/deveroom/
+* Documentation: http://speclink.me/deveroomdoc
 
 ## Supported platforms
 
@@ -29,7 +30,9 @@ Deveroom is a feature file editing tool in Visual Studio, developed by the creat
 
 ## Installation 
 
-In order to install Deveroom, open your Visual Studio, select "Tools / Extensions and Updates..." from the menu, switch to "Online" and search for "Deveroom". Click on the "Download" button for the Deveroom extension. You need to restart Visual Studio to finalize the installation. 
+Deveroom can be installed directly from Visual Studio using the extension manager. See detailed instructions at the [Installation documentation page](http://speclink.me/deveroominstall).
+
+Please also help other users by rating the extension at the Visual Studio Marketplace: [Deveroom for Visual Studio 2017](https://marketplace.visualstudio.com/items?itemName=SpecSolutions.DeveroomVisualStudio2017), [Deveroom for Visual Studio 2019](https://marketplace.visualstudio.com/items?itemName=SpecSolutions.DeveroomVisualStudio2019)
 
 ## Contributing
 
