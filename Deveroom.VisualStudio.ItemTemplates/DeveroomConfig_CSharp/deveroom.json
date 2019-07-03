@@ -1,5 +1,5 @@
 {
-  "$schema": "http://schemas.specsolutions.eu/deveroom-config-latest-alpha.json"
+  "$schema": "http://schemas.specsolutions.eu/deveroom-config-latest.json"
 
   // See configuration options and samples at http://speclink.me/deveroomconfig
   // or use the auto-complete feature of your IDE to discover configuration options.

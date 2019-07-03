@@ -37,8 +37,8 @@ namespace Deveroom.VisualStudio.Generation
                 var specFlowToolsFolder = projectSettings.SpecFlowGeneratorFolder;
                 if (string.IsNullOrEmpty(specFlowToolsFolder))
                 {
-                    projectScope.IdeScope.Actions.ShowProblem($"Unable to generate feature-file code behind, because SpecFlow NuGet package folder could not be detected. For configuring SpecFlow tools folder manually, check http://speclink.me/devrsftools.");
-                    toolsFolderErrorMessage = "Folder is not configured. See http://speclink.me/devrsftools for details.";
+                    projectScope.IdeScope.Actions.ShowProblem($"Unable to generate feature-file code behind, because SpecFlow NuGet package folder could not be detected. For configuring SpecFlow tools folder manually, check http://speclink.me/deveroomsfassref.");
+                    toolsFolderErrorMessage = "Folder is not configured. See http://speclink.me/deveroomsfassref for details.";
                     return null;
                 }
 

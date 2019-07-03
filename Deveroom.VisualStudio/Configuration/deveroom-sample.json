@@ -10,10 +10,9 @@
   // * the %LOCALAPPDATA%\Deveroom\ folder -- user-level settings for this machine
 
   "specFlow": {
-    "isSpecFlowProject": false,
-    "generatorFolder": "..\\packages\\SpecFlow.2.3.0\\tools",
+    "isSpecFlowProject": true,
+    "generatorFolder": "..\\MyDependencies\\SpecFlow.2.3.0\\tools",
     "traits": [
-      "MsBuildGeneration",
       "DesignTimeFeatureFileGeneration"
     ]
   }

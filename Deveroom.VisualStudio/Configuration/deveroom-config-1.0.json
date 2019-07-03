@@ -22,7 +22,7 @@
           "type": "boolean"
         },
         "generatorFolder": {
-          "description": "The path of the SpecFlow generator folder used by the project, that is usually the 'tools' folder of the SpecFlow NuGet package, e.g. '..\\packages\\SpecFlow.2.3.0\\tools'. (Default: [detect from the installed SpecFlow NuGet package])",
+          "description": "The path of the SpecFlow generator folder used by the project, that is usually the 'tools' folder of the SpecFlow NuGet package, e.g. '..\\MyDependencies\\SpecFlow.2.3.0\\tools'. (Default: [detect from the installed SpecFlow NuGet package])",
           "type": "string"
         },
         "configFilePath": {
@@ -30,11 +30,11 @@
           "type": "string"
         },
         "version": {
-          "description": "The SpecFlow version used by the project, e.g. 'specflow.json'. (Default: [detect version automatically])",
+          "description": "The SpecFlow version used by the project, e.g. '2.3.1'. (Default: [detect version automatically])",
           "type": "string"
         },
         "traits": {
-          "description": "The . (Default: '_SpecSyncWrapper_')",
+          "description": "The list of the SpecFlow-related project traits. The possible traits are: 'MsBuildGeneration', 'XUnitAdapter', 'DesignTimeFeatureFileGeneration', e.g. '[\"XUnitAdapter\"]'. (Default: [detect from the installed NuGet packages])",
           "type": "array",
           "items": {
             "enum": [ "None", "MsBuildGeneration", "XUnitAdapter", "DesignTimeFeatureFileGeneration" ]
