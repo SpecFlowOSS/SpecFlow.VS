@@ -11,7 +11,9 @@ namespace Deveroom.VisualStudio.Configuration
         public string ConfigurationBaseFolder { get; set; }
 
         public SpecFlowConfiguration SpecFlow { get; set; } = new SpecFlowConfiguration();
+        public TraceabilityConfiguration Traceability { get; set; } = new TraceabilityConfiguration();
 
+        // old settings to be reviewed
         public ProcessorArchitectureSetting ProcessorArchitecture { get; set; } = ProcessorArchitectureSetting.UseSystem;
         public bool DebugConnector { get; set; } = false;
         public string DefaultFeatureLanguage { get; set; } = "en-US";
@@ -25,6 +27,7 @@ namespace Deveroom.VisualStudio.Configuration
         private void FixEmptyContainers()
         {
             SpecFlow = SpecFlow ?? new SpecFlowConfiguration();
+            Traceability = Traceability ?? new TraceabilityConfiguration();
         }
 
         public void CheckConfiguration()
@@ -32,6 +35,7 @@ namespace Deveroom.VisualStudio.Configuration
             FixEmptyContainers();
 
             SpecFlow.CheckConfiguration();
+            Traceability.CheckConfiguration();
         }
 
     }

@@ -108,6 +108,7 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
                         break;
                 }
             }
+            _projectScope.DeveroomConfiguration.CheckConfiguration();
             _projectScope.DeveroomConfiguration.ConfigurationChangeTime = DateTime.Now;
         }
 
@@ -117,6 +118,8 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
             string configFileContent = "{" + jsonSnippet + "}";
             var configLoader = new DeveroomConfigurationLoader();
             configLoader.Update(_projectScope.DeveroomConfiguration, configFileContent, _projectScope.ProjectFolder);
+            _projectScope.DeveroomConfiguration.CheckConfiguration();
+            _projectScope.DeveroomConfiguration.ConfigurationChangeTime = DateTime.Now;
         }
 
         [When(@"a new step definition is added to the project as:")]
@@ -381,7 +384,7 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
         [Then(@"the tag links should target to the following URLs")]
         public void ThenTheTagLinksShouldTargetToTheFollowingURLs(Table expectedTagLinksTable)
         {
-            var tagSpans = GetVsTagSpans<UrlTag>(_wpfTextView, new DeveroomUrlTaggerProvider(new StubBufferTagAggregatorFactoryService(_ideScope))).ToArray();
+            var tagSpans = GetVsTagSpans<UrlTag>(_wpfTextView, new DeveroomUrlTaggerProvider(new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope)).ToArray();
             var actualTagLinks = tagSpans.Select(t => new {Tag = t.Span.GetText(), URL = t.Tag.Url.ToString()});
             expectedTagLinksTable.CompareToSet(actualTagLinks);
         }

@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.Editor.Services;
+using Deveroom.VisualStudio.ProjectSystem;
+using Deveroom.VisualStudio.ProjectSystem.Configuration;
 using Gherkin.Ast;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -10,9 +14,14 @@ namespace Deveroom.VisualStudio.Editor.Traceability
 {
     internal class DeveroomUrlTagger : DeveroomTagConsumer, ITagger<UrlTag>
     {
-        public DeveroomUrlTagger(ITextBuffer buffer, ITagAggregator<DeveroomTag> tagAggregator)
+        private readonly IIdeScope _ideScope;
+        private readonly IProjectScope _projectScope;
+
+        public DeveroomUrlTagger(ITextBuffer buffer, ITagAggregator<DeveroomTag> tagAggregator, IIdeScope ideScope)
             : base(buffer, tagAggregator)
         {
+            _ideScope = ideScope;
+            _projectScope = ideScope.GetProject(buffer);
         }
 
         public IEnumerable<ITagSpan<UrlTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -26,6 +35,33 @@ namespace Deveroom.VisualStudio.Editor.Traceability
 
         private Uri GetUrl(Tag tag)
         {
+            if (_projectScope == null)
+                return null; // TODO: support global config?
+
+            var configuration = _projectScope.GetDeveroomConfiguration();
+            if (!configuration.Traceability.TagLinks.Any())
+                return null;
+
+            foreach (var tagLinkConfiguration in configuration.Traceability.TagLinks)
+            {
+                if (tagLinkConfiguration.ResolvedTagPattern == null)
+                    continue;
+                var match = tagLinkConfiguration.ResolvedTagPattern.Match(tag.Name.TrimStart('@'));
+                if (!match.Success)
+                    continue;
+
+                try
+                {
+                    var url = Regex.Replace(tagLinkConfiguration.UrlTemplate, @"\{(?<paramName>[a-zA-Z_\d]+)\}",
+                        paramMatch => match.Groups[paramMatch.Groups["paramName"].Value].Value);
+                    return new Uri(url);
+                }
+                catch (Exception ex)
+                {
+                    _ideScope.Logger.LogDebugException(ex);
+                }
+            }
+
             return null;
         }
 
