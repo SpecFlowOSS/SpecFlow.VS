@@ -16,10 +16,6 @@ variables:
 steps:
 - task: NuGetToolInstaller@0
 
-- powershell: >-
-    (gc 'NuGet.config') -replace 'LocalNuGetFeed', '..\s\LocalNuGetFeed' | Out-File -Encoding UTF8 'NuGet.config'
-  displayName: 'Fix NuGet.config'
-
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore (with NuGet.config)'
   inputs:
