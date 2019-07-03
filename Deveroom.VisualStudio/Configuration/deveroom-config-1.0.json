@@ -31,7 +31,8 @@
         },
         "version": {
           "description": "The SpecFlow version used by the project, e.g. '2.3.1'. (Default: [detect version automatically])",
-          "type": "string"
+          "type": "string",
+          "pattern": "^(?:\\.?[0-9]+){2,}(?:\\-[\\-a-z0-9]*)?$"
         },
         "traits": {
           "description": "The list of the SpecFlow-related project traits. The possible traits are: 'MsBuildGeneration', 'XUnitAdapter', 'DesignTimeFeatureFileGeneration', e.g. '[\"XUnitAdapter\"]'. (Default: [detect from the installed NuGet packages])",

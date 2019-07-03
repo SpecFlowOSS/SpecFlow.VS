@@ -117,6 +117,10 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             {
                 OnSettingsInitialized(projectSettings, featureFileCount);
             }
+            else
+            {
+                Logger.LogInfo($"Project settings updated: {projectSettings.GetShortLabel()}");
+            }
             return _projectSettings;
         }
 

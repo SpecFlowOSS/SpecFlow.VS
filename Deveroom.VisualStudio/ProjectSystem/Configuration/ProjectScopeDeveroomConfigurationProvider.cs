@@ -141,6 +141,8 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
                         LoadFromDeveroomConfig(configSource.FilePath, configuration);
                     }
 
+                    configuration.CheckConfiguration();
+
                     loadedSources.Add(configSource);
                 }
                 catch (Exception ex)
@@ -159,6 +161,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
             }
             catch (Exception ex)
             {
+                Logger.LogWarning($"Invalid Deveroom configuration: {ex.Message}");
                 Logger.LogVerboseException(MonitoringService, ex, "Configuration error, using default config");
                 configuration = new DeveroomConfiguration();
             }

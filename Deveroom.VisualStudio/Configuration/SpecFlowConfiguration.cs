@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Deveroom.VisualStudio.Common;
 using Deveroom.VisualStudio.ProjectSystem.Settings;
 using Equ;
 
@@ -22,6 +24,9 @@ namespace Deveroom.VisualStudio.Configuration
         public void CheckConfiguration()
         {
             FixEmptyContainers();
+
+            if (Version != null && !Regex.IsMatch(Version, @"^(?:\.?[0-9]+){2,}(?:\-[\-a-z0-9]*)?$"))
+                throw new DeveroomConfigurationException("'specFlow/version' was not in a correct format");
         }
     }
 }

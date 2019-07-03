@@ -45,10 +45,15 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
                 specFlowSettings.Version = new NuGetVersion(configuration.SpecFlow.Version);
 
             if (configuration.SpecFlow.GeneratorFolder != null)
+            {
                 specFlowSettings.GeneratorFolder = configuration.SpecFlow.GeneratorFolder;
+                specFlowSettings.Traits |= SpecFlowProjectTraits.DesignTimeFeatureFileGeneration;
+            }
 
             if (configuration.SpecFlow.ConfigFilePath != null)
                 specFlowSettings.ConfigFilePath = configuration.SpecFlow.ConfigFilePath;
+            else if (specFlowSettings.ConfigFilePath == null)
+                specFlowSettings.ConfigFilePath = GetSpecFlowConfigFilePath(_projectScope);
 
             return specFlowSettings;
         }
@@ -62,8 +67,9 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             var specFlowGeneratorFolder = specFlowPackage.InstallPath == null
                 ? null
                 : Path.Combine(specFlowPackage.InstallPath, "tools");
+            var configFilePath = GetSpecFlowConfigFilePath(_projectScope);
 
-            return CreateSpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder);
+            return CreateSpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder, configFilePath);
         }
 
         private SpecFlowSettings GetSpecFlowSettingsFromOutputFolder()
@@ -81,7 +87,9 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
 
             var specFlowNuGetVersion = new NuGetVersion($"{specFlowVersion.FileMajorPart}.{specFlowVersion.FileMinorPart}.{specFlowVersion.FileBuildPart}");
 
-            return CreateSpecFlowSettings(specFlowNuGetVersion, SpecFlowProjectTraits.None, null);
+            var configFilePath = GetSpecFlowConfigFilePath(_projectScope);
+
+            return CreateSpecFlowSettings(specFlowNuGetVersion, SpecFlowProjectTraits.None, null, configFilePath);
         }
 
         private FileVersionInfo GetSpecFlowVersion(string outputFolder)
@@ -91,16 +99,17 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             return fileVersionInfo;
         }
 
-        private SpecFlowSettings CreateSpecFlowSettings(NuGetVersion specFlowVersion, SpecFlowProjectTraits specFlowProjectTraits, string specFlowGeneratorFolder)
+        private SpecFlowSettings CreateSpecFlowSettings(
+            NuGetVersion specFlowVersion, SpecFlowProjectTraits specFlowProjectTraits, 
+            string specFlowGeneratorFolder, string specFlowConfigFilePath)
         {
-            var configFilePath = GetSpecFlowConfigFilePath(_projectScope);
-
             if (specFlowVersion.Version < new Version(3, 0) &&
                 !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.MsBuildGeneration) &&
-                !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.XUnitAdapter))
+                !specFlowProjectTraits.HasFlag(SpecFlowProjectTraits.XUnitAdapter) &&
+                specFlowGeneratorFolder != null)
                 specFlowProjectTraits |= SpecFlowProjectTraits.DesignTimeFeatureFileGeneration;
 
-            return new SpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder, configFilePath);
+            return new SpecFlowSettings(specFlowVersion, specFlowProjectTraits, specFlowGeneratorFolder, specFlowConfigFilePath);
         }
 
         private NuGetPackageReference GetSpecFlowPackage(IProjectScope projectScope, IEnumerable<NuGetPackageReference> packageReferences, out SpecFlowProjectTraits specFlowProjectTraits)

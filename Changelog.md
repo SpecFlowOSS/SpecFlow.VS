@@ -3,6 +3,10 @@
 New features:
 
 * Provide documentation in autocompletion of keywords (Issue #3)
+* Support projects with SpecFlow assembly references (non-NuGet) (Issue #14)
+  * see http://speclink.me/deveroomsfassref for details
+* Deveroom configuration file support
+  * see http://speclink.me/deveroomconfig for details
 
 Improvements:
 
