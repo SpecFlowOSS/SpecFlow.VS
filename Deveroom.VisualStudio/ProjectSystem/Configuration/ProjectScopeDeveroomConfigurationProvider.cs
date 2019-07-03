@@ -19,6 +19,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
     {
         public const string SpecFlowJsonConfigFileName = "specflow.json";
         public const string SpecFlowAppConfigFileName = "App.config";
+        public const string SpecSyncJsonConfigFileName = "specsync.json";
 
         private readonly IProjectScope _projectScope;
         private ConfigCache _configCache;
@@ -93,6 +94,10 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
                     yield return appConfigSource;
             }
 
+            var specSyncConfigSource = GetProjectConfigFilePath(SpecSyncJsonConfigFileName);
+            if (specSyncConfigSource != null)
+                yield return specSyncConfigSource;
+
             var deveroomConfigSource = GetProjectConfigFilePath(DeveroomConfigurationLoader.DefaultConfigFileName);
             if (deveroomConfigSource != null)
                 yield return deveroomConfigSource;
@@ -134,6 +139,11 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
                     if (SpecFlowJsonConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
                     {
                         LoadFromSpecFlowJsonConfig(configSource.FilePath, configuration);
+                    }
+
+                    if (SpecSyncJsonConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        LoadFromSpecSyncJsonConfig(configSource.FilePath, configuration);
                     }
 
                     if (DeveroomConfigurationLoader.DefaultConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
@@ -213,6 +223,49 @@ namespace Deveroom.VisualStudio.ProjectSystem.Configuration
             var bindingCulture = (string) jsonConfigRoot["bindingCulture"]?["name"];
             if (bindingCulture != null)
                 configuration.ConfiguredBindingCulture = bindingCulture;
+        }
+
+        private void LoadFromSpecSyncJsonConfig(string configSourceFilePath, DeveroomConfiguration configuration)
+        {
+            var fileContent = FileSystem.File.ReadAllText(configSourceFilePath);
+            UpdateFromSpecSyncJsonConfig(configuration, fileContent);
+        }
+
+        internal static void UpdateFromSpecSyncJsonConfig(DeveroomConfiguration configuration, string fileContent)
+        {
+            var configDoc = JObject.Parse(fileContent);
+
+            var projectUrl = ((string) configDoc["remote"]?["projectUrl"])?.TrimEnd('/');
+            if (string.IsNullOrEmpty(projectUrl))
+                return;
+
+            var testCaseTagPrefix = (string) configDoc["synchronization"]?["testCaseTagPrefix"] ?? "tc";
+
+            var tagLinks = new List<TagLinkConfiguration>(configuration.Traceability.TagLinks);
+            AddSpecSyncTagLinkConfiguration(tagLinks, testCaseTagPrefix, projectUrl);
+
+            var linksArray = configDoc["synchronization"]?["links"] as JArray;
+            if (linksArray != null)
+            {
+                foreach (var link in linksArray)
+                {
+                    var tagPrefix = (string) link["tagPrefix"];
+                    if (string.IsNullOrEmpty(tagPrefix))
+                        continue;
+                    AddSpecSyncTagLinkConfiguration(tagLinks, tagPrefix, projectUrl);
+                }
+            }
+
+            configuration.Traceability.TagLinks = tagLinks.ToArray();
+        }
+
+        private static void AddSpecSyncTagLinkConfiguration(List<TagLinkConfiguration> tagLinks, string tagPrefix, string projectUrl)
+        {
+            tagLinks.Add(new TagLinkConfiguration
+            {
+                TagPattern = $@"{tagPrefix}\:(?<id>\d+)",
+                UrlTemplate = projectUrl + "/_workitems/edit/{id}"
+            });
         }
 
         public void Dispose()

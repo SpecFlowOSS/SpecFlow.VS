@@ -42,3 +42,19 @@ Scenario: Turns configured tag to a link
 	And the tag links should target to the following URLs
 		| tag         | url                                                     |
 		| @issue:1234 | https://github.com/specsolutions/my-project/issues/1234 |
+
+Scenario: Turns SpecSync tags to links automatically
+	Given there is a SpecFlow project scope
+	And the project is configured for SpecSync with Azure DevOps project URL "https://dev.azure.com/specsolutions/deveroom-visualstudio"
+	When the following feature file is opened in the editor
+		"""
+		Feature: Addition
+
+		@tc:1234
+		Scenario: Add two numbers
+			When I press add
+		"""
+	Then the tag links should target to the following URLs
+		| tag      | url                                                                            |
+		| @tc:1234 | https://dev.azure.com/specsolutions/deveroom-visualstudio/_workitems/edit/1234 |
+

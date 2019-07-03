@@ -13,6 +13,7 @@ using Deveroom.VisualStudio.Editor.Completions;
 using Deveroom.VisualStudio.Editor.Completions.Infrastructure;
 using Deveroom.VisualStudio.Editor.Services;
 using Deveroom.VisualStudio.Editor.Traceability;
+using Deveroom.VisualStudio.ProjectSystem.Configuration;
 using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using Deveroom.VisualStudio.Specs.Support;
 using Deveroom.VisualStudio.UI.ViewModels;
@@ -118,6 +119,19 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
             string configFileContent = "{" + jsonSnippet + "}";
             var configLoader = new DeveroomConfigurationLoader();
             configLoader.Update(_projectScope.DeveroomConfiguration, configFileContent, _projectScope.ProjectFolder);
+            _projectScope.DeveroomConfiguration.CheckConfiguration();
+            _projectScope.DeveroomConfiguration.ConfigurationChangeTime = DateTime.Now;
+        }
+
+        [Given(@"the project is configured for SpecSync with Azure DevOps project URL ""([^""]*)""")]
+        public void GivenTheProjectIsConfiguredForSpecSyncWithAzureDevOpsProjectURL(string projectUrl)
+        {
+            string specSyncConfigFileContent = @"{
+                    'remote': {
+                        'projectUrl': '" + projectUrl + @"',
+                    }
+                }";
+            ProjectScopeDeveroomConfigurationProvider.UpdateFromSpecSyncJsonConfig(_projectScope.DeveroomConfiguration, specSyncConfigFileContent);
             _projectScope.DeveroomConfiguration.CheckConfiguration();
             _projectScope.DeveroomConfiguration.ConfigurationChangeTime = DateTime.Now;
         }
