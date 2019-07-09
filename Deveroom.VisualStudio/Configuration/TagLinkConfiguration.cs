@@ -5,11 +5,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Deveroom.VisualStudio.Common;
-using Equ;
 
 namespace Deveroom.VisualStudio.Configuration
 {
-    public class TagLinkConfiguration : MemberwiseEquatable<TagLinkConfiguration>
+    public class TagLinkConfiguration
     {
         public string TagPattern { get; set; }
         public string UrlTemplate { get; set; }
@@ -39,5 +38,33 @@ namespace Deveroom.VisualStudio.Configuration
                 throw new DeveroomConfigurationException($"Invalid regular expression '{TagPattern}' was specified as 'traceability/tagLinks[]/tagPattern': {e.Message}");
             }
         }
+
+        #region Equality
+
+        protected bool Equals(TagLinkConfiguration other)
+        {
+            return string.Equals(TagPattern, other.TagPattern) && string.Equals(UrlTemplate, other.UrlTemplate) && Equals(ResolvedTagPattern, other.ResolvedTagPattern);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((TagLinkConfiguration) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (TagPattern != null ? TagPattern.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (UrlTemplate != null ? UrlTemplate.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (ResolvedTagPattern != null ? ResolvedTagPattern.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
+
+        #endregion
     }
 }
