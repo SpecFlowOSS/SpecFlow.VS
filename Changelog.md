@@ -1,3 +1,9 @@
+# v1.4.1 - 2019-07-09
+
+Bug fixes:
+
+* Getting type initializer exception for 'Equ.MemberwiseEquatable'1' when creating feature file for Specflow (Issue #45)
+
 # v1.4.0 - 2019-07-03
 
 New features:
