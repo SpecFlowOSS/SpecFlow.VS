@@ -15,10 +15,13 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
 
         public static DiscoveryOptions Parse(string[] args)
         {
+            if (args.Length < 1)
+                throw new InvalidOperationException("Usage: discovery <test-assembly-path> [<config-file-path>]");
+
             var options = new DiscoveryOptions
             {
                 AssemblyFilePath = Path.GetFullPath(args[0]),
-                ConfigFilePath = string.IsNullOrWhiteSpace(args[1]) ? null : Path.GetFullPath(args[1])
+                ConfigFilePath = args.Length < 2 || string.IsNullOrWhiteSpace(args[1]) ? null : Path.GetFullPath(args[1])
             };
 
             options.TargetFolder = Path.GetDirectoryName(options.AssemblyFilePath);
