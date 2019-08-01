@@ -68,11 +68,11 @@ namespace Deveroom.VisualStudio.Wizards.Infrastructure
                 var updatedFileContent = Regex.Replace(fileContent, @"\$[^\$\s]+\$", 
                     match => replacementsDictionary.TryGetValue(match.Value, out var value) ? value : match.Value);
                 fileSystem.File.WriteAllText(targetFile, updatedFileContent, Encoding.UTF8);
-                Logger.LogVerbose($"New file created: {targetFile}");
+                Logger?.LogVerbose($"New file created: {targetFile}");
             }
             catch (Exception ex)
             {
-                Logger.LogException(MonitoringService, ex);
+                Logger?.LogException(MonitoringService, ex);
             }
         }
 
@@ -84,12 +84,13 @@ namespace Deveroom.VisualStudio.Wizards.Infrastructure
             var logger = Logger;
             _openFileTimer = SafeDispatcherTimer.CreateOneTime(1, Logger, MonitoringService, () =>
             {
-                OpenFile(targetFile, project);
+                OpenFile(targetFile, project, logger);
             });
             _openFileTimer.Start();
         }
 
-        private void OpenFile(string targetFile, Project project)
+        // this method needs to be static as it is called from the timer, when the core wizard has been disposed already.
+        private static void OpenFile(string targetFile, Project project, IDeveroomLogger logger)
         {
             try
             {
@@ -98,12 +99,12 @@ namespace Deveroom.VisualStudio.Wizards.Infrastructure
                 {
                     //projectItem.Open();
                     project.DTE.ExecuteCommand("File.OpenFile", targetFile);
-                    Logger.LogVerbose($"File opened: {targetFile}");
+                    logger.LogVerbose($"File opened: {targetFile}");
                 }
             }
             catch (Exception ex)
             {
-                Logger.LogException(MonitoringService, ex);
+                logger.LogDebugException(ex);
             }
         }
     }

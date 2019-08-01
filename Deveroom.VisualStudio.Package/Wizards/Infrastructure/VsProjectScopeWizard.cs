@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Deveroom.VisualStudio.Annotations;
 using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.Monitoring;
 using Deveroom.VisualStudio.ProjectSystem;
@@ -16,8 +17,8 @@ namespace Deveroom.VisualStudio.Wizards.Infrastructure
         protected TWizard _wizard;
         protected Project _project;
 
-        protected IDeveroomLogger Logger => _wizardRunParameters?.ProjectScope.IdeScope.Logger;
-        protected IMonitoringService MonitoringService => _wizardRunParameters?.ProjectScope.IdeScope.MonitoringService;
+        [CanBeNull] protected IDeveroomLogger Logger => _wizardRunParameters?.ProjectScope.IdeScope.Logger;
+        [CanBeNull] protected IMonitoringService MonitoringService => _wizardRunParameters?.ProjectScope.IdeScope.MonitoringService;
 
         public virtual void RunStarted(object automationObjectDte, Dictionary<string, string> replacementsDictionary, WizardRunKind runKind, object[] customParams)
         {
@@ -135,13 +136,13 @@ namespace Deveroom.VisualStudio.Wizards.Infrastructure
 
             if (_wizardRunParameters.ReplacementsDictionary.TryGetValue(WizardRunParameters.CustomToolSettingKey, out var customToolSetting))
             {
-                Logger.LogVerbose($"Set CustomTool to '{customToolSetting}' for {projectItem.Name}");
+                Logger?.LogVerbose($"Set CustomTool to '{customToolSetting}' for {projectItem.Name}");
                 projectItem.Properties.Item("CustomTool").Value = customToolSetting;
             }
 
             if (_wizardRunParameters.ReplacementsDictionary.TryGetValue(WizardRunParameters.BuildActionKey, out var buildActionSetting))
             {
-                Logger.LogVerbose($"Set build action to '{buildActionSetting}' for {projectItem.Name}");
+                Logger?.LogVerbose($"Set build action to '{buildActionSetting}' for {projectItem.Name}");
                 projectItem.Properties.Item("ItemType").Value = buildActionSetting;
             }
         }
