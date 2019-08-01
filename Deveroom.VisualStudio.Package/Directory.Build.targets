@@ -9,5 +9,12 @@
     <ItemGroup>
       <AddModules Include="$(OutputPath)%(AdditionalDeveroomDependencies.Filename)%(AdditionalDeveroomDependencies.Extension)" />
     </ItemGroup>
+
+    <ItemGroup Condition="'$(Configuration)' == 'Debug' ">
+      <Content Include="$(OutputPath)\*.pdb">
+        <IncludeInVSIX>true</IncludeInVSIX>
+        <VSIXSubPath>.</VSIXSubPath>
+      </Content>
+    </ItemGroup>
   </Target>
 </Project>
