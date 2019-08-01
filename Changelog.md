@@ -1,3 +1,9 @@
+# v1.4.2 - 2019-08-04
+
+Bug fixes:
+
+* Visual Studio freezes and restart when adding a new feature file to an SDK-style project (Issue #46)
+
 # v1.4.1 - 2019-07-09
 
 Bug fixes:
