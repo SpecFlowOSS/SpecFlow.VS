@@ -37,7 +37,7 @@ namespace Deveroom.VisualStudio.Diagonostics
 
         public static void LogException(this IDeveroomLogger logger, IMonitoringService monitoringService, Exception ex, string message = "Exception", [CallerMemberName] string callerName = "???")
         {
-            monitoringService.MonitorError(ex);
+            monitoringService?.MonitorError(ex);
             logger.Log(TraceLevel.Error, $"{callerName}: {message}: {ex}");
         }
 
@@ -47,6 +47,7 @@ namespace Deveroom.VisualStudio.Diagonostics
             logger.Log(TraceLevel.Verbose, $"{callerName}: {message}: {ex}");
         }
 
+        //TODO: merge IDeveroomLogger with IMonitoringService
         public static void LogDebugException(this IDeveroomLogger logger, Exception ex, string message = "Exception", [CallerMemberName] string callerName = "???")
         {
             logger.Log(TraceLevel.Verbose, $"{callerName}: {message}: {ex}");

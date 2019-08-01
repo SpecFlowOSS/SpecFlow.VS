@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Threading;
 using Deveroom.VisualStudio.Diagonostics;
 using EnvDTE;
 
@@ -77,19 +76,16 @@ namespace Deveroom.VisualStudio.Wizards.Infrastructure
             }
         }
 
-        private DispatcherTimer _openFileTimer;
+        private SafeDispatcherTimer _openFileTimer;
 
         private void ScheduleOpenFile(string targetFile)
         {
             var project = _project;
             var logger = Logger;
-            _openFileTimer = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.ContextIdle,
-                (sender, args) =>
-                {
-                    _openFileTimer.Stop();
-                    _openFileTimer = null;
-                    OpenFile(targetFile, project);
-                }, Dispatcher.CurrentDispatcher);
+            _openFileTimer = SafeDispatcherTimer.CreateOneTime(1, Logger, MonitoringService, () =>
+            {
+                OpenFile(targetFile, project);
+            });
             _openFileTimer.Start();
         }
 
