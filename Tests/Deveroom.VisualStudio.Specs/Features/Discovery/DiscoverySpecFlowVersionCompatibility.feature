@@ -8,6 +8,7 @@ Scenario Outline: Discover bindings from a simple SpecFlow project
 	And the step definitions contain source file and line
 Examples: 
 	| case          | version       |
+	| beta          | v3.1.44-beta  |
 	| latest        | v3.0.220      |
 	| recent        | v3.0.213      |
 	| first v3      | v3.0.188      |
