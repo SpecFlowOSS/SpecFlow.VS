@@ -29,6 +29,7 @@ Scenario Outline: Discover bindings from different SpecFlow v3 versions for .NET
 	Then the discovery succeeds with several step definitions
 Examples: 
 	| version       |
+	| v3.1.44-beta  |
 	| v3.0.161-beta |
 	| v3.0.188      |
 	| v3.0.213      |
