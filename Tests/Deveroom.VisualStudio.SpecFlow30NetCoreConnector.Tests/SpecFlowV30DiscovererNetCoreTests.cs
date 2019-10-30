@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30;
 using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using FluentAssertions;
@@ -13,7 +14,7 @@ namespace Deveroom.VisualStudio.SpecFlow30NetCoreConnector.Tests
     {
         private SpecFlowV30Discoverer CreateSut()
         {
-            var stubDiscoverer = new SpecFlowV30Discoverer();
+            var stubDiscoverer = new SpecFlowV30Discoverer(AssemblyLoadContext.Default);
             return stubDiscoverer;
         }
 

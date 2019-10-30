@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Loader;
 using BoDi;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Bindings;
@@ -11,6 +12,13 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30
 {
     public class SpecFlowV30P220Discoverer : BaseDiscoverer
     {
+        protected readonly AssemblyLoadContext _loadContext;
+
+        public SpecFlowV30P220Discoverer(AssemblyLoadContext loadContext)
+        {
+            _loadContext = loadContext;
+        }
+
         protected override IBindingRegistry GetBindingRegistry(Assembly testAssembly, string configFilePath)
         {
             IConfigurationLoader configurationLoader = new SpecFlow21ConfigurationLoader(configFilePath);
@@ -25,10 +33,15 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30
         protected virtual IObjectContainer CreateGlobalContainer(IConfigurationLoader configurationLoader, Assembly testAssembly)
         {
             var globalContainer =
-                new ContainerBuilder(new NoInvokeDependencyProvider()).CreateGlobalContainer(
+                new ContainerBuilder(CreateDefaultDependencyProvider()).CreateGlobalContainer(
                     testAssembly,
                     new DefaultRuntimeConfigurationProvider(configurationLoader));
             return globalContainer;
+        }
+
+        protected virtual DefaultDependencyProvider CreateDefaultDependencyProvider()
+        {
+            return new NoInvokeDependencyProvider();
         }
 
         protected override IEnumerable<IStepDefinitionBinding> GetStepDefinitions(IBindingRegistry bindingRegistry)

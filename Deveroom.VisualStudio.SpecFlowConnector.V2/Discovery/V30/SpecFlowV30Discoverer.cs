@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.Loader;
 using BoDi;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
@@ -8,6 +9,10 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30
 {
     public class SpecFlowV30Discoverer : SpecFlowV30P220Discoverer
     {
+        public SpecFlowV30Discoverer(AssemblyLoadContext loadContext) : base(loadContext)
+        {
+        }
+
         protected override IObjectContainer CreateGlobalContainer(IConfigurationLoader configurationLoader, Assembly testAssembly)
         {
             // We need to call the CreateGlobalContainer through reflection because the interface has been changed in V3.0.220.

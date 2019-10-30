@@ -171,12 +171,12 @@ namespace Deveroom.SampleProjectGenerator
                        Text="$([System.String]::Format('$(ErrorText)', '..\packages\SpecFlow.2.3.1\build\SpecFlow.targets'))" />
             </Target>            
             */
-            var lastItemGroup = DescendantsSimple(_projXml, "ItemGroup").Last();
+            var lastImport = DescendantsSimple(_projXml, "Import").Last();
             var importElm = CreateElement("Import");
             var relativeTargetPath = GetRelativePath(targetFile, _projectFolder);
             importElm.SetAttributeValue("Project", relativeTargetPath);
             importElm.SetAttributeValue("Condition", $"Exists('{relativeTargetPath}')");
-            lastItemGroup.AddAfterSelf(importElm);
+            lastImport.AddAfterSelf(importElm);
 
             RegisterImportVerification(relativeTargetPath);
         }

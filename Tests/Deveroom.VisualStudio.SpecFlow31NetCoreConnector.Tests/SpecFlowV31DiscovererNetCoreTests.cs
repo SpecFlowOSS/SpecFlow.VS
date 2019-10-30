@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30;
+using System.Runtime.Loader;
+using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V31;
 using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using FluentAssertions;
 using TechTalk.SpecFlow;
@@ -11,9 +12,9 @@ namespace Deveroom.VisualStudio.SpecFlow31NetCoreConnector.Tests
 {
     public class SpecFlowV31DiscovererNetCoreTests
     {
-        private SpecFlowV30P220Discoverer CreateSut()
+        private SpecFlowV31Discoverer CreateSut()
         {
-            var stubDiscoverer = new SpecFlowV30P220Discoverer();
+            var stubDiscoverer = new SpecFlowV31Discoverer(AssemblyLoadContext.Default);
             return stubDiscoverer;
         }
 
@@ -22,7 +23,7 @@ namespace Deveroom.VisualStudio.SpecFlow31NetCoreConnector.Tests
             return Assembly.GetExecutingAssembly().Location;
         }
 
-        private DiscoveryResult PerformDiscover(SpecFlowV30P220Discoverer sut)
+        private DiscoveryResult PerformDiscover(SpecFlowV31Discoverer sut)
         {
             var testAssemblyPath = GetTestAssemblyPath();
             var testAssembly = Assembly.LoadFrom(testAssemblyPath);

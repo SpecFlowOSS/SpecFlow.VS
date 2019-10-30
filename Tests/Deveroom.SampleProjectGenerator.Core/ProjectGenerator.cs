@@ -138,7 +138,9 @@ namespace Deveroom.SampleProjectGenerator
 
         private void GenerateTestArtifacts(string projectFilePath)
         {
-            var featuresFolder = Path.Combine(_options.TargetFolder, "Features");
+            var customTool = _options.SpecFlowVersion >= new Version("3.0") ? null : "SpecFlowSingleFileGenerator";
+
+                var featuresFolder = Path.Combine(_options.TargetFolder, "Features");
             var stepDefsFolder = Path.Combine(_options.TargetFolder, "StepDefinitions");
             EnsureEmptyFolder(featuresFolder);
             EnsureEmptyFolder(stepDefsFolder);
@@ -156,7 +158,7 @@ namespace Deveroom.SampleProjectGenerator
                     _options.ScenarioPerFeatureFileCount * _options.ScenarioOutlinePerScenarioPercent / 100;
                 var scenarioCount = _options.ScenarioPerFeatureFileCount - scenarioOutlineCount;
                 var filePath = assetGenerator.GenerateFeatureFile(featuresFolder, scenarioCount, scenarioOutlineCount);
-                projectChanger.AddFile(filePath, "None", "SpecFlowSingleFileGenerator");
+                projectChanger.AddFile(filePath, "None", customTool);
                 FeatureFiles.Add(filePath);
             }
             var stepDefClasses = assetGenerator.GenerateStepDefClasses(stepDefsFolder, _options.StepDefPerClassCount);
@@ -278,6 +280,12 @@ namespace Deveroom.SampleProjectGenerator
         {
             if (_options.SpecFlowVersion >= new Version("3.0"))
             {
+                var sourcePlatform = _options.SpecFlowVersion >= new Version("2.0") ? "net45" : "net35";
+                ExecNuGetInstall("SpecFlow.Tools.MsBuild.Generation", packagesFolder, "-Version", _options.SpecFlowPackageVersion);
+                InstallNuGetPackage(projectChanger, packagesFolder, "SpecFlow.Tools.MsBuild.Generation", sourcePlatform, _options.SpecFlowPackageVersion);
+
+                ExecNuGetInstall("SpecFlow." + _options.UnitTestProvider, packagesFolder, "-Version", _options.SpecFlowPackageVersion);
+                InstallNuGetPackage(projectChanger, packagesFolder, "SpecFlow." + _options.UnitTestProvider, sourcePlatform, _options.SpecFlowPackageVersion);
                 return;
             }
 
@@ -288,23 +296,28 @@ namespace Deveroom.SampleProjectGenerator
         {
             var sourcePlatform = _options.SpecFlowVersion >= new Version("2.0") ? "net45" : "net35";
             InstallNuGetPackage(projectChanger, packagesFolder, "SpecFlow", sourcePlatform, _options.SpecFlowPackageVersion);
+
+            if (_options.SpecFlowVersion >= new Version("3.1"))
+            {
+                InstallNuGetPackage(projectChanger, packagesFolder, "Cucumber.Messages", dependency: true, packageVersion: "6.0.1");
+                InstallNuGetPackage(projectChanger, packagesFolder, "Google.Protobuf", dependency: true, packageVersion: "3.7.0");
+            }
+
             if (_options.SpecFlowVersion >= new Version("3.0.188"))
             {
                 InstallNuGetPackage(projectChanger, packagesFolder, "BoDi", dependency: true, packageVersion: "1.4.1");
                 InstallNuGetPackage(projectChanger, packagesFolder, "Gherkin", dependency: true, packageVersion: "6.0.0");
                 InstallNuGetPackage(projectChanger, packagesFolder, "Utf8Json", "net45", dependency: true, packageVersion: "1.3.7");
                 InstallNuGetPackage(projectChanger, packagesFolder, "System.ValueTuple", "netstandard1.0", dependency: true);
-                return;
             }
-            if (_options.SpecFlowVersion >= new Version("3.0"))
+            else if (_options.SpecFlowVersion >= new Version("3.0"))
             {
                 InstallNuGetPackage(projectChanger, packagesFolder, "BoDi", dependency: true, packageVersion: "1.4.0-alpha1");
                 InstallNuGetPackage(projectChanger, packagesFolder, "Gherkin", dependency: true, packageVersion: "6.0.0-beta1");
                 InstallNuGetPackage(projectChanger, packagesFolder, "Utf8Json", "net45", dependency: true, packageVersion: "1.3.7");
                 InstallNuGetPackage(projectChanger, packagesFolder, "System.ValueTuple", "netstandard1.0", dependency: true);
-                return;
             }
-            if (_options.SpecFlowVersion >= new Version("2.3"))
+            else if (_options.SpecFlowVersion >= new Version("2.3"))
             {
                 InstallNuGetPackage(projectChanger, packagesFolder, "Newtonsoft.Json", dependency: true);
                 InstallNuGetPackage(projectChanger, packagesFolder, "System.ValueTuple", "netstandard1.0", dependency: true);
