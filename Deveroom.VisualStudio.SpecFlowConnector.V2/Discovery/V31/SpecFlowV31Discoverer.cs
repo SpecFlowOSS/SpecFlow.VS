@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Runtime.Loader;
 using BoDi;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30;
 using TechTalk.SpecFlow.Infrastructure;
 using TechTalk.SpecFlow.Plugins;
 
 namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V31
 {
-    public class SpecFlowV31Discoverer : SpecFlowV30P220Discoverer
+    public class SpecFlowV31Discoverer : SpecFlowV3BaseDiscoverer
     {
         public SpecFlowV31Discoverer(AssemblyLoadContext loadContext) : base(loadContext)
         {

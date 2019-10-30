@@ -7,7 +7,7 @@ using TechTalk.SpecFlow.Infrastructure;
 
 namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery.V30
 {
-    public class SpecFlowV30Discoverer : SpecFlowV30P220Discoverer
+    public class SpecFlowV30Discoverer : SpecFlowV3BaseDiscoverer
     {
         public SpecFlowV30Discoverer(AssemblyLoadContext loadContext) : base(loadContext)
         {
