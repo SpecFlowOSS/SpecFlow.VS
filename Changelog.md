@@ -1,3 +1,9 @@
+# v1.4.3 - 2019-11-05
+
+Bug fixes:
+
+* Initialisation error with .NET Core and SpecFlow v3.1 beta (Issue #49)
+
 # v1.4.2 - 2019-08-04
 
 Bug fixes:
