@@ -156,7 +156,33 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.V1.Tests
             var result = sut.DiscoverInternal(GetTestAssemblyPath(), null);
 
             result.StepDefinitions.Should().HaveCount(1);
-            result.StepDefinitions[0].Scope.Should().Be("@foo");
+            result.StepDefinitions[0].Scope.Tag.Should().Be("@foo");
+        }
+
+        [Fact]
+        public void Discovers_feature_scope()
+        {
+            RegisterStepDefinitionBinding(scope: new BindingScope(null, "foo", null));
+
+            var sut = CreateSut();
+
+            var result = sut.DiscoverInternal(GetTestAssemblyPath(), null);
+
+            result.StepDefinitions.Should().HaveCount(1);
+            result.StepDefinitions[0].Scope.FeatureTitle.Should().Be("foo");
+        }
+
+        [Fact]
+        public void Discovers_scenario_scope()
+        {
+            RegisterStepDefinitionBinding(scope: new BindingScope(null, null, "foo"));
+
+            var sut = CreateSut();
+
+            var result = sut.DiscoverInternal(GetTestAssemblyPath(), null);
+
+            result.StepDefinitions.Should().HaveCount(1);
+            result.StepDefinitions[0].Scope.ScenarioTitle.Should().Be("foo");
         }
 
         [Fact]

@@ -50,5 +50,18 @@ namespace Deveroom.VisualStudio.Discovery
             }
             return context.Parent;
         }
+
+        public static T AncestorOrSelfNode<T>(this IGherkinDocumentContext context)
+            where T : class
+        {
+            if (context.Node is T)
+                return context.Node as T;
+
+            while (context.Parent != null && !(context.Parent.Node is T))
+            {
+                context = context.Parent;
+            }
+            return context.Parent?.Node as T;
+        }
     }
 }

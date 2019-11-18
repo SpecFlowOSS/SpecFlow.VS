@@ -135,14 +135,19 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
         protected abstract IBindingRegistry GetBindingRegistry(Assembly testAssembly, string configFilePath);
         protected abstract IEnumerable<IStepDefinitionBinding> GetStepDefinitions(IBindingRegistry bindingRegistry);
 
-        private string GetScope(IStepDefinitionBinding stepDefinitionBinding)
+        private StepScope GetScope(IStepDefinitionBinding stepDefinitionBinding)
         {
             if (!stepDefinitionBinding.IsScoped)
                 return null;
-            if (stepDefinitionBinding.BindingScope.Tag == null)
-                return null;
 
-            return "@" + stepDefinitionBinding.BindingScope.Tag;
+            return new StepScope
+            {
+                Tag = stepDefinitionBinding.BindingScope.Tag == null
+                    ? null
+                    : "@" + stepDefinitionBinding.BindingScope.Tag,
+                FeatureTitle = stepDefinitionBinding.BindingScope.FeatureTitle,
+                ScenarioTitle = stepDefinitionBinding.BindingScope.ScenarioTitle
+            };
         }
 
         public void Dispose()

@@ -152,10 +152,10 @@ Scenario: Ambiguous step definitions
 			When {BindingError}I use a step{/BindingError}
 		"""
 
-Scenario: Matches scoped step definitions
+Scenario: Matches tag scoped step definitions
 	Given there is a SpecFlow project scope
 	And the following step definitions in the project:
-		| type | regex                        | scope       |
+		| type | regex                        | tag scope   |
 		| When | I use mytag scoped step      | @mytag      |
 		| When | I use featuretag scoped step | @featuretag |
 	When the following feature file is opened in the editor
@@ -188,10 +188,96 @@ Scenario: Matches scoped step definitions
 			When {DefinedStep}I use featuretag scoped step{/DefinedStep}
 		"""
 
+Scenario: Matches feature scoped step definitions
+	Given there is a SpecFlow project scope
+	And the following step definitions in the project:
+		| type | regex                       | feature scope |
+		| When | I use a feature scoped step | Addition      |
+		| When | I use a feature scoped step | Substraction  |
+	When the following feature file is opened in the editor
+		"""
+		Feature: Addition
+
+		Scenario: Random scenario
+			When I use a feature scoped step
+		"""
+	And the initial binding discovery is performed
+	Then all section of types DefinedStep should be highlighted as
+		"""
+		Feature: Addition
+
+		Scenario: Random scenario
+			When {DefinedStep}I use a feature scoped step{/DefinedStep}
+		"""
+	And no binding error should be highlighted
+
+Scenario: Matches scenario scoped step definitions
+	Given there is a SpecFlow project scope
+	And the following step definitions in the project:
+		| type | regex                        | scenario scope  |
+		| When | I use a scenario scoped step | Random scenario |
+		| When | I use a scenario scoped step |                 |
+	When the following feature file is opened in the editor
+		"""
+		Feature: Addition
+
+		Scenario: Random scenario
+			When I use a scenario scoped step
+		"""
+	And the initial binding discovery is performed
+	Then all section of types DefinedStep should be highlighted as
+		"""
+		Feature: Addition
+
+		Scenario: Random scenario
+			When {DefinedStep}I use a scenario scoped step{/DefinedStep}
+		"""
+	And no binding error should be highlighted
+
+Scenario: Matches combination scoped step definitions
+	Given there is a SpecFlow project scope
+	And the following step definitions in the project:
+		| type | regex                               | scenario scope  | feature scope | tag scope |
+		| When | I use a combination scoped step     | Random scenario | Addition      | @mytag    |
+		| When | I use a feature and tag scoped step |                 | Addition      | @mytag    |
+		| When | I use a feature scoped step         |                 | Addition      | @mytag    |
+	When the following feature file is opened in the editor
+		"""
+		Feature: Addition
+
+		@mytag
+		Scenario: Random scenario
+			When I use a combination scoped step
+
+		@mytag
+		Scenario: Another scenario
+			When I use a feature and tag scoped step
+
+		Scenario: Yet another scenario
+			When I use a feature scoped step
+		"""
+	And the initial binding discovery is performed
+	Then all section of types DefinedStep,UndefinedStep should be highlighted as
+		"""
+		Feature: Addition
+		
+		@mytag
+		Scenario: Random scenario
+			When {DefinedStep}I use a combination scoped step{/DefinedStep}
+		
+		@mytag
+		Scenario: Another scenario
+			When {DefinedStep}I use a feature and tag scoped step{/DefinedStep}
+
+		Scenario: Yet another scenario
+			When {UndefinedStep}I use a feature scoped step{/UndefinedStep}
+		"""
+	And no binding error should be highlighted
+
 Scenario: Analyses all scopes of background steps
 	Given there is a SpecFlow project scope
 	And the following step definitions in the project:
-		| type  | regex                      | scope     |
+		| type  | regex                      | tag scope |
 		| Given | I use mytag scoped step    | @mytag    |
 		| Given | I use othertag scoped step | @othertag |
 		| When  | I use a normal step        |           |

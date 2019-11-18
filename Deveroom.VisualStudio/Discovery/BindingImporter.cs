@@ -118,12 +118,19 @@ namespace Deveroom.VisualStudio.Discovery
             return new SourceLocation(sourceFile, line, column, endLineOrNull, endColumnOrNull);
         }
 
-        private ITagExpression ParseScope(string scope)
+        private Scope ParseScope(StepScope bindingScope)
         {
-            if (string.IsNullOrWhiteSpace(scope))
+            if (bindingScope == null)
                 return null;
 
-            return _tagExpressionParser.Parse(scope);
+            return new Scope
+            {
+                FeatureTitle = bindingScope.FeatureTitle,
+                ScenarioTitle = bindingScope.ScenarioTitle,
+                Tag = string.IsNullOrWhiteSpace(bindingScope.Tag)
+                    ? null
+                    : _tagExpressionParser.Parse(bindingScope.Tag)
+            };
         }
     }
 }

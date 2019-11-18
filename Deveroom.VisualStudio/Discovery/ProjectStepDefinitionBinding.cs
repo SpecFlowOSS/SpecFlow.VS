@@ -1,7 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
-using Deveroom.VisualStudio.Discovery.TagExpressions;
+using Deveroom.VisualStudio.Editor.Services;
 using Deveroom.VisualStudio.Editor.Services.Parser;
 using Gherkin.Ast;
 
@@ -12,10 +11,10 @@ namespace Deveroom.VisualStudio.Discovery
         public bool IsValid { get; set; } = true;
         public ScenarioBlock StepDefinitionType { get; }
         public Regex Regex { get; }
-        public ITagExpression Scope { get; }
+        public Scope Scope { get; }
         public ProjectStepDefinitionImplementation Implementation { get; }
 
-        public ProjectStepDefinitionBinding(ScenarioBlock stepDefinitionType, Regex regex, ITagExpression scope, ProjectStepDefinitionImplementation implementation)
+        public ProjectStepDefinitionBinding(ScenarioBlock stepDefinitionType, Regex regex, Scope scope, ProjectStepDefinitionImplementation implementation)
         {
             StepDefinitionType = stepDefinitionType;
             Regex = regex;
@@ -35,8 +34,15 @@ namespace Deveroom.VisualStudio.Discovery
                 return null;
 
             //check scope
-            if (Scope != null && !Scope.Evaluate(context.GetTagNames()))
-                return null;
+            if (Scope != null)
+            {
+                if (Scope.Tag != null && !Scope.Tag.Evaluate(context.GetTagNames()))
+                    return null;
+                if (Scope.FeatureTitle != null && context.AncestorOrSelfNode<Feature>()?.Name != Scope.FeatureTitle)
+                    return null;
+                if (Scope.ScenarioTitle != null && context.AncestorOrSelfNode<Scenario>()?.Name != Scope.ScenarioTitle)
+                    return null;
+            }
 
             var parameterMatch = MatchParameter(step, match);
             return MatchResultItem.CreateMatch(this, parameterMatch);

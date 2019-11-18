@@ -164,7 +164,7 @@ namespace Deveroom.VisualStudio.Tests.Discovery
 
             var result = sut.MatchStep(CreateStep(text: "my step"), CreateScenarioContext(null, "@mytag"));
             var matchItem = AssertSingleDefined(result);
-            matchItem.MatchedStepDefinition.Scope.Should().NotBeNull();
+            matchItem.MatchedStepDefinition.Scope.Tag.Should().NotBeNull();
         }
 
         [Fact]

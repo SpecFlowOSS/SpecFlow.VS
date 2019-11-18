@@ -6,7 +6,7 @@
         public string Regex { get; set; }
         public string Method { get; set; }
         public string ParamTypes { get; set; }
-        public string Scope { get; set; }
+        public StepScope Scope { get; set; }
 
         public string SourceLocation { get; set; }
 

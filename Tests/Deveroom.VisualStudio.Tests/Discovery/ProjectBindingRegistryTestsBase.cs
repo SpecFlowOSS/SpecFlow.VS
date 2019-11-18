@@ -28,7 +28,7 @@ namespace Deveroom.VisualStudio.Tests.Discovery
             return new DeveroomGherkinStep(null, stepKeyword + " ", text, stepArgument, stepKeyword, (ScenarioBlock)stepKeyword);
         }
 
-        protected ProjectStepDefinitionBinding CreateStepDefinitionBinding(string regex, ScenarioBlock scenarioBlock = ScenarioBlock.Given, ITagExpression scope = null, string[] parameterTypes = null, string methodName = null)
+        protected ProjectStepDefinitionBinding CreateStepDefinitionBinding(string regex, ScenarioBlock scenarioBlock = ScenarioBlock.Given, Scope scope = null, string[] parameterTypes = null, string methodName = null)
         {
             methodName = methodName ?? ("MyMethod" + Guid.NewGuid().ToString("N"));
             if (!Implementations.TryGetValue(methodName, out var implementation))
@@ -53,9 +53,9 @@ namespace Deveroom.VisualStudio.Tests.Discovery
             });
         }
 
-        protected ITagExpression CreateTagScope(string tagName)
+        protected Scope CreateTagScope(string tagName)
         {
-            return TagExpressionParser.CreateTagLiteral(tagName);
+            return new Scope { Tag = TagExpressionParser.CreateTagLiteral(tagName) };
         }
 
         private DeveroomTag CreateFeatureStructure(string[] featureTags, string[] scenarioTags, string[] scenarioOutlineTags = null, string[] soHeaders = null, string[][] soCells = null, bool includeScenario = true, bool includeOutline = true, string[] outlineExamplesTags = null)

@@ -1,3 +1,9 @@
+# v1.4.4 - 2019-11-18
+
+Improvements:
+
+* Add support for feature and scenario scoping
+
 # v1.4.3 - 2019-11-05
 
 Bug fixes:

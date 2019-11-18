@@ -19,7 +19,7 @@ namespace Deveroom.VisualStudio.Tests.Discovery
             return new BindingImporter(_sourceFiles, _typeNames, new DeveroomNullLogger());
         }
 
-        private StepDefinition CreateStepDefinition(string regex = null, string type = null, string sourceLocation = null, string scope = null, string paramTypes = null, string method = null)
+        private StepDefinition CreateStepDefinition(string regex = null, string type = null, string sourceLocation = null, StepScope scope = null, string paramTypes = null, string method = null)
         {
             return new StepDefinition
             {
@@ -135,10 +135,11 @@ namespace Deveroom.VisualStudio.Tests.Discovery
         public void Parses_step_definition_tag_scope()
         {
             var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(scope: "@mytag"));
+            var result = sut.ImportStepDefinition(CreateStepDefinition(scope: new StepScope { Tag = "@mytag" }));
 
             result.Scope.Should().NotBeNull();
-            result.Scope.ToString().Should().Be("@mytag");
+            result.Scope.Tag.Should().NotBeNull();
+            result.Scope.Tag.ToString().Should().Be("@mytag");
         }
 
         [Fact]
