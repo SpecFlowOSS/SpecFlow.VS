@@ -22,7 +22,10 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
         {
             using (AssemblyHelper.SubscribeResolveForAssembly(_options.AssemblyFilePath))
             {
-                var appDomain = new AppDomainManager(_options.AssemblyFilePath, _options.ConfigFilePath, false, null);
+                var appDomainConfig = $"{_options.AssemblyFilePath}.config";
+                if (!File.Exists(appDomainConfig))
+                    appDomainConfig = null;
+                var appDomain = new AppDomainManager(_options.AssemblyFilePath, appDomainConfig, false, null);
 
                 var specFlowVersion = GetSpecFlowVersion();
                 var discovererType = typeof(SpecFlowV30P220Discoverer); // assume recent version

@@ -8,6 +8,10 @@ Improvements:
 
 * Add support for feature and scenario scoping
 
+Bug fixes:
+
+* Discovery error when `specflow.json` is used for .NET Framework project (Issue #56)
+
 # v1.4.3 - 2019-11-05
 
 Bug fixes:
