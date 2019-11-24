@@ -56,6 +56,34 @@ Scenario: Highlights definition line keywords
 			| add |
 		"""
 
+@gherkin6
+Scenario: Highlights rule line keywords
+	Given there is a SpecFlow project scope
+	When the following feature file is opened in the editor
+		"""
+		Feature: Addition
+
+		Scenario: General feature scenario
+			When I press add
+
+		Rule: This is a rule
+
+		Scenario: Scenario illustrating a rule
+			When I press add
+		"""
+	Then all DefinitionLineKeyword section should be highlighted as
+		"""
+		{DefinitionLineKeyword}Feature:{/DefinitionLineKeyword} Addition
+
+		{DefinitionLineKeyword}Scenario:{/DefinitionLineKeyword} General feature scenario
+			When I press add
+
+		{DefinitionLineKeyword}Rule:{/DefinitionLineKeyword} This is a rule
+
+		{DefinitionLineKeyword}Scenario:{/DefinitionLineKeyword} Scenario illustrating a rule
+			When I press add
+		"""
+
 Scenario: Highlights tags
 	Given there is a SpecFlow project scope
 	When the following feature file is opened in the editor
