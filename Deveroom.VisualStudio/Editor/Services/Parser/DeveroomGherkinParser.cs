@@ -143,6 +143,8 @@ namespace Deveroom.VisualStudio.Editor.Services.Parser
                 CheckForDuplicateExamples(specFlowDocument.Feature, errors);
 
                 CheckForMissingExamples(specFlowDocument.Feature, errors);
+
+                CheckForRulesPreSpecFlow31(specFlowDocument.Feature, errors);
             }
 
             // collect
@@ -150,6 +152,11 @@ namespace Deveroom.VisualStudio.Editor.Services.Parser
                 throw errors[0];
             if (errors.Count > 1)
                 throw new CompositeParserException(errors.ToArray());
+        }
+
+        private void CheckForRulesPreSpecFlow31(Feature feature, List<ParserException> errors)
+        {
+            //TODO: Show error when Rule keyword is used in SpecFlow v3.0 or earlier
         }
 
         private void CheckForDuplicateScenarios(Feature feature, List<ParserException> errors)

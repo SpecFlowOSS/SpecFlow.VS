@@ -31,6 +31,9 @@ namespace Deveroom.VisualStudio.Editor.Services.Parser
         public static IEnumerable<Scenario> FlattenScenarioDefinitions(this Feature feature)
             => feature.FlattenStepsContainers().OfType<Scenario>();
 
+        public static IEnumerable<Rule> Rules(this Feature feature)
+            => feature.Children.OfType<Rule>();
+
         public static Background Background(this Feature feature)
             => feature.Children.OfType<Background>().FirstOrDefault();
 
