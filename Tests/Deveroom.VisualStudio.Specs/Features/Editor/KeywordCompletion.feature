@@ -1,4 +1,5 @@
-﻿Feature: Keyword completion
+﻿@gherkin6
+Feature: Keyword completion
 
 Rules:
 
@@ -51,6 +52,7 @@ Scenario: After a sceanrio it offers Step keywords, Scenario, Scenario Oultine a
 		| Scenario Template: |
 		| Examples:          |
 		| Scenarios:         |
+		| Rule:              |
 
 Scenario: Completes keyword at the caret position
 	Given there is a SpecFlow project scope
@@ -148,6 +150,7 @@ Scenario: Completion list is shown when the first letter is typed in a line
 		| Example:           |
 		| Scenario Outline:  |
 		| Scenario Template: |
+		| Rule:              |
 
 Scenario: A short description is shown for each keyword
 	Given there is a SpecFlow project scope

@@ -118,10 +118,9 @@ namespace Deveroom.VisualStudio.Editor.Completions
                     case TokenType.FeatureLine:
                         AddCompletions(completions, dialect.FeatureKeywords, ": ", "Introduces the feature being described");
                         break;
-                    //TODO: add this for Rule support
-                    //case TokenType.RuleLine:
-                    //    AddCompletions(completions, dialect.RuleKeywords, ": ", "Describes a business rule illustrated by the subsequent scenarios");
-                    //    break;
+                    case TokenType.RuleLine:
+                        AddCompletions(completions, dialect.RuleKeywords, ": ", "Describes a business rule illustrated by the subsequent scenarios");
+                        break;
                     case TokenType.BackgroundLine:
                         AddCompletions(completions, dialect.BackgroundKeywords, ": ", "Describes context common to all scenarios in this feature file");
                         break;
