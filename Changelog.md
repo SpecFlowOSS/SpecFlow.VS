@@ -1,4 +1,8 @@
-# v1.4.4 - 2019-11-18
+# vNext - ???
+
+New features:
+
+* Support for [Gherkin v6 `Rule` keyword](https://cucumber.io/docs/gherkin/reference/#rule) (with SpecFlow v3.1)
 
 Improvements:
 
