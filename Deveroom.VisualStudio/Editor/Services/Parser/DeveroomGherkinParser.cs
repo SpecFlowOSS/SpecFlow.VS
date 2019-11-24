@@ -155,49 +155,41 @@ namespace Deveroom.VisualStudio.Editor.Services.Parser
         private void CheckForDuplicateScenarios(Feature feature, List<ParserException> errors)
         {
             // duplicate scenario name
-            var duplicatedScenarios = feature.ScenarioDefinitions().GroupBy(sd => sd.Name, sd => sd).Where(g => g.Count() > 1).ToArray();
+            var duplicatedScenarios = feature.FlattenScenarioDefinitions().GroupBy(sd => sd.Name, sd => sd).Where(g => g.Count() > 1).ToArray();
             errors.AddRange(
                 duplicatedScenarios.Select(g =>
                     new SemanticParserException(
-                        string.Format("Feature file already contains a scenario with name '{0}'", g.Key),
+                        $"Feature file already contains a scenario with name '{g.Key}'",
                         g.ElementAt(1).Location)));
         }
 
         private void CheckForDuplicateExamples(Feature feature, List<ParserException> errors)
         {
-            foreach (var scenarioDefinition in feature.ScenarioDefinitions())
+            foreach (var scenarioOutline in feature.FlattenScenarioDefinitions().OfType<ScenarioOutline>())
             {
-                var scenarioOutline = scenarioDefinition as ScenarioOutline;
-                if (scenarioOutline != null)
-                {
-                    var duplicateExamples = scenarioOutline.Examples
-                                                           .Where(e => !String.IsNullOrWhiteSpace(e.Name))
-                                                           .Where(e => e.Tags.All(t => t.Name != "ignore"))
-                                                           .GroupBy(e => e.Name, e => e).Where(g => g.Count() > 1);
+                var duplicateExamples = scenarioOutline.Examples
+                                                       .Where(e => !String.IsNullOrWhiteSpace(e.Name))
+                                                       .Where(e => e.Tags.All(t => t.Name != "ignore"))
+                                                       .GroupBy(e => e.Name, e => e).Where(g => g.Count() > 1);
 
-                    foreach (var duplicateExample in duplicateExamples)
-                    {
-                        var message = string.Format("Scenario Outline '{0}' already contains an example with name '{1}'", scenarioOutline.Name, duplicateExample.Key);
-                        var semanticParserException = new SemanticParserException(message, duplicateExample.ElementAt(1).Location);
-                        errors.Add(semanticParserException);
-                    }
+                foreach (var duplicateExample in duplicateExamples)
+                {
+                    var message = $"Scenario Outline '{scenarioOutline.Name}' already contains an example with name '{duplicateExample.Key}'";
+                    var semanticParserException = new SemanticParserException(message, duplicateExample.ElementAt(1).Location);
+                    errors.Add(semanticParserException);
                 }
             }
         }
 
         private void CheckForMissingExamples(Feature feature, List<ParserException> errors)
         {
-            foreach (var scenarioDefinition in feature.ScenarioDefinitions())
+            foreach (var scenarioOutline in feature.FlattenScenarioDefinitions().OfType<ScenarioOutline>())
             {
-                var scenarioOutline = scenarioDefinition as ScenarioOutline;
-                if (scenarioOutline != null)
+                if (DoesntHavePopulatedExamples(scenarioOutline))
                 {
-                    if (DoesntHavePopulatedExamples(scenarioOutline))
-                    {
-                        var message = string.Format("Scenario Outline '{0}' has no examples defined", scenarioOutline.Name);
-                        var semanticParserException = new SemanticParserException(message, scenarioDefinition.Location);
-                        errors.Add(semanticParserException);
-                    }
+                    var message = $"Scenario Outline '{scenarioOutline.Name}' has no examples defined";
+                    var semanticParserException = new SemanticParserException(message, scenarioOutline.Location);
+                    errors.Add(semanticParserException);
                 }
             }
         }

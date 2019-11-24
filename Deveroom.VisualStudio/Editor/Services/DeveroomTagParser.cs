@@ -97,97 +97,123 @@ namespace Deveroom.VisualStudio.Editor.Services
             var featureTag = CreateDefinitionBlockTag(feature, DeveroomTagTypes.FeatureBlock, fileSnapshot,
                 fileSnapshot.LineCount);
 
-            foreach (var scenarioDefinition in feature.StepsContainers())
+            foreach (var block in feature.Children)
             {
-                var scenarioDefinitionTag = CreateDefinitionBlockTag(scenarioDefinition,
-                    DeveroomTagTypes.ScenarioDefinitionBlock, fileSnapshot,
-                    GetScenarioDefinitionLastLine(scenarioDefinition), featureTag);
+                if (block is StepsContainer stepsContainer)
+                    AddScenarioDefinitionBlockTag(fileSnapshot, bindingRegistry, stepsContainer, featureTag);
+                else if (block is Rule rule)
+                    AddRuleBlockTag(fileSnapshot, bindingRegistry, rule, featureTag);
+            }
 
-                foreach (var step in scenarioDefinition.Steps)
+            return featureTag;
+        }
+
+        private void AddRuleBlockTag(ITextSnapshot fileSnapshot, ProjectBindingRegistry bindingRegistry, Rule rule, DeveroomTag featureTag)
+        {
+            var lastStepsContainer = rule.StepsContainers().LastOrDefault();
+            var lastLine = lastStepsContainer != null ? 
+                GetScenarioDefinitionLastLine(lastStepsContainer) :
+                rule.Location.Line;
+            var ruleTag = CreateDefinitionBlockTag(rule,
+                DeveroomTagTypes.RuleBlock, fileSnapshot,
+                lastLine, featureTag);
+
+            foreach (var stepsContainer in rule.StepsContainers())
+            {
+                AddScenarioDefinitionBlockTag(fileSnapshot, bindingRegistry, stepsContainer, ruleTag);
+            }
+        }
+
+        private void AddScenarioDefinitionBlockTag(ITextSnapshot fileSnapshot, ProjectBindingRegistry bindingRegistry,
+            StepsContainer scenarioDefinition, DeveroomTag parentTag)
+        {
+            var scenarioDefinitionTag = CreateDefinitionBlockTag(scenarioDefinition,
+                DeveroomTagTypes.ScenarioDefinitionBlock, fileSnapshot,
+                GetScenarioDefinitionLastLine(scenarioDefinition), parentTag);
+
+            foreach (var step in scenarioDefinition.Steps)
+            {
+                var stepTag = scenarioDefinitionTag.AddChild(new DeveroomTag(DeveroomTagTypes.StepBlock,
+                    GetBlockSpan(fileSnapshot, step.Location, GetStepLastLine(step)), step));
+
+                stepTag.AddChild(
+                    new DeveroomTag(DeveroomTagTypes.StepKeyword,
+                        GetTextSpan(fileSnapshot, step.Location, step.Keyword),
+                        step.Keyword));
+
+                if (step.Argument is DataTable dataTable)
                 {
-                    var stepTag = scenarioDefinitionTag.AddChild(new DeveroomTag(DeveroomTagTypes.StepBlock,
-                        GetBlockSpan(fileSnapshot, step.Location, GetStepLastLine(step)), step));
-
-                    stepTag.AddChild(
-                        new DeveroomTag(DeveroomTagTypes.StepKeyword,
-                            GetTextSpan(fileSnapshot, step.Location, step.Keyword),
-                            step.Keyword));
-
-                    if (step.Argument is DataTable dataTable)
+                    var dataTableBlockTag = new DeveroomTag(DeveroomTagTypes.DataTable,
+                        GetBlockSpan(fileSnapshot, dataTable.Rows.First().Location,
+                            dataTable.Rows.Last().Location.Line),
+                        dataTable);
+                    stepTag.AddChild(dataTableBlockTag);
+                    var dataTableHeader = dataTable.Rows.FirstOrDefault();
+                    if (dataTableHeader != null)
                     {
-                        var dataTableBlockTag = new DeveroomTag(DeveroomTagTypes.DataTable,
-                            GetBlockSpan(fileSnapshot, dataTable.Rows.First().Location,
-                                dataTable.Rows.Last().Location.Line),
-                            dataTable);
-                        stepTag.AddChild(dataTableBlockTag);
-                        var dataTableHeader = dataTable.Rows.FirstOrDefault();
-                        if (dataTableHeader != null)
-                        {
-                            TagRowCells(fileSnapshot, dataTableHeader, dataTableBlockTag, DeveroomTagTypes.DataTableHeader);
-                        }
-                    }
-                    else if (step.Argument is DocString docString)
-                    {
-                        stepTag.AddChild(
-                            new DeveroomTag(DeveroomTagTypes.DocString,
-                                GetBlockSpan(fileSnapshot, docString.Location,
-                                    GetStepLastLine(step)),
-                                docString));
-                    }
-
-                    if (scenarioDefinition is ScenarioOutline)
-                    {
-                        AddPlaceholderTags(fileSnapshot, stepTag, step);
-                    }
-
-                    var match = bindingRegistry?.MatchStep(step, scenarioDefinitionTag);
-                    if (match != null)
-                    {
-                        if (match.HasDefined || match.HasAmbiguous)
-                        {
-                            stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.DefinedStep,
-                                GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
-                                match));
-                            if (!(scenarioDefinition is ScenarioOutline) || !step.Text.Contains("<"))
-                            {
-                                var parameterMatch = match.Items.FirstOrDefault(m => m.ParameterMatch != null)
-                                    ?.ParameterMatch;
-                                AddParameterTags(fileSnapshot, parameterMatch, stepTag, step);
-                            }
-                        }
-
-                        if (match.HasUndefined)
-                        {
-                            stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.UndefinedStep,
-                                GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
-                                match));
-                        }
-
-                        if (match.HasErrors)
-                        {
-                            stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.BindingError,
-                                GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
-                                match.GetErrorMessage()));
-                        }
+                        TagRowCells(fileSnapshot, dataTableHeader, dataTableBlockTag, DeveroomTagTypes.DataTableHeader);
                     }
                 }
-
-                if (scenarioDefinition is ScenarioOutline scenarioOutline)
+                else if (step.Argument is DocString docString)
                 {
-                    foreach (var scenarioOutlineExample in scenarioOutline.Examples)
+                    stepTag.AddChild(
+                        new DeveroomTag(DeveroomTagTypes.DocString,
+                            GetBlockSpan(fileSnapshot, docString.Location,
+                                GetStepLastLine(step)),
+                            docString));
+                }
+
+                if (scenarioDefinition is ScenarioOutline)
+                {
+                    AddPlaceholderTags(fileSnapshot, stepTag, step);
+                }
+
+                var match = bindingRegistry?.MatchStep(step, scenarioDefinitionTag);
+                if (match != null)
+                {
+                    if (match.HasDefined || match.HasAmbiguous)
                     {
-                        var examplesBlockTag = CreateDefinitionBlockTag(scenarioOutlineExample,
-                            DeveroomTagTypes.ExamplesBlock, fileSnapshot,
-                            GetExamplesLastLine(scenarioOutlineExample), scenarioDefinitionTag);
-                        if (scenarioOutlineExample.TableHeader != null)
+                        stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.DefinedStep,
+                            GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
+                            match));
+                        if (!(scenarioDefinition is ScenarioOutline) || !step.Text.Contains("<"))
                         {
-                            TagRowCells(fileSnapshot, scenarioOutlineExample.TableHeader, examplesBlockTag, DeveroomTagTypes.ScenarioOutlinePlaceholder);
+                            var parameterMatch = match.Items.FirstOrDefault(m => m.ParameterMatch != null)
+                                ?.ParameterMatch;
+                            AddParameterTags(fileSnapshot, parameterMatch, stepTag, step);
                         }
+                    }
+
+                    if (match.HasUndefined)
+                    {
+                        stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.UndefinedStep,
+                            GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
+                            match));
+                    }
+
+                    if (match.HasErrors)
+                    {
+                        stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.BindingError,
+                            GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
+                            match.GetErrorMessage()));
                     }
                 }
             }
 
-            return featureTag;
+            if (scenarioDefinition is ScenarioOutline scenarioOutline)
+            {
+                foreach (var scenarioOutlineExample in scenarioOutline.Examples)
+                {
+                    var examplesBlockTag = CreateDefinitionBlockTag(scenarioOutlineExample,
+                        DeveroomTagTypes.ExamplesBlock, fileSnapshot,
+                        GetExamplesLastLine(scenarioOutlineExample), scenarioDefinitionTag);
+                    if (scenarioOutlineExample.TableHeader != null)
+                    {
+                        TagRowCells(fileSnapshot, scenarioOutlineExample.TableHeader, examplesBlockTag,
+                            DeveroomTagTypes.ScenarioOutlinePlaceholder);
+                    }
+                }
+            }
         }
 
         private void TagRowCells(ITextSnapshot fileSnapshot, TableRow row, DeveroomTag parentTag, string tagType)

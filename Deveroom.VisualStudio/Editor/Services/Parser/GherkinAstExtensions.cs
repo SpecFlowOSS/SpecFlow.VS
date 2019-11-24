@@ -8,11 +8,28 @@ namespace Deveroom.VisualStudio.Editor.Services.Parser
 {
     public static class GherkinAstExtensions
     {
-        public static IEnumerable<StepsContainer> StepsContainers(this Feature feature)
-            => feature.Children.OfType<StepsContainer>();
+        public static IEnumerable<StepsContainer> StepsContainers(this IHasChildren container)
+            => container.Children.OfType<StepsContainer>();
 
-        public static IEnumerable<Scenario> ScenarioDefinitions(this Feature feature)
-            => feature.Children.OfType<Scenario>();
+        public static IEnumerable<StepsContainer> FlattenStepsContainers(this Feature feature)
+        {
+            foreach (var featureChild in feature.Children)
+            {
+                if (featureChild is StepsContainer stepsContainer)
+                    yield return stepsContainer;
+                else if (featureChild is IHasChildren containerNode)
+                    foreach (var ruleStepsContainer in containerNode.StepsContainers())
+                    {
+                        yield return ruleStepsContainer;
+                    }
+            }
+        }
+
+        public static IEnumerable<Scenario> ScenarioDefinitions(this IHasChildren container)
+            => container.Children.OfType<Scenario>();
+
+        public static IEnumerable<Scenario> FlattenScenarioDefinitions(this Feature feature)
+            => feature.FlattenStepsContainers().OfType<Scenario>();
 
         public static Background Background(this Feature feature)
             => feature.Children.OfType<Background>().FirstOrDefault();

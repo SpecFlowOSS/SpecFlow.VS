@@ -62,7 +62,7 @@ namespace Deveroom.VisualStudio.Discovery
             if (!(featureContext?.Node is Feature feature))
                 yield break;
 
-            var scenarioDefinitions = feature.ScenarioDefinitions().ToArray();
+            var scenarioDefinitions = feature.FlattenScenarioDefinitions().ToArray();
             if (!scenarioDefinitions.Any()) // if there are no scenarios yet, we use the feature context for matching
                 yield return featureContext;
 

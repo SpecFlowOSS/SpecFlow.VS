@@ -66,6 +66,8 @@ Scenario: Highlights rule line keywords
 		Scenario: General feature scenario
 			When I press add
 
+		Rule: Empty rule
+
 		Rule: This is a rule
 
 		Scenario: Scenario illustrating a rule
@@ -77,6 +79,8 @@ Scenario: Highlights rule line keywords
 
 		{DefinitionLineKeyword}Scenario:{/DefinitionLineKeyword} General feature scenario
 			When I press add
+
+		{DefinitionLineKeyword}Rule:{/DefinitionLineKeyword} Empty rule
 
 		{DefinitionLineKeyword}Rule:{/DefinitionLineKeyword} This is a rule
 

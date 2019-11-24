@@ -99,7 +99,7 @@ namespace Deveroom.VisualStudio.Editor.Services
 
             var featureContext = new UsageFinderContext(featureNode);
 
-            foreach (var scenarioDefinition in featureNode.StepsContainers())
+            foreach (var scenarioDefinition in featureNode.FlattenStepsContainers())
             {
                 var context = new UsageFinderContext(scenarioDefinition, featureContext);
                 foreach (var step in scenarioDefinition.Steps)

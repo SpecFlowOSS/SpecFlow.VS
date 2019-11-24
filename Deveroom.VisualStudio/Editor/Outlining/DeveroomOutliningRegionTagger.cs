@@ -10,6 +10,7 @@ namespace Deveroom.VisualStudio.Editor.Outlining
     internal class DeveroomOutliningRegionTagger : DeveroomTagConsumer, ITagger<IOutliningRegionTag>
     {
         public static readonly string[] OutlinedTags = {
+            DeveroomTagTypes.RuleBlock,
             DeveroomTagTypes.ScenarioDefinitionBlock,
             DeveroomTagTypes.ExamplesBlock,
             DeveroomTagTypes.DataTable,
