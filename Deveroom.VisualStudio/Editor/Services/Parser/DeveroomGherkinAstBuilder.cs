@@ -85,18 +85,6 @@ namespace Deveroom.VisualStudio.Editor.Services.Parser
             }
         }
 
-        //protected override Scenario CreateScenario(Tag[] tags, Location location, string keyword, string name, string description, Step[] steps, AstNode node)
-        //{
-        //    ResetBlock();
-        //    return base.CreateScenario(tags, location, keyword, name, description, steps, node);
-        //}
-
-        //protected override ScenarioOutline CreateScenarioOutline(Tag[] tags, Location location, string keyword, string name, string description, Step[] steps, Examples[] examples, AstNode node)
-        //{
-        //    ResetBlock();
-        //    return base.CreateScenarioOutline(tags, location, keyword, name, description, steps, examples, node);
-        //}
-
         protected override Background CreateBackground(Location location, string keyword, string name, string description, Step[] steps, AstNode node)
         {
             ResetBlock();

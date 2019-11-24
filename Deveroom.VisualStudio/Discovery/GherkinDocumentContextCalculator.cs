@@ -62,10 +62,11 @@ namespace Deveroom.VisualStudio.Discovery
             if (!(featureContext?.Node is Feature feature))
                 yield break;
 
-            if (!feature.Children.OfType<IHasTags>().Any()) // if there are no scenarios yet, we use the feature context for matching
+            var scenarioDefinitions = feature.ScenarioDefinitions().ToArray();
+            if (!scenarioDefinitions.Any()) // if there are no scenarios yet, we use the feature context for matching
                 yield return featureContext;
 
-            foreach (var scenarioDefinition in feature.Children.OfType<IHasTags>())
+            foreach (var scenarioDefinition in scenarioDefinitions)
             {
                 var subContext = new TagMatchingContext(featureContext, scenarioDefinition);
                 yield return subContext;
