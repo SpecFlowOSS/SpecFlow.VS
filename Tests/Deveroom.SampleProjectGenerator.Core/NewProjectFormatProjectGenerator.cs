@@ -53,7 +53,19 @@ namespace Deveroom.SampleProjectGenerator
                 throw new Exception($"dotnet restore failed with exit code {exitCode}");
             }
 
-            ExecDotNet("build");
+            if (_options.SpecFlowVersion >= new Version("3.0.0"))
+            {
+                exitCode = ExecDotNet("build");
+                if (exitCode != 0)
+                {
+                    _consoleWriteLine($"dotnet build exit code: {exitCode}");
+                    throw new Exception($"dotnet build failed with exit code {exitCode}");
+                }
+            }
+            else
+            {
+                base.BuildProject();
+            }
         }
 
         private int ExecDotNet(params string[] args)
