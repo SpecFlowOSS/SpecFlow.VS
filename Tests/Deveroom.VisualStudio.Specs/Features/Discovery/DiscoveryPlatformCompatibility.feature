@@ -8,7 +8,9 @@ Scenario Outline: Discover bindings from a SpecFlow v3 project in different .NET
 	When the binding discovery performed
 	Then the discovery succeeds with several step definitions
 Examples: 
-	| label         | framework     |
-	| .NET Core 2.0 | netcoreapp2.0 |
-	| .NET Core 2.1 | netcoreapp2.1 |
-	| .NET Core 2.2 | netcoreapp2.2 |
+	| framework     |
+	| netcoreapp2.0 |
+	| netcoreapp2.1 |
+	| netcoreapp2.2 |
+	| netcoreapp3.0 |
+	| netcoreapp3.1 |
