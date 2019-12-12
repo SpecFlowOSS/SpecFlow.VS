@@ -13,4 +13,17 @@
       <VSIXSubPath>$(DeploymentV2TargetDir)\%(RecursiveDir)</VSIXSubPath>
     </Content>
   </ItemGroup>
+  <PropertyGroup>
+    <DeploymentV3OutputDir>$(MSBuildThisFileDirectory)bin\$(Configuration)\netcoreapp3.1\publish</DeploymentV3OutputDir>
+    <DeploymentV3TargetDir>Connectors\V3</DeploymentV3TargetDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(DeploymentV3OutputDir)\**\*.*">
+      <Link>$(DeploymentV3TargetDir)\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <Visible>False</Visible>
+      <VSIXSubPath>$(DeploymentV3TargetDir)\%(RecursiveDir)</VSIXSubPath>
+    </Content>
+  </ItemGroup>
 </Project>

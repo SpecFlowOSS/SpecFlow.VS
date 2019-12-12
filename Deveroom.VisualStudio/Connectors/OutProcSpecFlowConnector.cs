@@ -14,6 +14,7 @@ namespace Deveroom.VisualStudio.Connectors
         private const string ConnectorV1AnyCpu = @"V1\deveroom-specflow-v1.exe";
         private const string ConnectorV1X86 = @"V1\deveroom-specflow-v1.x86.exe";
         private const string ConnectorV2AnyCpu = @"V2\deveroom-specflow-v2.dll";
+        private const string ConnectorV3AnyCpu = @"V3\deveroom-specflow-v3.dll";
         private const string GenerationCommandName = "generation";
         private const string BindingDiscoveryCommandName = "binding discovery";
 
@@ -118,6 +119,15 @@ namespace Deveroom.VisualStudio.Connectors
         private string GetConnectorPath(List<string> arguments)
         {
             var connectorsFolder = GetConnectorsFolder();
+
+            //V3
+            if (_targetFrameworkMoniker != null && _targetFrameworkMoniker.StartsWith(".NETCoreApp") &&
+                _targetFrameworkMoniker.Contains("v3.1"))
+            {
+                arguments.Add("exec");
+                arguments.Add(Path.Combine(connectorsFolder, ConnectorV3AnyCpu));
+                return GetDotNetCommand();
+            }
 
             //V2
             if (_targetFrameworkMoniker != null && _targetFrameworkMoniker.StartsWith(".NETCoreApp"))

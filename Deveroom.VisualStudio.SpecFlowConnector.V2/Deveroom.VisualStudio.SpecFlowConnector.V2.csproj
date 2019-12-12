@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>deveroom-specflow-v2</AssemblyName>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <AssemblyName Condition="'$(TargetFramework)' == 'netcoreapp2.1'">deveroom-specflow-v2</AssemblyName>
+    <AssemblyName Condition="'$(TargetFramework)' == 'netcoreapp3.1'">deveroom-specflow-v3</AssemblyName>
     <Configurations>Debug;Release;Debug_x86;Release_x86</Configurations>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
@@ -25,10 +26,6 @@
     <ProjectReference Include="..\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
-
 <Target Name="SGenFilesOutputGroupDependencies" />
 <Target Name="SGenFilesOutputGroup" />
 <Target Name="SatelliteDllsProjectOutputGroupDependencies" />
@@ -42,7 +39,8 @@
 <Target Name="GetCopyToOutputDirectoryItems" />
 <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(BuildingInsideVisualStudio)'=='true'">
   <Message Importance="High" Text="Publishing manually" />
-  <Exec Command="dotnet publish" />
+  <Exec Command="dotnet publish -f netcoreapp2.1" />
+  <Exec Command="dotnet publish -f netcoreapp3.1" />
 </Target>
 <Import Project="..\Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems" Label="Shared" />
 <Import Project="..\Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.projitems" Label="Shared" />
