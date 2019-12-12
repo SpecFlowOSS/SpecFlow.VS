@@ -53,7 +53,7 @@ namespace Deveroom.SampleProjectGenerator
                 throw new Exception($"dotnet restore failed with exit code {exitCode}");
             }
 
-            base.BuildProject();
+            ExecDotNet("build");
         }
 
         private int ExecDotNet(params string[] args)
