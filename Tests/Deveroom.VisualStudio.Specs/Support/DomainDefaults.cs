@@ -6,6 +6,8 @@ namespace Deveroom.VisualStudio.Specs.Support
 {
     public static class DomainDefaults
     {
-        public static NuGetVersion LatestSpecFlowVersion = new NuGetVersion("2.4.1");
+        //TODO: calculate latest versions automatically
+        public static NuGetVersion LatestSpecFlowV2Version = new NuGetVersion("2.4.1");
+        public static NuGetVersion LatestSpecFlowV3Version = new NuGetVersion("3.1.67");
     }
 }

@@ -76,7 +76,7 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
         {
             GivenThereIsASmallSpecFlowProject();
             _generatorOptions.AddExternalBindingPackage = true;
-            _generatorOptions.ExternalBindingPackageName = $"Deveroom.SampleSpecFlow{DomainDefaults.LatestSpecFlowVersion.ToShortVersionString()}.ExternalBindings";
+            _generatorOptions.ExternalBindingPackageName = $"Deveroom.SampleSpecFlow{DomainDefaults.LatestSpecFlowV2Version.ToShortVersionString()}.ExternalBindings";
         }
 
         [Given(@"there is a small SpecFlow project with async bindings")]
