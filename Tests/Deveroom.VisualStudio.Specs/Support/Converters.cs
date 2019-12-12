@@ -12,15 +12,15 @@ namespace Deveroom.VisualStudio.Specs.Support
     public class Converters
     {
         [StepArgumentTransformation(@"the latest version")]
-        [StepArgumentTransformation(@"v2.*")]
+        [StepArgumentTransformation(@"v2\.\*")]
         public NuGetVersion LatestVersionConverter()
         {
             return DomainDefaults.LatestSpecFlowV2Version;
         }
 
         [StepArgumentTransformation(@"the latest V3 version")]
-        [StepArgumentTransformation(@"v3.*")]
-        [StepArgumentTransformation(@"v3.1.*")]
+        [StepArgumentTransformation(@"v3\.\*")]
+        [StepArgumentTransformation(@"v3\.1\.\*")]
         public NuGetVersion LatestV3VersionConverter()
         {
             return DomainDefaults.LatestSpecFlowV3Version;

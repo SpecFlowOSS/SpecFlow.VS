@@ -30,5 +30,5 @@ Examples:
 	| case        | version      |
 	| latest beta | v3.1.61-beta |
 	| latest      | v3.1.*       |
-	| recent      | v3.0.62      |
+	| recent      | v3.1.62      |
 	| line-v3.0   | v3.0.225     |
