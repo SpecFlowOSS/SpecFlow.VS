@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk" DefaultTargets="Build;Publish">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -37,10 +37,10 @@
 <Target Name="BuiltProjectOutputGroupDependencies" />
 <Target Name="BuiltProjectOutputGroup" />
 <Target Name="GetCopyToOutputDirectoryItems" />
-<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(BuildingInsideVisualStudio)'=='true'">
+<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(IN_PUBLISH)'!='true'">
   <Message Importance="High" Text="Publishing manually" />
-  <Exec Command="dotnet publish -f netcoreapp2.1" />
-  <Exec Command="dotnet publish -f netcoreapp3.1" />
+  <Exec Command="(set IN_PUBLISH=true) &amp; dotnet publish -f netcoreapp2.1"  />
+  <Exec Command="(set IN_PUBLISH=true) &amp; dotnet publish -f netcoreapp3.1" />
 </Target>
 <Import Project="..\Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems" Label="Shared" />
 <Import Project="..\Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.projitems" Label="Shared" />
