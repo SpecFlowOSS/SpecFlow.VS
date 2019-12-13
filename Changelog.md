@@ -1,3 +1,10 @@
+# v1.5.2 - 2019-12-13
+
+Improvements:
+
+* Support for .NET Core 3.1 projects (Issue #57)
+
+
 # v1.5.0 - 2019-11-24
 
 New features:
