@@ -13,4 +13,10 @@ Examples:
 	| netcoreapp2.1 |
 	| netcoreapp2.2 |
 	| netcoreapp3.0 |
+@quarantine
+Examples: .NET Core 3.1
+	This configuration is in quarantine until we figure out how 
+	the test project can be built in .NET Core 3.1. 
+	See related build pipleline: https://dev.azure.com/specsolutions/deveroom-visualstudio/_build?definitionId=7
+	| framework     |
 	| netcoreapp3.1 |

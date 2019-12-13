@@ -47,6 +47,7 @@ steps:
     testAssemblyVer2: |
      **\$(buildConfiguration)\**\*specs*.dll
      !**\obj\**
+    testFiltercriteria: '$(specsFilterCriteria)'
     otherConsoleOptions: '/platform:x64'
     testRunTitle: 'Deveroom Specs'
     platform: '$(buildPlatform)'
