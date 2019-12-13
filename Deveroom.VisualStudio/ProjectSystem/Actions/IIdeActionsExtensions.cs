@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Deveroom.VisualStudio.ProjectSystem.Actions
 {
@@ -16,6 +17,14 @@ namespace Deveroom.VisualStudio.ProjectSystem.Actions
         public static IAsyncContextMenu ShowAsyncContextMenu(this IIdeActions ideActions, string header, params ContextMenuItem[] contextMenuItems)
         {
             return ideActions.ShowContextMenu(header, true, contextMenuItems);
+        }
+
+        public static MessageBoxResult ShowSyncQuestion(this IIdeActions ideActions, string title, string description, bool includeCancel = false, MessageBoxResult defaultButton = MessageBoxResult.Yes)
+        {
+            MessageBoxResult result = MessageBoxResult.Cancel;
+            ideActions.ShowQuestion(
+                new QuestionDescription(title, description, _ => result = MessageBoxResult.Yes, _ => result = MessageBoxResult.No, includeCancel, defaultButton == MessageBoxResult.No));
+            return result;
         }
     }
 }

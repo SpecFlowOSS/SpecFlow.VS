@@ -2,12 +2,14 @@
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.Discovery;
 using Deveroom.VisualStudio.Editor.Commands.Infrastructure;
 using Deveroom.VisualStudio.Editor.Services;
 using Deveroom.VisualStudio.Monitoring;
 using Deveroom.VisualStudio.ProjectSystem;
+using Deveroom.VisualStudio.ProjectSystem.Actions;
 using Deveroom.VisualStudio.ProjectSystem.Settings;
 using Deveroom.VisualStudio.Snippets.Fallback;
 using Deveroom.VisualStudio.UI.ViewModels;
@@ -129,13 +131,21 @@ namespace Deveroom.VisualStudio.Editor.Commands
             var defaultNamespace = projectSettings.DefaultNamespace ?? projectScope.ProjectName;
             var fileNamespace = defaultNamespace;
             var stepDefinitionsFolder = Path.Combine(targetFolder, "StepDefinitions");
-            if (projectScope.IdeScope.FileSystem.Directory.Exists(stepDefinitionsFolder))
+            if (IdeScope.FileSystem.Directory.Exists(stepDefinitionsFolder))
             {
                 targetFolder = stepDefinitionsFolder;
                 fileNamespace = fileNamespace + ".StepDefinitions";
             }
 
             var targetFilePath = Path.Combine(targetFolder, className + ".cs");
+
+            if (IdeScope.FileSystem.File.Exists(targetFilePath))
+            {
+                if (IdeScope.Actions.ShowSyncQuestion("Overwrite file?",
+                    $"The selected step definition file '{targetFilePath}' already exists. By overwriting the existing file you might loose work. {Environment.NewLine}Do you want to overwrite the file?",
+                    defaultButton: MessageBoxResult.No) != MessageBoxResult.Yes)
+                    return;
+            }
 
             var template = $"using System;" + newLine +
                            $"using TechTalk.SpecFlow;" + newLine +

@@ -4,6 +4,9 @@ Improvements:
 
 * Support for .NET Core 3.1 projects (Issue #57)
 
+Bug fixes:
+
+* Define steps command overwrites existing step definition files (Issue #51)
 
 # v1.5.0 - 2019-11-24
 

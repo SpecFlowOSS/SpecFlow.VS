@@ -32,7 +32,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
             Logger.LogInfo($"User Question: {questionDescription.Description}");
             var caption = questionDescription.Title == null ? "Deveroom" : $"Deveroom: {questionDescription.Title}";
             var result = MessageBox.Show(questionDescription.Description, caption, questionDescription.IncludeCancel ? MessageBoxButton.YesNoCancel : MessageBoxButton.YesNo,
-                MessageBoxImage.Question, MessageBoxResult.Yes);
+                MessageBoxImage.Question, questionDescription.NoCommandIsDefault ? MessageBoxResult.No : MessageBoxResult.Yes);
             if (result == MessageBoxResult.Yes)
                 questionDescription.YesCommand?.Invoke(questionDescription);
             if (result == MessageBoxResult.No)
