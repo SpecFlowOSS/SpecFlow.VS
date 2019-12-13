@@ -145,7 +145,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             var settings = new ProjectSettings(
                 kind,
                 _projectScope.OutputAssemblyPath,
-                _projectScope.TargetFrameworkMoniker,
+                TargetFrameworkMoniker.Create(_projectScope.TargetFrameworkMoniker),
                 _projectScope.DefaultNamespace,
                 specFlowSettings?.Version, 
                 specFlowSettings?.GeneratorFolder,

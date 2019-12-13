@@ -24,11 +24,11 @@ namespace Deveroom.VisualStudio.Connectors
         private readonly TargetFrameworkMoniker _targetFrameworkMoniker;
         private readonly string _extensionFolder;
 
-        public OutProcSpecFlowConnector(DeveroomConfiguration configuration, IDeveroomLogger logger, string targetFrameworkMoniker, string extensionFolder)
+        public OutProcSpecFlowConnector(DeveroomConfiguration configuration, IDeveroomLogger logger, TargetFrameworkMoniker targetFrameworkMoniker, string extensionFolder)
         {
             _configuration = configuration;
             _logger = logger;
-            _targetFrameworkMoniker = TargetFrameworkMoniker.Create(targetFrameworkMoniker);
+            _targetFrameworkMoniker = targetFrameworkMoniker;
             _extensionFolder = extensionFolder;
         }
 

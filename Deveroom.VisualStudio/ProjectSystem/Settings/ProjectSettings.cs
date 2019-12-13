@@ -5,7 +5,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
     public class ProjectSettings
     {
         public DeveroomProjectKind Kind { get; }
-        public string TargetFrameworkMoniker { get; }
+        public TargetFrameworkMoniker TargetFrameworkMoniker { get; }
         public string OutputAssemblyPath { get; }
         public string DefaultNamespace { get; }
         public NuGetVersion SpecFlowVersion { get; }
@@ -13,7 +13,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
         public string SpecFlowConfigFilePath { get; }
         public SpecFlowProjectTraits SpecFlowProjectTraits { get; }
 
-        public ProjectSettings(DeveroomProjectKind kind, string outputAssemblyPath, string targetFrameworkMoniker, string defaultNamespace,
+        public ProjectSettings(DeveroomProjectKind kind, string outputAssemblyPath, TargetFrameworkMoniker targetFrameworkMoniker, string defaultNamespace,
             NuGetVersion specFlowVersion, string specFlowGeneratorFolder, string specFlowConfigFilePath, SpecFlowProjectTraits specFlowProjectTraits)
         {
             Kind = kind;
@@ -50,7 +50,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
 
         protected bool Equals(ProjectSettings other)
         {
-            return Kind == other.Kind && string.Equals(TargetFrameworkMoniker, other.TargetFrameworkMoniker) && string.Equals(OutputAssemblyPath, other.OutputAssemblyPath) && string.Equals(DefaultNamespace, other.DefaultNamespace) && Equals(SpecFlowVersion, other.SpecFlowVersion) && string.Equals(SpecFlowGeneratorFolder, other.SpecFlowGeneratorFolder) && string.Equals(SpecFlowConfigFilePath, other.SpecFlowConfigFilePath) && SpecFlowProjectTraits == other.SpecFlowProjectTraits;
+            return Kind == other.Kind && TargetFrameworkMoniker == other.TargetFrameworkMoniker && string.Equals(OutputAssemblyPath, other.OutputAssemblyPath) && string.Equals(DefaultNamespace, other.DefaultNamespace) && Equals(SpecFlowVersion, other.SpecFlowVersion) && string.Equals(SpecFlowGeneratorFolder, other.SpecFlowGeneratorFolder) && string.Equals(SpecFlowConfigFilePath, other.SpecFlowConfigFilePath) && SpecFlowProjectTraits == other.SpecFlowProjectTraits;
         }
 
         public override bool Equals(object obj)

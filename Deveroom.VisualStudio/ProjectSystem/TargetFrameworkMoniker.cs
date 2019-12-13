@@ -11,10 +11,10 @@ namespace Deveroom.VisualStudio.ProjectSystem
         private const string NetFrameworkShortValuePrefix = "net";
 
         // e.g .NETCoreApp,Version=v2.1 or .NETFramework,Version=v4.5.2
-        public string Value { private set; get; }
+        public string Value { get; }
 
-        public string Platform { private set; get; }
-        public Version Version { private set; get; }
+        public string Platform { get; }
+        public Version Version { get; }
 
         public bool HasVersion => Version != null;
         public bool IsNetCore => NetCorePlatform.Equals(Platform);
@@ -63,6 +63,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
             return Value;
         }
 
+        // e.g netcoreapp2.1 or net452
         public string ToShortString()
         {
             if (IsNetCore && HasVersion)
@@ -71,5 +72,35 @@ namespace Deveroom.VisualStudio.ProjectSystem
                 return NetFrameworkShortValuePrefix + Version.ToString().Replace(".", "");
             return Value;
         }
+
+        #region Equality
+        protected bool Equals(TargetFrameworkMoniker other)
+        {
+            return Value == other.Value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((TargetFrameworkMoniker) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Value.GetHashCode();
+        }
+
+        public static bool operator ==(TargetFrameworkMoniker left, TargetFrameworkMoniker right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(TargetFrameworkMoniker left, TargetFrameworkMoniker right)
+        {
+            return !Equals(left, right);
+        }
+        #endregion
     }
 }
