@@ -46,7 +46,6 @@ namespace Deveroom.SampleProjectGenerator
 
         protected override void BuildProject()
         {
-            ExecDotNet("--list-sdks");
             var exitCode = ExecDotNet("restore");
             if (exitCode != 0)
             {
