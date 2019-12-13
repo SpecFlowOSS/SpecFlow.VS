@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Deveroom.VisualStudio.Configuration;
 using Deveroom.VisualStudio.Diagonostics;
+using Deveroom.VisualStudio.ProjectSystem;
 using Deveroom.VisualStudio.SpecFlowConnector;
 using Deveroom.VisualStudio.SpecFlowConnector.Models;
 
@@ -20,14 +21,14 @@ namespace Deveroom.VisualStudio.Connectors
 
         private readonly DeveroomConfiguration _configuration;
         private readonly IDeveroomLogger _logger;
-        private readonly string _targetFrameworkMoniker;
+        private readonly TargetFrameworkMoniker _targetFrameworkMoniker;
         private readonly string _extensionFolder;
 
         public OutProcSpecFlowConnector(DeveroomConfiguration configuration, IDeveroomLogger logger, string targetFrameworkMoniker, string extensionFolder)
         {
             _configuration = configuration;
             _logger = logger;
-            _targetFrameworkMoniker = targetFrameworkMoniker;
+            _targetFrameworkMoniker = TargetFrameworkMoniker.Create(targetFrameworkMoniker);
             _extensionFolder = extensionFolder;
         }
 
@@ -121,8 +122,10 @@ namespace Deveroom.VisualStudio.Connectors
             var connectorsFolder = GetConnectorsFolder();
 
             //V3
-            if (_targetFrameworkMoniker != null && _targetFrameworkMoniker.StartsWith(".NETCoreApp") &&
-                _targetFrameworkMoniker.Contains("v3.1"))
+            if (_targetFrameworkMoniker != null && 
+                _targetFrameworkMoniker.IsNetCore && 
+                _targetFrameworkMoniker.HasVersion &&
+                _targetFrameworkMoniker.Version >= new Version(3,1))
             {
                 arguments.Add("exec");
                 arguments.Add(Path.Combine(connectorsFolder, ConnectorV3AnyCpu));
@@ -130,7 +133,8 @@ namespace Deveroom.VisualStudio.Connectors
             }
 
             //V2
-            if (_targetFrameworkMoniker != null && _targetFrameworkMoniker.StartsWith(".NETCoreApp"))
+            if (_targetFrameworkMoniker != null && 
+                _targetFrameworkMoniker.IsNetCore)
             {
                 arguments.Add("exec");
                 //arguments.Add("--additionalprobingpath");

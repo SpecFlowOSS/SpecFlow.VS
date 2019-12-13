@@ -27,14 +27,8 @@ namespace Deveroom.VisualStudio.VsxStubs.ProjectSystem
             OutputAssemblyPath = Path.GetFullPath(Path.Combine(ProjectFolder, outputAssemblyPath));
             _packageReferences = new List<NuGetPackageReference>(packageReferences);
 
-            if (targetFramework.StartsWith("netcoreapp"))
-            {
-                TargetFrameworkMoniker = $".NETCoreApp,Version=v{targetFramework.Substring("netcoreapp".Length)}";
-            }
-            else if (targetFramework.StartsWith("net"))
-            {
-                TargetFrameworkMoniker = $".NETFramework,Version=v{targetFramework[3]}.{targetFramework[4]}.{targetFramework[5]}";
-            }
+            TargetFrameworkMoniker = VisualStudio.ProjectSystem.TargetFrameworkMoniker
+                .CreateFromShortName(targetFramework).Value;
         }
 
         public void AddFile(string targetFilePath, string template)
