@@ -156,6 +156,8 @@ namespace Deveroom.VisualStudio.Connectors
         private string GetDotNetInstallLocation()
         {
             var programFiles = Environment.GetEnvironmentVariable("ProgramW6432");
+            if (_configuration.ProcessorArchitecture == ProcessorArchitectureSetting.X86)
+                programFiles = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
             if (string.IsNullOrEmpty(programFiles))
                 programFiles = Environment.GetEnvironmentVariable("ProgramFiles");
             return Path.Combine(programFiles, "dotnet");
