@@ -1,3 +1,9 @@
+# v1.5.2 - 2020-01-31
+
+Improvements:
+
+* Setting `processorArchitecture` in config file will determined which dotnet.exe version to use. (Issue #62)
+
 # v1.5.1 - 2019-12-13
 
 Improvements:
