@@ -44,6 +44,7 @@ namespace Deveroom.SampleProjectGenerator
 
         public string FallbackNuGetPackageSource { get; set; }
 
+        [Option("targetFramework", Required = false, Default = DefaultTargetFramework)]
         public string TargetFramework { get; set; } = DefaultTargetFramework;
 
         public bool AddGeneratorPlugin { get; set; }
