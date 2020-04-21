@@ -13,5 +13,6 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
         MsBuildGeneration = 1,
         XUnitAdapter = 2,
         DesignTimeFeatureFileGeneration = 4,
+        CucumberExpression = 8,
     }
 }

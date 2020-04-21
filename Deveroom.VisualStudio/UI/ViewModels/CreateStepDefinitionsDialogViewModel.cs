@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
+using Deveroom.VisualStudio.Snippets;
 
 namespace Deveroom.VisualStudio.UI.ViewModels
 {
     public class CreateStepDefinitionsDialogViewModel
     {
         public string ClassName { get; set; }
+        public SnippetExpressionStyle ExpressionStyle { get; set; }
         public List<StepDefinitionSnippetItemViewModel> Items { get; set; } = new List<StepDefinitionSnippetItemViewModel>();
         public CreateStepDefinitionsDialogResult Result { get; set; }
 
@@ -14,6 +16,7 @@ namespace Deveroom.VisualStudio.UI.ViewModels
         public static CreateStepDefinitionsDialogViewModel DesignData = new CreateStepDefinitionsDialogViewModel()
         {
             ClassName = "MyFeatureSteps",
+            ExpressionStyle = SnippetExpressionStyle.CucumberExpression,
             Items = new List<StepDefinitionSnippetItemViewModel>()
             {
                 new StepDefinitionSnippetItemViewModel

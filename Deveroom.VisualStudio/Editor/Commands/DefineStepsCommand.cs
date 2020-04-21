@@ -80,13 +80,14 @@ namespace Deveroom.VisualStudio.Editor.Commands
             var feature = (Feature)featureTag.Data;
             var viewModel = new CreateStepDefinitionsDialogViewModel();
             viewModel.ClassName = feature.Name.ToIdentifier()+"Steps";
+            viewModel.ExpressionStyle = snippetService.DefaultExpressionStyle;
 
             foreach (var undefinedStepTag in undefinedStepTags)
             {
                 var matchResult = (MatchResult)undefinedStepTag.Data;
                 foreach (var match in matchResult.Items.Where(mi => mi.Type == MatchResultType.Undefined))
                 {
-                    var snippet = snippetService.GetStepDefinitionSkeletonSnippet(match.UndefinedStep, indent, newLine);
+                    var snippet = snippetService.GetStepDefinitionSkeletonSnippet(match.UndefinedStep, viewModel.ExpressionStyle, indent, newLine);
                     if (viewModel.Items.Any(i => i.Snippet == snippet))
                         continue;
 

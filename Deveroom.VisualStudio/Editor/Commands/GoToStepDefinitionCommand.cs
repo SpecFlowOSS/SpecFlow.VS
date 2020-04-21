@@ -106,7 +106,7 @@ namespace Deveroom.VisualStudio.Editor.Commands
             const string indent = "    ";
             string newLine = Environment.NewLine;
 
-            var snippet = snippetService.GetStepDefinitionSkeletonSnippet(match.UndefinedStep, indent, newLine);
+            var snippet = snippetService.GetStepDefinitionSkeletonSnippet(match.UndefinedStep, snippetService.DefaultExpressionStyle, indent, newLine);
 
             IdeScope.Actions.ShowQuestion(new QuestionDescription(PopupHeader, $"The step is undefined. Do you want to copy a step definition skeleton snippet to the clipboard?{Environment.NewLine}{Environment.NewLine}{snippet}", _ => PerformCopySnippet(snippet.Indent(indent + indent))));
         }

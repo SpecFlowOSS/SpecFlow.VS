@@ -126,6 +126,8 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
                     specFlowProjectTraits |= SpecFlowProjectTraits.MsBuildGeneration;
                 if (detector.IsXUnitAdapterEnabled(packageReferencesArray))
                     specFlowProjectTraits |= SpecFlowProjectTraits.XUnitAdapter;
+                if (detector.IsCucumberExpressionPluginEnabled(packageReferencesArray))
+                    specFlowProjectTraits |= SpecFlowProjectTraits.CucumberExpression;
             }
 
             return specFlowPackage;
