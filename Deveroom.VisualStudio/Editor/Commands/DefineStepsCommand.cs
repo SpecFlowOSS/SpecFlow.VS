@@ -79,7 +79,7 @@ namespace Deveroom.VisualStudio.Editor.Commands
 
             var feature = (Feature)featureTag.Data;
             var viewModel = new CreateStepDefinitionsDialogViewModel();
-            viewModel.ClassName = feature.Name.ToIdentifier()+"Steps";
+            viewModel.ClassName = feature.Name.ToIdentifier()+"StepDefinitions";
             viewModel.ExpressionStyle = snippetService.DefaultExpressionStyle;
 
             foreach (var undefinedStepTag in undefinedStepTags)
