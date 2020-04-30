@@ -8,18 +8,22 @@ namespace Deveroom.VisualStudio.Discovery
 {
     public class ProjectStepDefinitionBinding
     {
-        public bool IsValid { get; set; } = true;
+        public bool IsValid => Regex != null && Error == null;
+        public string Error { get; }
         public ScenarioBlock StepDefinitionType { get; }
+        public string Expression { get; set; }
         public Regex Regex { get; }
         public Scope Scope { get; }
         public ProjectStepDefinitionImplementation Implementation { get; }
 
-        public ProjectStepDefinitionBinding(ScenarioBlock stepDefinitionType, Regex regex, Scope scope, ProjectStepDefinitionImplementation implementation)
+        public ProjectStepDefinitionBinding(ScenarioBlock stepDefinitionType, Regex regex, Scope scope, ProjectStepDefinitionImplementation implementation, string expression = null, string error = null)
         {
             StepDefinitionType = stepDefinitionType;
             Regex = regex;
             Scope = scope;
             Implementation = implementation;
+            Expression = expression;
+            Error = error;
         }
 
         public MatchResultItem Match(Step step, IGherkinDocumentContext context, string stepText = null)
@@ -63,7 +67,7 @@ namespace Deveroom.VisualStudio.Discovery
 
         public override string ToString()
         {
-            return $"[{StepDefinitionType}({Regex})]: {Implementation}";
+            return $"[{StepDefinitionType}({Expression ?? Regex?.ToString()})]: {Implementation}";
         }
     }
 }

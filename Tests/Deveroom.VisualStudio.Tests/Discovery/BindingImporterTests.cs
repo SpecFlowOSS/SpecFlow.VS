@@ -19,7 +19,7 @@ namespace Deveroom.VisualStudio.Tests.Discovery
             return new BindingImporter(_sourceFiles, _typeNames, new DeveroomNullLogger());
         }
 
-        private StepDefinition CreateStepDefinition(string regex = null, string type = null, string sourceLocation = null, StepScope scope = null, string paramTypes = null, string method = null)
+        private StepDefinition CreateStepDefinition(string regex = null, string type = null, string sourceLocation = null, StepScope scope = null, string paramTypes = null, string method = null, string expression = null, string error = null)
         {
             return new StepDefinition
             {
@@ -28,7 +28,9 @@ namespace Deveroom.VisualStudio.Tests.Discovery
                 Regex = regex ?? "regex",
                 SourceLocation = sourceLocation,
                 Scope = scope,
-                ParamTypes = paramTypes
+                ParamTypes = paramTypes,
+                Expression = expression,
+                Error = error
             };
         }
 
@@ -129,6 +131,40 @@ namespace Deveroom.VisualStudio.Tests.Discovery
             var result = sut.ImportStepDefinition(CreateStepDefinition(scope: null));
 
             result.Scope.Should().BeNull();
+        }
+
+        [Fact]
+        public void Imports_to_valid_when_no_error()
+        {
+            var sut = CreateSut();
+            var result = sut.ImportStepDefinition(CreateStepDefinition(regex: "^my step$"));
+
+            result.IsValid.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Imports_expression_and_error()
+        {
+            var sut = CreateSut();
+            var result = sut.ImportStepDefinition(CreateStepDefinition(regex: "^my step$", 
+                expression: "my step", error: "this is an error"));
+
+            result.Expression.Should().Be("my step");
+            result.Error.Should().Be("this is an error");
+            result.IsValid.Should().BeFalse();
+        }
+
+        [Fact]
+        public void Imports_invalid_step_definition_with_null_regex()
+        {
+            var sut = CreateSut();
+            var stepDefinition = CreateStepDefinition(error: "this is an error");
+            stepDefinition.Regex = null;
+            var result = sut.ImportStepDefinition(stepDefinition);
+
+            result.Regex.Should().BeNull();
+            result.Error.Should().Be("this is an error");
+            result.IsValid.Should().BeFalse();
         }
 
         [Fact]

@@ -35,7 +35,7 @@ namespace Deveroom.VisualStudio.Discovery
             try
             {
                 var stepDefinitionType = (ScenarioBlock)Enum.Parse(typeof(ScenarioBlock), stepDefinition.Type);
-                var regex = new Regex(stepDefinition.Regex, RegexOptions.CultureInvariant);
+                var regex = ParseRegex(stepDefinition);
                 var sourceLocation = ParseSourceLocation(stepDefinition.SourceLocation);
                 var scope = ParseScope(stepDefinition.Scope);
                 var parameterTypes = ParseParameterTypes(stepDefinition.ParamTypes);
@@ -46,14 +46,20 @@ namespace Deveroom.VisualStudio.Discovery
                     _implementations.Add(stepDefinition.Method, implementation);
                 }
                 
-
-                return new ProjectStepDefinitionBinding(stepDefinitionType, regex, scope, implementation);
+                return new ProjectStepDefinitionBinding(stepDefinitionType, regex, scope, implementation, stepDefinition.Expression, stepDefinition.Error);
             }
             catch (Exception ex)
             {
                 _logger.LogWarning($"Invalid binding: {ex.Message}");
                 return null;
             }
+        }
+
+        private static Regex ParseRegex(StepDefinition stepDefinition)
+        {
+            return string.IsNullOrEmpty(stepDefinition.Regex)
+                ? null
+                : new Regex(stepDefinition.Regex, RegexOptions.CultureInvariant);
         }
 
         private string[] ParseParameterTypes(string paramTypes)
