@@ -52,6 +52,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
         public IDeveroomWindowManager WindowManager { get; }
         public IFileSystem FileSystem { get; } = new FileSystem();
         public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; }
+        public IDeveroomErrorListServices DeveroomErrorListServices { get; }
 
         public event EventHandler<EventArgs> ProjectsBuilt;
         public event EventHandler<EventArgs> WeakProjectsBuilt
@@ -75,6 +76,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
 
             Dte = (DTE)serviceProvider.GetService(typeof(DTE));
             DeveroomOutputPaneServices = new VsDeveroomOutputPaneServices(this);
+            DeveroomErrorListServices = new VsDeveroomErrorListServices(this);
 
             CompositeLogger.Add(new OutputWindowPaneLogger(DeveroomOutputPaneServices));
             Logger.LogVerbose("Creating IDE Scope");

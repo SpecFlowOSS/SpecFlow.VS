@@ -17,6 +17,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
         IIdeActions Actions { get; }
         IDeveroomWindowManager WindowManager { get; }
         IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; }
+        IDeveroomErrorListServices DeveroomErrorListServices { get; }
         IFileSystem FileSystem { get; }
         event EventHandler<EventArgs> WeakProjectsBuilt;
         event EventHandler<EventArgs> WeakProjectOutputsUpdated;

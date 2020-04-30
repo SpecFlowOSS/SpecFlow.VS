@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Windows.Threading;
 using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -8,19 +7,15 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Deveroom.VisualStudio.ProjectSystem
 {
-    public class VsDeveroomOutputPaneServices : IDeveroomOutputPaneServices
+    public class VsDeveroomOutputPaneServices : VsServiceBase, IDeveroomOutputPaneServices
     {
         private static Guid _outputPaneGuid = Guid.NewGuid();
         private const string PaneName = "Deveroom";
 
-        private readonly IVsIdeScope _vsIdeScope;
         private readonly Lazy<IVsOutputWindowPane> _outputWindowPane;
-        private readonly Dispatcher _dispatcher;
 
-        public VsDeveroomOutputPaneServices(IVsIdeScope vsIdeScope)
+        public VsDeveroomOutputPaneServices(IVsIdeScope vsIdeScope) : base(vsIdeScope)
         {
-            _vsIdeScope = vsIdeScope;
-            _dispatcher = Dispatcher.CurrentDispatcher;
             _outputWindowPane = new Lazy<IVsOutputWindowPane>(CreateOutputWindowPane);
         }
 
@@ -57,18 +52,6 @@ namespace Deveroom.VisualStudio.ProjectSystem
         public void SendWriteLine(string text)
         {
             RunOnUiThread(() => WriteLine(text));
-        }
-
-        private void RunOnUiThread(Action action)
-        {
-            if (ThreadHelper.CheckAccess())
-            {
-                action();
-            }
-            else
-            {
-                _dispatcher.BeginInvoke(action, DispatcherPriority.ContextIdle);
-            }
         }
 
         public void Activate()

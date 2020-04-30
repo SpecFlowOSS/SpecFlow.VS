@@ -118,6 +118,8 @@ namespace Deveroom.VisualStudio.ProjectSystem
         public IServiceProvider ServiceProvider { get; }
         public DTE Dte { get; }
         public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; }
+        public IDeveroomErrorListServices DeveroomErrorListServices { get; }
+
         public IProjectScope GetProjectScope(Project project)
         {
             throw new NotImplementedException();
@@ -135,6 +137,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
             Actions = new NullIdeActions(this);
             Dte = null;
             DeveroomOutputPaneServices = null;
+            DeveroomErrorListServices = null;
         }
 
         public IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation)

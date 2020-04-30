@@ -134,6 +134,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
         public IServiceProvider ServiceProvider => VsIdeScope.ServiceProvider;
         public DTE Dte => VsIdeScope.Dte;
         public IDeveroomOutputPaneServices DeveroomOutputPaneServices => VsIdeScope.DeveroomOutputPaneServices;
+        public IDeveroomErrorListServices DeveroomErrorListServices => VsIdeScope.DeveroomErrorListServices;
 
         public IProjectScope GetProjectScope(Project project)
         {

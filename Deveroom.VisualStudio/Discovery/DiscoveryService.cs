@@ -11,6 +11,7 @@ using Deveroom.VisualStudio.Monitoring;
 using Deveroom.VisualStudio.ProjectSystem;
 using Deveroom.VisualStudio.ProjectSystem.Configuration;
 using Deveroom.VisualStudio.ProjectSystem.Settings;
+using Microsoft.VisualStudio.Shell;
 
 namespace Deveroom.VisualStudio.Discovery
 {
@@ -31,6 +32,7 @@ namespace Deveroom.VisualStudio.Discovery
         private readonly IDeveroomLogger _logger;
         private readonly IMonitoringService _monitoringService;
         private readonly ProjectSettingsProvider _projectSettingsProvider;
+        private readonly IDeveroomErrorListServices _errorListServices;
 
         private bool _isDiscovering;
         private ProjectBindingRegistryCache _cached = new ProjectBindingRegistryCache(DiscoveryStatus.Uninitialized);
@@ -65,6 +67,7 @@ namespace Deveroom.VisualStudio.Discovery
             _discoveryResultProvider = discoveryResultProvider ?? new DiscoveryResultProvider(_projectScope);
             _logger = _projectScope.IdeScope.Logger;
             _monitoringService = _projectScope.IdeScope.MonitoringService;
+            _errorListServices = _projectScope.IdeScope.DeveroomErrorListServices;
             _projectSettingsProvider = _projectScope.GetProjectSettingsProvider();
 
             InitializeBindingRegistry();
@@ -218,6 +221,8 @@ namespace Deveroom.VisualStudio.Discovery
         {
             try
             {
+                _errorListServices?.ClearErrors(DeveroomUserErrorCategory.Discovery);
+
                 var result = _discoveryResultProvider.RunDiscovery(testAssemblySource.FilePath, projectSettings.SpecFlowConfigFilePath, projectSettings);
                 var bindingRegistry = new ProjectBindingRegistry();
                 if (result.IsFailed)
@@ -236,6 +241,24 @@ namespace Deveroom.VisualStudio.Discovery
                         .ToArray();
                     _logger.LogInfo(
                         $"{bindingRegistry.StepDefinitions.Length} step definitions discovered for project {_projectScope.ProjectName}");
+
+                    if (bindingRegistry.StepDefinitions.Any(sd => !sd.IsValid))
+                    {
+                        _logger.LogWarning($"Invalid step definitions found: {Environment.NewLine}" + 
+                                           string.Join(Environment.NewLine, bindingRegistry.StepDefinitions.Where(sd => !sd.IsValid)
+                                               .Select(sd => $"  {sd}: {sd.Error} at {sd.Implementation?.SourceLocation}")));
+
+                        _errorListServices?.AddErrors(
+                            bindingRegistry.StepDefinitions.Where(sd => !sd.IsValid)
+                                .Select(sd => new DeveroomUserError
+                                {
+                                    Category = DeveroomUserErrorCategory.Discovery,
+                                    Message = sd.Error,
+                                    SourceLocation = sd.Implementation?.SourceLocation,
+                                    Type = TaskErrorCategory.Error
+                                })
+                            );
+                    }
 
                     CalculateSourceLocationTrackingPositions(bindingRegistry);
                 }
