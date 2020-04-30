@@ -35,6 +35,22 @@ namespace Deveroom.VisualStudio.SpecFlowConnector
             return (T)methodInfo.Invoke(null, args);
         }
 
+        public static bool ReflectionHasProperty(this object obj, string propertyName)
+        {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            var propertyInfo = obj.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            return propertyInfo != null;
+        }
+
+        public static T ReflectionGetProperty<T>(this object obj, string propertyName)
+        {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+            var propertyInfo = obj.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (propertyInfo == null)
+                throw new ArgumentException($"Cannot find property {propertyName} on type {obj.GetType().FullName}");
+            return (T)propertyInfo.GetValue(obj);
+        }
+
         public static T ReflectionGetField<T>(this object obj, string fieldName)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));

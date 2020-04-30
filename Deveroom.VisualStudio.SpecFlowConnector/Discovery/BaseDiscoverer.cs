@@ -35,16 +35,8 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
             GetOrCreateSymbolReader(testAssembly, warningCollector, testAssemblyPath);
 
             result.StepDefinitions =
-                GetStepDefinitions(bindingRegistry).Select(sdb =>
-                        new StepDefinition
-                        {
-                            Type = sdb.StepDefinitionType.ToString(),
-                            Regex = sdb.Regex.ToString(),
-                            Method = sdb.Method.ToString(),
-                            ParamTypes = GetParamTypes(sdb.Method),
-                            Scope = GetScope(sdb),
-                            SourceLocation = GetSourceLocation(sdb.Method, warningCollector)
-                        })
+                GetStepDefinitions(bindingRegistry)
+                    .Select(sdb => CreateStepDefinition(sdb, warningCollector))
                     .Distinct() //TODO: SpecFlow discoverers bindings from external assemblies twice -- needs fix
                     .ToArray();
             result.SourceFiles = _sourceFiles.ToDictionary(sf => sf.Value.ToString(), sf => sf.Key);
@@ -52,6 +44,35 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
             result.Warnings = warningCollector.Warnings;
             result.SpecFlowVersion = typeof(IStepDefinitionBinding).Assembly.Location;
             return result;
+        }
+
+        private StepDefinition CreateStepDefinition(IStepDefinitionBinding sdb, WarningCollector warningCollector)
+        {
+            var stepDefinition = new StepDefinition
+            {
+                Type = sdb.StepDefinitionType.ToString(),
+                Regex = sdb.Regex?.ToString(),
+                Method = sdb.Method.ToString(),
+                ParamTypes = GetParamTypes(sdb.Method),
+                Scope = GetScope(sdb),
+                SourceLocation = GetSourceLocation(sdb.Method, warningCollector),
+                Expression = GetSourceExpression(sdb),
+                Error = GetError(sdb)
+            };
+
+            return stepDefinition;
+        }
+
+        private string GetError(IStepDefinitionBinding sdb)
+        {
+            const string propertyName = "Error";
+            return sdb.ReflectionHasProperty(propertyName) ? sdb.ReflectionGetProperty<string>(propertyName) : null;
+        }
+
+        private string GetSourceExpression(IStepDefinitionBinding sdb)
+        {
+            const string propertyName = "SourceExpression";
+            return sdb.ReflectionHasProperty(propertyName) ? sdb.ReflectionGetProperty<string>(propertyName) : null;
         }
 
         protected virtual IDeveroomSymbolReader CreateSymbolReader(string assemblyFilePath, WarningCollector warningCollector)

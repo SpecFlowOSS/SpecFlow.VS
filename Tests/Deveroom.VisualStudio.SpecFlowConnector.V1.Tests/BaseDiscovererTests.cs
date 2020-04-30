@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Deveroom.VisualStudio.SpecFlowConnector.Discovery;
 using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using Deveroom.VisualStudio.SpecFlowConnector.SourceDiscovery;
@@ -77,6 +78,16 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.V1.Tests
             public void WithStdParams(string p0, string p1, int p2, Table p3) { }
         }
 
+        public class StepDefinitionBindingWithSourceAndError : StepDefinitionBinding
+        {
+            public string SourceExpression { get; set; }
+            public string Error { get; set; }
+
+            public StepDefinitionBindingWithSourceAndError(StepDefinitionType stepDefinitionType, string regexString, IBindingMethod bindingMethod, BindingScope bindingScope) : base(stepDefinitionType, regexString, bindingMethod, bindingScope)
+            {
+            }
+        }
+
         private StubDiscoverer CreateSut()
         {
             var stubDiscoverer = new StubDiscoverer();
@@ -93,6 +104,16 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.V1.Tests
         {
             var methodInfo = GetMethodInfo(method);
             _bindingRegistry.RegisterStepDefinitionBinding(new StepDefinitionBinding(type, regex, new RuntimeBindingMethod(methodInfo), scope));
+        }
+
+        private void RegisterStepDefinitionBindingWithSourceAndError(string regex = "I press add", StepDefinitionType type = StepDefinitionType.When, string method = nameof(StubBindingClass.WhenIPressAdd), BindingScope scope = null, string sourceExpression = null, string error = null)
+        {
+            var methodInfo = GetMethodInfo(method);
+            _bindingRegistry.RegisterStepDefinitionBinding(new StepDefinitionBindingWithSourceAndError(type, regex, new RuntimeBindingMethod(methodInfo), scope)
+            {
+                SourceExpression = sourceExpression,
+                Error = error
+            });
         }
 
         private static MethodInfo GetMethodInfo(string method)
@@ -287,6 +308,47 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.V1.Tests
             result.StepDefinitions.Should().HaveCount(1);
             result.StepDefinitions[0].ParamTypes.Should().Be("s|s|i|st");
             result.TypeNames.Should().HaveCount(0);
+        }
+
+        [Fact]
+        public void Discovers_source_expression()
+        {
+            RegisterStepDefinitionBindingWithSourceAndError(sourceExpression: "this is source {num}");
+
+            var sut = CreateSut();
+
+            var result = sut.DiscoverInternal(GetTestAssemblyPath(), null);
+
+            result.StepDefinitions.Should().HaveCount(1);
+            result.StepDefinitions[0].Expression.Should().Be("this is source {num}");
+        }
+
+        [Fact]
+        public void Discovers_error()
+        {
+            RegisterStepDefinitionBindingWithSourceAndError(error: "this an error");
+
+            var sut = CreateSut();
+
+            var result = sut.DiscoverInternal(GetTestAssemblyPath(), null);
+
+            result.StepDefinitions.Should().HaveCount(1);
+            result.StepDefinitions[0].Error.Should().Be("this an error");
+        }
+
+
+        [Fact]
+        public void Does_not_discover_source_expression_and_error_from_old_stepdefs()
+        {
+            RegisterStepDefinitionBinding();
+
+            var sut = CreateSut();
+
+            var result = sut.DiscoverInternal(GetTestAssemblyPath(), null);
+
+            result.StepDefinitions.Should().HaveCount(1);
+            result.StepDefinitions[0].Expression.Should().BeNull();
+            result.StepDefinitions[0].Error.Should().BeNull();
         }
     }
 }
