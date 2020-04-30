@@ -75,7 +75,10 @@ namespace Deveroom.VisualStudio.ProjectSystem
         {
             if (sender is Task task)
             {
-                _errorListProvider.Value.Navigate(task, VSConstants.LOGVIEWID_TextView);
+                if (string.IsNullOrEmpty(task.Document))
+                    _vsIdeScope.DeveroomOutputPaneServices?.Activate();
+                else
+                    _errorListProvider.Value.Navigate(task, VSConstants.LOGVIEWID_TextView);
             }
         }
     }

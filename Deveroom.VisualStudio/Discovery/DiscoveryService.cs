@@ -126,6 +126,7 @@ namespace Deveroom.VisualStudio.Discovery
         private void TriggerDiscovery()
         {
             var projectSettings = _projectScope.GetProjectSettings();
+            _errorListServices?.ClearErrors(DeveroomUserErrorCategory.Discovery);
             ProjectBindingRegistryCache skippedResult = GetSkippedBindingRegistryResult(projectSettings, out var testAssemblySource);
             if (skippedResult != null)
             {
@@ -157,6 +158,12 @@ namespace Deveroom.VisualStudio.Discovery
             if (testAssemblySource == null)
             {
                 _logger.LogInfo("Test assembly not found. Please build the project to enable Deveroom features.");
+                _errorListServices?.AddErrors(new []{ new DeveroomUserError
+                {
+                    Category = DeveroomUserErrorCategory.Discovery,
+                    Message = "Test assembly not found. Please build the project to enable Deveroom features.",
+                    Type = TaskErrorCategory.Warning
+                }});
                 return new ProjectBindingRegistryCache(DiscoveryStatus.TestAssemblyNotFound, projectSettings: projectSettings);
             }
 
@@ -221,8 +228,6 @@ namespace Deveroom.VisualStudio.Discovery
         {
             try
             {
-                _errorListServices?.ClearErrors(DeveroomUserErrorCategory.Discovery);
-
                 var result = _discoveryResultProvider.RunDiscovery(testAssemblySource.FilePath, projectSettings.SpecFlowConfigFilePath, projectSettings);
                 var bindingRegistry = new ProjectBindingRegistry();
                 if (result.IsFailed)
@@ -230,6 +235,13 @@ namespace Deveroom.VisualStudio.Discovery
                     bindingRegistry.IsFailed = true;
                     _logger.LogWarning(result.ErrorMessage);
                     _logger.LogWarning($"The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled. {Environment.NewLine}  Please check the error message above and report to https://github.com/specsolutions/deveroom-visualstudio/issues if you cannot fix.");
+
+                    _errorListServices?.AddErrors(new[]{ new DeveroomUserError
+                    {
+                        Category = DeveroomUserErrorCategory.Discovery,
+                        Message = "The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled.",
+                        Type = TaskErrorCategory.Warning
+                    }});
                 }
                 else
                 {
