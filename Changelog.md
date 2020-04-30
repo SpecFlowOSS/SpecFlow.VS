@@ -1,3 +1,12 @@
+# v1.6.0 - 2020-04-30
+
+Improvements:
+
+* Support for [Cucumber expressions](https://cucumber.io/docs/cucumber/cucumber-expressions/) by using the [CucumberExpressions.SpecFlow.3-1](https://github.com/gasparnagy/CucumberExpressions.SpecFlow) NuGet package (Issue #65)
+* Imroved error handling of binding errors (e.g. invalid regular expression)
+* Suggested suffix for step definition classes changed to `StepDefinitions` (from `Steps`)
+* Detect platform target (x86, x64) automatically (Issue #50)
+
 # v1.5.2 - 2020-01-31
 
 Improvements:
