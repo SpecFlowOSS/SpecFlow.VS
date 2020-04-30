@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -19,10 +20,13 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.V1.Tests
 
         class StubDiscoverer : RemotingBaseDiscoverer
         {
+            public Exception GetBindingRegistryError { get; set; }
             public IBindingRegistry BindingRegistry { get; set; }
 
             protected override IBindingRegistry GetBindingRegistry(Assembly testAssembly, string configFilePath)
             {
+                if (GetBindingRegistryError != null)
+                    throw GetBindingRegistryError;
                 return BindingRegistry;
             }
 
@@ -349,6 +353,27 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.V1.Tests
             result.StepDefinitions.Should().HaveCount(1);
             result.StepDefinitions[0].Expression.Should().BeNull();
             result.StepDefinitions[0].Error.Should().BeNull();
+        }
+
+        [Fact]
+        public void Should_detect_regex_error()
+        {
+            RegisterStepDefinitionBinding();
+
+            var sut = CreateSut();
+            try
+            {
+                new Regex("invalid (regex");
+            }
+            catch (Exception ex)
+            {
+                sut.GetBindingRegistryError = new TargetInvocationException(ex);
+            }
+
+            var result = sut.DiscoverInternal(GetTestAssemblyPath(), null);
+
+            result.StepDefinitions.Should().HaveCount(1);
+            result.StepDefinitions[0].Error.Should().NotBeNullOrEmpty();
         }
     }
 }

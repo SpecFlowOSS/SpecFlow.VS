@@ -26,24 +26,54 @@ namespace Deveroom.VisualStudio.SpecFlowConnector.Discovery
 
         internal DiscoveryResult DiscoverInternal(Assembly testAssembly, string testAssemblyPath, string configFilePath)
         {
-            var bindingRegistry = GetBindingRegistry(testAssembly, configFilePath);
+            try
+            {
+                var bindingRegistry = GetBindingRegistry(testAssembly, configFilePath);
 
-            var result = new DiscoveryResult();
-            var warningCollector = new WarningCollector();
+                var result = new DiscoveryResult();
+                var warningCollector = new WarningCollector();
 
-            _sourceFiles.Clear();
-            GetOrCreateSymbolReader(testAssembly, warningCollector, testAssemblyPath);
+                _sourceFiles.Clear();
+                GetOrCreateSymbolReader(testAssembly, warningCollector, testAssemblyPath);
 
-            result.StepDefinitions =
-                GetStepDefinitions(bindingRegistry)
-                    .Select(sdb => CreateStepDefinition(sdb, warningCollector))
-                    .Distinct() //TODO: SpecFlow discoverers bindings from external assemblies twice -- needs fix
-                    .ToArray();
-            result.SourceFiles = _sourceFiles.ToDictionary(sf => sf.Value.ToString(), sf => sf.Key);
-            result.TypeNames = _typeNames.ToDictionary(sf => sf.Value.ToString(), sf => sf.Key);
-            result.Warnings = warningCollector.Warnings;
-            result.SpecFlowVersion = typeof(IStepDefinitionBinding).Assembly.Location;
-            return result;
+                result.StepDefinitions =
+                    GetStepDefinitions(bindingRegistry)
+                        .Select(sdb => CreateStepDefinition(sdb, warningCollector))
+                        .Distinct() //TODO: SpecFlow discoverers bindings from external assemblies twice -- needs fix
+                        .ToArray();
+                result.SourceFiles = _sourceFiles.ToDictionary(sf => sf.Value.ToString(), sf => sf.Key);
+                result.TypeNames = _typeNames.ToDictionary(sf => sf.Value.ToString(), sf => sf.Key);
+                result.Warnings = warningCollector.Warnings;
+                result.SpecFlowVersion = typeof(IStepDefinitionBinding).Assembly.Location;
+                return result;
+            }
+            catch (Exception ex) when (GetRegexError(ex) != null)
+            {
+                var regexError = GetRegexError(ex);
+                return new DiscoveryResult()
+                {
+                    SpecFlowVersion = typeof(IStepDefinitionBinding).Assembly.Location,
+                    StepDefinitions = new[] { 
+                        new StepDefinition
+                        {
+                            Method = "Unknown method",
+                            Error = $"Step definition regular expression error: {regexError.Message}" 
+                        }
+                    }
+                };
+            }
+        }
+
+        private Exception GetRegexError(Exception exception)
+        {
+            if (exception is TargetInvocationException && exception.InnerException != null)
+                return GetRegexError(exception.InnerException);
+
+            if (exception.StackTrace?.Contains("System.Text.RegularExpressions") ?? false)
+                return exception;
+            if (exception.InnerException == null)
+                return null;
+            return GetRegexError(exception.InnerException);
         }
 
         private StepDefinition CreateStepDefinition(IStepDefinitionBinding sdb, WarningCollector warningCollector)

@@ -34,7 +34,7 @@ namespace Deveroom.VisualStudio.Discovery
         {
             try
             {
-                var stepDefinitionType = (ScenarioBlock)Enum.Parse(typeof(ScenarioBlock), stepDefinition.Type);
+                var stepDefinitionType = (ScenarioBlock)Enum.Parse(typeof(ScenarioBlock), stepDefinition.Type ?? ScenarioBlock.Unknown.ToString());
                 var regex = ParseRegex(stepDefinition);
                 var sourceLocation = ParseSourceLocation(stepDefinition.SourceLocation);
                 var scope = ParseScope(stepDefinition.Scope);
