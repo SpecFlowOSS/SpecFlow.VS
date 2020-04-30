@@ -101,7 +101,7 @@ Scenario: Selected step definition skeletons are saved to a new file
 	And the "Define Steps" command is being invoked
 	When I select the step definition snippets 0,1
 	And close the define steps dialog with "Create"
-	Then the following step definition snippets should be in file "AdditionSteps.cs"
+	Then the following step definition snippets should be in file "AdditionStepDefinitions.cs"
 		| type  | regex                          |
 		| Given | the operands have been entered |
 		| When  | I press multiply               |
