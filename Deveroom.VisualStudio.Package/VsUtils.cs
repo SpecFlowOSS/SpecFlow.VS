@@ -127,6 +127,34 @@ namespace Deveroom.VisualStudio
             }
         }
 
+        public static string GetPlatformName(Project project)
+        {
+            try
+            {
+                return project.ConfigurationManager.ActiveConfiguration.PlatformName;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex, $"{nameof(VsUtils)}.{nameof(GetPlatformName)}");
+                return null;
+            }
+        }
+
+        public static string GetPlatformTargetName(Project project)
+        {
+            try
+            {
+                if (project.ConfigurationManager.ActiveConfiguration.Properties == null)
+                    return null;
+                return project.ConfigurationManager.ActiveConfiguration.Properties.Item("PlatformTarget").Value.ToString();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex, $"{nameof(VsUtils)}.{nameof(GetPlatformTargetName)}");
+                return null;
+            }
+        }
+
         public static string GetOutputFileName(Project project)
         {
             try

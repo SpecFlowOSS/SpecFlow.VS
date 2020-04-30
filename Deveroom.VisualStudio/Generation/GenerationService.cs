@@ -71,7 +71,7 @@ namespace Deveroom.VisualStudio.Generation
 
             try
             {
-                var connector = new OutProcSpecFlowConnector(_projectScope.GetDeveroomConfiguration(), _logger, projectSettings.TargetFrameworkMoniker, _projectScope.IdeScope.GetExtensionFolder());
+                var connector = OutProcSpecFlowConnectorFactory.Create(_projectScope);
 
                 var result = connector.RunGenerator(featureFilePath, projectSettings.SpecFlowConfigFilePath,
                     targetExtension, targetNamespace, _projectScope.ProjectFolder, specFlowToolsFolder);

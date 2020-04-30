@@ -23,13 +23,15 @@ namespace Deveroom.VisualStudio.Connectors
         private readonly IDeveroomLogger _logger;
         private readonly TargetFrameworkMoniker _targetFrameworkMoniker;
         private readonly string _extensionFolder;
+        private readonly ProcessorArchitectureSetting _processorArchitecture;
 
-        public OutProcSpecFlowConnector(DeveroomConfiguration configuration, IDeveroomLogger logger, TargetFrameworkMoniker targetFrameworkMoniker, string extensionFolder)
+        public OutProcSpecFlowConnector(DeveroomConfiguration configuration, IDeveroomLogger logger, TargetFrameworkMoniker targetFrameworkMoniker, string extensionFolder, ProcessorArchitectureSetting processorArchitecture)
         {
             _configuration = configuration;
             _logger = logger;
             _targetFrameworkMoniker = targetFrameworkMoniker;
             _extensionFolder = extensionFolder;
+            _processorArchitecture = processorArchitecture;
         }
 
         private bool DebugConnector => _configuration.DebugConnector || Environment.GetEnvironmentVariable("DEVEROOM_DEBUGCONNECTOR") == "1";
@@ -147,7 +149,7 @@ namespace Deveroom.VisualStudio.Connectors
 
             //V1
             string connectorName = ConnectorV1AnyCpu;
-            if (_configuration.ProcessorArchitecture == ProcessorArchitectureSetting.X86)
+            if (_processorArchitecture == ProcessorArchitectureSetting.X86)
                 connectorName = ConnectorV1X86;
 
             return Path.Combine(connectorsFolder, connectorName);
@@ -156,7 +158,7 @@ namespace Deveroom.VisualStudio.Connectors
         private string GetDotNetInstallLocation()
         {
             var programFiles = Environment.GetEnvironmentVariable("ProgramW6432");
-            if (_configuration.ProcessorArchitecture == ProcessorArchitectureSetting.X86)
+            if (_processorArchitecture == ProcessorArchitectureSetting.X86)
                 programFiles = Environment.GetEnvironmentVariable("ProgramFiles(x86)");
             if (string.IsNullOrEmpty(programFiles))
                 programFiles = Environment.GetEnvironmentVariable("ProgramFiles");

@@ -20,6 +20,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
         public string ProjectFolder { get; }
         public string OutputAssemblyPath => VsUtils.GetOutputAssemblyPath(_project);
         public string TargetFrameworkMoniker => VsUtils.GetTargetFrameworkMoniker(_project);
+        public string PlatformTargetName => VsUtils.GetPlatformTargetName(_project) ?? VsUtils.GetPlatformName(_project);
         public string ProjectName { get; }
         public string DefaultNamespace => GetDefaultNamespace();
 

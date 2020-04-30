@@ -13,6 +13,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
         IEnumerable<NuGetPackageReference> PackageReferences { get; }
         string OutputAssemblyPath { get; }
         string TargetFrameworkMoniker { get; }
+        string PlatformTargetName { get; }
         string DefaultNamespace { get; }
 
         void AddFile(string targetFilePath, string template);

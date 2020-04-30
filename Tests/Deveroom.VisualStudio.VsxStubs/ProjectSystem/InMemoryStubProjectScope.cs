@@ -19,6 +19,7 @@ namespace Deveroom.VisualStudio.VsxStubs.ProjectSystem
         public string ProjectFolder { get; } = Path.GetTempPath();
         public string OutputAssemblyPath => Path.Combine(ProjectFolder, "out.dll");
         public string TargetFrameworkMoniker { get; } = ".NETFramework,Version=v4.5.2";
+        public string PlatformTargetName { get; } = "Any CPU";
         public string ProjectName { get; } = "Test Project";
         public string DefaultNamespace => ProjectName.Replace(" ", "");
 

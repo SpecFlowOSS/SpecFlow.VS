@@ -6,6 +6,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
     {
         public DeveroomProjectKind Kind { get; }
         public TargetFrameworkMoniker TargetFrameworkMoniker { get; }
+        public ProjectPlatformTarget PlatformTarget { get; }
         public string OutputAssemblyPath { get; }
         public string DefaultNamespace { get; }
         public NuGetVersion SpecFlowVersion { get; }
@@ -13,11 +14,12 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
         public string SpecFlowConfigFilePath { get; }
         public SpecFlowProjectTraits SpecFlowProjectTraits { get; }
 
-        public ProjectSettings(DeveroomProjectKind kind, string outputAssemblyPath, TargetFrameworkMoniker targetFrameworkMoniker, string defaultNamespace,
+        public ProjectSettings(DeveroomProjectKind kind, string outputAssemblyPath, TargetFrameworkMoniker targetFrameworkMoniker, ProjectPlatformTarget platformTarget, string defaultNamespace,
             NuGetVersion specFlowVersion, string specFlowGeneratorFolder, string specFlowConfigFilePath, SpecFlowProjectTraits specFlowProjectTraits)
         {
             Kind = kind;
             TargetFrameworkMoniker = targetFrameworkMoniker;
+            PlatformTarget = platformTarget;
             OutputAssemblyPath = outputAssemblyPath;
             DefaultNamespace = defaultNamespace;
             SpecFlowVersion = specFlowVersion;
@@ -41,6 +43,8 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
         public string GetShortLabel()
         {
             var result = $"{TargetFrameworkMoniker},SpecFlow:{GetSpecFlowVersionLabel()}";
+            if (PlatformTarget != ProjectPlatformTarget.Unknown && PlatformTarget != ProjectPlatformTarget.AnyCpu)
+                result += "," + PlatformTarget;
             if (DesignTimeFeatureFileGenerationEnabled)
                 result += ",Gen";
             return result;
@@ -50,14 +54,14 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
 
         protected bool Equals(ProjectSettings other)
         {
-            return Kind == other.Kind && TargetFrameworkMoniker == other.TargetFrameworkMoniker && string.Equals(OutputAssemblyPath, other.OutputAssemblyPath) && string.Equals(DefaultNamespace, other.DefaultNamespace) && Equals(SpecFlowVersion, other.SpecFlowVersion) && string.Equals(SpecFlowGeneratorFolder, other.SpecFlowGeneratorFolder) && string.Equals(SpecFlowConfigFilePath, other.SpecFlowConfigFilePath) && SpecFlowProjectTraits == other.SpecFlowProjectTraits;
+            return Kind == other.Kind && Equals(TargetFrameworkMoniker, other.TargetFrameworkMoniker) && PlatformTarget == other.PlatformTarget && OutputAssemblyPath == other.OutputAssemblyPath && DefaultNamespace == other.DefaultNamespace && Equals(SpecFlowVersion, other.SpecFlowVersion) && SpecFlowGeneratorFolder == other.SpecFlowGeneratorFolder && SpecFlowConfigFilePath == other.SpecFlowConfigFilePath && SpecFlowProjectTraits == other.SpecFlowProjectTraits;
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (obj.GetType() != this.GetType()) return false;
             return Equals((ProjectSettings) obj);
         }
 
@@ -67,6 +71,7 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             {
                 var hashCode = (int) Kind;
                 hashCode = (hashCode * 397) ^ (TargetFrameworkMoniker != null ? TargetFrameworkMoniker.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (int) PlatformTarget;
                 hashCode = (hashCode * 397) ^ (OutputAssemblyPath != null ? OutputAssemblyPath.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (DefaultNamespace != null ? DefaultNamespace.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (SpecFlowVersion != null ? SpecFlowVersion.GetHashCode() : 0);

@@ -12,7 +12,7 @@ namespace Deveroom.VisualStudio.Configuration
         public TraceabilityConfiguration Traceability { get; set; } = new TraceabilityConfiguration();
 
         // old settings to be reviewed
-        public ProcessorArchitectureSetting ProcessorArchitecture { get; set; } = ProcessorArchitectureSetting.UseSystem;
+        public ProcessorArchitectureSetting ProcessorArchitecture { get; set; } = ProcessorArchitectureSetting.AutoDetect;
         public bool DebugConnector { get; set; } = false;
         public string DefaultFeatureLanguage { get; set; } = "en-US";
         public string ConfiguredBindingCulture { get; set; } = null;

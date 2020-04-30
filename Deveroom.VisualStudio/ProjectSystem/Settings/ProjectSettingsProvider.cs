@@ -141,11 +141,13 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             var specFlowSettings = _specFlowProjectSettingsProvider.GetSpecFlowSettings(packageReferences);
             var hasFeatureFiles = (featureFileCount ?? 0) > 0;
             var kind = GetKind(isInvalid, specFlowSettings != null, hasFeatureFiles);
+            var platformTarget = GetPlatformTarget(_projectScope.PlatformTargetName);
 
             var settings = new ProjectSettings(
                 kind,
                 _projectScope.OutputAssemblyPath,
                 TargetFrameworkMoniker.Create(_projectScope.TargetFrameworkMoniker),
+                platformTarget,
                 _projectScope.DefaultNamespace,
                 specFlowSettings?.Version, 
                 specFlowSettings?.GeneratorFolder,
@@ -153,6 +155,14 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
                 specFlowSettings?.Traits ?? SpecFlowProjectTraits.None);
 
             return settings;
+        }
+
+        private ProjectPlatformTarget GetPlatformTarget(string platformName)
+        {
+            if (platformName != null && Enum.TryParse<ProjectPlatformTarget>(platformName.Replace(" ", ""), true, out var platform))
+                return platform;
+
+            return ProjectPlatformTarget.Unknown;
         }
 
         private DeveroomProjectKind GetKind(bool isInvalid, bool isSpecFlowProject, bool hasFeatureFiles)

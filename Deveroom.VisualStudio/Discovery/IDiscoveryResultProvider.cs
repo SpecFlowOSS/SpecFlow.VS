@@ -36,7 +36,7 @@ namespace Deveroom.VisualStudio.Discovery
 
         private OutProcSpecFlowConnector GetConnector(ProjectSettings projectSettings)
         {
-            return new OutProcSpecFlowConnector(_projectScope.GetDeveroomConfiguration(), Logger, projectSettings.TargetFrameworkMoniker, _projectScope.IdeScope.GetExtensionFolder());
+            return OutProcSpecFlowConnectorFactory.Create(_projectScope);
         }
     }
 }
