@@ -10,7 +10,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
         private const string SpecFlowPackageName = "SpecFlow";
         public const string SpecFlowToolsMsBuildGenerationPackageName = "SpecFlow.Tools.MsBuild.Generation";
         public const string SpecFlowXUnitAdapterPackageName = "SpecFlow.xUnitAdapter";
-        public const string CucumberExpressionPluginPackageName = "CucumberExpressions.SpecFlow.3-1";
+        public const string CucumberExpressionPluginPackageNamePrefix = "CucumberExpressions.SpecFlow";
 
         private static readonly string[] KnownSpecFlowPackages =
         {
@@ -49,7 +49,7 @@ namespace Deveroom.VisualStudio.ProjectSystem
 
         public bool IsCucumberExpressionPluginEnabled(IEnumerable<NuGetPackageReference> packageReferences)
         {
-            return packageReferences.Any(pr => pr.PackageName == CucumberExpressionPluginPackageName);
+            return packageReferences.Any(pr => pr.PackageName != null && pr.PackageName.StartsWith(CucumberExpressionPluginPackageNamePrefix));
         }
 
         public NuGetPackageReference GetSpecFlowPackage(IEnumerable<NuGetPackageReference> packageReferences)

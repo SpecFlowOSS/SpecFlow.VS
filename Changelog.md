@@ -1,3 +1,9 @@
+# v1.6.1 - 2020-05-13
+
+Improvements:
+
+* Extend [Cucumber expressions](https://cucumber.io/docs/cucumber/cucumber-expressions/) support for SpecFlow v3.3 using [CucumberExpressions.SpecFlow.3-3](https://github.com/gasparnagy/CucumberExpressions.SpecFlow) NuGet package
+
 # v1.6.0 - 2020-04-30
 
 Improvements:
