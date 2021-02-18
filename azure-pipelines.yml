@@ -17,6 +17,11 @@ steps:
   inputs:
     version: 3.x
 
+- task: UseDotNet@2
+  displayName: 'Use .Net 5 sdk'
+  inputs:
+    version: 5.x
+
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore (with NuGet.config)'
   inputs:

@@ -26,4 +26,17 @@
       <VSIXSubPath>$(DeploymentV3TargetDir)\%(RecursiveDir)</VSIXSubPath>
     </Content>
   </ItemGroup>
+  <PropertyGroup>
+    <DeploymentV5OutputDir>$(MSBuildThisFileDirectory)bin\$(Configuration)\net5.0\publish</DeploymentV5OutputDir>
+    <DeploymentV5TargetDir>Connectors\V5</DeploymentV5TargetDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(DeploymentV5OutputDir)\**\*.*">
+      <Link>$(DeploymentV5TargetDir)\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <Visible>False</Visible>
+      <VSIXSubPath>$(DeploymentV5TargetDir)\%(RecursiveDir)</VSIXSubPath>
+    </Content>
+  </ItemGroup>
 </Project>
