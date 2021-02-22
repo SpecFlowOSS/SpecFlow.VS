@@ -21,14 +21,9 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.5.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != 'net5.0'">
+  <ItemGroup>
     <PackageReference Include="SpecFlow" Version="3.0.220" />
     <PackageReference Include="SpecFlow.CustomPlugin" Version="3.0.220" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-    <PackageReference Include="SpecFlow" Version="3.5.14" />
-    <PackageReference Include="SpecFlow.CustomPlugin" Version="3.5.14" />
   </ItemGroup>
 
   <ItemGroup>
@@ -48,7 +43,7 @@
 <Target Name="GetCopyToOutputDirectoryItems" />
 <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(IN_PUBLISH)'!='true'">
   <Message Importance="High" Text="Publishing manually" />
-  <Exec Command="(set IN_PUBLISH=true) &amp; dotnet publish -f netcoreapp2.1 -c $(Configuration)"  />
+  <Exec Command="(set IN_PUBLISH=true) &amp; dotnet publish -f netcoreapp2.1 -c $(Configuration)" />
   <Exec Command="(set IN_PUBLISH=true) &amp; dotnet publish -f netcoreapp3.1 -c $(Configuration)" />
   <Exec Command="(set IN_PUBLISH=true) &amp; dotnet publish -f net5.0 -c $(Configuration)" />
 </Target>
