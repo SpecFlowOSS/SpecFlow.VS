@@ -11,15 +11,23 @@ namespace Deveroom.VisualStudio.ProjectSystem
         public const string SpecFlowToolsMsBuildGenerationPackageName = "SpecFlow.Tools.MsBuild.Generation";
         public const string SpecFlowXUnitAdapterPackageName = "SpecFlow.xUnitAdapter";
         public const string CucumberExpressionPluginPackageNamePrefix = "CucumberExpressions.SpecFlow";
+        public const string SpecFlowPlusRunnerPluginPackageNamePrefix = "SpecRun.SpecFlow";
 
-        private static readonly string[] KnownSpecFlowPackages =
+        private static readonly string[] SpecFlowTestFrameworkPackages =
         {
             "SpecFlow.MsTest",
             "SpecFlow.xUnit",
             "SpecFlow.NUnit",
-            "SpecFlow.MsTest",
-            SpecFlowToolsMsBuildGenerationPackageName
+            "SpecFlow.MsTest"
         };
+
+        private static readonly string[] KnownSpecFlowPackages =
+            SpecFlowTestFrameworkPackages
+                .Concat(new[]
+                {
+                    SpecFlowToolsMsBuildGenerationPackageName
+                })
+                .ToArray();
 
         private const string SpecRunPackageRe = @"^SpecRun.SpecFlow.(?<sfver>[\d-]+)$";
         private const string SpecSyncPackageRe = @"^SpecSync.AzureDevOps.SpecFlow.(?<sfver>[\d-]+)$";
@@ -50,6 +58,11 @@ namespace Deveroom.VisualStudio.ProjectSystem
         public bool IsCucumberExpressionPluginEnabled(IEnumerable<NuGetPackageReference> packageReferences)
         {
             return packageReferences.Any(pr => pr.PackageName != null && pr.PackageName.StartsWith(CucumberExpressionPluginPackageNamePrefix));
+        }
+
+        public bool IsSpecFlowTestFrameworkPackagesUsed(NuGetPackageReference[] packageReferences)
+        {
+            return packageReferences.Any(pr => SpecFlowTestFrameworkPackages.Contains(pr.PackageName) || pr.PackageName.StartsWith(SpecFlowPlusRunnerPluginPackageNamePrefix));
         }
 
         public NuGetPackageReference GetSpecFlowPackage(IEnumerable<NuGetPackageReference> packageReferences)

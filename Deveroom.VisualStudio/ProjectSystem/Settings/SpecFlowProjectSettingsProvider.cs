@@ -122,7 +122,9 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             var specFlowPackage = detector.GetSpecFlowPackage(packageReferencesArray);
             if (specFlowPackage != null)
             {
-                if (detector.IsMsBuildGenerationEnabled(packageReferencesArray))
+                var specFlowVersion = specFlowPackage.Version.Version;
+                if (detector.IsMsBuildGenerationEnabled(packageReferencesArray) ||
+                    IsImplicitMsBuildGeneration(detector, specFlowVersion, packageReferencesArray))
                     specFlowProjectTraits |= SpecFlowProjectTraits.MsBuildGeneration;
                 if (detector.IsXUnitAdapterEnabled(packageReferencesArray))
                     specFlowProjectTraits |= SpecFlowProjectTraits.XUnitAdapter;
@@ -131,6 +133,12 @@ namespace Deveroom.VisualStudio.ProjectSystem.Settings
             }
 
             return specFlowPackage;
+        }
+
+        private bool IsImplicitMsBuildGeneration(SpecFlowPackageDetector detector, Version specFlowVersion, NuGetPackageReference[] packageReferencesArray)
+        {
+            return specFlowVersion >= new Version(3, 3) && 
+                   detector.IsSpecFlowTestFrameworkPackagesUsed(packageReferencesArray);
         }
 
         private string GetSpecFlowConfigFilePath(IProjectScope projectScope)

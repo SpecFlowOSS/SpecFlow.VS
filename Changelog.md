@@ -4,6 +4,7 @@ Improvements:
 
 * Support for .NET 5 projects (Issue #67, thx for Timothée Lecomte)
 * Support for SpecFlow v3.7 projects (Issue #69)
+* Do not warn for missing 'SpecFlow.Tools.MsBuild.Generation' package when SpecFlow v3.3 or later is used
 
 # v1.6.1 - 2020-05-13
 
