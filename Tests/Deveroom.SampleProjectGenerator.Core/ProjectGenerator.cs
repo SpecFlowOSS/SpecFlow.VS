@@ -280,7 +280,7 @@ namespace Deveroom.SampleProjectGenerator
         {
             if (_options.SpecFlowVersion >= new Version("3.0"))
             {
-                var sourcePlatform = _options.SpecFlowVersion >= new Version("2.0") ? "net45" : "net35";
+                var sourcePlatform = GetSpecFlowSourcePlatform();
                 ExecNuGetInstall("SpecFlow.Tools.MsBuild.Generation", packagesFolder, "-Version", _options.SpecFlowPackageVersion);
                 InstallNuGetPackage(projectChanger, packagesFolder, "SpecFlow.Tools.MsBuild.Generation", sourcePlatform, _options.SpecFlowPackageVersion);
 
@@ -294,7 +294,7 @@ namespace Deveroom.SampleProjectGenerator
 
         protected virtual void InstallSpecFlowPackages(string packagesFolder, ProjectChanger projectChanger)
         {
-            var sourcePlatform = _options.SpecFlowVersion >= new Version("2.0") ? "net45" : "net35";
+            var sourcePlatform = GetSpecFlowSourcePlatform();
             InstallNuGetPackage(projectChanger, packagesFolder, "SpecFlow", sourcePlatform, _options.SpecFlowPackageVersion);
 
             if (_options.SpecFlowVersion >= new Version("3.1"))
@@ -322,6 +322,15 @@ namespace Deveroom.SampleProjectGenerator
                 InstallNuGetPackage(projectChanger, packagesFolder, "Newtonsoft.Json", dependency: true);
                 InstallNuGetPackage(projectChanger, packagesFolder, "System.ValueTuple", "netstandard1.0", dependency: true);
             }
+        }
+
+        private string GetSpecFlowSourcePlatform()
+        {
+            var sourcePlatform =
+                _options.SpecFlowVersion >= new Version("3.3") ? "net461" :
+                _options.SpecFlowVersion >= new Version("2.0") ? "net45" :
+                "net35";
+            return sourcePlatform;
         }
 
         protected void InstallNuGetPackage(ProjectChanger projectChanger, string packagesFolder, string packageName,

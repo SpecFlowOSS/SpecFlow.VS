@@ -8,6 +8,6 @@ namespace Deveroom.VisualStudio.Specs.Support
     {
         //TODO: calculate latest versions automatically
         public static NuGetVersion LatestSpecFlowV2Version = new NuGetVersion("2.4.1");
-        public static NuGetVersion LatestSpecFlowV3Version = new NuGetVersion("3.1.67");
+        public static NuGetVersion LatestSpecFlowV3Version = new NuGetVersion("3.6.23");
     }
 }

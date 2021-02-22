@@ -10,6 +10,6 @@ Scenario Outline: Discover bindings from SDK-style project format
 	And the step definitions contain source file and line
 Examples: 
 	| label            | framework     | version |
-	| .NET new prj     | net452        | v3.*    |
+	| .NET new prj     | net461        | v3.*    |
 	| .NET Core        | netcoreapp2.1 | v3.*    |
 	| .NET SpecFlow v2 | net452        | v2.*    |

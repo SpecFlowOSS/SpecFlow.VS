@@ -9,9 +9,9 @@ namespace Deveroom.SampleProjectGenerator
     public class GeneratorOptions
     {
         private const string LatestSpecFlowVersion = "2.3.2";
-        public const string SpecFlowV3Version = "3.0.188";
+        public const string SpecFlowV3Version = "3.6.23";
         public const string UnicodeBindingRegex = "Unicode Алло Χαίρετε Árvíztűrő tükörfúrógép";
-        public const string DefaultTargetFramework = "net452";
+        public const string DefaultTargetFramework = "net461";
 
         [Option("force", Required = false, Default = false)]
         public bool Force { get; set; }
