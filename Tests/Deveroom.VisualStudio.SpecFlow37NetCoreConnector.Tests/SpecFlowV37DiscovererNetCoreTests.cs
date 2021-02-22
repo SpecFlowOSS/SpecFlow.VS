@@ -8,9 +8,9 @@ using FluentAssertions;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace Deveroom.VisualStudio.SpecFlow31NetCoreConnector.Tests
+namespace Deveroom.VisualStudio.SpecFlow37NetCoreConnector.Tests
 {
-    public class SpecFlowV31DiscovererNet5Tests
+    public class SpecFlowV37DiscovererNetCoreTests
     {
         private SpecFlowV31Discoverer CreateSut()
         {

@@ -8,6 +8,7 @@ Scenario Outline: Discover bindings from a SpecFlow project on .NET Framework
 	And the step definitions contain source file and line
 Examples: 
 	| case      | version  |
+	| line-v3.7 | v3.7.13  |
 	| line-v3.6 | v3.6.23  |
 	| line-v3.5 | v3.5.14  |
 	| line-v3.4 | v3.4.31  |
@@ -30,6 +31,7 @@ Scenario Outline: Discover bindings from a SpecFlow project on .NET Core
 	Then the discovery succeeds with several step definitions
 Examples: 
 	| case      | version |
+	| line-v3.7 | v3.7.13 |
 	| line-v3.6 | v3.6.23 |
 	| line-v3.5 | v3.5.14 |
 	| line-v3.4 | v3.4.31 |

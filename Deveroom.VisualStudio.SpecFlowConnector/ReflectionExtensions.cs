@@ -12,6 +12,11 @@ namespace Deveroom.VisualStudio.SpecFlowConnector
             return ReflectionCallMethod<T>(obj, methodName, args?.Select(a => a.GetType()).ToArray() ?? new Type[0], args);
         }
 
+        public static void ReflectionCallMethod(this object obj, string methodName, params object[] args)
+        {
+            ReflectionCallMethod<object>(obj, methodName, args);
+        }
+
         public static void ReflectionCallMethod(this object obj, string methodName, Type[] parameterTypes, params object[] args)
         {
             ReflectionCallMethod<object>(obj, methodName, parameterTypes, args);

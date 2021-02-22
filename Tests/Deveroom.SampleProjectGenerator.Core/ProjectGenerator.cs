@@ -303,7 +303,14 @@ namespace Deveroom.SampleProjectGenerator
                 InstallNuGetPackage(projectChanger, packagesFolder, "Google.Protobuf", dependency: true, packageVersion: "3.7.0");
             }
 
-            if (_options.SpecFlowVersion >= new Version("3.0.188"))
+            if (_options.SpecFlowVersion >= new Version("3.7"))
+            {
+                InstallNuGetPackage(projectChanger, packagesFolder, "BoDi", dependency: true, packageVersion: "1.5.0");
+                InstallNuGetPackage(projectChanger, packagesFolder, "Gherkin", dependency: true, packageVersion: "6.0.0");
+                InstallNuGetPackage(projectChanger, packagesFolder, "Utf8Json", "net45", dependency: true, packageVersion: "1.3.7");
+                InstallNuGetPackage(projectChanger, packagesFolder, "System.ValueTuple", "netstandard1.0", dependency: true);
+            }
+            else if (_options.SpecFlowVersion >= new Version("3.0.188"))
             {
                 InstallNuGetPackage(projectChanger, packagesFolder, "BoDi", dependency: true, packageVersion: "1.4.1");
                 InstallNuGetPackage(projectChanger, packagesFolder, "Gherkin", dependency: true, packageVersion: "6.0.0");
