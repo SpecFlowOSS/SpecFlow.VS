@@ -9,8 +9,12 @@ namespace Deveroom.VisualStudio.ProjectSystem
         public const string NetFrameworkPlatform = ".NETFramework";
         private const string NetCoreShortValuePrefix = "netcoreapp";
         private const string NetFrameworkShortValuePrefix = "net";
+        private const string Net5ShortValuePrefix = "net5";
 
-        // e.g .NETCoreApp,Version=v2.1 or .NETFramework,Version=v4.5.2
+        // e.g.
+        // * .NET 5:    .NETCoreApp,Version=v5.0
+        // * .NET Core: .NETCoreApp,Version=v2.1
+        // * .NET Fw:   .NETFramework,Version=v4.5.2
         public string Value { get; }
 
         public string Platform { get; }
@@ -50,6 +54,10 @@ namespace Deveroom.VisualStudio.ProjectSystem
             if (shortValue.StartsWith(NetCoreShortValuePrefix))
             {
                 value = $".NETCoreApp,Version=v{shortValue.Substring(NetCoreShortValuePrefix.Length)}";
+            }
+            else if (shortValue.StartsWith(Net5ShortValuePrefix))
+            {
+                value = $".NETCoreApp,Version=v{shortValue.Substring(Net5ShortValuePrefix.Length-1)}";
             }
             else if (shortValue.StartsWith(NetFrameworkShortValuePrefix))
             {

@@ -161,11 +161,18 @@ namespace Deveroom.VisualStudio.Specs.StepDefinitions
                 _generatorOptions.NewProjectFormat = true;
         }
 
+        private bool IsNet5(string targetFramework)
+        {
+            return targetFramework.StartsWith("net") && targetFramework.Length >= 6 &&
+                   char.IsDigit(targetFramework[3]) &&
+                   !targetFramework.StartsWith("net3") && !targetFramework.StartsWith("net4");
+        }
+        
         [Given(@"the target framework is (.*)")]
         public void GivenTheTargetFrameworkIs(string targetFramework)
         {
             _generatorOptions.TargetFramework = targetFramework;
-            if (targetFramework.Contains("netcoreapp"))
+            if (targetFramework.Contains("netcoreapp") || IsNet5(targetFramework))
             {
                 if (!_generatorOptions.NewProjectFormat)
                     _generatorOptions.NewProjectFormat = true;

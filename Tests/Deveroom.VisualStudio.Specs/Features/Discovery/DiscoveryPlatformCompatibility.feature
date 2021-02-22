@@ -14,3 +14,4 @@ Examples:
 	| netcoreapp2.2 |
 	| netcoreapp3.0 |
 	| netcoreapp3.1 |
+	| net5.0        |
