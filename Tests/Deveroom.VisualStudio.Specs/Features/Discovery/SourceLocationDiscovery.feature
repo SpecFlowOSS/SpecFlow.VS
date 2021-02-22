@@ -16,6 +16,7 @@ Scenario: Discover binding source location from SpecFlow project with external b
 
 Scenario Outline: Discover binding source location from SpecFlow project with async bindings
 	Given there is a small SpecFlow project with async bindings
+	And the project uses the new project format
 	And the target framework is <framework>
 	And the project is built
 	When the binding discovery performed
