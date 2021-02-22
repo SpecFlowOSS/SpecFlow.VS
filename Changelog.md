@@ -2,7 +2,7 @@
 
 Improvements:
 
-* Support for .NET 5 projects (Issue #67, thx for Timothée Lecomte)
+* Support for .NET 5 projects (Issue #67, thx for TimothÃ©e Lecomte)
 * Support for SpecFlow v3.7 projects (Issue #69)
 
 # v1.6.1 - 2020-05-13
