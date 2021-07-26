@@ -66,7 +66,10 @@ namespace Deveroom.VisualStudio.Connectors
             }
 
             _logger.LogVerbose(connectorPath);
+
+#if DEBUG
             _logger.LogVerbose(result.StandardOut);
+#endif
 
             var discoveryResult = JsonSerialization.DeserializeObjectWithMarker<DiscoveryResult>(result.StandardOut);
             if (discoveryResult.IsFailed)
