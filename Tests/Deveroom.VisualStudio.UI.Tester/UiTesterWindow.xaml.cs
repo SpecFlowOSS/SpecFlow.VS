@@ -61,5 +61,19 @@ namespace Deveroom.VisualStudio.UI.Tester
             var dialog = new ReportErrorDialog(viewModel);
             dialog.ShowDialog();
         }
+
+        private void Test_WelcomeDialog(object sender, RoutedEventArgs e)
+        {
+            var viewModel = WelcomeDialogViewModel.DesignData;
+            var dialog = new WelcomeDialog(viewModel);
+            dialog.ShowDialog();
+        }
+
+        private void Test_UpgradeDialog(object sender, RoutedEventArgs e)
+        {
+            var viewModel = WhatsNewDialogViewModel.DesignData;
+            var dialog = new WelcomeDialog(viewModel);
+            dialog.ShowDialog();
+        }
     }
 }
