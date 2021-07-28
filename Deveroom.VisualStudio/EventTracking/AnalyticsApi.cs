@@ -5,15 +5,19 @@ namespace Deveroom.VisualStudio.EventTracking
 {
     public class AnalyticsApi : IAnalyticsApi
     {
-        public bool HasClientId
+        public bool HasClientId => RegistryManager.GetStringValue("cid") != null;
+
+        private static string GetClientId()
         {
-            get
+            var cid = RegistryManager.GetStringValue("cid");
+            if (cid == null)
             {
-                //TODO: return RegistryManager.GetStringValue("cid") != null;
-                return false;
+                cid = Guid.NewGuid().ToString("D");
+                RegistryManager.SetString("cid", cid);
             }
+            return cid;
         }
-        
+
         public bool LogEnabled { get; }
         public Exception SenderError { get; }
 
