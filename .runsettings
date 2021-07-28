@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <!-- Configurations that affect the Test Framework -->
+  <!-- see https://docs.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file?view=vs-2019#example-runsettings-file for an example -->
+  <RunConfiguration>
+    <!-- x86 or x64 -->
+    <!-- You can also change it from the Test menu; choose "Processor Architecture for AnyCPU Projects" -->
+    <TargetPlatform>x64</TargetPlatform>
+  </RunConfiguration>
+</RunSettings>

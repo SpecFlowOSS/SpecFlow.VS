@@ -14,6 +14,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.SampleProjectGenerator.Core", "Tests\Deveroom.SampleProjectGenerator.Core\Deveroom.SampleProjectGenerator.Core.csproj", "{A43E4E30-1062-4EF8-A17D-4DEF77BAACA3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{11E7849D-8059-417F-BEB2-7B576B7993F3}"
+	ProjectSection(SolutionItems) = preProject
+		.runsettings = .runsettings
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.VsxStubs", "Tests\Deveroom.VisualStudio.VsxStubs\Deveroom.VisualStudio.VsxStubs.csproj", "{84081A7E-4D74-4388-9CA7-8F488DF4C68B}"
 EndProject
