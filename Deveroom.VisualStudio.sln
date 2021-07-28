@@ -4,10 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Package", "Deveroom.VisualStudio.Package\Deveroom.VisualStudio.Package.csproj", "{00920A0A-A73C-487F-BC41-9B92F2F0EBD7}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4A884C12-01D7-4519-A510-3493BE910988} = {4A884C12-01D7-4519-A510-3493BE910988}
-		{B1D4F570-499E-4550-8D29-40510954FD05} = {B1D4F570-499E-4550-8D29-40510954FD05}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlowConnector.Models", "Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj", "{261CCD0B-7411-40F0-B780-12537175B468}"
 EndProject
@@ -32,6 +28,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Connectors", "Connectors", "{B9F019ED-754C-4D7E-90ED-7D54A50B38EB}"
 	ProjectSection(SolutionItems) = preProject
 		Connectors\build.ps1 = Connectors\build.ps1
+		Connectors\DeploymentAssets.props = Connectors\DeploymentAssets.props
 	EndProjectSection
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Deveroom.VisualStudio.Common", "Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.shproj", "{0CA5992A-E95E-472F-90CF-36BE75A6CEDE}"
@@ -58,10 +55,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Tests", "Tests\Deveroom.VisualStudio.Tests\Deveroom.VisualStudio.Tests.csproj", "{69997CEE-FE90-4CF6-97AE-8A2B7811A4F5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Specs", "Tests\Deveroom.VisualStudio.Specs\Deveroom.VisualStudio.Specs.csproj", "{14A1CF32-83E1-4B67-88E2-3EBFE9F5071C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{4A884C12-01D7-4519-A510-3493BE910988} = {4A884C12-01D7-4519-A510-3493BE910988}
-		{B1D4F570-499E-4550-8D29-40510954FD05} = {B1D4F570-499E-4550-8D29-40510954FD05}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow30NetFwConnector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow30NetFwConnector.Tests\Deveroom.VisualStudio.SpecFlow30NetFwConnector.Tests.csproj", "{817E430C-8C30-4452-A4EA-ECCFCD466BDF}"
 EndProject

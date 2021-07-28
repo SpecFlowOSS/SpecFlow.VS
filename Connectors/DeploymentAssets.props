@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ConnectorOutputDir>$(MSBuildThisFileDirectory)bin\$(Configuration)</ConnectorOutputDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(ConnectorOutputDir)\V1\**\*.*">
+      <Link>Connectors\V1\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <Visible>False</Visible>
+      <VSIXSubPath>Connectors\V1\%(RecursiveDir)</VSIXSubPath>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(ConnectorOutputDir)\V2\**\*.*">
+      <Link>Connectors\V2\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <Visible>False</Visible>
+      <VSIXSubPath>Connectors\V2\%(RecursiveDir)</VSIXSubPath>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(ConnectorOutputDir)\V3\**\*.*">
+      <Link>Connectors\V3\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <Visible>False</Visible>
+      <VSIXSubPath>Connectors\V3\%(RecursiveDir)</VSIXSubPath>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(ConnectorOutputDir)\V5\**\*.*">
+      <Link>Connectors\V5\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <Visible>False</Visible>
+      <VSIXSubPath>Connectors\V5\%(RecursiveDir)</VSIXSubPath>
+    </Content>
+  </ItemGroup>
+
+</Project>

@@ -83,6 +83,5 @@
     <AdditionalDeveroomDependencies Include="System.IO.Abstractions.dll" />
   </ItemGroup>
 
-  <Import Project="..\Deveroom.VisualStudio.SpecFlowConnector.V1\DeploymentAssets.props" />
-  <Import Project="..\Deveroom.VisualStudio.SpecFlowConnector.V2\DeploymentAssets.props" />
+  <Import Project="..\Connectors\DeploymentAssets.props" />
 </Project>
