@@ -54,6 +54,12 @@ namespace Deveroom.VisualStudio.UI
             if ((object)viewModel is ReportErrorDialogViewModel reportErrorDialogViewModel)
                 return new ReportErrorDialog(reportErrorDialogViewModel, _vsUiShell);
 
+            if ((object)viewModel is WelcomeDialogViewModel welcomeDialogViewModel)
+                return new WelcomeDialog(welcomeDialogViewModel, _vsUiShell);
+
+            if ((object)viewModel is WhatsNewDialogViewModel whatsNewDialogViewModel)
+                return new WelcomeDialog(whatsNewDialogViewModel, _vsUiShell);
+
             throw new NotSupportedException(typeof(TViewModel).ToString());
         }
     }
