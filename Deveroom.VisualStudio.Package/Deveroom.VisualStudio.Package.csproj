@@ -21,7 +21,7 @@
     <RootNamespace>Deveroom.VisualStudio</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' AND '$(DEVEROOM_SKIP_DEPLOY_DEV)' != 'true' ">
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DeployExtension>true</DeployExtension>
   </PropertyGroup>
 
