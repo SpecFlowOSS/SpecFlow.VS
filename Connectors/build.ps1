@@ -4,9 +4,9 @@ param (
 
 $outputFolder = "$PSScriptRoot\bin\$configuration"
 
-Remove-Item $outputFolder -Recurse -Force
+Remove-Item $outputFolder -Recurse -Force -ErrorAction SilentlyContinue
 
-mkdir $outputFolder
+mkdir $outputFolder 
 
 # build V1 any cpu
 
@@ -19,7 +19,7 @@ Copy-Item bin\$configuration\net452\publish\* $outputFolder\V1\ -Exclude @('Tech
 
 # build V1 x86
 
-Remove-Item bin\$configuration\net452\win-x86\publish -Recurse -Force
+Remove-Item bin\$configuration\net452\win-x86\publish -Recurse -Force -ErrorAction SilentlyContinue
 
 dotnet publish -r win-x86 -c $configuration /p:PlatformTarget=x86
 
