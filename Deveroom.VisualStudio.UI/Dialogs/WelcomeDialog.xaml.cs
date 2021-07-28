@@ -4,7 +4,7 @@ using Deveroom.VisualStudio.UI.ViewModels;
 using Deveroom.VisualStudio.UI.ViewModels.WizardDialogs;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace Deveroom.VisualStudio.Pro.UI.Dialogs
+namespace Deveroom.VisualStudio.UI.Dialogs
 {
     public partial class WelcomeDialog
     {
