@@ -68,7 +68,6 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
     </ProjectReference>
-    <ProjectReference Include="..\Deveroom.VisualStudio.Dev\Deveroom.VisualStudio.Dev.csproj" Name="Deveroom.VisualStudio.Dev" />
   </ItemGroup>
 
   <ItemGroup>

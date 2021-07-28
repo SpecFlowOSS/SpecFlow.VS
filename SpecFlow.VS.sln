@@ -69,8 +69,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow24Connector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow24Connector.Tests\Deveroom.VisualStudio.SpecFlow24Connector.Tests.csproj", "{02BA7A29-42F3-484F-A93A-CA0EEEB46A92}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Dev", "Deveroom.VisualStudio.Dev\Deveroom.VisualStudio.Dev.csproj", "{17DD8701-E404-4343-AA04-61FC11CEDE72}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repo", "Repo", "{31ACD27E-7410-40B8-8E7D-3C0E787C0814}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
@@ -228,12 +226,6 @@ Global
 		{02BA7A29-42F3-484F-A93A-CA0EEEB46A92}.Release|Any CPU.Build.0 = Release|Any CPU
 		{02BA7A29-42F3-484F-A93A-CA0EEEB46A92}.TestDebug|Any CPU.ActiveCfg = Debug|Any CPU
 		{02BA7A29-42F3-484F-A93A-CA0EEEB46A92}.TestDebug|Any CPU.Build.0 = Debug|Any CPU
-		{17DD8701-E404-4343-AA04-61FC11CEDE72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17DD8701-E404-4343-AA04-61FC11CEDE72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17DD8701-E404-4343-AA04-61FC11CEDE72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17DD8701-E404-4343-AA04-61FC11CEDE72}.Release|Any CPU.Build.0 = Release|Any CPU
-		{17DD8701-E404-4343-AA04-61FC11CEDE72}.TestDebug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17DD8701-E404-4343-AA04-61FC11CEDE72}.TestDebug|Any CPU.Build.0 = Debug|Any CPU
 		{C4DF9612-4416-4BD3-A67B-EC4115C97A44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C4DF9612-4416-4BD3-A67B-EC4115C97A44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4DF9612-4416-4BD3-A67B-EC4115C97A44}.Release|Any CPU.ActiveCfg = Release|Any CPU
