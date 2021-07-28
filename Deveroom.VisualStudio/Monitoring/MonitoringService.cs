@@ -20,7 +20,7 @@ namespace Deveroom.VisualStudio.Monitoring
         public void MonitorOpenProjectSystem(string vsVersion, IIdeScope ideScope)
         {
             EventTracker.TrackOpenProjectSystem(vsVersion, ActivityTracker.ActiveDays);
-            //TODO:  WelcomeService.OnIdeScopeActivityStarted(ideScope);
+            WelcomeService.OnIdeScopeActivityStarted(ideScope);
         }
 
         public void MonitorOpenProject(ProjectSettings settings, int? featureFileCount)
