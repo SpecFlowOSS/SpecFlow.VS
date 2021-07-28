@@ -8,13 +8,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
     <PlatformTarget>anycpu</PlatformTarget>
-    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
     <RootNamespace>Deveroom.VisualStudio.SpecFlowConnector</RootNamespace>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug_x86' OR '$(Configuration)' == 'Release_x86' ">
-    <AssemblyName>deveroom-specflow-v1.x86</AssemblyName>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,13 +26,6 @@
     <Reference Include="ISymWrapper" />
     <Reference Include="System.Configuration" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" 
-          Condition=" '$(Configuration)' != 'Debug_x86' AND '$(Configuration)' != 'Release_x86' ">
-    <Exec Command="del $(TargetDir)TechTalk.*&#xD;&#xA;del $(TargetDir)Gherkin.*" />
-    
-    <Exec Command="&quot;$(MSBuildBinPath)\msbuild.exe&quot; /p:Configuration=$(Configuration)_x86&#xD;&#xA;copy $(ProjectDir)bin\$(Configuration)_x86\$(TargetFramework)\$(RuntimeIdentifier)\deveroom-specflow-v1.*  $(TargetDir)" Condition=" '$(PlatformTarget)' == 'anycpu' " />
-  </Target>
 
   <Import Project="..\Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems" Label="Shared" />
 
