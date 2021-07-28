@@ -21,7 +21,7 @@ Copy-Item bin\$configuration\net452\publish\* $outputFolder\V1\ -Exclude @('Tech
 
 Remove-Item bin\$configuration\net452\win-x86\publish -Recurse -Force
 
-dotnet publish -r win-x86 -c $configuration #/p:AssemblyName=deveroom-specflow-v1.x86
+dotnet publish -r win-x86 -c $configuration /p:PlatformTarget=x86
 
 Rename-Item bin\$configuration\net452\win-x86\publish\deveroom-specflow-v1.exe deveroom-specflow-v1.x86.exe -Force
 Rename-Item bin\$configuration\net452\win-x86\publish\deveroom-specflow-v1.pdb deveroom-specflow-v1.x86.pdb -Force
