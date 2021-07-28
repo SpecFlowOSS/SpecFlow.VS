@@ -176,7 +176,8 @@ namespace Deveroom.SampleProjectGenerator
         {
             var args = new[]
             {
-                "install", packageName, "-OutputDirectory", packagesFolder
+                "install", packageName, "-OutputDirectory", packagesFolder,
+                "-Source", "https://api.nuget.org/v3/index.json"
             }.AsEnumerable();
             if (otherArgs != null)
                 args = args.Concat(otherArgs);
