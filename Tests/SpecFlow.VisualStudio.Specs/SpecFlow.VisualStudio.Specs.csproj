@@ -15,10 +15,28 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="NuGet.CommandLine" Version="4.6.2" CopyTools="true" CopyToolsTarget="Tools-NuGet" />
+    
+    <PackageReference Include="SpecFlow.xUnit" Version="3.0.213" />
+    <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.0.213" />
+
+
+    <!--TODO: fix SpecFlow.xUnitAdapter for sdk-style projects-->
+    <!--<PackageReference Include="SpecFlow.xUnitAdapter" Version="1.2.1" />-->
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\SpecFlow.VisualStudio\SpecFlow.VisualStudio.csproj" />
+    <ProjectReference Include="..\SpecFlow.SampleProjectGenerator.Core\SpecFlow.SampleProjectGenerator.Core.csproj" />
     <ProjectReference Include="..\SpecFlow.VisualStudio.VsxStubs\SpecFlow.VisualStudio.VsxStubs.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <ItemGroup>
+      <DeveroomTestExternalPackages Include="$(MSBuildThisFileDirectory)..\ExternalPackages\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DeveroomTestExternalPackages)" DestinationFolder="$(TargetDir)\ExternalPackages" OverwriteReadOnlyFiles="true" />
+  </Target>
+
+  <Import Project="..\..\Connectors\DeploymentAssets.props" />
 </Project>

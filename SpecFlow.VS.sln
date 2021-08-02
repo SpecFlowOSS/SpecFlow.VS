@@ -7,18 +7,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.Packa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.Models", "Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj", "{261CCD0B-7411-40F0-B780-12537175B468}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.SampleProjectGenerator", "Tests\Deveroom.SampleProjectGenerator\Deveroom.SampleProjectGenerator.csproj", "{69E328C0-247D-45B8-9A57-DAE6D88A4AD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.SampleProjectGenerator", "Tests\SpecFlow.SampleProjectGenerator\SpecFlow.SampleProjectGenerator.csproj", "{69E328C0-247D-45B8-9A57-DAE6D88A4AD8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio", "SpecFlow.VisualStudio\SpecFlow.VisualStudio.csproj", "{E687A5FA-A35F-4190-BFFB-3AC245CB2AD5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.SampleProjectGenerator.Core", "Tests\Deveroom.SampleProjectGenerator.Core\Deveroom.SampleProjectGenerator.Core.csproj", "{A43E4E30-1062-4EF8-A17D-4DEF77BAACA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.SampleProjectGenerator.Core", "Tests\SpecFlow.SampleProjectGenerator.Core\SpecFlow.SampleProjectGenerator.Core.csproj", "{A43E4E30-1062-4EF8-A17D-4DEF77BAACA3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{11E7849D-8059-417F-BEB2-7B576B7993F3}"
 	ProjectSection(SolutionItems) = preProject
 		.runsettings = .runsettings
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.VsxStubs", "Tests\Deveroom.VisualStudio.VsxStubs\Deveroom.VisualStudio.VsxStubs.csproj", "{84081A7E-4D74-4388-9CA7-8F488DF4C68B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.VsxStubs", "Tests\SpecFlow.VisualStudio.VsxStubs\SpecFlow.VisualStudio.VsxStubs.csproj", "{84081A7E-4D74-4388-9CA7-8F488DF4C68B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.V1", "Connectors\SpecFlow.VisualStudio.SpecFlowConnector.V1\SpecFlow.VisualStudio.SpecFlowConnector.V1.csproj", "{B1D4F570-499E-4550-8D29-40510954FD05}"
 EndProject
@@ -57,7 +57,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.Tests", "Tests\SpecFlow.VisualStudio.Tests\SpecFlow.VisualStudio.Tests.csproj", "{69997CEE-FE90-4CF6-97AE-8A2B7811A4F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Specs", "Tests\Deveroom.VisualStudio.Specs\Deveroom.VisualStudio.Specs.csproj", "{14A1CF32-83E1-4B67-88E2-3EBFE9F5071C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.Specs", "Tests\SpecFlow.VisualStudio.Specs\SpecFlow.VisualStudio.Specs.csproj", "{14A1CF32-83E1-4B67-88E2-3EBFE9F5071C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow30NetFwConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow30NetFwConnector.Tests\SpecFlow.VisualStudio.SpecFlow30NetFwConnector.Tests.csproj", "{817E430C-8C30-4452-A4EA-ECCFCD466BDF}"
 EndProject

@@ -1,8 +1,8 @@
 ﻿using System;
 using SpecFlow.VisualStudio.Diagonostics;
 using SpecFlow.VisualStudio.Editor.Commands;
-using Deveroom.VisualStudio.VsxStubs;
-using Deveroom.VisualStudio.VsxStubs.ProjectSystem;
+using SpecFlow.VisualStudio.VsxStubs;
+using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using Xunit;
 using Xunit.Abstractions;
 

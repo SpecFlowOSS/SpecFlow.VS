@@ -2,7 +2,7 @@
 using System.Linq;
 using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Monitoring;
-using Deveroom.VisualStudio.VsxStubs;
+using SpecFlow.VisualStudio.VsxStubs;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Moq;
