@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Deveroom.VisualStudio.UI.Properties {
+namespace SpecFlow.VisualStudio.UI.Properties {
     
     
     /// <summary>
@@ -38,7 +38,7 @@ namespace Deveroom.VisualStudio.UI.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if ((resourceMan == null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Deveroom.VisualStudio.UI.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SpecFlow.VisualStudio.UI.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

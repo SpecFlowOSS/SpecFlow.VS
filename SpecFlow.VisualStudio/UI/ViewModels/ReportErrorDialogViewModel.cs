@@ -41,14 +41,14 @@ namespace SpecFlow.VisualStudio.UI.ViewModels
         {
             Message = INIT_ERROR + ERROR_SUFFIX_TEMPLATE.Replace("{logFilePath}", DeveroomFileLogger.GetLogFile()),
             ErrorInfo = @"Error hash: {554A5919-12BC-4AAC-AE3B-E1C77DD98540}
-A MEF Component threw an exception at runtime: Microsoft.VisualStudio.Composition.CompositionFailedException: An exception was thrown while initializing part ""Deveroom.VisualStudio.IdeScope.VsProjectSystem"". 
----> System.TypeInitializationException: The type initializer for 'Deveroom.VisualStudio.EventTracking.GoogleAnalyticsApi' threw an exception. 
+A MEF Component threw an exception at runtime: Microsoft.VisualStudio.Composition.CompositionFailedException: An exception was thrown while initializing part ""SpecFlow.VisualStudio.IdeScope.VsProjectSystem"". 
+---> System.TypeInitializationException: The type initializer for 'SpecFlow.VisualStudio.EventTracking.GoogleAnalyticsApi' threw an exception. 
 ---> System.IO.FileNotFoundException: Could not load file or assembly 'System.Net.Http, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies. The system cannot find the file specified. 
-at Deveroom.VisualStudio.EventTracking.GoogleAnalyticsApi..cctor() 
+at SpecFlow.VisualStudio.EventTracking.GoogleAnalyticsApi..cctor() 
 --- End of inner exception stack trace --- 
-at Deveroom.VisualStudio.EventTracking.MonitoringService.TrackEvent(String category, String action, String label, Nullable`1 value) 
-at Deveroom.VisualStudio.EventTracking.MonitoringService.TrackOpenProjectSystem(String vsVersion) 
-at Deveroom.VisualStudio.IdeScope.VsProjectSystem..ctor(IServiceProvider serviceProvider, IVsPackageInstallerServices vsPackageInstallerServices, IVsSolutionEventListener solutionEventListener) in W:\Devero\Deveroom.VisualStudio\Deveroom.VisualStudio.Package\IdeScope\VsProjectSystem.cs:line 62 
+at SpecFlow.VisualStudio.EventTracking.MonitoringService.TrackEvent(String category, String action, String label, Nullable`1 value) 
+at SpecFlow.VisualStudio.EventTracking.MonitoringService.TrackOpenProjectSystem(String vsVersion) 
+at SpecFlow.VisualStudio.IdeScope.VsProjectSystem..ctor(IServiceProvider serviceProvider, IVsPackageInstallerServices vsPackageInstallerServices, IVsSolutionEventListener solutionEventListener) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.Package\IdeScope\VsProjectSystem.cs:line 62 
 --- End of inner exception stack trace --- 
 at Microsoft.VisualStudio.Composition.RuntimeExportProviderFactory.RuntimeExportProvider.RuntimePartLifecycleTracker.CreateValue() 
 at Microsoft.VisualStudio.Composition.ExportProvider.PartLifecycleTracker.Create() 

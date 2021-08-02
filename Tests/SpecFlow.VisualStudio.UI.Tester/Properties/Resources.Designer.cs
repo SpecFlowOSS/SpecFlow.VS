@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Deveroom.VisualStudio.UI.Tester.Properties
+namespace SpecFlow.VisualStudio.UI.Tester.Properties
 {
 
 
@@ -44,7 +44,7 @@ namespace Deveroom.VisualStudio.UI.Tester.Properties
             {
                 if ((resourceMan == null))
                 {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Deveroom.VisualStudio.UI.Tester.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SpecFlow.VisualStudio.UI.Tester.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
