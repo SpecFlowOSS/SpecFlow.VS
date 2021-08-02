@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
-    <ProjectReference Include="..\..\Connectors\Deveroom.VisualStudio.SpecFlowConnector.V2\Deveroom.VisualStudio.SpecFlowConnector.V2.csproj" />
+    <ProjectReference Include="..\..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.V2\SpecFlow.VisualStudio.SpecFlowConnector.V2.csproj" />
   </ItemGroup>
 
 </Project>

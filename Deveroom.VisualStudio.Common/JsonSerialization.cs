@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
-namespace Deveroom.VisualStudio.SpecFlowConnector
+namespace SpecFlow.VisualStudio.SpecFlowConnector
 {
     internal static class JsonSerialization
     {

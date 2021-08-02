@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Deveroom.VisualStudio.SpecFlowConnector.Generation.V22;
+using SpecFlow.VisualStudio.SpecFlowConnector.Generation.V22;
 using FluentAssertions;
 using TechTalk.SpecFlow.Generator.Interfaces;
 using Xunit;

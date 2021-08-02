@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery;
+using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 using FluentAssertions;
 using TechTalk.SpecFlow.Configuration;
 using Xunit;

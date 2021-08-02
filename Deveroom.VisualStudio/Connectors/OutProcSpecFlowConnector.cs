@@ -5,7 +5,7 @@ using System.Text;
 using Deveroom.VisualStudio.Configuration;
 using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.ProjectSystem;
-using Deveroom.VisualStudio.SpecFlowConnector;
+using SpecFlow.VisualStudio.SpecFlowConnector;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 namespace Deveroom.VisualStudio.Connectors

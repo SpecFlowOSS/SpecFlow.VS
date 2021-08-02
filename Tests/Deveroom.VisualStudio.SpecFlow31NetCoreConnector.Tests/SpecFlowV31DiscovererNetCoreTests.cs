@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V31;
+using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V31;
 using FluentAssertions;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow;
