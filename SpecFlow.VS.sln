@@ -34,7 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Connectors", "Connectors", 
 		Connectors\DeploymentAssets.props = Connectors\DeploymentAssets.props
 	EndProjectSection
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Deveroom.VisualStudio.Common", "Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.shproj", "{0CA5992A-E95E-472F-90CF-36BE75A6CEDE}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SpecFlow.VisualStudio.Common", "SpecFlow.VisualStudio.Common\SpecFlow.VisualStudio.Common.shproj", "{0CA5992A-E95E-472F-90CF-36BE75A6CEDE}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SpecFlow.VisualStudio.SpecFlowConnector", "Connectors\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.shproj", "{E0B508C5-C71F-43B2-A564-E2BB0CD92F7C}"
 EndProject
@@ -90,13 +90,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.UI.Te
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems*{0ca5992a-e95e-472f-90cf-36be75a6cede}*SharedItemsImports = 13
+		SpecFlow.VisualStudio.Common\SpecFlow.VisualStudio.Common.projitems*{0ca5992a-e95e-472f-90cf-36be75a6cede}*SharedItemsImports = 13
 		Connectors\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.projitems*{4a884c12-01d7-4519-a510-3493be910988}*SharedItemsImports = 5
-		Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems*{4a884c12-01d7-4519-a510-3493be910988}*SharedItemsImports = 5
+		SpecFlow.VisualStudio.Common\SpecFlow.VisualStudio.Common.projitems*{4a884c12-01d7-4519-a510-3493be910988}*SharedItemsImports = 5
 		Connectors\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.projitems*{b1d4f570-499e-4550-8d29-40510954fd05}*SharedItemsImports = 5
-		Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems*{b1d4f570-499e-4550-8d29-40510954fd05}*SharedItemsImports = 5
+		SpecFlow.VisualStudio.Common\SpecFlow.VisualStudio.Common.projitems*{b1d4f570-499e-4550-8d29-40510954fd05}*SharedItemsImports = 5
 		Connectors\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.projitems*{e0b508c5-c71f-43b2-a564-e2bb0cd92f7c}*SharedItemsImports = 13
-		Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems*{e687a5fa-a35f-4190-bffb-3ac245cb2ad5}*SharedItemsImports = 5
+		SpecFlow.VisualStudio.Common\SpecFlow.VisualStudio.Common.projitems*{e687a5fa-a35f-4190-bffb-3ac245cb2ad5}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

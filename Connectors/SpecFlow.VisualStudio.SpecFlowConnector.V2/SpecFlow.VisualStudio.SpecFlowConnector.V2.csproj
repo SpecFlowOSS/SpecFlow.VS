@@ -29,7 +29,7 @@
   </ItemGroup>
 
 
-<Import Project="..\..\Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems" Label="Shared" />
+<Import Project="..\..\SpecFlow.VisualStudio.Common\SpecFlow.VisualStudio.Common.projitems" Label="Shared" />
 <Import Project="..\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.projitems" Label="Shared" />
 
 </Project>

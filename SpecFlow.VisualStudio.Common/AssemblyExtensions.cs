@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 
-namespace Deveroom.VisualStudio.Common
+namespace SpecFlow.VisualStudio.Common
 {
     internal static class AssemblyExtensions
     {

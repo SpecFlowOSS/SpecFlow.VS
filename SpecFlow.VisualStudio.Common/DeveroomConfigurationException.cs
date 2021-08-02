@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Deveroom.VisualStudio.Common
+namespace SpecFlow.VisualStudio.Common
 {
     public class DeveroomConfigurationException : Exception
     {

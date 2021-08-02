@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Deveroom.VisualStudio.Common
+namespace SpecFlow.VisualStudio.Common
 {
     public static class FileSystemHelper
     {

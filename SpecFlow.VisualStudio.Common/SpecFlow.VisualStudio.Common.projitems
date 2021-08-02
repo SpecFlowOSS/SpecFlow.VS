@@ -6,7 +6,7 @@
     <SharedGUID>0ca5992a-e95e-472f-90cf-36be75a6cede</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Deveroom.VisualStudio.Common</Import_RootNamespace>
+    <Import_RootNamespace>SpecFlow.VisualStudio.Common</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyExtensions.cs" />
