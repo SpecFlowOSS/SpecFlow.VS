@@ -10,7 +10,7 @@ mkdir $outputFolder
 
 # build V1 any cpu
 
-cd Deveroom.VisualStudio.SpecFlowConnector.V1
+cd ..\Connectors\Deveroom.VisualStudio.SpecFlowConnector.V1
 
 dotnet publish -c $configuration
 
@@ -32,7 +32,7 @@ cd ..
 
 # build V2 any cpu
 
-cd Deveroom.VisualStudio.SpecFlowConnector.V2
+cd ..\Connectors\Deveroom.VisualStudio.SpecFlowConnector.V2
 
 dotnet publish -f netcoreapp2.1 -c $configuration
 
