@@ -23,10 +23,10 @@ Remove-Item bin\$configuration\net452\win-x86\publish -Recurse -Force -ErrorActi
 
 dotnet publish -r win-x86 -c $configuration /p:PlatformTarget=x86
 
-Rename-Item bin\$configuration\net452\win-x86\publish\deveroom-specflow-v1.exe deveroom-specflow-v1.x86.exe -Force
-Rename-Item bin\$configuration\net452\win-x86\publish\deveroom-specflow-v1.pdb deveroom-specflow-v1.x86.pdb -Force
+Rename-Item bin\$configuration\net452\win-x86\publish\specflow-vs-v1.exe specflow-vs-v1.x86.exe -Force
+Rename-Item bin\$configuration\net452\win-x86\publish\specflow-vs-v1.pdb specflow-vs-v1.x86.pdb -Force
 
-Copy-Item bin\$configuration\net452\win-x86\publish\deveroom-specflow-v1.x86.* $outputFolder\V1\
+Copy-Item bin\$configuration\net452\win-x86\publish\specflow-vs-v1.x86.* $outputFolder\V1\
 
 cd ..
 

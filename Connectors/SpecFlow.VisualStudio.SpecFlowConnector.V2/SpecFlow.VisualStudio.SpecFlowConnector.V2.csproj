@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <AssemblyName>deveroom-specflow</AssemblyName>
+    <AssemblyName>specflow-vs</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
     <Configurations>Debug;Release;Debug_x86;Release_x86</Configurations>
     <SignAssembly>true</SignAssembly>

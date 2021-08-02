@@ -12,11 +12,11 @@ namespace Deveroom.VisualStudio.Connectors
 {
     public class OutProcSpecFlowConnector
     {
-        private const string ConnectorV1AnyCpu = @"V1\deveroom-specflow-v1.exe";
-        private const string ConnectorV1X86 = @"V1\deveroom-specflow-v1.x86.exe";
-        private const string ConnectorV2AnyCpu = @"V2\deveroom-specflow.dll";
-        private const string ConnectorV3AnyCpu = @"V3\deveroom-specflow.dll";
-        private const string ConnectorV5AnyCpu = @"V5\deveroom-specflow.dll";
+        private const string ConnectorV1AnyCpu = @"V1\specflow-vs-v1.exe";
+        private const string ConnectorV1X86 = @"V1\specflow-vs-v1.x86.exe";
+        private const string ConnectorV2AnyCpu = @"V2\specflow-vs.dll";
+        private const string ConnectorV3AnyCpu = @"V3\specflow-vs.dll";
+        private const string ConnectorV5AnyCpu = @"V5\specflow-vs.dll";
         private const string GenerationCommandName = "generation";
         private const string BindingDiscoveryCommandName = "binding discovery";
 
