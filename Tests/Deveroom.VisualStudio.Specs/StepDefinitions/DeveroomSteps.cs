@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Deveroom.SampleProjectGenerator;
-using Deveroom.VisualStudio.Configuration;
-using Deveroom.VisualStudio.Connectors;
-using Deveroom.VisualStudio.Discovery;
-using Deveroom.VisualStudio.ProjectSystem;
-using Deveroom.VisualStudio.ProjectSystem.Configuration;
+using SpecFlow.VisualStudio.Configuration;
+using SpecFlow.VisualStudio.Connectors;
+using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 using Deveroom.VisualStudio.Specs.Support;
 using Deveroom.VisualStudio.VsxStubs.ProjectSystem;
 using FluentAssertions;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow;
 using Xunit.Abstractions;
-using ScenarioBlock=Deveroom.VisualStudio.Editor.Services.Parser.ScenarioBlock;
+using ScenarioBlock= SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace Deveroom.VisualStudio.Specs.StepDefinitions
 {

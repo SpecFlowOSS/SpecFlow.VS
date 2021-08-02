@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Deveroom.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio.Utilities;
 
 namespace Deveroom.VisualStudio.VsxStubs.ProjectSystem
@@ -28,8 +28,7 @@ namespace Deveroom.VisualStudio.VsxStubs.ProjectSystem
             OutputAssemblyPath = Path.GetFullPath(Path.Combine(ProjectFolder, outputAssemblyPath));
             _packageReferences = new List<NuGetPackageReference>(packageReferences);
 
-            TargetFrameworkMoniker = VisualStudio.ProjectSystem.TargetFrameworkMoniker
-                .CreateFromShortName(targetFramework).Value;
+            TargetFrameworkMoniker = SpecFlow.VisualStudio.ProjectSystem.TargetFrameworkMoniker.CreateFromShortName(targetFramework).Value;
         }
 
         public void AddFile(string targetFilePath, string template)

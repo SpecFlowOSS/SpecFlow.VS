@@ -1,4 +1,4 @@
-﻿using Deveroom.VisualStudio.Editor.Services.Parser;
+﻿using SpecFlow.VisualStudio.Editor.Services.Parser;
 using FluentAssertions;
 using Xunit;
 

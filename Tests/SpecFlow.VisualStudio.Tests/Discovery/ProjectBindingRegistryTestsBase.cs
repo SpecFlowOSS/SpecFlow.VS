@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Deveroom.VisualStudio.Discovery;
-using Deveroom.VisualStudio.Discovery.TagExpressions;
-using Deveroom.VisualStudio.Editor.Services;
-using Deveroom.VisualStudio.Editor.Services.Parser;
+using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Discovery.TagExpressions;
+using SpecFlow.VisualStudio.Editor.Services;
+using SpecFlow.VisualStudio.Editor.Services.Parser;
 using Gherkin.Ast;
 using Microsoft.VisualStudio.Text;
 

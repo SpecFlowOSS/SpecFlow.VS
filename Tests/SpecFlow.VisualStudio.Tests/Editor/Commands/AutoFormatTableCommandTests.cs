@@ -1,6 +1,6 @@
 ﻿using System;
-using Deveroom.VisualStudio.Diagonostics;
-using Deveroom.VisualStudio.Editor.Commands;
+using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Editor.Commands;
 using Deveroom.VisualStudio.VsxStubs;
 using Deveroom.VisualStudio.VsxStubs.ProjectSystem;
 using Xunit;

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Deveroom.VisualStudio.Common;
-using Deveroom.VisualStudio.Configuration;
-using Deveroom.VisualStudio.ProjectSystem;
-using Deveroom.VisualStudio.ProjectSystem.Configuration;
+using SpecFlow.VisualStudio.Common;
+using SpecFlow.VisualStudio.Configuration;
+using SpecFlow.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 using Microsoft.VisualStudio.Utilities;
 
 namespace Deveroom.VisualStudio.VsxStubs.ProjectSystem

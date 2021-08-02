@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using Deveroom.VisualStudio.Common;
+using SpecFlow.VisualStudio.Common;
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector

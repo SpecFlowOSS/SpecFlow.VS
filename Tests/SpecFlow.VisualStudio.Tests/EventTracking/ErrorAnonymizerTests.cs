@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Deveroom.VisualStudio.EventTracking;
+using SpecFlow.VisualStudio.EventTracking;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,7 +23,7 @@ namespace SpecFlow.VisualStudio.Tests.EventTracking
         public void SimplifyStackTrace_removes_namespace_and_params()
         {
             const string stackTrace = @"
-   at Deveroom.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
+   at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
 ";
 
             var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: false);
@@ -35,7 +35,7 @@ namespace SpecFlow.VisualStudio.Tests.EventTracking
         public void SimplifyStackTrace_includes_line_number()
         {
             const string stackTrace = @"
-   at Deveroom.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args) in W:\Devero\Deveroom.VisualStudio\Deveroom.VisualStudio.SpecFlowConnector.V2\ReflectionExtensions.cs:line 17
+   at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\ReflectionExtensions.cs:line 17
 ";
 
             var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: false);
@@ -48,8 +48,8 @@ namespace SpecFlow.VisualStudio.Tests.EventTracking
         {
             const string stackTrace = @"
    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
-   at Deveroom.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
-   at Deveroom.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath)
+   at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
+   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath)
 ";
 
             var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: false);
@@ -62,8 +62,8 @@ namespace SpecFlow.VisualStudio.Tests.EventTracking
         {
             const string stackTrace = @"
    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
-   at Deveroom.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args) in W:\Devero\Deveroom.VisualStudio\Deveroom.VisualStudio.SpecFlowConnector.V2\ReflectionExtensions.cs:line 17
-   at Deveroom.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath) in W:\Devero\Deveroom.VisualStudio\Deveroom.VisualStudio.SpecFlowConnector.V2\Discovery\ReflectionSpecFlowDiscoverer.cs:line 25
+   at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\ReflectionExtensions.cs:line 17
+   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\Discovery\ReflectionSpecFlowDiscoverer.cs:line 25
 ";
 
             var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: true);
@@ -83,7 +83,7 @@ namespace SpecFlow.VisualStudio.Tests.EventTracking
    at TechTalk.SpecFlow.Bindings.Discovery.BindingSourceProcessor.ProcessMethod(BindingSourceMethod bindingSourceMethod) 
    at TechTalk.SpecFlow.Bindings.Discovery.RuntimeBindingRegistryBuilder.BuildBindingsFromType(Type type) 
    at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
-   at Deveroom.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
+   at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
 ";
 
             var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: false);
@@ -110,18 +110,18 @@ Server stack trace:
    at TechTalk.SpecFlow.TestRunnerManager.BuildBindingRegistry(IEnumerable`1 bindingAssemblies) 
    at TechTalk.SpecFlow.TestRunnerManager.InitializeBindingRegistry(ITestRunner testRunner) 
    at TechTalk.SpecFlow.TestRunnerManager.CreateTestRunner(Int32 threadId) 
-   at Deveroom.VisualStudio.SpecFlowConnector.Discovery.V2020.SpecFlowV2020Discoverer.GetBindingRegistry(Assembly testAssembly, String configFilePath) 
-   at Deveroom.VisualStudio.SpecFlowConnector.Discovery.BaseDiscoverer.DiscoverInternal(String testAssemblyPath, String configFilePath) 
-   at Deveroom.VisualStudio.SpecFlowConnector.Discovery.BaseDiscoverer.Discover(String testAssemblyPath, String configFilePath) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V2020.SpecFlowV2020Discoverer.GetBindingRegistry(Assembly testAssembly, String configFilePath) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.BaseDiscoverer.DiscoverInternal(String testAssemblyPath, String configFilePath) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.BaseDiscoverer.Discover(String testAssemblyPath, String configFilePath) 
    at System.Runtime.Remoting.Messaging.StackBuilderSink._PrivateProcessMessage(IntPtr md, Object[] args, Object server, Object[]& outArgs) 
    at System.Runtime.Remoting.Messaging.StackBuilderSink.SyncProcessMessage(IMessage msg) 
  
 Exception rethrown at [0]:  
    at System.Runtime.Remoting.Proxies.RealProxy.HandleReturnMessage(IMessage reqMsg, IMessage retMsg) 
    at System.Runtime.Remoting.Proxies.RealProxy.PrivateInvoke(MessageData& msgData, Int32 type) 
-   at Deveroom.VisualStudio.SpecFlowConnector.Discovery.ISpecFlowDiscoverer.Discover(String testAssembly, String configFilePath) 
-   at Deveroom.VisualStudio.SpecFlowConnector.Discovery.DiscoveryProcessor.Process() 
-   at Deveroom.VisualStudio.SpecFlowConnector.ConsoleRunner.EntryPoint(String[] args) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ISpecFlowDiscoverer.Discover(String testAssembly, String configFilePath) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.DiscoveryProcessor.Process() 
+   at SpecFlow.VisualStudio.SpecFlowConnector.ConsoleRunner.EntryPoint(String[] args) 
 ";
 
             var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: true);

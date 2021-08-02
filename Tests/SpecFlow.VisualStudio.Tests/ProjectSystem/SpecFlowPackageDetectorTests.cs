@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
-using Deveroom.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem;
 using FluentAssertions;
 using Xunit;
 

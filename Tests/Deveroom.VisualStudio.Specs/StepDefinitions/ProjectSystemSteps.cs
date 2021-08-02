@@ -4,18 +4,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Deveroom.VisualStudio.Configuration;
-using Deveroom.VisualStudio.Diagonostics;
-using Deveroom.VisualStudio.Discovery;
-using Deveroom.VisualStudio.Editor.Commands;
-using Deveroom.VisualStudio.Editor.Commands.Infrastructure;
-using Deveroom.VisualStudio.Editor.Completions;
-using Deveroom.VisualStudio.Editor.Completions.Infrastructure;
-using Deveroom.VisualStudio.Editor.Services;
-using Deveroom.VisualStudio.Editor.Traceability;
-using Deveroom.VisualStudio.ProjectSystem.Configuration;
+using SpecFlow.VisualStudio.Configuration;
+using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Editor.Commands;
+using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
+using SpecFlow.VisualStudio.Editor.Completions;
+using SpecFlow.VisualStudio.Editor.Completions.Infrastructure;
+using SpecFlow.VisualStudio.Editor.Services;
+using SpecFlow.VisualStudio.Editor.Traceability;
+using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 using Deveroom.VisualStudio.Specs.Support;
-using Deveroom.VisualStudio.UI.ViewModels;
+using SpecFlow.VisualStudio.UI.ViewModels;
 using Deveroom.VisualStudio.VsxStubs;
 using Deveroom.VisualStudio.VsxStubs.ProjectSystem;
 using FluentAssertions;
@@ -27,7 +27,7 @@ using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using Xunit;
-using ScenarioBlock = Deveroom.VisualStudio.Editor.Services.Parser.ScenarioBlock;
+using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace Deveroom.VisualStudio.Specs.StepDefinitions
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Deveroom.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem;
 using TechTalk.SpecFlow;
 
 namespace Deveroom.VisualStudio.Specs.Support

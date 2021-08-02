@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Deveroom.VisualStudio.Common;
+using SpecFlow.VisualStudio.Common;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
 {

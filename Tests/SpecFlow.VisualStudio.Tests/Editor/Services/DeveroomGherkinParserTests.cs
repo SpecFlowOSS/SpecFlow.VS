@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Deveroom.VisualStudio.Diagonostics;
-using Deveroom.VisualStudio.Editor.Services.Parser;
-using Deveroom.VisualStudio.Monitoring;
+using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Editor.Services.Parser;
+using SpecFlow.VisualStudio.Monitoring;
 using FluentAssertions;
 using Moq;
 using Xunit;

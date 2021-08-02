@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Deveroom.VisualStudio.Discovery;
-using Deveroom.VisualStudio.Editor.Completions;
-using Deveroom.VisualStudio.Editor.Services.Parser;
+using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Editor.Completions;
+using SpecFlow.VisualStudio.Editor.Services.Parser;
 using FluentAssertions;
 using Xunit;
 

@@ -1,5 +1,5 @@
 ﻿using System;
-using Deveroom.VisualStudio.Editor.Services;
+using SpecFlow.VisualStudio.Editor.Services;
 using Deveroom.VisualStudio.VsxStubs.ProjectSystem;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Tagging;

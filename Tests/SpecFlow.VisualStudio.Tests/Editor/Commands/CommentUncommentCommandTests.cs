@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Deveroom.VisualStudio.Editor.Commands;
-using Deveroom.VisualStudio.Monitoring;
+using SpecFlow.VisualStudio.Editor.Commands;
+using SpecFlow.VisualStudio.Monitoring;
 using Deveroom.VisualStudio.VsxStubs;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;

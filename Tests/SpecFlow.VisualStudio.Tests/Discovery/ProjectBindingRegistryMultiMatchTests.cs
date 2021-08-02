@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using Deveroom.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Discovery;
 using FluentAssertions;
 using Xunit;
 

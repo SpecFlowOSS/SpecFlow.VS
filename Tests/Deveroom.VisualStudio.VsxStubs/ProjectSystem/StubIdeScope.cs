@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
-using Deveroom.VisualStudio.Diagonostics;
-using Deveroom.VisualStudio.Discovery;
-using Deveroom.VisualStudio.Monitoring;
-using Deveroom.VisualStudio.ProjectSystem;
-using Deveroom.VisualStudio.ProjectSystem.Actions;
+using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Monitoring;
+using SpecFlow.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using Microsoft.VisualStudio.Text;
 using Moq;
 using Xunit.Abstractions;

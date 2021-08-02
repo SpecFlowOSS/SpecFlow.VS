@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Deveroom.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagonostics;
 using Xunit.Abstractions;
 
 namespace Deveroom.VisualStudio.VsxStubs.ProjectSystem

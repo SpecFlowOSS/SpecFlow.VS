@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Loader;
-using Deveroom.VisualStudio.Common;
+using SpecFlow.VisualStudio.Common;
 using McMaster.NETCore.Plugins;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery

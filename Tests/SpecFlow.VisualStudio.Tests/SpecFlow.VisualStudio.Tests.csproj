@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Deveroom.VisualStudio\Deveroom.VisualStudio.csproj" />
+    <ProjectReference Include="..\..\SpecFlow.VisualStudio\SpecFlow.VisualStudio.csproj" />
     <ProjectReference Include="..\Deveroom.VisualStudio.VsxStubs\Deveroom.VisualStudio.VsxStubs.csproj" />
   </ItemGroup>
 </Project>

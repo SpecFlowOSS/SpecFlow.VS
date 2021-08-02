@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Deveroom.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem;
 
 namespace Deveroom.VisualStudio.VsxStubs.ProjectSystem
 {

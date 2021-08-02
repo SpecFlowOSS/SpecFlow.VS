@@ -1,8 +1,8 @@
 ﻿using System;
-using Deveroom.VisualStudio.Discovery;
-using Deveroom.VisualStudio.ProjectSystem;
-using Deveroom.VisualStudio.ProjectSystem.Configuration;
-using Deveroom.VisualStudio.ProjectSystem.Settings;
+using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem.Configuration;
+using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using Moq;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 

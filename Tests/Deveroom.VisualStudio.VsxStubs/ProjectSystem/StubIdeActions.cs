@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Deveroom.VisualStudio.Diagonostics;
-using Deveroom.VisualStudio.Discovery;
-using Deveroom.VisualStudio.ProjectSystem;
-using Deveroom.VisualStudio.ProjectSystem.Actions;
+using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem.Actions;
 
 namespace Deveroom.VisualStudio.VsxStubs.ProjectSystem
 {

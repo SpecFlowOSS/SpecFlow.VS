@@ -1,6 +1,6 @@
 ﻿using System;
-using Deveroom.VisualStudio.Configuration;
-using Deveroom.VisualStudio.ProjectSystem.Configuration;
+using SpecFlow.VisualStudio.Configuration;
+using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 
 namespace Deveroom.VisualStudio.VsxStubs.ProjectSystem
 {

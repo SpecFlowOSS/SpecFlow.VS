@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Deveroom.VisualStudio.Diagonostics;
-using Deveroom.VisualStudio.Discovery;
-using Deveroom.VisualStudio.Editor.Services.Parser;
+using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Editor.Services.Parser;
 using FluentAssertions;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using Xunit;

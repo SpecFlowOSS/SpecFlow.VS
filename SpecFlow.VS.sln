@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Package", "Deveroom.VisualStudio.Package\Deveroom.VisualStudio.Package.csproj", "{00920A0A-A73C-487F-BC41-9B92F2F0EBD7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.Package", "SpecFlow.VisualStudio.Package\SpecFlow.VisualStudio.Package.csproj", "{00920A0A-A73C-487F-BC41-9B92F2F0EBD7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.Models", "Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj", "{261CCD0B-7411-40F0-B780-12537175B468}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.SampleProjectGenerator", "Tests\Deveroom.SampleProjectGenerator\Deveroom.SampleProjectGenerator.csproj", "{69E328C0-247D-45B8-9A57-DAE6D88A4AD8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio", "Deveroom.VisualStudio\Deveroom.VisualStudio.csproj", "{E687A5FA-A35F-4190-BFFB-3AC245CB2AD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio", "SpecFlow.VisualStudio\SpecFlow.VisualStudio.csproj", "{E687A5FA-A35F-4190-BFFB-3AC245CB2AD5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.SampleProjectGenerator.Core", "Tests\Deveroom.SampleProjectGenerator.Core\Deveroom.SampleProjectGenerator.Core.csproj", "{A43E4E30-1062-4EF8-A17D-4DEF77BAACA3}"
 EndProject
@@ -22,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.VsxSt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.V1", "Connectors\SpecFlow.VisualStudio.SpecFlowConnector.V1\SpecFlow.VisualStudio.SpecFlowConnector.V1.csproj", "{B1D4F570-499E-4550-8D29-40510954FD05}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.UI", "Deveroom.VisualStudio.UI\Deveroom.VisualStudio.UI.csproj", "{AD1186D6-A3AD-4425-A447-12D7E1C342D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.UI", "SpecFlow.VisualStudio.UI\SpecFlow.VisualStudio.UI.csproj", "{AD1186D6-A3AD-4425-A447-12D7E1C342D8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.ItemTemplates", "Deveroom.VisualStudio.ItemTemplates\Deveroom.VisualStudio.ItemTemplates.csproj", "{05D08F34-A49E-4F4C-A896-F5FDE3A9263A}"
 EndProject
@@ -86,7 +86,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow37NetCoreConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow37NetCoreConnector.Tests\SpecFlow.VisualStudio.SpecFlow37NetCoreConnector.Tests.csproj", "{E67A8D21-105E-4A1E-AF01-B0718D4E696A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.UI.Tester", "Tests\Deveroom.VisualStudio.UI.Tester\Deveroom.VisualStudio.UI.Tester.csproj", "{2A412F65-68C7-4A5D-AFCF-74E928C40C21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.UI.Tester", "Tests\SpecFlow.VisualStudio.UI.Tester\SpecFlow.VisualStudio.UI.Tester.csproj", "{2A412F65-68C7-4A5D-AFCF-74E928C40C21}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

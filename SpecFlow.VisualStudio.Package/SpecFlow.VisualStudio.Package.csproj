@@ -1,0 +1,86 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
+    <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <IsVsixProject>True</IsVsixProject>
+    <UseCodebase>True</UseCodebase>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+
+    <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <DeployExtension>false</DeployExtension>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
+    <IncludeDebugSymbolsInLocalVSIXDeployment>true</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+    <RootNamespace>SpecFlow.VisualStudio</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DeployExtension>true</DeployExtension>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <VSIXSourceItem Include="..\Changelog.md">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <TargetPath>Changelog.txt</TargetPath>
+    </VSIXSourceItem>
+    <Content Include="Package\Resources\DeveroomPackage.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <VSCTCompile Include="Commands\DeveroomPackage.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+    <EmbeddedResource Include="Package\VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <ManifestResourceName>VSPackage</ManifestResourceName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Designer.Interfaces" Version="1.1.4323" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="15.9.3032">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.SDK.EmbedInteropTypes" PrivateAssets="All" Version="15.0.27" />
+    <PackageReference Include="NuGet.VisualStudio" Version="4.7.0" />
+    <PackageReference Include="VSSDK.DTE" Version="7.0.4" />
+    <PackageReference Include="EnvDTE80" Version="8.0.3" />
+    <PackageReference Include="VSLangProj" Version="7.0.3301" />
+    <PackageReference Include="VSLangProj80" Version="8.0.50728" />
+    <PackageReference Include="Microsoft.VisualStudio.ComponentModelHost" Version="15.8.525" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
+    <ProjectReference Include="..\SpecFlow.VisualStudio.UI\SpecFlow.VisualStudio.UI.csproj" Name="Deveroom.VisualStudio.UI" />
+    <ProjectReference Include="..\SpecFlow.VisualStudio\SpecFlow.VisualStudio.csproj" Name="Deveroom.VisualStudio" />
+    <ProjectReference Include="..\Deveroom.VisualStudio.ItemTemplates\Deveroom.VisualStudio.ItemTemplates.csproj">
+      <Name>Deveroom.VisualStudio.ItemTemplates</Name>
+      <VSIXSubPath>ItemTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Design" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalDeveroomDependencies Include="Newtonsoft.Json.dll" />
+    <AdditionalDeveroomDependencies Include="Gherkin.dll" />
+    <AdditionalDeveroomDependencies Include="Utf8Json.dll" />
+    <AdditionalDeveroomDependencies Include="System.Threading.Tasks.Extensions.dll" />
+    <AdditionalDeveroomDependencies Include="System.IO.Abstractions.dll" />
+  </ItemGroup>
+
+  <Import Project="..\Connectors\DeploymentAssets.props" />
+</Project>
