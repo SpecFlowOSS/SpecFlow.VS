@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj" />
-    <ProjectReference Include="..\..\Deveroom.VisualStudio.SpecFlowConnector.V1\Deveroom.VisualStudio.SpecFlowConnector.V1.csproj" />
+    <ProjectReference Include="..\..\Connectors\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj" />
+    <ProjectReference Include="..\..\Connectors\Deveroom.VisualStudio.SpecFlowConnector.V1\Deveroom.VisualStudio.SpecFlowConnector.V1.csproj" />
   </ItemGroup>
 
 </Project>

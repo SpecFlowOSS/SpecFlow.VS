@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>NETStandard1.2</TargetFramework>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
 </Project>
