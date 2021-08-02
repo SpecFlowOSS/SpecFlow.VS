@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.Discovery.TagExpressions;
 using Deveroom.VisualStudio.Editor.Services.Parser;
-using Deveroom.VisualStudio.SpecFlowConnector.Models;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 namespace Deveroom.VisualStudio.Discovery
 {

@@ -8,7 +8,7 @@ using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.ProjectSystem;
 using Deveroom.VisualStudio.ProjectSystem.Configuration;
 using Deveroom.VisualStudio.ProjectSystem.Settings;
-using Deveroom.VisualStudio.SpecFlowConnector.Models;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 namespace Deveroom.VisualStudio.Discovery
 {

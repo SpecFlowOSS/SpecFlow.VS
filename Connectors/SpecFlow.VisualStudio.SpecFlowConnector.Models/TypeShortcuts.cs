@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Deveroom.VisualStudio.SpecFlowConnector.Models
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Models
 {
     public static class TypeShortcuts
     {

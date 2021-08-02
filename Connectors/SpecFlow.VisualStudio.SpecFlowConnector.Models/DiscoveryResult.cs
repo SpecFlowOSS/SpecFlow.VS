@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Deveroom.VisualStudio.SpecFlowConnector.Models
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Models
 {
     public class DiscoveryResult : ConnectorResult
     {

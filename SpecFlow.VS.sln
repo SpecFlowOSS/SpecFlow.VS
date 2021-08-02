@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Package", "Deveroom.VisualStudio.Package\Deveroom.VisualStudio.Package.csproj", "{00920A0A-A73C-487F-BC41-9B92F2F0EBD7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlowConnector.Models", "Connectors\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj", "{261CCD0B-7411-40F0-B780-12537175B468}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.Models", "Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj", "{261CCD0B-7411-40F0-B780-12537175B468}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.SampleProjectGenerator", "Tests\Deveroom.SampleProjectGenerator\Deveroom.SampleProjectGenerator.csproj", "{69E328C0-247D-45B8-9A57-DAE6D88A4AD8}"
 EndProject

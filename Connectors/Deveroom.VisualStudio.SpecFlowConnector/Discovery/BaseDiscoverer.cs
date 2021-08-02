@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using Deveroom.VisualStudio.SpecFlowConnector.SourceDiscovery;
 using Deveroom.VisualStudio.SpecFlowConnector.SourceDiscovery.DnLib;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow.Bindings;
 using TechTalk.SpecFlow.Bindings.Reflection;
 

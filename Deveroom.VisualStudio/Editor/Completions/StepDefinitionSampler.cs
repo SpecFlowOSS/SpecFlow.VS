@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Deveroom.VisualStudio.Discovery;
-using Deveroom.VisualStudio.SpecFlowConnector.Models;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 namespace Deveroom.VisualStudio.Editor.Completions
 {

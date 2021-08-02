@@ -1,4 +1,4 @@
-﻿namespace Deveroom.VisualStudio.SpecFlowConnector.Models
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Models
 {
     public class GenerationResult : ConnectorResult
     {

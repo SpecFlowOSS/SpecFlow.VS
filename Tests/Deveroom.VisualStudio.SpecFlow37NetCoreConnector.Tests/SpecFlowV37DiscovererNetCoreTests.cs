@@ -3,8 +3,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V31;
-using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using FluentAssertions;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow;
 using Xunit;
 

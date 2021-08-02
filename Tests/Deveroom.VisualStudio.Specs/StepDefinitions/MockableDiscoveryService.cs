@@ -3,8 +3,8 @@ using Deveroom.VisualStudio.Discovery;
 using Deveroom.VisualStudio.ProjectSystem;
 using Deveroom.VisualStudio.ProjectSystem.Configuration;
 using Deveroom.VisualStudio.ProjectSystem.Settings;
-using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using Moq;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 namespace Deveroom.VisualStudio.Specs.StepDefinitions
 {

@@ -3,8 +3,8 @@ using System.Linq;
 using Deveroom.VisualStudio.Diagonostics;
 using Deveroom.VisualStudio.Discovery;
 using Deveroom.VisualStudio.Editor.Services.Parser;
-using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using FluentAssertions;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using Xunit;
 
 namespace Deveroom.VisualStudio.Tests.Discovery

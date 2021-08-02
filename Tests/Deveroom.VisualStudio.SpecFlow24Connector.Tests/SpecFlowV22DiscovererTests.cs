@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Reflection;
 using Deveroom.VisualStudio.SpecFlowConnector.Discovery.V22;
-using Deveroom.VisualStudio.SpecFlowConnector.Models;
 using FluentAssertions;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow;
 using Xunit;
 

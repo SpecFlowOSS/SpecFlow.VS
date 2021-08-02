@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Xml;
-using Deveroom.VisualStudio.SpecFlowConnector.Models;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow.Generator;
 using TechTalk.SpecFlow.Generator.Interfaces;
 using TechTalk.SpecFlow.Utils;
