@@ -45,46 +45,46 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{73BEBCB3-7CC
 		CONTRIBUTION.md = CONTRIBUTION.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow19Connector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow19Connector.Tests\Deveroom.VisualStudio.SpecFlow19Connector.Tests.csproj", "{71474D25-09C0-424B-8FAF-62F0B73FA6BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow19Connector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow19Connector.Tests\SpecFlow.VisualStudio.SpecFlow19Connector.Tests.csproj", "{71474D25-09C0-424B-8FAF-62F0B73FA6BD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow20Connector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow20Connector.Tests\Deveroom.VisualStudio.SpecFlow20Connector.Tests.csproj", "{45C56238-1F6C-47AF-BC25-92CC4BCF51F6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow20Connector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow20Connector.Tests\SpecFlow.VisualStudio.SpecFlow20Connector.Tests.csproj", "{45C56238-1F6C-47AF-BC25-92CC4BCF51F6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow21Connector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow21Connector.Tests\Deveroom.VisualStudio.SpecFlow21Connector.Tests.csproj", "{239857A5-F335-4ABF-A8BB-8EB9A81BA3F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow21Connector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow21Connector.Tests\SpecFlow.VisualStudio.SpecFlow21Connector.Tests.csproj", "{239857A5-F335-4ABF-A8BB-8EB9A81BA3F3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow22Connector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow22Connector.Tests\Deveroom.VisualStudio.SpecFlow22Connector.Tests.csproj", "{7BC975EF-EA69-4EA0-8AC7-01642F2D6086}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow22Connector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow22Connector.Tests\SpecFlow.VisualStudio.SpecFlow22Connector.Tests.csproj", "{7BC975EF-EA69-4EA0-8AC7-01642F2D6086}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlowConnector.V1.Tests", "Tests\Deveroom.VisualStudio.SpecFlowConnector.V1.Tests\Deveroom.VisualStudio.SpecFlowConnector.V1.Tests.csproj", "{91127A4A-B1CA-4A5E-8A54-2F1E0C9B0BFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests", "Tests\SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests\SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests.csproj", "{91127A4A-B1CA-4A5E-8A54-2F1E0C9B0BFC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Tests", "Tests\Deveroom.VisualStudio.Tests\Deveroom.VisualStudio.Tests.csproj", "{69997CEE-FE90-4CF6-97AE-8A2B7811A4F5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Specs", "Tests\Deveroom.VisualStudio.Specs\Deveroom.VisualStudio.Specs.csproj", "{14A1CF32-83E1-4B67-88E2-3EBFE9F5071C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow30NetFwConnector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow30NetFwConnector.Tests\Deveroom.VisualStudio.SpecFlow30NetFwConnector.Tests.csproj", "{817E430C-8C30-4452-A4EA-ECCFCD466BDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow30NetFwConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow30NetFwConnector.Tests\SpecFlow.VisualStudio.SpecFlow30NetFwConnector.Tests.csproj", "{817E430C-8C30-4452-A4EA-ECCFCD466BDF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow30NetCoreConnector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow30NetCoreConnector.Tests\Deveroom.VisualStudio.SpecFlow30NetCoreConnector.Tests.csproj", "{C932BEDD-F645-448B-B37E-C326FDC1A453}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow30NetCoreConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow30NetCoreConnector.Tests\SpecFlow.VisualStudio.SpecFlow30NetCoreConnector.Tests.csproj", "{C932BEDD-F645-448B-B37E-C326FDC1A453}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3710808B-7098-4236-9053-FDB52CBB51E0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow23Connector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow23Connector.Tests\Deveroom.VisualStudio.SpecFlow23Connector.Tests.csproj", "{51C25E90-B0E4-4781-B973-2D2C2987F304}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow23Connector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow23Connector.Tests\SpecFlow.VisualStudio.SpecFlow23Connector.Tests.csproj", "{51C25E90-B0E4-4781-B973-2D2C2987F304}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow24Connector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow24Connector.Tests\Deveroom.VisualStudio.SpecFlow24Connector.Tests.csproj", "{02BA7A29-42F3-484F-A93A-CA0EEEB46A92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow24Connector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow24Connector.Tests\SpecFlow.VisualStudio.SpecFlow24Connector.Tests.csproj", "{02BA7A29-42F3-484F-A93A-CA0EEEB46A92}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repo", "Repo", "{31ACD27E-7410-40B8-8E7D-3C0E787C0814}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow30P220NetCoreConnector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow30P220NetCoreConnector.Tests\Deveroom.VisualStudio.SpecFlow30P220NetCoreConnector.Tests.csproj", "{C4DF9612-4416-4BD3-A67B-EC4115C97A44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow30P220NetCoreConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow30P220NetCoreConnector.Tests\SpecFlow.VisualStudio.SpecFlow30P220NetCoreConnector.Tests.csproj", "{C4DF9612-4416-4BD3-A67B-EC4115C97A44}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow30P220NetFwConnector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow30P220NetFwConnector.Tests\Deveroom.VisualStudio.SpecFlow30P220NetFwConnector.Tests.csproj", "{4E99D386-BAD3-4B5E-A80A-EFD3D90A1654}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow30P220NetFwConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow30P220NetFwConnector.Tests\SpecFlow.VisualStudio.SpecFlow30P220NetFwConnector.Tests.csproj", "{4E99D386-BAD3-4B5E-A80A-EFD3D90A1654}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow31NetCoreConnector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow31NetCoreConnector.Tests\Deveroom.VisualStudio.SpecFlow31NetCoreConnector.Tests.csproj", "{F001F36F-536C-4EEB-AB11-712D8120A771}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow31NetCoreConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow31NetCoreConnector.Tests\SpecFlow.VisualStudio.SpecFlow31NetCoreConnector.Tests.csproj", "{F001F36F-536C-4EEB-AB11-712D8120A771}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow31NetFwConnector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow31NetFwConnector.Tests\Deveroom.VisualStudio.SpecFlow31NetFwConnector.Tests.csproj", "{1DE6AE23-DB3F-44B5-8633-80F6A1AB0BC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow31NetFwConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow31NetFwConnector.Tests\SpecFlow.VisualStudio.SpecFlow31NetFwConnector.Tests.csproj", "{1DE6AE23-DB3F-44B5-8633-80F6A1AB0BC1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow36NetCoreConnector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow36NetCoreConnector.Tests\Deveroom.VisualStudio.SpecFlow36NetCoreConnector.Tests.csproj", "{A514B820-E7D3-4B07-8BC8-09F5354009B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow36NetCoreConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow36NetCoreConnector.Tests\SpecFlow.VisualStudio.SpecFlow36NetCoreConnector.Tests.csproj", "{A514B820-E7D3-4B07-8BC8-09F5354009B3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlow37NetCoreConnector.Tests", "Tests\Deveroom.VisualStudio.SpecFlow37NetCoreConnector.Tests\Deveroom.VisualStudio.SpecFlow37NetCoreConnector.Tests.csproj", "{E67A8D21-105E-4A1E-AF01-B0718D4E696A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow37NetCoreConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow37NetCoreConnector.Tests\SpecFlow.VisualStudio.SpecFlow37NetCoreConnector.Tests.csproj", "{E67A8D21-105E-4A1E-AF01-B0718D4E696A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.UI.Tester", "Tests\Deveroom.VisualStudio.UI.Tester\Deveroom.VisualStudio.UI.Tester.csproj", "{2A412F65-68C7-4A5D-AFCF-74E928C40C21}"
 EndProject
