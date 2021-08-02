@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests", "Tests\SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests\SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests.csproj", "{91127A4A-B1CA-4A5E-8A54-2F1E0C9B0BFC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Tests", "Tests\Deveroom.VisualStudio.Tests\Deveroom.VisualStudio.Tests.csproj", "{69997CEE-FE90-4CF6-97AE-8A2B7811A4F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.Tests", "Tests\SpecFlow.VisualStudio.Tests\SpecFlow.VisualStudio.Tests.csproj", "{69997CEE-FE90-4CF6-97AE-8A2B7811A4F5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Specs", "Tests\Deveroom.VisualStudio.Specs\Deveroom.VisualStudio.Specs.csproj", "{14A1CF32-83E1-4B67-88E2-3EBFE9F5071C}"
 EndProject

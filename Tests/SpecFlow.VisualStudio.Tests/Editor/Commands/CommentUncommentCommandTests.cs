@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Moq;
 using Xunit;
 
-namespace Deveroom.VisualStudio.Tests.Editor.Commands
+namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
     public class CommentUncommentCommandTests
     {

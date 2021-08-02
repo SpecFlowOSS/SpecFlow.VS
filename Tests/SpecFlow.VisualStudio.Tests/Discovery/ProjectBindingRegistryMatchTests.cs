@@ -4,7 +4,7 @@ using Deveroom.VisualStudio.Editor.Services.Parser;
 using FluentAssertions;
 using Xunit;
 
-namespace Deveroom.VisualStudio.Tests.Discovery
+namespace SpecFlow.VisualStudio.Tests.Discovery
 {
     /*
 

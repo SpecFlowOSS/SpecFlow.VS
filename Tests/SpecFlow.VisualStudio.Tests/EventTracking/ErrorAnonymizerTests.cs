@@ -7,7 +7,7 @@ using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Deveroom.VisualStudio.Tests.EventTracking
+namespace SpecFlow.VisualStudio.Tests.EventTracking
 {
     public class ErrorAnonymizerTests
     {

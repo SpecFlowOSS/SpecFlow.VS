@@ -7,7 +7,7 @@ using Deveroom.VisualStudio.Editor.Services.Parser;
 using FluentAssertions;
 using Xunit;
 
-namespace Deveroom.VisualStudio.Tests.Editor.Completions
+namespace SpecFlow.VisualStudio.Tests.Editor.Completions
 {
     public class StepDefinitionSamplerTests
     {

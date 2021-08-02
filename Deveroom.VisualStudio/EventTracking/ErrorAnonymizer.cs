@@ -8,7 +8,7 @@ namespace Deveroom.VisualStudio.EventTracking
 {
     public static class ErrorAnonymizer
     {
-        private const string OWN_NAMESPACE = "Deveroom";
+        private const string OWN_NAMESPACE = "SpecFlow";
         private const string SPECFLOW_NAMESPACE = "TechTalk.SpecFlow";
         private static readonly string[] KnownWrapperExceptions = 
             {

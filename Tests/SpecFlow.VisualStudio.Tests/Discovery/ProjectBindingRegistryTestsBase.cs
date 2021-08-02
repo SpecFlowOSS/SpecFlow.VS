@@ -9,7 +9,7 @@ using Deveroom.VisualStudio.Editor.Services.Parser;
 using Gherkin.Ast;
 using Microsoft.VisualStudio.Text;
 
-namespace Deveroom.VisualStudio.Tests.Discovery
+namespace SpecFlow.VisualStudio.Tests.Discovery
 {
     public abstract class ProjectBindingRegistryTestsBase
     {

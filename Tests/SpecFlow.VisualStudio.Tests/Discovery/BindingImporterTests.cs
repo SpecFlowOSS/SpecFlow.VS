@@ -7,7 +7,7 @@ using FluentAssertions;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using Xunit;
 
-namespace Deveroom.VisualStudio.Tests.Discovery
+namespace SpecFlow.VisualStudio.Tests.Discovery
 {
     public class BindingImporterTests
     {

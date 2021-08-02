@@ -5,7 +5,7 @@ using Deveroom.VisualStudio.ProjectSystem;
 using FluentAssertions;
 using Xunit;
 
-namespace Deveroom.VisualStudio.Tests.ProjectSystem
+namespace SpecFlow.VisualStudio.Tests.ProjectSystem
 {
     public class SpecFlowPackageDetectorTests
     {

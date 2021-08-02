@@ -7,7 +7,7 @@ using FluentAssertions;
 using Moq;
 using Xunit;
 
-namespace Deveroom.VisualStudio.Tests.Editor.Services
+namespace SpecFlow.VisualStudio.Tests.Editor.Services
 {
     public class DeveroomGherkinParserTests
     {

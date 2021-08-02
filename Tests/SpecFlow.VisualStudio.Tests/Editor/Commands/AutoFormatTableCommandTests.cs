@@ -6,7 +6,7 @@ using Deveroom.VisualStudio.VsxStubs.ProjectSystem;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Deveroom.VisualStudio.Tests.Editor.Commands
+namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
     public class AutoFormatTableCommandTests
     {
