@@ -60,8 +60,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
-    <ProjectReference Include="..\SpecFlow.VisualStudio.UI\SpecFlow.VisualStudio.UI.csproj" Name="Deveroom.VisualStudio.UI" />
-    <ProjectReference Include="..\SpecFlow.VisualStudio\SpecFlow.VisualStudio.csproj" Name="Deveroom.VisualStudio" />
+    <ProjectReference Include="..\SpecFlow.VisualStudio.UI\SpecFlow.VisualStudio.UI.csproj" Name="SpecFlow.VisualStudio.UI" />
+    <ProjectReference Include="..\SpecFlow.VisualStudio\SpecFlow.VisualStudio.csproj" Name="SpecFlow.VisualStudio" />
     <ProjectReference Include="..\Deveroom.VisualStudio.ItemTemplates\Deveroom.VisualStudio.ItemTemplates.csproj">
       <Name>Deveroom.VisualStudio.ItemTemplates</Name>
       <VSIXSubPath>ItemTemplates</VSIXSubPath>
