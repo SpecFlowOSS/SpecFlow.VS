@@ -77,8 +77,6 @@
   <ItemGroup>
     <AdditionalDeveroomDependencies Include="Newtonsoft.Json.dll" />
     <AdditionalDeveroomDependencies Include="Gherkin.dll" />
-    <AdditionalDeveroomDependencies Include="Utf8Json.dll" />
-    <AdditionalDeveroomDependencies Include="System.Threading.Tasks.Extensions.dll" />
     <AdditionalDeveroomDependencies Include="System.IO.Abstractions.dll" />
   </ItemGroup>
 

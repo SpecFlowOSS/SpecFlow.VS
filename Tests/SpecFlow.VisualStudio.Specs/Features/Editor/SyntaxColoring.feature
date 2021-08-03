@@ -72,6 +72,14 @@ Scenario: Highlights rule line keywords
 
 		Scenario: Scenario illustrating a rule
 			When I press add
+
+		Rule: This is a rule with a background
+
+		Background:
+			Given I have entered 50 into the calculator			
+
+		Scenario: Scenario illustrating a rule with a background
+			When I press add
 		"""
 	Then all DefinitionLineKeyword section should be highlighted as
 		"""
@@ -86,6 +94,14 @@ Scenario: Highlights rule line keywords
 
 		{DefinitionLineKeyword}Scenario:{/DefinitionLineKeyword} Scenario illustrating a rule
 			When I press add
+
+		{DefinitionLineKeyword}Rule:{/DefinitionLineKeyword} This is a rule with a background
+
+		{DefinitionLineKeyword}Background:{/DefinitionLineKeyword}
+			Given I have entered 50 into the calculator			
+
+		{DefinitionLineKeyword}Scenario:{/DefinitionLineKeyword} Scenario illustrating a rule with a background
+			When I press add
 		"""
 
 Scenario: Highlights tags
@@ -99,6 +115,9 @@ Scenario: Highlights tags
 		@qux
 		Scenario: Add two numbers
 			When I press add
+
+		@rqux
+		Rule: Commutativity
 
 		@quux
 		Scenario Outline: Add two numbers outline
@@ -117,6 +136,9 @@ Scenario: Highlights tags
 		{Tag}@qux{/Tag}
 		Scenario: Add two numbers
 			When I press add
+
+		{Tag}@rqux{/Tag}
+		Rule: Commutativity
 
 		{Tag}@quux{/Tag}
 		Scenario Outline: Add two numbers outline
