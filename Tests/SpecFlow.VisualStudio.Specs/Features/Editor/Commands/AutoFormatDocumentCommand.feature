@@ -9,7 +9,7 @@ Rules:
 * Formatting rules can be configured with editorconfig
 * Caret should stay in the same line where it was
 
-#Rule: Feature file can be formatted with useful defaults
+Rule: Feature file can be formatted with useful defaults
 
 Scenario: Misformatted feature file is cleaned up
 	Given there is a SpecFlow project scope
@@ -37,7 +37,7 @@ Scenario: Misformatted feature file is cleaned up
 		    When bar
 		"""
 
-#Rule: Caret should stay in the same line where it was
+Rule: Caret should stay in the same line where it was
 
 Scenario: Caret is moved to the end of the line
 	Given there is a SpecFlow project scope
@@ -53,7 +53,7 @@ Scenario: Caret is moved to the end of the line
 		Scenario: Add two numbers
 		"""
 
-#Rule: Selected text of a feature file can be formatted
+Rule: Selected text of a feature file can be formatted
 
 Scenario: Selected part of feature file is formatted
 	Given there is a SpecFlow project scope
