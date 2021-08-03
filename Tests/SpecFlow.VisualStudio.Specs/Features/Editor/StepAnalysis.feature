@@ -292,6 +292,16 @@ Scenario: Analyses all scopes of background steps
 		@mytag
 		Scenario: Tagged scenario
 			When I use a normal step
+
+		@mytag
+		Rule: Sample rule
+
+		Background: 
+			Given I use mytag scoped step
+			Given I use othertag scoped step
+
+		Scenario: Scenario in tagged rule
+			When I use a normal step
 		"""
 	And the initial binding discovery is performed
 	Then all section of types DefinedStep,UndefinedStep should be highlighted as
@@ -304,6 +314,16 @@ Scenario: Analyses all scopes of background steps
 
 		@mytag
 		Scenario: Tagged scenario
+			When {DefinedStep}I use a normal step{/DefinedStep}
+
+		@mytag
+		Rule: Sample rule
+
+		Background: 
+			Given {DefinedStep}I use mytag scoped step{/DefinedStep}
+			Given {UndefinedStep}I use othertag scoped step{/UndefinedStep}
+
+		Scenario: Scenario in tagged rule
 			When {DefinedStep}I use a normal step{/DefinedStep}
 		"""
 
