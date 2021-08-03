@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.28803.452
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.Package", "Deveroom.VisualStudio.Package\Deveroom.VisualStudio.Package.csproj", "{00920A0A-A73C-487F-BC41-9B92F2F0EBD7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlowConnector.Models", "Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj", "{261CCD0B-7411-40F0-B780-12537175B468}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlowConnector.Models", "Connectors\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj", "{261CCD0B-7411-40F0-B780-12537175B468}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.SampleProjectGenerator", "Tests\Deveroom.SampleProjectGenerator\Deveroom.SampleProjectGenerator.csproj", "{69E328C0-247D-45B8-9A57-DAE6D88A4AD8}"
 EndProject
@@ -20,13 +20,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{11E7849D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.VsxStubs", "Tests\Deveroom.VisualStudio.VsxStubs\Deveroom.VisualStudio.VsxStubs.csproj", "{84081A7E-4D74-4388-9CA7-8F488DF4C68B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlowConnector.V1", "Deveroom.VisualStudio.SpecFlowConnector.V1\Deveroom.VisualStudio.SpecFlowConnector.V1.csproj", "{B1D4F570-499E-4550-8D29-40510954FD05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlowConnector.V1", "Connectors\Deveroom.VisualStudio.SpecFlowConnector.V1\Deveroom.VisualStudio.SpecFlowConnector.V1.csproj", "{B1D4F570-499E-4550-8D29-40510954FD05}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.UI", "Deveroom.VisualStudio.UI\Deveroom.VisualStudio.UI.csproj", "{AD1186D6-A3AD-4425-A447-12D7E1C342D8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.ItemTemplates", "Deveroom.VisualStudio.ItemTemplates\Deveroom.VisualStudio.ItemTemplates.csproj", "{05D08F34-A49E-4F4C-A896-F5FDE3A9263A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlowConnector.V2", "Deveroom.VisualStudio.SpecFlowConnector.V2\Deveroom.VisualStudio.SpecFlowConnector.V2.csproj", "{4A884C12-01D7-4519-A510-3493BE910988}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.SpecFlowConnector.V2", "Connectors\Deveroom.VisualStudio.SpecFlowConnector.V2\Deveroom.VisualStudio.SpecFlowConnector.V2.csproj", "{4A884C12-01D7-4519-A510-3493BE910988}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Connectors", "Connectors", "{B9F019ED-754C-4D7E-90ED-7D54A50B38EB}"
 	ProjectSection(SolutionItems) = preProject
@@ -36,7 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Connectors", "Connectors", 
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Deveroom.VisualStudio.Common", "Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.shproj", "{0CA5992A-E95E-472F-90CF-36BE75A6CEDE}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Deveroom.VisualStudio.SpecFlowConnector", "Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.shproj", "{E0B508C5-C71F-43B2-A564-E2BB0CD92F7C}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Deveroom.VisualStudio.SpecFlowConnector", "Connectors\Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.shproj", "{E0B508C5-C71F-43B2-A564-E2BB0CD92F7C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{73BEBCB3-7CCD-4011-AB9B-ED2A291AA479}"
 	ProjectSection(SolutionItems) = preProject
@@ -91,11 +91,11 @@ EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems*{0ca5992a-e95e-472f-90cf-36be75a6cede}*SharedItemsImports = 13
+		Connectors\Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.projitems*{4a884c12-01d7-4519-a510-3493be910988}*SharedItemsImports = 5
 		Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems*{4a884c12-01d7-4519-a510-3493be910988}*SharedItemsImports = 5
-		Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.projitems*{4a884c12-01d7-4519-a510-3493be910988}*SharedItemsImports = 5
+		Connectors\Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.projitems*{b1d4f570-499e-4550-8d29-40510954fd05}*SharedItemsImports = 5
 		Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems*{b1d4f570-499e-4550-8d29-40510954fd05}*SharedItemsImports = 5
-		Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.projitems*{b1d4f570-499e-4550-8d29-40510954fd05}*SharedItemsImports = 5
-		Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.projitems*{e0b508c5-c71f-43b2-a564-e2bb0cd92f7c}*SharedItemsImports = 13
+		Connectors\Deveroom.VisualStudio.SpecFlowConnector\Deveroom.VisualStudio.SpecFlowConnector.projitems*{e0b508c5-c71f-43b2-a564-e2bb0cd92f7c}*SharedItemsImports = 13
 		Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems*{e687a5fa-a35f-4190-bffb-3ac245cb2ad5}*SharedItemsImports = 5
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

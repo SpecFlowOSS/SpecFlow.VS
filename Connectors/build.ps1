@@ -10,7 +10,7 @@ mkdir $outputFolder
 
 # build V1 any cpu
 
-cd ..\Deveroom.VisualStudio.SpecFlowConnector.V1
+cd Deveroom.VisualStudio.SpecFlowConnector.V1
 
 dotnet publish -c $configuration
 
@@ -28,11 +28,11 @@ Rename-Item bin\$configuration\net452\win-x86\publish\deveroom-specflow-v1.pdb d
 
 Copy-Item bin\$configuration\net452\win-x86\publish\deveroom-specflow-v1.x86.* $outputFolder\V1\
 
-cd ..\Connectors
+cd ..
 
 # build V2 any cpu
 
-cd ..\Deveroom.VisualStudio.SpecFlowConnector.V2
+cd Deveroom.VisualStudio.SpecFlowConnector.V2
 
 dotnet publish -f netcoreapp2.1 -c $configuration
 
@@ -46,4 +46,4 @@ dotnet publish -f net5.0 -c $configuration
 
 Copy-Item bin\$configuration\net5.0\publish\ $outputFolder\V5\ -Recurse
 
-cd ..\Connectors
+cd ..

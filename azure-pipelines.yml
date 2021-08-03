@@ -29,6 +29,14 @@ steps:
     feedsToUse: config
     nugetConfigPath: NuGet.config
 
+- task: PowerShell@2
+  displayName: 'Build Connectors'
+  inputs:
+    targetType: 'inline'
+    script: |
+        cd .\Connectors
+        .\build.ps1
+
 - task: VSBuild@1
   displayName: 'Build Solution'
   inputs:

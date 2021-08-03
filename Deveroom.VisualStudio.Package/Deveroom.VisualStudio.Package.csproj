@@ -59,8 +59,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj" />
-    <ProjectReference Include="..\Deveroom.VisualStudio.UI\Deveroom.VisualStudio.UI.csproj" Name="Deveroom.VisualStudio.UI"  />
+    <ProjectReference Include="..\Connectors\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj" />
+    <ProjectReference Include="..\Deveroom.VisualStudio.UI\Deveroom.VisualStudio.UI.csproj" Name="Deveroom.VisualStudio.UI" />
     <ProjectReference Include="..\Deveroom.VisualStudio\Deveroom.VisualStudio.csproj" Name="Deveroom.VisualStudio" />
     <ProjectReference Include="..\Deveroom.VisualStudio.ItemTemplates\Deveroom.VisualStudio.ItemTemplates.csproj">
       <Name>Deveroom.VisualStudio.ItemTemplates</Name>

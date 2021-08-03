@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj" />
+    <ProjectReference Include="..\Connectors\Deveroom.VisualStudio.SpecFlowConnector.Models\Deveroom.VisualStudio.SpecFlowConnector.Models.csproj" />
   </ItemGroup>
 
   <Import Project="..\Deveroom.VisualStudio.Common\Deveroom.VisualStudio.Common.projitems" Label="Shared" />
