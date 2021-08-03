@@ -307,6 +307,13 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                     command.PreExec(_wpfTextView, command.Targets.First());
                     break;
                 }
+                case "Auto Format Document":
+                {
+                    var command = new AutoFormatDocumentCommand(_ideScope,
+                        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                    command.PreExec(_wpfTextView, command.Targets.First());
+                    break;
+                }
                 case "Auto Format Table":
                 {
                     var command = new AutoFormatTableCommand(_ideScope,

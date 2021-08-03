@@ -9,6 +9,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.TextManager.Interop;
 
@@ -133,6 +134,24 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
                 selectionEndLine = selectionEndLine.Snapshot.GetLineFromLineNumber(selectionEndLine.LineNumber - 1);
             }
             return selectionEndLine;
+        }
+
+        protected string GetNewLine(IWpfTextView textView)
+        {
+            // based on EditorOperations.InsertNewLine()
+            string newLineString = null;
+            if (textView.Options.GetReplicateNewLineCharacter())
+            {
+                var caretLine = textView.Caret.Position.BufferPosition.GetContainingLine();
+                if (caretLine.LineBreakLength > 0)
+                    newLineString = caretLine.GetLineBreakText();
+                else if (textView.TextSnapshot.LineCount > 1)
+                {
+                    newLineString = textView.TextSnapshot.GetLineFromLineNumber(textView.TextSnapshot.LineCount - 2).GetLineBreakText();
+                }
+            }
+            newLineString = newLineString ?? textView.Options.GetNewLineCharacter();
+            return newLineString;
         }
         #endregion
     }

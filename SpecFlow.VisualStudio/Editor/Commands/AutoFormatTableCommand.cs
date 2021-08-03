@@ -98,24 +98,6 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return backslashCount % 2 == 1;
         }
 
-        private string GetNewLine(IWpfTextView textView)
-        {
-            // based on EditorOperations.InsertNewLine()
-            string newLineString = null;
-            if (textView.Options.GetReplicateNewLineCharacter())
-            {
-                var caretLine = textView.Caret.Position.BufferPosition.GetContainingLine();
-                if (caretLine.LineBreakLength > 0)
-                    newLineString = caretLine.GetLineBreakText();
-                else if (textView.TextSnapshot.LineCount > 1)
-                {
-                    newLineString = textView.TextSnapshot.GetLineFromLineNumber(textView.TextSnapshot.LineCount - 2).GetLineBreakText();
-                }
-            }
-            newLineString = newLineString ?? textView.Options.GetNewLineCharacter();
-            return newLineString;
-        }
-
         private string GetIndent(ITextSnapshot textSnapshot, IHasRows hasRows)
         {
             var firstLine = textSnapshot.GetLineFromLineNumber(hasRows.Rows.First().Location.Line - 1);
@@ -245,7 +227,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return unfinishedCell;
         }
 
-        private int[] GetWidths(IHasRows hasRows)
+        internal static int[] GetWidths(IHasRows hasRows)
         {
             var widths = new int[hasRows.Rows.Max(r => r.Cells.Count())];
             foreach (var row in hasRows.Rows)
@@ -287,7 +269,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                     PADDING_LENGHT);
         }
 
-        private string Escape(string cellValue)
+        internal static string Escape(string cellValue)
         {
             return cellValue
                 .Replace("\\", "\\\\")
