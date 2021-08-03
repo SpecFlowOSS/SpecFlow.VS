@@ -12,7 +12,7 @@
     <ProjectItem SubType="" TargetFileName="$fileinputname$.feature" ReplaceParameters="true">Feature1.feature</ProjectItem>
   </TemplateContent>
   <WizardExtension>
-    <Assembly>Deveroom.VisualStudio.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c392b06fa519a0e0</Assembly>
-    <FullClassName>Deveroom.VisualStudio.Wizards.VsFeatureFileWizard</FullClassName>
+    <Assembly>SpecFlow.VisualStudio.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c392b06fa519a0e0</Assembly>
+    <FullClassName>SpecFlow.VisualStudio.Wizards.VsFeatureFileWizard</FullClassName>
   </WizardExtension>
 </VSTemplate>

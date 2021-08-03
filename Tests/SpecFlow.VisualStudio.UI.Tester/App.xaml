@@ -1,0 +1,9 @@
+﻿<Application x:Class="SpecFlow.VisualStudio.UI.Tester.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SpecFlow.VisualStudio.UI.Tester"
+             StartupUri="UiTesterWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>

@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net452</TargetFramework>
+    <AssemblyName>specflow-vs-v1</AssemblyName>
+    <Configurations>Debug;Release;Debug_x86;Release_x86</Configurations>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
+    <PlatformTarget>anycpu</PlatformTarget>
+    <RootNamespace>SpecFlow.VisualStudio.SpecFlowConnector</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="dnlib" Version="3.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="SpecFlow" Version="2.3.2" />
+    <PackageReference Include="SpecFlow.CustomPlugin" Version="2.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="ISymWrapper" />
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+
+  <Import Project="..\..\SpecFlow.VisualStudio.Common\SpecFlow.VisualStudio.Common.projitems" Label="Shared" />
+
+  <Import Project="..\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.projitems" Label="Shared" />
+
+</Project>

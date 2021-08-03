@@ -1,0 +1,276 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Windows;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using SpecFlow.VisualStudio.Annotations;
+using SpecFlow.VisualStudio.Configuration;
+using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Monitoring;
+using Newtonsoft.Json.Linq;
+
+namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
+{
+    public class ProjectScopeDeveroomConfigurationProvider : IDeveroomConfigurationProvider, IDisposable
+    {
+        public const string SpecFlowJsonConfigFileName = "specflow.json";
+        public const string SpecFlowAppConfigFileName = "App.config";
+        public const string SpecSyncJsonConfigFileName = "specsync.json";
+
+        private readonly IProjectScope _projectScope;
+        private ConfigCache _configCache;
+        private IDeveroomLogger Logger => _projectScope.IdeScope.Logger;
+        private IMonitoringService MonitoringService => _projectScope.IdeScope.MonitoringService;
+        private IFileSystem FileSystem => _projectScope.IdeScope.FileSystem;
+
+        public event EventHandler<EventArgs> ConfigurationChanged;
+        public event EventHandler<EventArgs> WeakConfigurationChanged
+        {
+            add => WeakEventManager<ProjectScopeDeveroomConfigurationProvider, EventArgs>.AddHandler(this, nameof(ConfigurationChanged), value);
+            remove => WeakEventManager<ProjectScopeDeveroomConfigurationProvider, EventArgs>.RemoveHandler(this, nameof(ConfigurationChanged), value);
+        }
+
+        public ProjectScopeDeveroomConfigurationProvider([NotNull] IProjectScope projectScope)
+        {
+            _projectScope = projectScope ?? throw new ArgumentNullException(nameof(projectScope));
+            InitializeConfiguration();
+
+            _projectScope.IdeScope.WeakProjectsBuilt += ProjectSystemOnProjectsBuilt;
+        }
+
+        private void InitializeConfiguration()
+        {
+            var configSources = GetConfigSources().ToArray();
+            _configCache = LoadConfiguration(configSources);
+        }
+
+        private void ProjectSystemOnProjectsBuilt(object sender, EventArgs e)
+        {
+            CheckConfiguration(true);
+        }
+
+        private void CheckConfiguration(bool triggerChanged)
+        {
+            Logger.LogVerbose("Checking configuration...");
+
+            var configSources = GetConfigSources().ToArray();
+            if (_configCache.ConfigSources.SequenceEqual(configSources))
+                return; // no source changed
+
+            var oldConfiguration = _configCache.Configuration;
+            _configCache = LoadConfiguration(configSources);
+            Logger.LogVerbose("Configuration loaded");
+
+            if (triggerChanged && !oldConfiguration.Equals(_configCache.Configuration))
+            {
+                Logger.LogInfo("Configuration changed");
+                ConfigurationChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public DeveroomConfiguration GetConfiguration()
+        {
+            return _configCache.Configuration;
+        }
+
+        private DeveroomConfiguration GetDefaultConfiguration()
+        {
+            return new DeveroomConfiguration();
+        }
+
+        private IEnumerable<ConfigSource> GetConfigSources()
+        {
+            var jsonSource = GetProjectConfigFilePath(SpecFlowJsonConfigFileName);
+            if (jsonSource != null)
+                yield return jsonSource;
+            else
+            {
+                var appConfigSource = GetProjectConfigFilePath(SpecFlowAppConfigFileName);
+                if (appConfigSource != null)
+                    yield return appConfigSource;
+            }
+
+            var specSyncConfigSource = GetProjectConfigFilePath(SpecSyncJsonConfigFileName);
+            if (specSyncConfigSource != null)
+                yield return specSyncConfigSource;
+
+            var deveroomConfigSource = GetProjectConfigFilePath(DeveroomConfigurationLoader.DefaultConfigFileName);
+            if (deveroomConfigSource != null)
+                yield return deveroomConfigSource;
+        }
+
+        private ConfigSource GetProjectConfigFilePath(string fileName)
+        {
+            try
+            {
+                var projectFolder = _projectScope.ProjectFolder;
+                var fileSystem = _projectScope.IdeScope.FileSystem;
+                var configFilePath = fileSystem.GetFilePathIfExists(Path.Combine(projectFolder, fileName));
+                if (configFilePath == null)
+                    return null;
+                return new ConfigSource(configFilePath, FileSystem.File.GetLastWriteTimeUtc(configFilePath));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebugException(ex);
+                return null;
+            }
+        }
+
+        private ConfigCache LoadConfiguration(ConfigSource[] configSources)
+        {
+            var loadedSources = new List<ConfigSource>();
+            var configuration = GetDefaultConfiguration();
+
+            foreach (var configSource in configSources)
+            {
+                try
+                {
+                    var fileName = Path.GetFileName(configSource.FilePath);
+                    if (SpecFlowAppConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        LoadFromSpecFlowXmlConfig(configSource.FilePath, configuration);
+                    }
+
+                    if (SpecFlowJsonConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        LoadFromSpecFlowJsonConfig(configSource.FilePath, configuration);
+                    }
+
+                    if (SpecSyncJsonConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        LoadFromSpecSyncJsonConfig(configSource.FilePath, configuration);
+                    }
+
+                    if (DeveroomConfigurationLoader.DefaultConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        LoadFromDeveroomConfig(configSource.FilePath, configuration);
+                    }
+
+                    configuration.CheckConfiguration();
+
+                    loadedSources.Add(configSource);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning($"Unable to load configuration from '{configSource.FilePath}': {ex.Message}");
+                    Logger.LogVerboseException(MonitoringService, ex, "Unable to load configuration");
+                }
+            }
+
+            if (loadedSources.Any())
+                configuration.ConfigurationChangeTime = loadedSources.Max(cs => cs.LastChangeTime);
+
+            try
+            {
+                configuration.CheckConfiguration();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Invalid Deveroom configuration: {ex.Message}");
+                Logger.LogVerboseException(MonitoringService, ex, "Configuration error, using default config");
+                configuration = new DeveroomConfiguration();
+            }
+
+            return new ConfigCache(configuration, loadedSources.ToArray());
+        }
+
+        private void LoadFromDeveroomConfig(string configSourceFilePath, DeveroomConfiguration configuration)
+        {
+            Logger.LogVerbose($"Loading Deveroom config from '{configSourceFilePath}'");
+            var loader = new DeveroomConfigurationLoader();
+            loader.Update(configuration, configSourceFilePath);
+        }
+
+        private string XPathEvaluateAttribute(XDocument doc, string xpath)
+        {
+            return (doc.XPathEvaluate(xpath) as IEnumerable)?.OfType<XAttribute>()?.FirstOrDefault()?.Value;
+        }
+
+        private void LoadFromSpecFlowXmlConfig(string configSourceFilePath, DeveroomConfiguration configuration)
+        {
+            var fileContent = FileSystem.File.ReadAllText(configSourceFilePath);
+            var configDoc = XDocument.Parse(fileContent);
+            var featureLang = XPathEvaluateAttribute(configDoc, "/configuration/specFlow/language/@feature");
+            if (featureLang != null)
+                configuration.DefaultFeatureLanguage = featureLang;
+            var bindingCulture = XPathEvaluateAttribute(configDoc, "/configuration/specFlow/bindingCulture/@name");
+            if (bindingCulture != null)
+                configuration.ConfiguredBindingCulture = bindingCulture;
+        }
+
+        private void LoadFromSpecFlowJsonConfig(string configSourceFilePath, DeveroomConfiguration configuration)
+        {
+            var fileContent = FileSystem.File.ReadAllText(configSourceFilePath);
+            var configDoc = JObject.Parse(fileContent);
+
+            var v2ConfigRoot = configDoc["specFlow"];
+            if (v2ConfigRoot != null)
+                UpdateFromJsonConfigRoot(v2ConfigRoot, configuration);
+
+            UpdateFromJsonConfigRoot(configDoc, configuration);
+        }
+
+        private static void UpdateFromJsonConfigRoot(JToken jsonConfigRoot, DeveroomConfiguration configuration)
+        {
+            var featureLang = (string) jsonConfigRoot["language"]?["feature"];
+            if (featureLang != null)
+                configuration.DefaultFeatureLanguage = featureLang;
+            var bindingCulture = (string) jsonConfigRoot["bindingCulture"]?["name"];
+            if (bindingCulture != null)
+                configuration.ConfiguredBindingCulture = bindingCulture;
+        }
+
+        private void LoadFromSpecSyncJsonConfig(string configSourceFilePath, DeveroomConfiguration configuration)
+        {
+            var fileContent = FileSystem.File.ReadAllText(configSourceFilePath);
+            UpdateFromSpecSyncJsonConfig(configuration, fileContent);
+        }
+
+        internal static void UpdateFromSpecSyncJsonConfig(DeveroomConfiguration configuration, string fileContent)
+        {
+            var configDoc = JObject.Parse(fileContent);
+
+            var projectUrl = ((string) configDoc["remote"]?["projectUrl"])?.TrimEnd('/');
+            if (string.IsNullOrEmpty(projectUrl))
+                return;
+
+            var testCaseTagPrefix = (string) configDoc["synchronization"]?["testCaseTagPrefix"] ?? "tc";
+
+            var tagLinks = new List<TagLinkConfiguration>(configuration.Traceability.TagLinks);
+            AddSpecSyncTagLinkConfiguration(tagLinks, testCaseTagPrefix, projectUrl);
+
+            var linksArray = configDoc["synchronization"]?["links"] as JArray;
+            if (linksArray != null)
+            {
+                foreach (var link in linksArray)
+                {
+                    var tagPrefix = (string) link["tagPrefix"];
+                    if (string.IsNullOrEmpty(tagPrefix))
+                        continue;
+                    AddSpecSyncTagLinkConfiguration(tagLinks, tagPrefix, projectUrl);
+                }
+            }
+
+            configuration.Traceability.TagLinks = tagLinks.ToArray();
+        }
+
+        private static void AddSpecSyncTagLinkConfiguration(List<TagLinkConfiguration> tagLinks, string tagPrefix, string projectUrl)
+        {
+            tagLinks.Add(new TagLinkConfiguration
+            {
+                TagPattern = $@"{tagPrefix}\:(?<id>\d+)",
+                UrlTemplate = projectUrl + "/_workitems/edit/{id}"
+            });
+        }
+
+        public void Dispose()
+        {
+            _projectScope.IdeScope.WeakProjectsBuilt -= ProjectSystemOnProjectsBuilt;
+        }
+    }
+}
