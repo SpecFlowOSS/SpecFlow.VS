@@ -20,11 +20,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands
     public class AutoFormatDocumentCommand : DeveroomEditorCommandBase, IDeveroomFeatureEditorCommand
     {
         private const int PADDING_LENGHT = 1;
-        private const int PIPE_LENGHT = 1;
+
+        internal static readonly DeveroomEditorCommandTargetKey FormatDocumentKey =
+                    new DeveroomEditorCommandTargetKey(VSConstants.VSStd2K, VSConstants.VSStd2KCmdID.FORMATDOCUMENT);
+        internal static readonly DeveroomEditorCommandTargetKey FormatSelectionKey =
+                    new DeveroomEditorCommandTargetKey(VSConstants.VSStd2K, VSConstants.VSStd2KCmdID.FORMATSELECTION);
 
         public override DeveroomEditorCommandTargetKey[] Targets => new[]
         {
-            new DeveroomEditorCommandTargetKey(VSConstants.VSStd2K, VSConstants.VSStd2KCmdID.FORMATDOCUMENT)
+            FormatDocumentKey,
+            FormatSelectionKey
         };
 
         [ImportingConstructor]
@@ -40,31 +45,44 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             if (!(documentTag?.Data is DeveroomGherkinDocument gherkinDocument))
                 return false;
 
-            var selectionSpan = GetSelectionSpan(textView);
-            //var lines = GetSpanFullLines(selectionSpan).ToArray();
-            var formattingSpan = new SnapshotSpan(textView.TextBuffer.CurrentSnapshot, 0, textView.TextBuffer.CurrentSnapshot.Length);
-            var lines = GetSpanFullLines(formattingSpan).Select(l => l.GetText()).ToArray();
-
-
-
-            Debug.Assert(lines.Length > 0);
-
-
-            string indent = "    ";
+            var isSelectionFormatting = commandKey.Equals(FormatSelectionKey);
+            var textSnapshot = textView.TextSnapshot;
             var caretLineNumber = textView.Caret.Position.BufferPosition.GetContainingLine().LineNumber;
-            using (var textEdit = selectionSpan.Snapshot.TextBuffer.CreateEdit())
+            
+            var startLine = 0;
+            var endLine = textSnapshot.LineCount - 1;
+            
+            if (isSelectionFormatting)
             {
-                textEdit.Replace(formattingSpan, FormatDocument(lines, GetNewLine(textView), gherkinDocument, indent, formattingSpan.Snapshot));
+                var selectionSpan = GetSelectionSpan(textView);
+                startLine = selectionSpan.Start.GetContainingLine().LineNumber;
+                endLine = selectionSpan.End.GetContainingLine().LineNumber;
+            }
+
+            var lines = GetSpanFullLines(textSnapshot).Select(l => l.GetText()).ToArray();
+            if (lines.Length == 0)
+                return false;
+            
+            string indent = "    "; //todo: take from config
+            using (var textEdit = textSnapshot.TextBuffer.CreateEdit())
+            {
+                var formattingSpan = new SnapshotSpan(textSnapshot.GetLineFromLineNumber(startLine).Start, textSnapshot.GetLineFromLineNumber(endLine).End);
+                var newLine = GetNewLine(textView);
+                SetFormattedLines(lines, gherkinDocument, newLine, indent);
+
+                var replacementText = string.Join(newLine, lines.Take(endLine + 1)
+                    .Skip(startLine));
+
+                textEdit.Replace(formattingSpan, replacementText);
                 textEdit.Apply();
             }
-            
+
             textView.Caret.MoveTo(textView.TextSnapshot.GetLineFromLineNumber(caretLineNumber).End);
 
             return true;
         }
-
-        private string FormatDocument(string[] lines, string newLine,
-            DeveroomGherkinDocument gherkinDocument, string indent, ITextSnapshot textSnapshot)
+        
+        private void SetFormattedLines(string[] lines, DeveroomGherkinDocument gherkinDocument, string newLine, string indent)
         {
             if (gherkinDocument.Feature != null)
             {
@@ -76,6 +94,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                     {
                         SetLine(lines, scenario, $"{scenario.Keyword}: {scenario.Name}");
                     }
+
                     if (featureChild is IHasSteps hasSteps)
                     {
                         foreach (var step in hasSteps.Steps)
@@ -86,17 +105,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                                 FormatTable(lines, dataTable, indent + indent, newLine);
                             }
                         }
-
-                        
                     }
 
                     //todo: handle ScenarioOutline, Rule, Background, etc.
-                    
                 }
             }
-
-            
-            return string.Join(newLine, lines);
         }
 
         private void FormatTable(string[] lines, IHasRows hasRows, string indent, string newLine)
@@ -121,7 +134,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private void SetLine(string[] lines, IHasLocation hasLocation, string line)
         {
-            if (hasLocation?.Location != null && hasLocation.Location.Line >= 1 
+            if (hasLocation?.Location != null && hasLocation.Location.Line >= 1
                                               && hasLocation.Location.Line - 1 < line.Length)
             {
                 lines[hasLocation.Location.Line - 1] = line;

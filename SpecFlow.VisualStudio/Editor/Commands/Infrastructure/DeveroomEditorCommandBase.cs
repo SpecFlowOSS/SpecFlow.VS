@@ -124,6 +124,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
                 yield return selectionStartLine.Snapshot.GetLineFromLineNumber(lineNumber);
             }
         }
+        protected IEnumerable<ITextSnapshotLine> GetSpanFullLines(ITextSnapshot textSnapshot)
+        {
+            for (int lineNumber = 0; lineNumber < textSnapshot.LineCount; lineNumber++)
+            {
+                yield return textSnapshot.GetLineFromLineNumber(lineNumber);
+            }
+        }
 
         private ITextSnapshotLine GetSelectionEndLine(ITextSnapshotLine selectionStartLine, SnapshotSpan span)
         {

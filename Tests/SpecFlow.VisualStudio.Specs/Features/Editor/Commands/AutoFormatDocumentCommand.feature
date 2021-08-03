@@ -52,3 +52,49 @@ Scenario: Caret is moved to the end of the line
 		Feature: Addition{caret}
 		Scenario: Add two numbers
 		"""
+
+#Rule: Selected text of a feature file can be formatted
+
+Scenario: Selected part of feature file is formatted
+	Given there is a SpecFlow project scope
+	And the following feature file in the editor
+		"""
+		 Feature: Addition
+		  Scenario: Add two numbers
+		Given t{sel}he following numbers added
+				|  number| reason |
+				  |   1   | first number  |
+			   | 2  |second number |
+		And {/sel}foo
+		   When   bar
+		"""
+	When I invoke the "Auto Format Selection" command
+	Then the editor should be updated to
+		"""
+		 Feature: Addition
+		  Scenario: Add two numbers
+		    Given the following numbers added
+		        | number | reason        |
+		        | 1      | first number  |
+		        | 2      | second number |
+		    And foo
+		   When   bar
+		"""
+
+Scenario: Caret line of feature file is formatted
+	Given there is a SpecFlow project scope
+	And the following feature file in the editor
+		"""
+		 Feature: Addition
+		  Scenario: Add two numbers
+		Given t{caret}he following numbers added
+		   When   bar
+		"""
+	When I invoke the "Auto Format Selection" command
+	Then the editor should be updated to
+		"""
+		 Feature: Addition
+		  Scenario: Add two numbers
+		    Given the following numbers added
+		   When   bar
+		"""
