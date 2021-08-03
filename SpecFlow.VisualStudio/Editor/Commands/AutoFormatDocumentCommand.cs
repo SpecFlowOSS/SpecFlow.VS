@@ -49,17 +49,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             Debug.Assert(lines.Length > 0);
 
-            //int indent = lines.Min(l => l.GetText().TakeWhile(char.IsWhiteSpace).Count());
 
             string indent = "    ";
-
+            var caretLineNumber = textView.Caret.Position.BufferPosition.GetContainingLine().LineNumber;
             using (var textEdit = selectionSpan.Snapshot.TextBuffer.CreateEdit())
             {
                 textEdit.Replace(formattingSpan, FormatDocument(lines, GetNewLine(textView), gherkinDocument, indent, formattingSpan.Snapshot));
                 textEdit.Apply();
             }
-
-            //SetSelectionToChangedLines(textView, lines);
+            
+            textView.Caret.MoveTo(textView.TextSnapshot.GetLineFromLineNumber(caretLineNumber).End);
 
             return true;
         }
@@ -115,14 +114,6 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                     result.Append(new string(' ', PADDING_LENGHT));
                     result.Append('|');
                 }
-
-                //var lineText = textSnapshot.GetLineFromLineNumber(nextLine - 1).GetText();
-                //var unfinishedCell = GetUnfinishedCell(lineText);
-                //if (unfinishedCell != null)
-                //{
-                //    result.Append(' ');
-                //    result.Append(unfinishedCell);
-                //}
 
                 SetLine(lines, row, result.ToString());
             }
