@@ -9,18 +9,29 @@ Rules:
 * Selected text of a feature file can be formatted
 * Formatting rules can be configured with editorconfig
 * Caret should stay in the same line where it was
-* 
 
 Rule: Feature file can be formatted with useful defaults
 
 Scenario: Misformatted feature file is cleaned up
-TODO: Extend with Rule, Background, Scenario Outline, Examples, Examples Table, 
-Tags (normalize spaces), DocString ?
+TODO: 
+- DocString ? -> ```
+- Tags (normalize spaces), 
+
+
+- Description?
+- Comments
 
 	Given there is a SpecFlow project scope
 	And the following feature file in the editor
 		"""
+					@featureTag    @US1
 		 Feature: Addition
+		     Rule: Calculator functions
+
+		  Background:
+		Given I have entered 50 into the calculator
+
+		  @focus
 		  Scenario: Add two numbers
 		Given the following numbers added
 				|  number| reason |
@@ -28,11 +39,35 @@ Tags (normalize spaces), DocString ?
 			   | 2  |second number |
 		And foo
 			When   bar
+		
+			Scenario Outline: Add multiple
+				 Given I have entered <number1> to the calculator
+				    And I have entered <number2> to the calculator
+					When I check the output
+					```
+					1+2
+					  3
+ close
+					```
+
+			Examples:
+				| number1 | number2 |
+				| 1 | 2|
+			Examples: negative numbers
+				| number1 | number2 |
+				| -101 | -59              |
 		"""
 	When I invoke the "Auto Format Document" command
 	Then the editor should be updated to
 		"""
+		@featureTag @US1
 		Feature: Addition
+		Rule: Calculator functions
+
+		Background:
+		    Given I have entered 50 into the calculator
+
+		@focus
 		Scenario: Add two numbers
 		    Given the following numbers added
 		        | number | reason        |
@@ -40,6 +75,23 @@ Tags (normalize spaces), DocString ?
 		        | 2      | second number |
 		    And foo
 		    When bar
+
+		Scenario Outline: Add multiple
+		    Given I have entered <number1> to the calculator
+		    And I have entered <number2> to the calculator
+		    When I check the output
+		        ```
+		        1+2
+		          3
+		        close
+		        ```
+
+		Examples:
+		    | number1 | number2 |
+		    | 1       | 2       |
+		Examples: negative numbers
+		    | number1 | number2 |
+		    | -101    | -59     |
 		"""
 
 Rule: Caret should stay in the same line where it was

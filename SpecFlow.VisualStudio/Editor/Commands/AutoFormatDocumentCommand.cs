@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
@@ -86,28 +87,54 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             if (gherkinDocument.Feature != null)
             {
+                SetTags(lines, gherkinDocument.Feature.Tags);
                 SetLine(lines, gherkinDocument.Feature, $"{gherkinDocument.Feature.Keyword}: {gherkinDocument.Feature.Name}");
+                SetLinesForChildren(lines, gherkinDocument.Feature.Children, indent, newLine);
+            }
+        }
 
-                foreach (var featureChild in gherkinDocument.Feature.Children)
+        private void SetLinesForChildren(string[] lines, IEnumerable<IHasLocation> hasLocation, string indent, string newLine)
+        {
+            foreach (var featureChild in hasLocation)
+            {
+                if (featureChild is Rule rule)
                 {
-                    if (featureChild is Scenario scenario)
-                    {
-                        SetLine(lines, scenario, $"{scenario.Keyword}: {scenario.Name}");
-                    }
+                    SetLine(lines, rule, $"{rule.Keyword}: {rule.Name}");
+                    SetLinesForChildren(lines, rule.Children, indent, newLine);
+                }
 
-                    if (featureChild is IHasSteps hasSteps)
+                if (featureChild is Background background)
+                {
+                    SetLine(lines, background, GetHasDescriptionLine(background));
+                }
+
+                if (featureChild is Scenario scenario)
+                {
+                    SetTags(lines, scenario.Tags);
+                    SetLine(lines, scenario, $"{scenario.Keyword}: {scenario.Name}");
+                }
+
+                if (featureChild is ScenarioOutline scenarioOutline)
+                {
+                    SetTags(lines, scenarioOutline.Tags);
+                    SetLine(lines, scenarioOutline, $"{scenarioOutline.Keyword}: {scenarioOutline.Name}");
+                    foreach (var example in scenarioOutline.Examples)
                     {
-                        foreach (var step in hasSteps.Steps)
+                        SetLine(lines, example, GetHasDescriptionLine(example));
+                        FormatTable(lines, example, indent, newLine);
+                    }
+                }
+
+                if (featureChild is IHasSteps hasSteps)
+                {
+                    foreach (var step in hasSteps.Steps)
+                    {
+                        SetLine(lines, step, $"{indent}{step.Keyword}{step.Text}");
+                        if (step.Argument is DataTable dataTable)
                         {
-                            SetLine(lines, step, $"{indent}{step.Keyword}{step.Text}");
-                            if (step.Argument is DataTable dataTable)
-                            {
-                                FormatTable(lines, dataTable, indent + indent, newLine);
-                            }
+                            FormatTable(lines, dataTable, indent + indent, newLine);
                         }
                     }
-
-                    //todo: handle ScenarioOutline, Rule, Background, etc.
                 }
             }
         }
@@ -132,10 +159,27 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }
         }
 
+        private string GetHasDescriptionLine(IHasDescription hasDescription)
+        {
+            var line = $"{hasDescription.Keyword}:";
+            if (!string.IsNullOrEmpty(hasDescription.Name))
+                line += $" {hasDescription.Name}";
+            return line;
+        }
+
+        private void SetTags(string[] lines, IEnumerable<Tag> tags)
+        {
+            //todo: currently 1 tag 1 line
+            foreach (var tag in tags)
+            {
+                SetLine(lines, tag, $"{tag.Name}");
+            }
+        }
+
         private void SetLine(string[] lines, IHasLocation hasLocation, string line)
         {
             if (hasLocation?.Location != null && hasLocation.Location.Line >= 1
-                                              && hasLocation.Location.Line - 1 < line.Length)
+                                              && hasLocation.Location.Column - 1 < line.Length)
             {
                 lines[hasLocation.Location.Line - 1] = line;
             }
