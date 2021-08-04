@@ -227,9 +227,14 @@ Scenario: Highlights non-English step keywords
 
 Scenario: Highlights non-English step keywords using default feature language
 	Given there is a SpecFlow project scope
-	And the project configuration contains
-		| setting                | value |
-		| DefaultFeatureLanguage | hu-HU |
+	And the specflow.json configuration file contains
+		"""
+		{ 
+			"language": {
+				"feature": "hu-HU"
+			}
+		}
+		"""
 	When the following feature file is opened in the editor
 		"""
 		Jellemző: Összeadás

@@ -94,9 +94,14 @@ Scenario: Replaces keyword at the caret position
 
 Scenario: Offers the keywords of the configured language
 	Given there is a SpecFlow project scope
-	And the project configuration contains
-		| setting                | value |
-		| DefaultFeatureLanguage | hu-HU |
+	And the specflow.json configuration file contains
+		"""
+		{ 
+			"language": {
+				"feature": "hu-HU"
+			}
+		}
+		"""
 	And the following feature file in the editor
 		"""
 		{caret}

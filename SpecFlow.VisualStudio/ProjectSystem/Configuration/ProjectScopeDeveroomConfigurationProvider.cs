@@ -20,6 +20,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
         public const string SpecFlowJsonConfigFileName = "specflow.json";
         public const string SpecFlowAppConfigFileName = "App.config";
         public const string SpecSyncJsonConfigFileName = "specsync.json";
+        public const string DeveroomConfigFileName = "deveroom.json";
 
         private readonly IProjectScope _projectScope;
         private ConfigCache _configCache;
@@ -98,7 +99,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
             if (specSyncConfigSource != null)
                 yield return specSyncConfigSource;
 
-            var deveroomConfigSource = GetProjectConfigFilePath(DeveroomConfigurationLoader.DefaultConfigFileName);
+            var deveroomConfigSource = GetProjectConfigFilePath(DeveroomConfigFileName);
             if (deveroomConfigSource != null)
                 yield return deveroomConfigSource;
         }
@@ -146,7 +147,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
                         LoadFromSpecSyncJsonConfig(configSource.FilePath, configuration);
                     }
 
-                    if (DeveroomConfigurationLoader.DefaultConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
+                    if (DeveroomConfigFileName.Equals(fileName, StringComparison.InvariantCultureIgnoreCase))
                     {
                         LoadFromDeveroomConfig(configSource.FilePath, configuration);
                     }
@@ -182,13 +183,13 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
         private void LoadFromDeveroomConfig(string configSourceFilePath, DeveroomConfiguration configuration)
         {
             Logger.LogVerbose($"Loading Deveroom config from '{configSourceFilePath}'");
-            var loader = new DeveroomConfigurationLoader();
+            var loader = DeveroomConfigurationLoader.CreateDeveroomJsonConfigurationLoader();
             loader.Update(configuration, configSourceFilePath);
         }
 
         private string XPathEvaluateAttribute(XDocument doc, string xpath)
         {
-            return (doc.XPathEvaluate(xpath) as IEnumerable)?.OfType<XAttribute>()?.FirstOrDefault()?.Value;
+            return (doc.XPathEvaluate(xpath) as IEnumerable)?.OfType<XAttribute>().FirstOrDefault()?.Value;
         }
 
         private void LoadFromSpecFlowXmlConfig(string configSourceFilePath, DeveroomConfiguration configuration)
@@ -205,24 +206,16 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
 
         private void LoadFromSpecFlowJsonConfig(string configSourceFilePath, DeveroomConfiguration configuration)
         {
+            Logger.LogVerbose($"Loading configuration from '{configSourceFilePath}'");
+
             var fileContent = FileSystem.File.ReadAllText(configSourceFilePath);
-            var configDoc = JObject.Parse(fileContent);
-
-            var v2ConfigRoot = configDoc["specFlow"];
-            if (v2ConfigRoot != null)
-                UpdateFromJsonConfigRoot(v2ConfigRoot, configuration);
-
-            UpdateFromJsonConfigRoot(configDoc, configuration);
+            UpdateFromSpecFlowJsonConfig(configuration, fileContent, Path.GetDirectoryName(configSourceFilePath));
         }
 
-        private static void UpdateFromJsonConfigRoot(JToken jsonConfigRoot, DeveroomConfiguration configuration)
+        internal static void UpdateFromSpecFlowJsonConfig(DeveroomConfiguration configuration, string fileContent, string configFileFolderPath)
         {
-            var featureLang = (string) jsonConfigRoot["language"]?["feature"];
-            if (featureLang != null)
-                configuration.DefaultFeatureLanguage = featureLang;
-            var bindingCulture = (string) jsonConfigRoot["bindingCulture"]?["name"];
-            if (bindingCulture != null)
-                configuration.ConfiguredBindingCulture = bindingCulture;
+            var configLoader = DeveroomConfigurationLoader.CreateSpecFlowJsonConfigurationLoader();
+            configLoader.Update(configuration, fileContent, configFileFolderPath);
         }
 
         private void LoadFromSpecSyncJsonConfig(string configSourceFilePath, DeveroomConfiguration configuration)

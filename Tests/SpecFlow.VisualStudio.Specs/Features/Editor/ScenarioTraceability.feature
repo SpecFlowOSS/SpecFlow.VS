@@ -12,15 +12,19 @@ and the URL template as
 
 Scenario: Turns configured tag to a link
 	Given there is a SpecFlow project scope
-	And the project configuration file contains
+	And the specflow.json configuration file contains
 		"""
-		"traceability": {
-			"tagLinks": [
-				{
-					"tagPattern": "issue\\:(?<id>\\d+)",
-					"urlTemplate": "https://github.com/specsolutions/my-project/issues/{id}"
+		{ 
+			"ide": {
+				"traceability": {
+					"tagLinks": [
+						{
+							"tagPattern": "issue\\:(?<id>\\d+)",
+							"urlTemplate": "https://github.com/specsolutions/my-project/issues/{id}"
+						}
+					]
 				}
-			]
+			}
 		}
 		"""
 	When the following feature file is opened in the editor

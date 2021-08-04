@@ -89,36 +89,11 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                 },
             };
         }
-
-        private class ConfigSettingData
+        
+        [Given(@"the specflow.json configuration file contains")]
+        public void GivenTheSpecFlowJsonConfigurationFileContains(string configFileContent)
         {
-            public string Setting { get; set; }
-            public string Value { get; set; }
-        }
-
-        [Given(@"the project configuration contains")]
-        public void GivenTheProjectConfigurationContains(Table configSettingsTable)
-        {
-            var settings = configSettingsTable.CreateSet<ConfigSettingData>();
-            foreach (var configSetting in settings)
-            {
-                switch (configSetting.Setting)
-                {
-                    case "DefaultFeatureLanguage":
-                        _projectScope.DeveroomConfiguration.DefaultFeatureLanguage = configSetting.Value;
-                        break;
-                }
-            }
-            _projectScope.DeveroomConfiguration.CheckConfiguration();
-            _projectScope.DeveroomConfiguration.ConfigurationChangeTime = DateTime.Now;
-        }
-
-        [Given(@"the project configuration file contains")]
-        public void GivenTheProjectConfigurationFileContains(string jsonSnippet)
-        {
-            string configFileContent = "{" + jsonSnippet + "}";
-            var configLoader = new DeveroomConfigurationLoader();
-            configLoader.Update(_projectScope.DeveroomConfiguration, configFileContent, _projectScope.ProjectFolder);
+            ProjectScopeDeveroomConfigurationProvider.UpdateFromSpecFlowJsonConfig(_projectScope.DeveroomConfiguration, configFileContent, _projectScope.ProjectFolder);
             _projectScope.DeveroomConfiguration.CheckConfiguration();
             _projectScope.DeveroomConfiguration.ConfigurationChangeTime = DateTime.Now;
         }

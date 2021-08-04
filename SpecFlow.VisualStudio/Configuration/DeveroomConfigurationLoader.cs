@@ -1,62 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Linq.Expressions;
 using SpecFlow.VisualStudio.Common;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 
 namespace SpecFlow.VisualStudio.Configuration
 {
-    internal interface IConfigDeserializer
-    {
-        DeveroomConfiguration Deserialize(string jsonString);
-        void Populate(string jsonString, DeveroomConfiguration config);
-    }
-
-    internal class JsonNetConfigDeserializer : IConfigDeserializer
-    {
-        public DeveroomConfiguration Deserialize(string jsonString)
-        {
-            return JsonConvert.DeserializeObject<DeveroomConfiguration>(jsonString, GetJsonSerializerSettings(true));
-        }
-
-        public void Populate(string jsonString, DeveroomConfiguration config)
-        {
-            JsonConvert.PopulateObject(jsonString, config, GetJsonSerializerSettings(true));
-        }
-
-        public static JsonSerializerSettings GetJsonSerializerSettings(bool indented)
-        {
-            var serializerSettings = new JsonSerializerSettings();
-            var contractResolver = new CamelCasePropertyNamesContractResolver();
-            contractResolver.NamingStrategy.ProcessDictionaryKeys = false;
-            serializerSettings.ContractResolver = contractResolver;
-            serializerSettings.Converters = new List<JsonConverter> { new StringEnumConverter
-            {
-#if OLD_JSONNET_API
-                CamelCaseText = true
-#else
-                NamingStrategy = new CamelCaseNamingStrategy()
-#endif
-            } };
-            serializerSettings.Formatting = indented ? Formatting.Indented : Formatting.None;
-            serializerSettings.NullValueHandling = NullValueHandling.Ignore;
-            return serializerSettings;
-        }
-    }
-
     public class DeveroomConfigurationLoader
     {
-        private readonly IConfigDeserializer _configDeserializer;
-        public const string DefaultConfigFileName = "deveroom.json";
+        private readonly IConfigDeserializer<DeveroomConfiguration> _configDeserializer;
 
-        public DeveroomConfigurationLoader() : this(new JsonNetConfigDeserializer()) { }
-        internal DeveroomConfigurationLoader(IConfigDeserializer configDeserializer)
+        private DeveroomConfigurationLoader(IConfigDeserializer<DeveroomConfiguration> configDeserializer)
         {
             _configDeserializer = configDeserializer;
+        }
+
+        public static DeveroomConfigurationLoader CreateSpecFlowJsonConfigurationLoader()
+        {
+            return new (new SpecFlowConfigDeserializer());
+        }
+
+        public static DeveroomConfigurationLoader CreateDeveroomJsonConfigurationLoader()
+        {
+            return new (new JsonNetConfigDeserializer<DeveroomConfiguration>());
         }
 
         public DeveroomConfiguration Load(string configFilePath)
