@@ -15,11 +15,6 @@ Rule: Feature file can be formatted with useful defaults
 Scenario: Misformatted feature file is cleaned up
 TODO: 
 - DocString ? -> ```
-- Tags (normalize spaces), 
-
-
-- Description?
-- Comments
 
 	Given there is a SpecFlow project scope
 	And the following feature file in the editor
@@ -32,6 +27,7 @@ TODO:
 		Given I have entered 50 into the calculator
 
 		  @focus
+		  @WIP              @US1.1
 		  Scenario: Add two numbers
 		Given the following numbers added
 				|  number| reason |
@@ -50,6 +46,7 @@ TODO:
  close
 					```
 
+			  @optimal
 			Examples:
 				| number1 | number2 |
 				| 1 | 2|
@@ -68,6 +65,7 @@ TODO:
 		    Given I have entered 50 into the calculator
 
 		@focus
+		@WIP @US1.1
 		Scenario: Add two numbers
 		    Given the following numbers added
 		        | number | reason        |
@@ -86,6 +84,7 @@ TODO:
 		        close
 		        ```
 
+		@optimal
 		Examples:
 		    | number1 | number2 |
 		    | 1       | 2       |
@@ -155,3 +154,7 @@ Scenario: Caret line of feature file is formatted
 		    Given the following numbers added
 		   When   bar
 		"""
+
+Rule: Auto format should not add or remove empty lines
+
+Scenario: Formatting of Descriptions and Comments are not changed

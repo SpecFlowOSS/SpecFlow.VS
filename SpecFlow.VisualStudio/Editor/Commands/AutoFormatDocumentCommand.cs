@@ -87,8 +87,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             if (gherkinDocument.Feature != null)
             {
-                SetTags(lines, gherkinDocument.Feature.Tags);
-                SetLine(lines, gherkinDocument.Feature, $"{gherkinDocument.Feature.Keyword}: {gherkinDocument.Feature.Name}");
+                SetTagsAndLine(lines, gherkinDocument.Feature);
                 SetLinesForChildren(lines, gherkinDocument.Feature.Children, indent, newLine);
             }
         }
@@ -97,31 +96,19 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             foreach (var featureChild in hasLocation)
             {
+                SetTagsAndLine(lines, featureChild);
+
                 if (featureChild is Rule rule)
                 {
-                    SetLine(lines, rule, $"{rule.Keyword}: {rule.Name}");
                     SetLinesForChildren(lines, rule.Children, indent, newLine);
-                }
-
-                if (featureChild is Background background)
-                {
-                    SetLine(lines, background, GetHasDescriptionLine(background));
-                }
-
-                if (featureChild is Scenario scenario)
-                {
-                    SetTags(lines, scenario.Tags);
-                    SetLine(lines, scenario, $"{scenario.Keyword}: {scenario.Name}");
                 }
 
                 if (featureChild is ScenarioOutline scenarioOutline)
                 {
-                    SetTags(lines, scenarioOutline.Tags);
-                    SetLine(lines, scenarioOutline, $"{scenarioOutline.Keyword}: {scenarioOutline.Name}");
                     foreach (var example in scenarioOutline.Examples)
                     {
-                        SetLine(lines, example, GetHasDescriptionLine(example));
-                        FormatTable(lines, example, indent, newLine);
+                        SetTagsAndLine(lines, example);
+                        FormatTable(lines, example, indent);
                     }
                 }
 
@@ -132,14 +119,32 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                         SetLine(lines, step, $"{indent}{step.Keyword}{step.Text}");
                         if (step.Argument is DataTable dataTable)
                         {
-                            FormatTable(lines, dataTable, indent + indent, newLine);
+                            FormatTable(lines, dataTable, indent + indent);
+                        }
+
+                        if (step.Argument is DocString docString)
+                        {
+                            FormatDocString(lines, indent, docString);
                         }
                     }
                 }
             }
         }
 
-        private void FormatTable(string[] lines, IHasRows hasRows, string indent, string newLine)
+        private void SetTagsAndLine(string[] lines, IHasLocation hasLocation)
+        {
+            if (hasLocation is IHasTags hasTags)
+            {
+                SetTags(lines, hasTags.Tags);
+            }
+
+            if (hasLocation is IHasDescription hasDescription)
+            {
+                SetLine(lines, hasLocation, GetHasDescriptionLine(hasDescription));
+            }
+        }
+
+        private void FormatTable(string[] lines, IHasRows hasRows, string indent)
         {
             var widths = AutoFormatTableCommand.GetWidths(hasRows);
             foreach (var row in hasRows.Rows)
@@ -159,6 +164,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }
         }
 
+        private void FormatDocString(string[] lines, string indent, DocString docString)
+        {
+            //todo: implement
+        }
+
         private string GetHasDescriptionLine(IHasDescription hasDescription)
         {
             var line = $"{hasDescription.Keyword}:";
@@ -169,10 +179,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private void SetTags(string[] lines, IEnumerable<Tag> tags)
         {
-            //todo: currently 1 tag 1 line
-            foreach (var tag in tags)
+            var tagGroup = tags.GroupBy(t => t.Location.Line);
+            foreach (var tag in tagGroup)
             {
-                SetLine(lines, tag, $"{tag.Name}");
+                var line = string.Join(" ", tag.Select(t => t.Name));
+                SetLine(lines, tag.Key, line);
             }
         }
 
@@ -181,8 +192,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             if (hasLocation?.Location != null && hasLocation.Location.Line >= 1
                                               && hasLocation.Location.Column - 1 < line.Length)
             {
-                lines[hasLocation.Location.Line - 1] = line;
+                SetLine(lines, hasLocation.Location.Line, line);
             }
+        }
+
+        private void SetLine(string[] lines, int lineNumber, string line)
+        {
+            lines[lineNumber - 1] = line;
         }
     }
 }
