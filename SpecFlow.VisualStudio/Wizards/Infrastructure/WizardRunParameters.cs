@@ -8,12 +8,13 @@ namespace SpecFlow.VisualStudio.Wizards.Infrastructure
     {
         public const string CustomToolSettingKey = "$customtool$";
         public const string BuildActionKey = "$buildaction$";
+        public const string CopyToOutputDirectoryKey = "$copytooutputdir$";
 
         public bool IsAddNewItem { get; }
         public IProjectScope ProjectScope { get; }
         public string TemplateFolder { get; }
         public string TargetFolder { get; }
-        public string TargetFileName { get; }
+        public string TargetFileName { get; set; }
         public Dictionary<string, string> ReplacementsDictionary { get; }
 
         public IMonitoringService MonitoringService => ProjectScope.IdeScope.MonitoringService;

@@ -145,6 +145,24 @@ namespace SpecFlow.VisualStudio.Wizards.Infrastructure
                 Logger?.LogVerbose($"Set build action to '{buildActionSetting}' for {projectItem.Name}");
                 projectItem.Properties.Item("ItemType").Value = buildActionSetting;
             }
+
+            if (_wizardRunParameters.ReplacementsDictionary.TryGetValue(WizardRunParameters.CopyToOutputDirectoryKey, out var copyToOutputDirectory))
+            {
+                Logger?.LogVerbose($"Set copy to output directory to '{copyToOutputDirectory}' for {projectItem.Name}");
+                switch (copyToOutputDirectory)
+                {
+                    case "Never":
+                        projectItem.Properties.Item("CopyToOutputDirectory").Value = (uint)0;
+                        break;
+                    case "Always":
+                        projectItem.Properties.Item("CopyToOutputDirectory").Value = (uint)1;
+                        break;
+                    case "PreserveNewest":
+                        projectItem.Properties.Item("CopyToOutputDirectory").Value = (uint)2;
+                        break;
+                }
+                
+            }
         }
 
         public virtual void BeforeOpeningFile(ProjectItem projectItem)
