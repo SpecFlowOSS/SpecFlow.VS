@@ -58,17 +58,17 @@ namespace SpecFlow.VisualStudio.Discovery
 
         private static IEnumerable<IGherkinDocumentContext> GetBackgroundContexts(IGherkinDocumentContext context)
         {
-            var featureContext = context.GetParentOf<Feature>();
-            if (!(featureContext?.Node is Feature feature))
+            var featureOrRuleContext = context.GetParentOf<IHasChildren>();
+            if (!(featureOrRuleContext?.Node is IHasChildren featureOrRule))
                 yield break;
 
-            var scenarioDefinitions = feature.FlattenScenarioDefinitions().ToArray();
+            var scenarioDefinitions = featureOrRule.FlattenScenarioDefinitions().ToArray();
             if (!scenarioDefinitions.Any()) // if there are no scenarios yet, we use the feature context for matching
-                yield return featureContext;
+                yield return featureOrRuleContext;
 
             foreach (var scenarioDefinition in scenarioDefinitions)
             {
-                var subContext = new TagMatchingContext(featureContext, scenarioDefinition);
+                var subContext = new TagMatchingContext(featureOrRuleContext, scenarioDefinition);
                 yield return subContext;
                 if (scenarioDefinition is ScenarioOutline scenarioOutline) // create scopes for tagged example sets
                 {

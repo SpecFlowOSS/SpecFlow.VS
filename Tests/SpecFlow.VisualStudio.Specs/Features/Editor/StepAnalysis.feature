@@ -277,29 +277,31 @@ Scenario: Matches combination scoped step definitions
 Scenario: Analyses all scopes of background steps
 	Given there is a SpecFlow project scope
 	And the following step definitions in the project:
-		| type  | regex                      | tag scope |
-		| Given | I use mytag scoped step    | @mytag    |
-		| Given | I use othertag scoped step | @othertag |
-		| When  | I use a normal step        |           |
+		| type  | regex                         | tag scope    |
+		| Given | I use scenariotag scoped step | @scenariotag |
+		| Given | I use ruletag scoped step     | @ruletag     |
+		| Given | I use othertag scoped step    | @othertag    |
+		| When  | I use a normal step           |              |
 	When the following feature file is opened in the editor
 		"""
 		Feature: Addition
 
 		Background: 
-			Given I use mytag scoped step
+			Given I use scenariotag scoped step
 			Given I use othertag scoped step
 
-		@mytag
+		@scenariotag
 		Scenario: Tagged scenario
 			When I use a normal step
 
-		@mytag
+		@ruletag
 		Rule: Sample rule
 
 		Background: 
-			Given I use mytag scoped step
+			Given I use ruletag scoped step
 			Given I use othertag scoped step
 
+		@scenariotag
 		Scenario: Scenario in tagged rule
 			When I use a normal step
 		"""
@@ -309,20 +311,21 @@ Scenario: Analyses all scopes of background steps
 		Feature: Addition
 
 		Background: 
-			Given {DefinedStep}I use mytag scoped step{/DefinedStep}
+			Given {DefinedStep}I use scenariotag scoped step{/DefinedStep}
 			Given {UndefinedStep}I use othertag scoped step{/UndefinedStep}
 
-		@mytag
+		@scenariotag
 		Scenario: Tagged scenario
 			When {DefinedStep}I use a normal step{/DefinedStep}
 
-		@mytag
+		@ruletag
 		Rule: Sample rule
 
 		Background: 
-			Given {DefinedStep}I use mytag scoped step{/DefinedStep}
+			Given {DefinedStep}I use ruletag scoped step{/DefinedStep}
 			Given {UndefinedStep}I use othertag scoped step{/UndefinedStep}
 
+		@scenariotag
 		Scenario: Scenario in tagged rule
 			When {DefinedStep}I use a normal step{/DefinedStep}
 		"""

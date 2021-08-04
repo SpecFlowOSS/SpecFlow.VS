@@ -394,16 +394,21 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             var tags = GetDeveroomTags(_wpfTextView).Where(t => keywordTypes.Contains(t.Type)).ToArray();
             var testTextSections = expectedContentText.Sections.Where(s => keywordTypes.Contains(s.Label)).ToArray();
             testTextSections.Should().NotBeEmpty("there should be something to expect");
+            var matchedTags = tags.ToList();
             foreach (var section in testTextSections)
             {
-                tags.Should().Contain(t =>
+                var matchedTag = tags.FirstOrDefault(
+                    t =>
                         t.Type == section.Label &&
-                        t.Span.Start == expectedContentText.GetSnapshotPoint(t.Span.Snapshot, section.Start.Line, section.Start.Column) &&
-                        t.Span.End == expectedContentText.GetSnapshotPoint(t.Span.Snapshot, section.End.Line, section.End.Column),
-                    $"the section '{section}' should be highlighted"
+                        t.Span.Start == expectedContentText.GetSnapshotPoint(t.Span.Snapshot, section.Start.Line,
+                            section.Start.Column) &&
+                        t.Span.End ==
+                        expectedContentText.GetSnapshotPoint(t.Span.Snapshot, section.End.Line, section.End.Column)
                 );
+                matchedTag.Should().NotBeNull($"the section '{section}' should be highlighted");
+                matchedTags.Remove(matchedTag);
             }
-            tags.Should().HaveCount(testTextSections.Length);
+            matchedTags.Should().BeEmpty();
         }
 
         [Then(@"no binding error should be highlighted")]

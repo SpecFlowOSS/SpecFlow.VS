@@ -11,9 +11,9 @@ namespace SpecFlow.VisualStudio.Editor.Services.Parser
         public static IEnumerable<StepsContainer> StepsContainers(this IHasChildren container)
             => container.Children.OfType<StepsContainer>();
 
-        public static IEnumerable<StepsContainer> FlattenStepsContainers(this Feature feature)
+        public static IEnumerable<StepsContainer> FlattenStepsContainers(this IHasChildren featureOrRule)
         {
-            foreach (var featureChild in feature.Children)
+            foreach (var featureChild in featureOrRule.Children)
             {
                 if (featureChild is StepsContainer stepsContainer)
                     yield return stepsContainer;
@@ -28,8 +28,8 @@ namespace SpecFlow.VisualStudio.Editor.Services.Parser
         public static IEnumerable<Scenario> ScenarioDefinitions(this IHasChildren container)
             => container.Children.OfType<Scenario>();
 
-        public static IEnumerable<Scenario> FlattenScenarioDefinitions(this Feature feature)
-            => feature.FlattenStepsContainers().OfType<Scenario>();
+        public static IEnumerable<Scenario> FlattenScenarioDefinitions(this IHasChildren featureOrRule)
+            => featureOrRule.FlattenStepsContainers().OfType<Scenario>();
 
         public static IEnumerable<Rule> Rules(this Feature feature)
             => feature.Children.OfType<Rule>();
