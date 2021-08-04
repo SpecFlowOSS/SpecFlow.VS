@@ -1,13 +1,69 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
+
+  /*
+
+  Changelog:
+
+  1.0
+  - Initial SpecFlow configuration schema containing SpecFlow v3.9 settings and IDE settings
+    //TODO: add generator
+    //TODO: add runtime
+    //TODO: add trace
+  
+  */
+
   "type": "object",
-  "additionalProperties": false,
+  "additionalProperties": true,
   "properties": {
-    "specFlow": {
-      "$ref": "#/definitions/SpecFlow"
+    "language": {
+      "description": "TODO: description for language",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "feature": {
+          "description": "TODO: description for language/feature",
+          "type": "string"
+        }
+      }
     },
-    "traceability": {
-      "$ref": "#/definitions/Traceability"
+    "bindingCulture": {
+      "description": "TODO: description for bindingCulture",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "description": "TODO: description for bindingCulture/name",
+          "type": "string"
+        }
+      }
+    },
+    "stepAssemblies": {
+      "description": "TODO: description for stepAssemblies",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "assembly": {
+            "description": "TODO: description for stepAssemblies[]/assembly",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ide": {
+      "description": "TODO: description for ide",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "specFlow": {
+          "$ref": "#/definitions/SpecFlow"
+        },
+        "traceability": {
+          "$ref": "#/definitions/Traceability"
+        }
+      }
     },
     "$schema": {
       "type": "string"

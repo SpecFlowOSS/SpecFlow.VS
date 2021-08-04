@@ -1,0 +1,13 @@
+{
+  "$schema": "specflow-config-1.0.json",
+
+  "ide": {
+    "specFlow": {
+      "isSpecFlowProject": true,
+      "generatorFolder": "..\\MyDependencies\\SpecFlow.2.3.0\\tools",
+      "traits": [
+        "DesignTimeFeatureFileGeneration"
+      ]
+    }
+  }
+}
