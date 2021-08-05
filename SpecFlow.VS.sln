@@ -88,6 +88,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.UI.Tester", "Tests\SpecFlow.VisualStudio.UI.Tester\SpecFlow.VisualStudio.UI.Tester.csproj", "{2A412F65-68C7-4A5D-AFCF-74E928C40C21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpecFlow.VisualStudio.ProjectTemplate", "SpecFlow.VisualStudio.ProjectTemplate\SpecFlow.VisualStudio.ProjectTemplate.csproj", "{8C5AE61C-F325-436C-B851-CA60944BD276}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		SpecFlow.VisualStudio.Common\SpecFlow.VisualStudio.Common.projitems*{0ca5992a-e95e-472f-90cf-36be75a6cede}*SharedItemsImports = 13
@@ -268,6 +270,12 @@ Global
 		{2A412F65-68C7-4A5D-AFCF-74E928C40C21}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2A412F65-68C7-4A5D-AFCF-74E928C40C21}.TestDebug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2A412F65-68C7-4A5D-AFCF-74E928C40C21}.TestDebug|Any CPU.Build.0 = Debug|Any CPU
+		{8C5AE61C-F325-436C-B851-CA60944BD276}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C5AE61C-F325-436C-B851-CA60944BD276}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C5AE61C-F325-436C-B851-CA60944BD276}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C5AE61C-F325-436C-B851-CA60944BD276}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C5AE61C-F325-436C-B851-CA60944BD276}.TestDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C5AE61C-F325-436C-B851-CA60944BD276}.TestDebug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
