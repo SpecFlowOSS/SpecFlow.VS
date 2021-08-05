@@ -5,7 +5,7 @@
     <Name>SpecFlow configuration file</Name>
     <Description>A json file containing SpecFlow configuration settings. Place it in the project root.</Description>
     <ProjectType>CSharp</ProjectType>
-    <Icon>Deveroom-Icon.ico</Icon>
+    <Icon>SpecFlowIcon.ico</Icon>
   </TemplateData>
   <TemplateContent>
     <ProjectItem SubType="" TargetFileName="specflow.json" ReplaceParameters="true">specflow.json</ProjectItem>

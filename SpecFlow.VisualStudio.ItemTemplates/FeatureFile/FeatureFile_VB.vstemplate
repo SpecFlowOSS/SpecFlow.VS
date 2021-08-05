@@ -3,10 +3,10 @@
     <DefaultName>Feature.feature</DefaultName>
     <Name>Feature File for SpecFlow</Name>
     <Description>A feature file containing executable specification in a form of BDD Gherkin scenarios.</Description>
-    <ProjectType>CSharp</ProjectType>
+    <ProjectType>VisualBasic</ProjectType>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
     <SortOrder>10</SortOrder>
-    <Icon>FeatureFileIcon.ico</Icon>
+    <Icon>SpecFlowIcon.ico</Icon>
   </TemplateData>
   <TemplateContent>
     <ProjectItem SubType="" TargetFileName="$fileinputname$.feature" ReplaceParameters="true">Feature1.feature</ProjectItem>

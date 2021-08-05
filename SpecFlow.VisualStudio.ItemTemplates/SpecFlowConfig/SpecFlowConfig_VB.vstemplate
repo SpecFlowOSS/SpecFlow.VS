@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <DefaultName>specflow.json</DefaultName>
+    <Name>SpecFlow configuration file</Name>
+    <Description>A json file containing SpecFlow configuration settings. Place it in the project root.</Description>
+    <ProjectType>VisualBasic</ProjectType>
+    <Icon>SpecFlowIcon.ico</Icon>
+  </TemplateData>
+  <TemplateContent>
+    <ProjectItem SubType="" TargetFileName="specflow.json" ReplaceParameters="true">specflow.json</ProjectItem>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>SpecFlow.VisualStudio.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c392b06fa519a0e0</Assembly>
+    <FullClassName>SpecFlow.VisualStudio.Wizards.VsSpecFlowConfigFileWizard</FullClassName>
+  </WizardExtension>
+</VSTemplate>
