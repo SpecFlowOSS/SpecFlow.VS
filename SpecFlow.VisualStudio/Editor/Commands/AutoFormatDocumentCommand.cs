@@ -167,7 +167,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         private void FormatDocString(string[] lines, string indent, DocString docString, string newLine)
         {
             var docStringStartLine = docString.Location.Line;
-            var docStringContentLines = docString.Content.Split(new[] { newLine }, StringSplitOptions.None);
+            var docStringContentLines = DeveroomTagParser.NewLineRe.Split(docString.Content);
             var docStringEndLine = docStringStartLine + docStringContentLines.Length + 1;
             var delimiterLine = $"{indent + indent}{docString.Delimiter}";
 

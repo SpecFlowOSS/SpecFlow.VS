@@ -280,7 +280,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
             return blockTag;
         }
 
-        private static readonly Regex NewLineRe = new Regex(@"(\r\n|\n|\r)");
+        internal static readonly Regex NewLineRe = new Regex(@"\r\n|\n|\r");
         private int CountLines(string text) =>
             NewLineRe.Matches(text).Count + 1;
 
