@@ -60,6 +60,9 @@ namespace SpecFlow.VisualStudio.UI
             if ((object)viewModel is WhatsNewDialogViewModel whatsNewDialogViewModel)
                 return new WelcomeDialog(whatsNewDialogViewModel, _vsUiShell);
 
+            if ((object)viewModel is AddNewSpecFlowProjectViewModel addNewSpecFlowProjectViewModel)
+                return new AddNewSpecFlowProjectDialog(addNewSpecFlowProjectViewModel, _vsUiShell);
+
             throw new NotSupportedException(typeof(TViewModel).ToString());
         }
     }

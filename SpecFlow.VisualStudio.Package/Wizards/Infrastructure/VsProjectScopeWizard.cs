@@ -32,28 +32,43 @@ namespace SpecFlow.VisualStudio.Wizards.Infrastructure
             if (dte == null)
                 return;
 
-            var project = GetActiveProject(dte);
-            if (project == null)
-                return;
+            Project project = null;
+            IProjectScope projectScope = null; 
+            IIdeScope ideScope = null; 
+            string targetFolder = null;
+            string targetFileName = null;
 
-            var projectScope = GetProjectScope(project);
-            if (projectScope == null)
-                return;
+            if (isAddNewItem)
+            {
+                project = GetActiveProject(dte);
+                if (project == null)
+                    return;
+
+                projectScope = GetProjectScope(project);
+                if (projectScope == null)
+                    return;
+                
+                ideScope = projectScope.IdeScope;
+                targetFolder = GetTargetFolder(project);
+                targetFileName = replacementsDictionary["$rootname$"];
+            }
+            else
+            {
+                ideScope = VsUtils.SafeResolveMefDependency<IIdeScope>(dte);
+                if (ideScope == null)
+                    return;
+            }
 
             var templateFolder = GetTemplateFolder(customParams);
             if (templateFolder == null)
                 return;
 
-            string targetFolder = null;
-            if (isAddNewItem) 
-                targetFolder = GetTargetFolder(project);
-
             _wizard = ResolveWizard(dte);
             if (_wizard == null)
                 return;
-
-            _wizardRunParameters = new WizardRunParameters(isAddNewItem, projectScope, templateFolder, targetFolder,
-                replacementsDictionary["$rootname$"], replacementsDictionary);
+            
+            _wizardRunParameters = new WizardRunParameters(isAddNewItem, projectScope, ideScope, templateFolder, targetFolder,
+                targetFileName, replacementsDictionary);
             _project = project;
 
             _isValidRun = RunStarted(project, _wizardRunParameters, _wizard);

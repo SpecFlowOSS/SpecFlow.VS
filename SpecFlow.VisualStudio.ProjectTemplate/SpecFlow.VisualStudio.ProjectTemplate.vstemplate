@@ -24,4 +24,8 @@
       <ProjectItem ReplaceParameters="true">StepDefinitions\CalculatorStepDefinitions.cs</ProjectItem>
     </Project>
   </TemplateContent>
+  <WizardExtension>
+    <Assembly>SpecFlow.VisualStudio.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c392b06fa519a0e0</Assembly>
+    <FullClassName>SpecFlow.VisualStudio.Wizards.VsSpecFlowProjectWizard</FullClassName>
+  </WizardExtension>
 </VSTemplate>

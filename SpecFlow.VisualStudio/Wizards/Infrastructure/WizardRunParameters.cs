@@ -12,6 +12,7 @@ namespace SpecFlow.VisualStudio.Wizards.Infrastructure
 
         public bool IsAddNewItem { get; }
         public IProjectScope ProjectScope { get; }
+        public IIdeScope IdeScope { get; }
         public string TemplateFolder { get; }
         public string TargetFolder { get; }
         public string TargetFileName { get; set; }
@@ -19,10 +20,11 @@ namespace SpecFlow.VisualStudio.Wizards.Infrastructure
 
         public IMonitoringService MonitoringService => ProjectScope.IdeScope.MonitoringService;
 
-        public WizardRunParameters(bool isAddNewItem, IProjectScope projectScope, string templateFolder, string targetFolder, string targetFileName, Dictionary<string, string> replacementsDictionary)
+        public WizardRunParameters(bool isAddNewItem, IProjectScope projectScope, IIdeScope ideScope, string templateFolder, string targetFolder, string targetFileName, Dictionary<string, string> replacementsDictionary)
         {
             IsAddNewItem = isAddNewItem;
             ProjectScope = projectScope;
+            IdeScope = ideScope;
             TemplateFolder = templateFolder;
             TargetFolder = targetFolder;
             TargetFileName = targetFileName;
