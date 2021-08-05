@@ -24,7 +24,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.UI", "SpecFlow.VisualStudio.UI\SpecFlow.VisualStudio.UI.csproj", "{AD1186D6-A3AD-4425-A447-12D7E1C342D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveroom.VisualStudio.ItemTemplates", "Deveroom.VisualStudio.ItemTemplates\Deveroom.VisualStudio.ItemTemplates.csproj", "{05D08F34-A49E-4F4C-A896-F5FDE3A9263A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.ItemTemplates", "SpecFlow.VisualStudio.ItemTemplates\SpecFlow.VisualStudio.ItemTemplates.csproj", "{05D08F34-A49E-4F4C-A896-F5FDE3A9263A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.V2", "Connectors\SpecFlow.VisualStudio.SpecFlowConnector.V2\SpecFlow.VisualStudio.SpecFlowConnector.V2.csproj", "{4A884C12-01D7-4519-A510-3493BE910988}"
 EndProject
