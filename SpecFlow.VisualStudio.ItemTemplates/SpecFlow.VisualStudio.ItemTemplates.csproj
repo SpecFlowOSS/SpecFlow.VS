@@ -17,10 +17,10 @@
 
   <ItemGroup>
     <VSTemplate Include="SpecFlowConfig_CSharp\SpecFlowConfig_CSharp.vstemplate">
-      <OutputSubPath>Deveroom</OutputSubPath>
+      <OutputSubPath>SpecFlow</OutputSubPath>
     </VSTemplate>
     <VSTemplate Include="FeatureFile_CSharp\FeatureFile_CSharp.vstemplate">
-      <OutputSubPath>Deveroom</OutputSubPath>
+      <OutputSubPath>SpecFlow</OutputSubPath>
     </VSTemplate>
   </ItemGroup>
 
