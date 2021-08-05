@@ -40,7 +40,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         public override bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs = default(IntPtr))
         {
-            //MonitoringService.MonitorCommandCommentUncomment();
+            //MonitoringService.MonitorAutoFormatDocument();
 
             var documentTag = GetDeveroomTagForCaret(textView, DeveroomTagTypes.Document);
             if (!(documentTag?.Data is DeveroomGherkinDocument gherkinDocument))
@@ -55,6 +55,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             
             if (isSelectionFormatting)
             {
+                //MonitoringService.MonitorAutoFormatSelection();
+
                 var selectionSpan = GetSelectionSpan(textView);
                 startLine = selectionSpan.Start.GetContainingLine().LineNumber;
                 endLine = selectionSpan.End.GetContainingLine().LineNumber;
