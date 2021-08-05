@@ -124,7 +124,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
                         if (step.Argument is DocString docString)
                         {
-                            FormatDocString(lines, indent, docString);
+                            FormatDocString(lines, indent, docString, newLine);
                         }
                     }
                 }
@@ -164,9 +164,21 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }
         }
 
-        private void FormatDocString(string[] lines, string indent, DocString docString)
+        private void FormatDocString(string[] lines, string indent, DocString docString, string newLine)
         {
-            //todo: implement
+            var docStringStartLine = docString.Location.Line;
+            var docStringContentLines = docString.Content.Split(new[] { newLine }, StringSplitOptions.None);
+            var docStringEndLine = docStringStartLine + docStringContentLines.Length + 1;
+            var delimiterLine = $"{indent + indent}{docString.Delimiter}";
+
+            SetLine(lines, docStringStartLine, delimiterLine);
+            var docStringRow = 1;
+            foreach (var contentLine in docStringContentLines)
+            {
+                var line = $"{indent + indent}{contentLine}";
+                SetLine(lines, docStringStartLine + docStringRow++, line);
+            }
+            SetLine(lines, docStringEndLine, delimiterLine);
         }
 
         private string GetHasDescriptionLine(IHasDescription hasDescription)

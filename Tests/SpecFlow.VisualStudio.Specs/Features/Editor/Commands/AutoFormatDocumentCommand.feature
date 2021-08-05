@@ -1,5 +1,4 @@
-﻿@focus
-Feature: Auto format document command	
+﻿Feature: Auto format document command	
 
 Rules:
 
@@ -13,8 +12,6 @@ Rules:
 Rule: Feature file can be formatted with useful defaults
 
 Scenario: Misformatted feature file is cleaned up
-TODO: 
-- DocString ? -> ```
 
 	Given there is a SpecFlow project scope
 	And the following feature file in the editor
@@ -43,6 +40,7 @@ TODO:
 					```
 					1+2
 					  3
+
  close
 					```
 
@@ -81,6 +79,7 @@ TODO:
 		        ```
 		        1+2
 		          3
+		        
 		        close
 		        ```
 
@@ -158,3 +157,28 @@ Scenario: Caret line of feature file is formatted
 Rule: Auto format should not add or remove empty lines
 
 Scenario: Formatting of Descriptions and Comments are not changed
+
+	Given there is a SpecFlow project scope
+	And the following feature file in the editor
+		"""
+		Feature: Addition
+			this is an indented description
+
+		#not working since 2000
+		Scenario: Add two numbers
+		  Todo: handle negative numbers
+
+		    Given I have entered 50 into the calculator
+		"""
+	When I invoke the "Auto Format Document" command
+	Then the editor should be updated to
+		"""
+		Feature: Addition
+			this is an indented description
+
+		#not working since 2000
+		Scenario: Add two numbers
+		  Todo: handle negative numbers
+
+		    Given I have entered 50 into the calculator
+		"""
