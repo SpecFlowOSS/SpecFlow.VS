@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.Annotations;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Monitoring;
 using EnvDTE;
 using Microsoft.VisualStudio.TemplateWizard;

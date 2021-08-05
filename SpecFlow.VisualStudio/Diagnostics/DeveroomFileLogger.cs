@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace SpecFlow.VisualStudio.Diagonostics
+namespace SpecFlow.VisualStudio.Diagnostics
 {
     public class DeveroomFileLogger : IDeveroomLogger
     {

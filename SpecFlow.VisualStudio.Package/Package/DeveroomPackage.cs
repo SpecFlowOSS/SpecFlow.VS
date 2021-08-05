@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Threading;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Generator;
 using SpecFlow.VisualStudio.ProjectSystem;
 using Microsoft.VisualStudio;

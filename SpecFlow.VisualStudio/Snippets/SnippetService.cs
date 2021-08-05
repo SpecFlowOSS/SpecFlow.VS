@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Configuration;

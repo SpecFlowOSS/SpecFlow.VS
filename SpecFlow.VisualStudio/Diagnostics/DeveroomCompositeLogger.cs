@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace SpecFlow.VisualStudio.Diagonostics
+namespace SpecFlow.VisualStudio.Diagnostics
 {
     public class DeveroomCompositeLogger : IDeveroomLogger, IEnumerable<IDeveroomLogger>
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using EnvDTE;
 
 namespace SpecFlow.VisualStudio.Wizards.Infrastructure

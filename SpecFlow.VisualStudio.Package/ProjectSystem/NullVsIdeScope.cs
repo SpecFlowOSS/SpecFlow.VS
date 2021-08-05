@@ -2,7 +2,7 @@
 using System.IO.Abstractions;
 using System.Threading;
 using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;

@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using SpecFlow.VisualStudio.Annotations;
 using SpecFlow.VisualStudio.Configuration;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Monitoring;
 using Newtonsoft.Json.Linq;
 

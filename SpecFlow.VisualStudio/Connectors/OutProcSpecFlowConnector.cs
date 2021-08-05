@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using SpecFlow.VisualStudio.Configuration;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.SpecFlowConnector;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;

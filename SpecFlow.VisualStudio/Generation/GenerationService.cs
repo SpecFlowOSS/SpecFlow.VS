@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using SpecFlow.VisualStudio.Connectors;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Configuration;

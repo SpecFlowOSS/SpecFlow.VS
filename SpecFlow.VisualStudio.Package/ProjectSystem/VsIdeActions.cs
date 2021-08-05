@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Controls;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using SpecFlow.VisualStudio.UI;

@@ -16,7 +16,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         public const string DataTableHeader = "deveroom.data_table_header";
 
         public const string UndefinedStep = "deveroom.undefined_step";
-        public const string StepPatameter = "deveroom.step_parameter";
+        public const string StepParameter = "deveroom.step_parameter";
         public const string ScenarioOutlinePlaceholder = "deveroom.scenario_outline_placeholder";
 
         // This disables "The field is never used" compiler's warning. Justification: the field is used by MEF.
@@ -188,13 +188,13 @@ namespace SpecFlow.VisualStudio.Editor.Classification
 
 
         [Export]
-        [Name(StepPatameter)]
+        [Name(StepParameter)]
         [BaseDefinition("string")]
         private static ClassificationTypeDefinition _stepParameterClassificationTypeDefinition;
 
         [Export(typeof(EditorFormatDefinition))]
-        [ClassificationType(ClassificationTypeNames = StepPatameter)]
-        [Name(StepPatameter)]
+        [ClassificationType(ClassificationTypeNames = StepParameter)]
+        [Name(StepParameter)]
         [UserVisible(true)]
         [Order(Before = Priority.Default)]
         internal sealed class GherkinStepParameterClassificationFormat : ClassificationFormatDefinition

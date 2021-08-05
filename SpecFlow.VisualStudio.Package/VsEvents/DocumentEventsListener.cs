@@ -1,5 +1,5 @@
 ﻿using System;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using EnvDTE;
 
 namespace SpecFlow.VisualStudio.VsEvents

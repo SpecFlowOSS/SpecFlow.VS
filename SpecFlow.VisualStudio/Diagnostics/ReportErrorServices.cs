@@ -4,7 +4,7 @@ using System.Linq;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.UI.ViewModels;
 
-namespace SpecFlow.VisualStudio.Diagonostics
+namespace SpecFlow.VisualStudio.Diagnostics
 {
     public static class ReportErrorServices
     {

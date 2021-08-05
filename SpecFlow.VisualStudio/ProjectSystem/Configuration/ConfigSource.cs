@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO.Abstractions;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 
 namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
 {

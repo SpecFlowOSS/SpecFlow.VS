@@ -19,7 +19,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
             { DeveroomTagTypes.DocString, DeveroomClassifications.DocString },
             { DeveroomTagTypes.DataTable, DeveroomClassifications.DataTable },
             { DeveroomTagTypes.UndefinedStep, DeveroomClassifications.UndefinedStep },
-            { DeveroomTagTypes.StepParameter, DeveroomClassifications.StepPatameter },
+            { DeveroomTagTypes.StepParameter, DeveroomClassifications.StepParameter },
             { DeveroomTagTypes.ScenarioOutlinePlaceholder, DeveroomClassifications.ScenarioOutlinePlaceholder },
             { DeveroomTagTypes.DataTableHeader, DeveroomClassifications.DataTableHeader },
         };

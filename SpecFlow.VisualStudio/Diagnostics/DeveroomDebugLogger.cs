@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 
-namespace SpecFlow.VisualStudio.Diagonostics
+namespace SpecFlow.VisualStudio.Diagnostics
 {
     public class DeveroomDebugLogger : IDeveroomLogger
     {

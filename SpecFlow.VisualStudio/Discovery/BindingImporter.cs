@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery.TagExpressions;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;

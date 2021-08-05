@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.ProjectSystem;
 
 namespace SpecFlow.VisualStudio.Diagnostics

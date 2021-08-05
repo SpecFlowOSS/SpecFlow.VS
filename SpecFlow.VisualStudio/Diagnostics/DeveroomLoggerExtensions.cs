@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SpecFlow.VisualStudio.Monitoring;
 
-namespace SpecFlow.VisualStudio.Diagonostics
+namespace SpecFlow.VisualStudio.Diagnostics
 {
     public static class DeveroomLoggerExtensions
     {

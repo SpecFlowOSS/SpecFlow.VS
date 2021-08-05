@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
 using SpecFlow.VisualStudio.Common;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Generation;
 using SpecFlow.VisualStudio.ProjectSystem;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 
 namespace SpecFlow.VisualStudio.UI.ViewModels
 {

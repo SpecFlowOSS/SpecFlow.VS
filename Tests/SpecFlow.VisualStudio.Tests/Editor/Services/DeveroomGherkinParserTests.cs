@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using SpecFlow.VisualStudio.Diagonostics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
 using SpecFlow.VisualStudio.Monitoring;
 using FluentAssertions;
