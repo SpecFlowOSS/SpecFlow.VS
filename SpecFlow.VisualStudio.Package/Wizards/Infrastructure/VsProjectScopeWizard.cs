@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.Annotations;
 using SpecFlow.VisualStudio.Diagnostics;
@@ -71,7 +72,24 @@ namespace SpecFlow.VisualStudio.Wizards.Infrastructure
                 targetFileName, replacementsDictionary);
             _project = project;
 
-            _isValidRun = RunStarted(project, _wizardRunParameters, _wizard);
+            try
+            {
+                _isValidRun = RunStarted(project, _wizardRunParameters, _wizard);
+            }
+            catch (Exception ex)
+            {
+                ideScope.Actions.ShowError("Error during project generation", ex);
+                _isValidRun = false;
+            }
+
+            if (!_isValidRun && !isAddNewItem)
+            {
+                var projectDirectory = _wizardRunParameters.ReplacementsDictionary["$destinationdirectory$"];
+                var solutionDirectory = _wizardRunParameters.ReplacementsDictionary["$solutiondirectory$"];
+
+                CleanupProjectFiles(projectDirectory, solutionDirectory);
+                throw new WizardBackoutException();
+            }
         }
 
         protected virtual bool RunStarted(Project project, WizardRunParameters wizardRunParameters, TWizard wizard)
@@ -191,6 +209,21 @@ namespace SpecFlow.VisualStudio.Wizards.Infrastructure
             _wizardRunParameters = null;
             _isValidRun = false;
             _project = null;
+        }
+
+        private void CleanupProjectFiles(string projectDirectory, string solutionDirectory)
+        {
+            if (Directory.Exists(projectDirectory))
+            {
+                Directory.Delete(projectDirectory, true);
+            }
+
+            if (projectDirectory != solutionDirectory &&
+                Directory.Exists(solutionDirectory) &&
+                !Directory.EnumerateFileSystemEntries(solutionDirectory).Any())
+            {
+                Directory.Delete(solutionDirectory);
+            }
         }
     }
 }

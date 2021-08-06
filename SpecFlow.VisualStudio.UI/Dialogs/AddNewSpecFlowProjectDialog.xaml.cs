@@ -34,5 +34,11 @@ namespace SpecFlow.VisualStudio.UI.Dialogs
             ViewModel = viewModel;
             InitializeComponent();
         }
+
+        private void CreateButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+            Close();
+        }
     }
 }

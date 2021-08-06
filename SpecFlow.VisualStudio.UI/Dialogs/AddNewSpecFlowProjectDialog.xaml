@@ -90,7 +90,7 @@
 
                 <StackPanel Grid.Row="0" Grid.Column="0">
                     <Label Margin="0,16,0,10" Padding="0,0,0,0">Framework</Label>
-                    <ComboBox x:Name="DotNetFrameworkComboBox" SelectedValuePath="Tag" IsEditable="True" IsReadOnly="True" Margin="0,0,0,0" Padding="8,8,8,8">
+                    <ComboBox x:Name="DotNetFrameworkComboBox" SelectedValuePath="Tag" IsEditable="True" IsReadOnly="True" Margin="0,0,0,0" Padding="8,8,8,8" SelectedValue="{Binding DotNetFramework}" IsSynchronizedWithCurrentItem="True">
                         <ComboBoxItem Tag="netcoreapp2.1">.NET Core 2.1</ComboBoxItem>
                         <ComboBoxItem Tag="netcoreapp3.1" IsSelected="True">.NET Core 3.1</ComboBoxItem>
                         <ComboBoxItem Tag="net5.0">.NET 5.0</ComboBoxItem>
@@ -105,7 +105,7 @@
 
                 <StackPanel Grid.Row="1" Grid.Column="0">
                     <Label Margin="0,16,0,10" Padding="0,0,0,0">Test Framework</Label>
-                    <ComboBox x:Name="UnitTestFrameworkComboBox" SelectedValuePath="Tag" IsEditable="True" IsReadOnly="True" Margin="0,0,0,0" Padding="8,8,8,8" SelectedItem="{Binding UnitTestFramework}" >
+                    <ComboBox x:Name="UnitTestFrameworkComboBox" SelectedValuePath="Tag" IsEditable="True" IsReadOnly="True" Margin="0,0,0,0" Padding="8,8,8,8" SelectedValue="{Binding UnitTestFramework}" IsSynchronizedWithCurrentItem="True">
                         <ComboBoxItem Tag="runner" IsSelected="True">SpecFlow+ Runner</ComboBoxItem>
                         <ComboBoxItem Tag="xunit">xUnit</ComboBoxItem>
                         <ComboBoxItem Tag="nunit">NUnit</ComboBoxItem>
@@ -128,7 +128,7 @@
                 </Grid.RowDefinitions>
 
                 <Button Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" MinWidth="90" MinHeight="28" x:Name="BackButton" Content="Back" Margin="0,0,8,0" Padding="13,5.5,13,5.5" IsCancel="True" />
-                <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" MinWidth="90" MinHeight="28" x:Name="CreateButton" Content="Create" Margin="0,0,0,0" Padding="13,5.5,13,5.5" IsDefault="True" />
+                <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" MinWidth="90" MinHeight="28" x:Name="CreateButton" Content="Create" Margin="0,0,0,0" Padding="13,5.5,13,5.5" IsDefault="True" Click="CreateButton_Click" />
             </Grid>
         </Grid>
     </DockPanel>
