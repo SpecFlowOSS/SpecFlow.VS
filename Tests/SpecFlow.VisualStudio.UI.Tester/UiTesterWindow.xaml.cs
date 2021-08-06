@@ -76,5 +76,12 @@ namespace SpecFlow.VisualStudio.UI.Tester
             var dialog = new WelcomeDialog(viewModel);
             dialog.ShowDialog();
         }
+
+        private void Test_ProjectTemplateWizard(object sender, RoutedEventArgs e)
+        {
+            var viewModel = AddNewSpecFlowProjectViewModel.DesignData;
+            var dialog = new AddNewSpecFlowProjectDialog(viewModel);
+            dialog.ShowDialog();
+        }
     }
 }

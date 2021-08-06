@@ -11,6 +11,44 @@
             <Setter Property="Background" Value="#ECECF0" />
             <Setter Property="BorderBrush" Value="#ACACAC" />
         </Style.Setters>
+    </Style>    
+    <Style x:Key="VsWizardButton" TargetType="{x:Type Button}">
+        <Style.Setters>
+            <Setter Property="Padding" Value="13,5.5,13,5.5" />
+            <Setter Property="MinWidth" Value="90" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Height" Value="23" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Background" Value="#ECECF0" />
+            <Setter Property="BorderBrush" Value="#ACACAC" />
+        </Style.Setters>
+    </Style>
+    <Style x:Key="VsCloseButton" TargetType="{x:Type Button}">
+        <Style.Setters>
+            <!--<Setter Property="Foreground" Value="{DynamicResource {x:Static platformUi:EnvironmentColors.SystemButtonTextBrushKey}}" />-->
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+            <Setter Property="IsTabStop" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border
+                            Background="Transparent"
+                            BorderThickness="0"
+                            SnapsToDevicePixels="true">
+                            <ContentPresenter
+                                x:Name="contentPresenter"
+                                Margin="0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Focusable="False"
+                                RecognizesAccessKey="True" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
     </Style>
     <Style x:Key="VsDialogUpperPart" TargetType="{x:Type Border}">
         <Style.Setters>
