@@ -33,11 +33,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
             RunOnUiThread(() =>
             {
-                if (_errorListProvider.Value.Tasks.OfType<Task>().All(t => t.SubcategoryIndex == subCategoryIndex))
+                if (_errorListProvider.Value.Tasks.OfType<TaskListItem>().All(t => t.SubcategoryIndex == subCategoryIndex))
                     _errorListProvider.Value.Tasks.Clear();
                 else
                 {
-                    foreach (var task in _errorListProvider.Value.Tasks.OfType<Task>().Where(t => t.SubcategoryIndex == subCategoryIndex).ToArray())
+                    foreach (var task in _errorListProvider.Value.Tasks.OfType<TaskListItem>().Where(t => t.SubcategoryIndex == subCategoryIndex).ToArray())
                     {
                         _errorListProvider.Value.Tasks.Remove(task);
                     }
@@ -73,7 +73,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
         private void NavigateTask(object sender, EventArgs e)
         {
-            if (sender is Task task)
+            if (sender is TaskListItem task)
             {
                 if (string.IsNullOrEmpty(task.Document))
                     _vsIdeScope.DeveroomOutputPaneServices?.Activate();
