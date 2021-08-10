@@ -37,20 +37,11 @@ steps:
         cd .\Connectors
         .\build.ps1
 
-# - task: VSBuild@1
-  # displayName: 'Build Solution'
-  # inputs:
-    # solution: '$(solution)'
-    # msbuildArgs: '/p:DeployExtension=false /nowarn:VSTHRD010'
-    # platform: '$(buildPlatform)'
-    # configuration: '$(buildConfiguration)'
-    
-- task: MSBuild@1
+- task: VSBuild@1
   displayName: 'Build Solution'
   inputs:
     solution: '$(solution)'
-    msbuildVersion: 16.10
-    msbuildArguments: '/p:DeployExtension=false /nowarn:VSTHRD010'
+    msbuildArgs: '/p:DeployExtension=false /nowarn:VSTHRD010'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
