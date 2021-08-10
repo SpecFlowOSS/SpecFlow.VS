@@ -13,6 +13,7 @@
     <PackageReference Include="System.IO.Abstractions" Version="4.2.10" />
     <PackageReference Include="Microsoft.Composition" Version="1.0.31" />
 
+    <PackageReference Include="Microsoft.VisualStudio.Validation" Version="17.0.16-alpha" />
     <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="17.0.191-preview-gdb4a0010f6" />
     <PackageReference Include="Microsoft.VisualStudio.Editor" Version="17.0.191-preview-gdb4a0010f6" /> 
     <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.0.0-previews-2-31512-422" />
