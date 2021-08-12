@@ -7,9 +7,6 @@
 
   1.0
   - Initial SpecFlow configuration schema containing SpecFlow v3.9 settings and IDE settings
-    //TODO: add generator
-    //TODO: add runtime
-    //TODO: add trace
   
   */
 
@@ -17,36 +14,135 @@
   "additionalProperties": true,
   "properties": {
     "language": {
-      "description": "TODO: description for language",
+      "description": "Use this section to define the default language for feature files and other language-related settings. For more details see https://docs.specflow.org/projects/specflow/en/latest/Installation/Configuration.html#language",
       "type": "object",
       "additionalProperties": true,
       "properties": {
         "feature": {
-          "description": "TODO: description for language/feature",
-          "type": "string"
+          "description": "The default language of feature files added to the project. We recommend using specific culture names (e.g.: \"en-US\") rather than generic (neutral) cultures (e.g.: \"en\").",
+          "type": "string",
+          "default": "en-US"
         }
       }
     },
     "bindingCulture": {
-      "description": "TODO: description for bindingCulture",
+      "description": "Use this section to define the culture for executing binding methods and converting step arguments. For more details see https://docs.specflow.org/projects/specflow/en/latest/Installation/Configuration.html#bindingculture",
       "type": "object",
       "additionalProperties": true,
       "properties": {
         "name": {
-          "description": "TODO: description for bindingCulture/name",
-          "type": "string"
+          "description": "Specifies the culture to be used to execute binding methods and convert step arguments. If not specified, the feature language is used. We recommend using specific culture names (e.g.: \"en-US\") rather than generic (neutral) cultures (e.g.: \"en\").",
+          "type": "string",
+          "default": "not specified"
+        }
+      }
+    },
+    "generator": {
+      "description": "Use this section to define unit test generation options. For more details see https://docs.specflow.org/projects/specflow/en/latest/Installation/Configuration.html#generator",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "allowDebugGeneratedFiles": {
+          "description": "By default, the debugger is configured to step through the generated code. This helps you debug your feature files and bindings. Disable this option by setting this attribute to \"true\".",
+          "type": "boolean",
+          "default": false
+        },
+        "allowRowTests": {
+          "description": "Determines whether \"row tests\" should be generated for scenario outlines. This setting is ignored if the unit test framework does not support row based testing.",
+          "type": "boolean",
+          "default": false
+        },
+        "addNonParallelizableMarkerForTags": {
+          "description": "Defines a set of tags, any of which specify that a feature should be excluded from running in parallel with any other feature. For mor details see https://docs.specflow.org/projects/specflow/en/latest/Execution/Parallel-Execution.html",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "runtime": {
+      "description": "Use this section to specify various test execution options. For more details see https://docs.specflow.org/projects/specflow/en/latest/Installation/Configuration.html#runtime",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "dependencies": {
+          "description": "Specifies custom dependencies for the SpecFlow runtime.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "type": {
+                "description": "The implementation to use",
+                "type": "string"
+              },
+              "as": {
+                "description": "The interface to override",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "missingOrPendingStepsOutcome": {
+          "description": "Determines how SpecFlow behaves if a step binding is not implemented or pending.",
+          "type": "string",
+          "default": "Pending",
+          "enum": [ "Pending", "Inconclusive", "Ignore", "Error" ]
+        },
+        "obsoleteBehavior": {
+          "description": "Determines how SpecFlow behaves if a step binding is marked with [Obsolete] attribute.",
+          "type": "string",
+          "default": "Warn",
+          "enum": [ "None", "Warn", "Pending", "Error" ]
+        },
+        "stopAtFirstError": {
+          "description": "Determines whether the execution should stop when encountering the first error, or whether it should attempt to try and match subsequent steps (in order to detect missing steps).",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "trace": {
+      "description": "Use this section to determine the SpecFlow trace output. For more details see https://docs.specflow.org/projects/specflow/en/latest/Installation/Configuration.html#trace",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "traceSuccessfulSteps": {
+          "description": "Determines whether SpecFlow should trace successful step binding executions.",
+          "type": "boolean",
+          "default": true
+        },
+        "traceTimings": {
+          "description": "Determines whether SpecFlow should trace execution time of the binding methods (only if the execution time is longer than the minTracedDuration value).",
+          "type": "boolean",
+          "default": false
+        },
+        "minTracedDuration": {
+          "description": "Specifies a threshold for tracing the binding execution times. Example: 0:0:0.1 (100 ms)",
+          "type": "string",
+          "default": "0:0:0.1"
+        },
+        "stepDefinitionSkeletonStyle": {
+          "description": "Specifies the default step definition style.",
+          "type": "string",
+          "default": "RegexAttribute",
+          "enum": [ "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
         }
       }
     },
     "stepAssemblies": {
-      "description": "TODO: description for stepAssemblies",
+      "description": "This section can be used to configure additional assemblies that contain external binding assemblies. The assembly of the SpecFlow project (the project containing the feature files) is automatically included. The binding assemblies must be placed in the output folder (e.g. bin/Debug) of the SpecFlow project, for example by adding a reference to the assembly from the project. For more details see https://docs.specflow.org/projects/specflow/en/latest/Installation/Configuration.html#stepassemblies",
       "type": "array",
+      "default": [],
       "items": {
         "type": "object",
         "additionalProperties": true,
         "properties": {
           "assembly": {
-            "description": "TODO: description for stepAssemblies[]/assembly",
+            "description": "The name of the assembly containing bindings.",
             "type": "string"
           }
         }
@@ -70,7 +166,6 @@
     }
   },
   "definitions": {
-
     "SpecFlow": {
       "description": "Settings related to SpecFlow projects",
       "type": "object",
