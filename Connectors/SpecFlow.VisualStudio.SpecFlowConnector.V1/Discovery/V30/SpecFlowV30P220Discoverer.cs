@@ -17,15 +17,15 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V30
 
             IConfigurationLoader configurationLoader = new SpecFlow21ConfigurationLoader(configFilePath);
             var globalContainer = CreateGlobalContainer(configurationLoader, testAssembly);
-            ReflectionExtensions.RegisterTypeAs<NoInvokeDependencyProvider.NullBindingInvoker, IBindingInvoker>(globalContainer);
+            globalContainer.ReflectionRegisterTypeAs<NoInvokeDependencyProvider.NullBindingInvoker, IBindingInvoker>();
 
             //var testRunnerManager = (TestRunnerManager)globalContainer.Resolve<ITestRunnerManager>();
-            var testRunnerManager = (TestRunnerManager)ReflectionExtensions.Resolve<ITestRunnerManager>(globalContainer);
+            var testRunnerManager = (TestRunnerManager)globalContainer.ReflectionResolve<ITestRunnerManager>();
 
             InitializeTestRunnerManager(testAssembly, testRunnerManager);
 
             //return globalContainer.Resolve<IBindingRegistry>();
-            return ReflectionExtensions.Resolve<IBindingRegistry>(globalContainer);
+            return globalContainer.ReflectionResolve<IBindingRegistry>();
         }
 
         protected virtual object CreateGlobalContainer(IConfigurationLoader configurationLoader, Assembly testAssembly)

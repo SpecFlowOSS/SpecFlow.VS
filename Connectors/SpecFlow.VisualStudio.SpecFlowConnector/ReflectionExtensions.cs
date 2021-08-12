@@ -103,14 +103,14 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
 
         //BoDi
 
-        public static T Resolve<T>(object container)
+        public static T ReflectionResolve<T>(this object container)
         {
             return container.ReflectionCallMethod<T>(nameof(BoDi.IObjectContainer.Resolve),
                 new[] { typeof(Type), typeof(string) },
                 typeof(T), null);
         }
 
-        public static void RegisterTypeAs<TType, TInterface>(object container) where TType : class, TInterface
+        public static void ReflectionRegisterTypeAs<TType, TInterface>(this object container) where TType : class, TInterface
         {
             container.ReflectionCallMethod(nameof(BoDi.IObjectContainer.RegisterTypeAs),
                 new[] { typeof(Type), typeof(Type) },

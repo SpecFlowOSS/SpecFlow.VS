@@ -32,11 +32,17 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
 
         protected virtual IObjectContainer CreateGlobalContainer(IConfigurationLoader configurationLoader, Assembly testAssembly)
         {
+            var defaultDependencyProvider = CreateDefaultDependencyProvider();
             var globalContainer =
-                new ContainerBuilder(CreateDefaultDependencyProvider()).CreateGlobalContainer(
+                CreateContainerBuilder(defaultDependencyProvider).CreateGlobalContainer(
                     testAssembly,
                     new DefaultRuntimeConfigurationProvider(configurationLoader));
             return globalContainer;
+        }
+
+        protected virtual ContainerBuilder CreateContainerBuilder(DefaultDependencyProvider defaultDependencyProvider)
+        {
+            return new ContainerBuilder(defaultDependencyProvider);
         }
 
         protected virtual DefaultDependencyProvider CreateDefaultDependencyProvider()

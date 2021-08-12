@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V30;
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V31;
+using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V38;
 using TechTalk.SpecFlow;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
@@ -43,7 +44,9 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
                 var versionNumber =
                     ((specFlowVersion.FileMajorPart * 100) + specFlowVersion.FileMinorPart) * 1000 + specFlowVersion.FileBuildPart;
 
-                if (versionNumber >= 3_01_000)
+                if (versionNumber >= 3_08_000)
+                    discovererType = typeof(SpecFlowV38Discoverer);
+                else if (versionNumber >= 3_01_000)
                     discovererType = typeof(SpecFlowV31Discoverer);
                 else if (versionNumber >= 3_00_220)
                     discovererType = typeof(SpecFlowV30P220Discoverer);

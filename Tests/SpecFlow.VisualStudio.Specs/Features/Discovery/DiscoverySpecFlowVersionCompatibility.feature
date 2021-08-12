@@ -62,10 +62,8 @@ Scenario Outline: Regression tests for special discovery combinations
 	When the binding discovery performed
 	Then the discovery succeeds with several step definitions
 Examples: 
-	| case         | version | framework | test runner tool |
-	| v3.9, MsTest | v3.9.22 | net5.0    | MsTest           |
-	| v3.9, NUnit  | v3.9.22 | net5.0    | NUnit            |
-	| v3.9, xUnit  | v3.9.22 | net5.0    | xUnit            |
-	| v3.8, MsTest | v3.8.14 | net5.0    | MsTest           |
-	| v3.8, NUnit  | v3.8.14 | net5.0    | NUnit            |
-	| v3.8, xUnit  | v3.8.14 | net5.0    | xUnit            |
+	| case                          | version | framework | test runner tool |
+	| v3.9, MsTest                  | v3.9.22 | net5.0    | MsTest           |
+	| v3.9, NUnit                   | v3.9.22 | net5.0    | NUnit            |
+	| v3.9, xUnit                   | v3.9.22 | net5.0    | xUnit            |
+	| v3.8 + MsTest discovery issue | v3.8.14 | net5.0    | MsTest           |

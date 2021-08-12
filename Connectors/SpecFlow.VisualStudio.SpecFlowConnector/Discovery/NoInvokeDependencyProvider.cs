@@ -21,13 +21,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
         public override void RegisterGlobalContainerDefaults(ObjectContainer container)
         {
             base.RegisterGlobalContainerDefaults(container);
-            ContainerRegisterTypeAs<NullBindingInvoker, IBindingInvoker>(container);
-        }
-
-        protected void ContainerRegisterTypeAs<TType, TInterface>(ObjectContainer container)
-        {
-            // need to call RegisterTypeAs through reflection, because BoDi 1.5 (used from SpecFlow 3.7) introduced a return type
-            container.ReflectionCallMethod("RegisterTypeAs", typeof(TType), typeof(TInterface));
+            container.ReflectionRegisterTypeAs<NullBindingInvoker, IBindingInvoker>();
         }
     }
 }

@@ -30,7 +30,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V31
             {
                 base.RegisterGlobalContainerDefaults(globalContainer);
                 globalContainer.RegisterInstanceAs(_loadContext);
-                ContainerRegisterTypeAs<LoadContextPluginLoader, IRuntimePluginLoader>(globalContainer);
+                globalContainer.ReflectionRegisterTypeAs<LoadContextPluginLoader, IRuntimePluginLoader>();
             }
         }
     }
