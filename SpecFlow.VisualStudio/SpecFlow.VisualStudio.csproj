@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>TRACE;OLD_JSONNET_API</DefineConstants>
@@ -12,14 +12,11 @@
     <PackageReference Include="Gherkin" Version="20.0.1" />
     <PackageReference Include="System.IO.Abstractions" Version="4.2.10" />
     <PackageReference Include="Microsoft.Composition" Version="1.0.31" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
 
-    <PackageReference Include="Microsoft.VisualStudio.Text.Data" Version="15.6.27740" />
-    <PackageReference Include="Microsoft.VisualStudio.Text.Logic" Version="15.6.27740" />
-    <PackageReference Include="Microsoft.VisualStudio.Text.UI.Wpf" Version="15.6.27740" />
-    <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="15.6.27740" />
-    <PackageReference Include="Microsoft.VisualStudio.Editor" Version="15.6.27740" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.7.27703" />
+    <PackageReference Include="Microsoft.VisualStudio.Validation" Version="17.0.16-alpha" />
+    <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="17.0.191-preview-gdb4a0010f6" />
+    <PackageReference Include="Microsoft.VisualStudio.Editor" Version="17.0.191-preview-gdb4a0010f6" /> 
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.0.0-previews-2-31512-422" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
     <VsEditorAssembliesLocation Condition="'$(VsEditorAssembliesLocation)' == ''">..\ExternalTestDependencies\VS\</VsEditorAssembliesLocation>
@@ -11,7 +11,7 @@
     <PackageReference Include="FluentAssertions" Version="5.6.0" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
 
-    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="15.9.3032">
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.2155-preview2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

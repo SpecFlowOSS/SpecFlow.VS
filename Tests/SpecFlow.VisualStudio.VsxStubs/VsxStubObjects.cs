@@ -11,6 +11,7 @@ namespace SpecFlow.VisualStudio.VsxStubs
     {
         public static object GuardedOperations { get; private set; }
         public static IBufferGraphFactoryService BufferGraphFactoryService { get; private set; }
+        public static ITextBufferFactoryService BufferFactoryService { get; private set; }
 
         public static ITextBuffer CreateTextBuffer(string content)
         {
@@ -20,12 +21,12 @@ namespace SpecFlow.VisualStudio.VsxStubs
                 "Create", content);
             var contentTypeImpl = CreateInstance(
                 "Microsoft.VisualStudio.Utilities.Implementation.ContentTypeImpl, Microsoft.VisualStudio.Platform.VSEditor",
-                "deveroom", null, null);
+                "deveroom", null, null);            
             var defaultTextDifferencingService = CreateInstance(
                 "Microsoft.VisualStudio.Text.Differencing.Implementation.DefaultTextDifferencingService, Microsoft.VisualStudio.Platform.VSEditor");
             var textBuffer = CreateInstance(
                 "Microsoft.VisualStudio.Text.Implementation.TextBuffer, Microsoft.VisualStudio.Platform.VSEditor",
-                contentTypeImpl, stringRebuilder, defaultTextDifferencingService, GuardedOperations);
+                contentTypeImpl, stringRebuilder, defaultTextDifferencingService, GuardedOperations, BufferFactoryService, null, null);
             return (ITextBuffer)textBuffer;
         }
 
@@ -79,6 +80,8 @@ namespace SpecFlow.VisualStudio.VsxStubs
             GuardedOperations = CreateObject<object>("Microsoft.VisualStudio.Text.Utilities.GuardedOperations, Microsoft.VisualStudio.Platform.VSEditor");
             BufferGraphFactoryService = CreateObject<IBufferGraphFactoryService>("Microsoft.VisualStudio.Text.Projection.Implementation.BufferGraphFactoryService, Microsoft.VisualStudio.Platform.VSEditor");
             SetField(BufferGraphFactoryService, nameof(GuardedOperations), GuardedOperations);
+
+            BufferFactoryService = CreateObject<ITextBufferFactoryService>("Microsoft.VisualStudio.Text.Implementation.BufferFactoryService, Microsoft.VisualStudio.Platform.VSEditor");
         }
     }
 }
