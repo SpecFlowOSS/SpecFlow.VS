@@ -53,7 +53,14 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
             var contractResolver = new CamelCasePropertyNamesContractResolver();
             contractResolver.NamingStrategy.ProcessDictionaryKeys = false;
             serializerSettings.ContractResolver = contractResolver;
-            serializerSettings.Converters = new List<JsonConverter> { new StringEnumConverter { CamelCaseText = true } };
+            serializerSettings.Converters = new List<JsonConverter> { new StringEnumConverter
+            {
+#if OLD_JSONNET_API
+                CamelCaseText = true
+#else
+                NamingStrategy = new CamelCaseNamingStrategy()
+#endif
+            } };
             serializerSettings.Formatting = indented ? Formatting.Indented : Formatting.None;
             serializerSettings.NullValueHandling = NullValueHandling.Ignore;
             return serializerSettings;

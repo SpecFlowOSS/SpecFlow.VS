@@ -9,6 +9,7 @@
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>SpecFlow.VisualStudio.SpecFlowConnector</RootNamespace>
+    <DefineConstants>OLD_JSONNET_API</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

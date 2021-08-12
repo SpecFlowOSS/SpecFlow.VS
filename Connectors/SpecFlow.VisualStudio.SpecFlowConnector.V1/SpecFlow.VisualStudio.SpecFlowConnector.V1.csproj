@@ -9,6 +9,7 @@
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
     <PlatformTarget>anycpu</PlatformTarget>
     <RootNamespace>SpecFlow.VisualStudio.SpecFlowConnector</RootNamespace>
+    <DefineConstants>OLD_JSONNET_API</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
