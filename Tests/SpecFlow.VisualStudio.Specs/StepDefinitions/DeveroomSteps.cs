@@ -69,6 +69,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         {
             GivenThereIsASmallSpecFlowProject();
             _generatorOptions.UnitTestProvider = runner;
+            _generatorOptions.SpecFlowPackageVersion = specFlowVersion.ToString();
         }
 
         [Given(@"there is a small SpecFlow project with external bindings")]

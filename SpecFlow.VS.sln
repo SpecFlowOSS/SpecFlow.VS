@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.452
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31606.5
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.Package", "SpecFlow.VisualStudio.Package\SpecFlow.VisualStudio.Package.csproj", "{00920A0A-A73C-487F-BC41-9B92F2F0EBD7}"
 EndProject
@@ -88,7 +88,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.UI.Tester", "Tests\SpecFlow.VisualStudio.UI.Tester\SpecFlow.VisualStudio.UI.Tester.csproj", "{2A412F65-68C7-4A5D-AFCF-74E928C40C21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpecFlow.VisualStudio.ProjectTemplate", "SpecFlow.VisualStudio.ProjectTemplate\SpecFlow.VisualStudio.ProjectTemplate.csproj", "{8C5AE61C-F325-436C-B851-CA60944BD276}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.ProjectTemplate", "SpecFlow.VisualStudio.ProjectTemplate\SpecFlow.VisualStudio.ProjectTemplate.csproj", "{8C5AE61C-F325-436C-B851-CA60944BD276}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow39NetCoreConnector.Tests", "Tests\Connector\SpecFlow.VisualStudio.SpecFlow39NetCoreConnector.Tests\SpecFlow.VisualStudio.SpecFlow39NetCoreConnector.Tests.csproj", "{33407FFB-5059-4293-9520-1BCD8A9DD14D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow38NetCoreMsTestConnector.Tests", "Tests\Connector\SpecFlow.VisualStudio.SpecFlow38NetCoreMsTestConnector.Tests\SpecFlow.VisualStudio.SpecFlow38NetCoreMsTestConnector.Tests.csproj", "{DFD1404C-8353-431A-BF42-8FFB47B56F78}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -276,6 +280,18 @@ Global
 		{8C5AE61C-F325-436C-B851-CA60944BD276}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C5AE61C-F325-436C-B851-CA60944BD276}.TestDebug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8C5AE61C-F325-436C-B851-CA60944BD276}.TestDebug|Any CPU.Build.0 = Debug|Any CPU
+		{33407FFB-5059-4293-9520-1BCD8A9DD14D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33407FFB-5059-4293-9520-1BCD8A9DD14D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33407FFB-5059-4293-9520-1BCD8A9DD14D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33407FFB-5059-4293-9520-1BCD8A9DD14D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33407FFB-5059-4293-9520-1BCD8A9DD14D}.TestDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33407FFB-5059-4293-9520-1BCD8A9DD14D}.TestDebug|Any CPU.Build.0 = Debug|Any CPU
+		{DFD1404C-8353-431A-BF42-8FFB47B56F78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFD1404C-8353-431A-BF42-8FFB47B56F78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFD1404C-8353-431A-BF42-8FFB47B56F78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFD1404C-8353-431A-BF42-8FFB47B56F78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFD1404C-8353-431A-BF42-8FFB47B56F78}.TestDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFD1404C-8353-431A-BF42-8FFB47B56F78}.TestDebug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -307,6 +323,8 @@ Global
 		{A514B820-E7D3-4B07-8BC8-09F5354009B3} = {3710808B-7098-4236-9053-FDB52CBB51E0}
 		{E67A8D21-105E-4A1E-AF01-B0718D4E696A} = {3710808B-7098-4236-9053-FDB52CBB51E0}
 		{2A412F65-68C7-4A5D-AFCF-74E928C40C21} = {11E7849D-8059-417F-BEB2-7B576B7993F3}
+		{33407FFB-5059-4293-9520-1BCD8A9DD14D} = {3710808B-7098-4236-9053-FDB52CBB51E0}
+		{DFD1404C-8353-431A-BF42-8FFB47B56F78} = {3710808B-7098-4236-9053-FDB52CBB51E0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2F4914B0-F8E8-4745-979B-5F36DFA8013A}

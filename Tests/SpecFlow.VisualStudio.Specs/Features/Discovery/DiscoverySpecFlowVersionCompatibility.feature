@@ -8,6 +8,8 @@ Scenario Outline: Discover bindings from a SpecFlow project on .NET Framework
 	And the step definitions contain source file and line
 Examples: 
 	| case      | version  |
+	| line-v3.9 | v3.9.22  |
+	| line-v3.8 | v3.8.14  |
 	| line-v3.7 | v3.7.13  |
 	| line-v3.6 | v3.6.23  |
 	| line-v3.5 | v3.5.14  |
@@ -24,15 +26,46 @@ Examples:
 
 Scenario Outline: Discover bindings from a SpecFlow project on .NET Core
 	Given there is a simple SpecFlow project for <version>
-	And the project format is new
+	And the project uses the new project format
 	And the target framework is netcoreapp2.1
 	And the project is built
 	When the binding discovery performed
 	Then the discovery succeeds with several step definitions
 Examples: 
 	| case      | version |
+	| line-v3.9 | v3.9.22 |
+	| line-v3.8 | v3.8.14 |
 	| line-v3.7 | v3.7.13 |
 	| line-v3.6 | v3.6.23 |
 	| line-v3.5 | v3.5.14 |
 	| line-v3.4 | v3.4.31 |
 	| line-v3.3 | v3.3.74 |
+
+Scenario Outline: Discover bindings from SpecFlow using different test runners
+	Given there is a simple SpecFlow project with test runner "<test runner tool>" for the latest version
+	And the project uses the new project format
+	And the target framework is net5.0
+	And the project is built
+	When the binding discovery performed
+	Then the discovery succeeds with several step definitions
+Examples: 
+	| test runner tool | 
+	| NUnit            | 
+	| xUnit            | 
+	| MsTest           | 
+
+Scenario Outline: Regression tests for special discovery combinations
+	Given there is a simple SpecFlow project with test runner "<test runner tool>" for <version>
+	And the project uses the new project format
+	And the target framework is <framework>
+	And the project is built
+	When the binding discovery performed
+	Then the discovery succeeds with several step definitions
+Examples: 
+	| case         | version | framework | test runner tool |
+	| v3.9, MsTest | v3.9.22 | net5.0    | MsTest           |
+	| v3.9, NUnit  | v3.9.22 | net5.0    | NUnit            |
+	| v3.9, xUnit  | v3.9.22 | net5.0    | xUnit            |
+	| v3.8, MsTest | v3.8.14 | net5.0    | MsTest           |
+	| v3.8, NUnit  | v3.8.14 | net5.0    | NUnit            |
+	| v3.8, xUnit  | v3.8.14 | net5.0    | xUnit            |
