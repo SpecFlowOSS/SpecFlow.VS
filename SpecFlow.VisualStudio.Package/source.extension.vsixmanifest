@@ -6,7 +6,7 @@
         <Description xml:space="preserve">Visual Studio extension for working with SpecFlow projects and Gherkin feature files.</Description>
         <MoreInfo>https://www.specsolutions.eu/services/deveroom/</MoreInfo>
         <ReleaseNotes>Changelog.txt</ReleaseNotes>
-        <Icon>Package\Resources\DeveroomPackage.ico</Icon>
+        <Icon>Package\Resources\SpecFlowIcon.ico</Icon>
         <Tags>SpecFlow, BDD, Gherkin, Feature File</Tags>
     </Metadata>
     <Installation>
