@@ -137,7 +137,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Settings
 
         private bool IsImplicitMsBuildGeneration(SpecFlowPackageDetector detector, Version specFlowVersion, NuGetPackageReference[] packageReferencesArray)
         {
-            return specFlowVersion >= new Version(3, 3) && 
+            return specFlowVersion >= new Version(3, 3, 57) && 
                    detector.IsSpecFlowTestFrameworkPackagesUsed(packageReferencesArray);
         }
 
