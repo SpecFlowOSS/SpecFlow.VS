@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Win32;
 
 namespace SpecFlow.VisualStudio.EventTracking
 {
-    public static class RegistryManager
+    public interface IRegistryManager
+    {
+        object GetValueForKey(string configRoot, string registryValueName);
+    }
+
+    [Export(typeof(IRegistryManager))]
+    public class RegistryManager : IRegistryManager
     {
         public static void SetString(string name, string value)
         {
@@ -62,7 +69,7 @@ namespace SpecFlow.VisualStudio.EventTracking
             }
         }
 
-        public static Dictionary<string,string> GetStringValues(Func<string, bool> keyFilter)
+        public static Dictionary<string, string> GetStringValues(Func<string, bool> keyFilter)
         {
             try
             {
@@ -70,7 +77,7 @@ namespace SpecFlow.VisualStudio.EventTracking
                     return key
                         .GetValueNames()
                         .Where(keyFilter)
-                        .Select(n => new {Name = n, Value = key.GetValue(n) as string})
+                        .Select(n => new { Name = n, Value = key.GetValue(n) as string })
                         .Where(nv => !string.IsNullOrEmpty(nv.Value))
                         .ToDictionary(nv => nv.Name, nv => nv.Value);
             }
@@ -81,7 +88,7 @@ namespace SpecFlow.VisualStudio.EventTracking
             }
         }
 
-        public static Dictionary<string,int> GetIntValues(Func<string, bool> keyFilter)
+        public static Dictionary<string, int> GetIntValues(Func<string, bool> keyFilter)
         {
             try
             {
@@ -89,7 +96,7 @@ namespace SpecFlow.VisualStudio.EventTracking
                     return key
                         .GetValueNames()
                         .Where(keyFilter)
-                        .Select(n => new {Name = n, Value = key.GetValue(n) as int?})
+                        .Select(n => new { Name = n, Value = key.GetValue(n) as int? })
                         .Where(nv => nv.Value != null)
                         .ToDictionary(nv => nv.Name, nv => nv.Value.Value);
             }
@@ -106,6 +113,23 @@ namespace SpecFlow.VisualStudio.EventTracking
             var key = Registry.CurrentUser.OpenSubKey(configRoot, RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl);
             if (key == null) key = Registry.CurrentUser.CreateSubKey(configRoot, RegistryKeyPermissionCheck.ReadWriteSubTree);
             return key;
+        }
+
+        private RegistryKey OpenKey(string configRoot)
+        {
+            return Registry.CurrentUser.OpenSubKey(configRoot, RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl);
+        }
+
+        public object GetValueForKey(string configRoot, string registryValueName)
+        {
+            var key = OpenKey(configRoot);
+            if (key != null)
+            {
+                var keyValue = key.GetValue(registryValueName, null);
+                return keyValue;
+            }
+
+            return null;
         }
     }
 }
