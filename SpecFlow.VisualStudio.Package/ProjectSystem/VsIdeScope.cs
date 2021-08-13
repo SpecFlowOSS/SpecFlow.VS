@@ -49,7 +49,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         public IMonitoringService MonitoringService { get; }
         public IIdeActions Actions { get; }
         public IDeveroomWindowManager WindowManager { get; }
-        public IFileSystem FileSystem { get; } = new FileSystem();
+        public IFileSystem FileSystem { get; }
         public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; }
         public IDeveroomErrorListServices DeveroomErrorListServices { get; }
 
@@ -68,10 +68,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         }
 
         [ImportingConstructor]
-        public VsIdeScope([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IVsPackageInstallerServices vsPackageInstallerServices, IVsSolutionEventListener solutionEventListener, IMonitoringService monitoringService, IDeveroomWindowManager windowManager)
+        public VsIdeScope([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IVsPackageInstallerServices vsPackageInstallerServices, IVsSolutionEventListener solutionEventListener, IMonitoringService monitoringService, IDeveroomWindowManager windowManager, IFileSystem fileSystem)
         {
             ServiceProvider = serviceProvider;
             MonitoringService = monitoringService;
+            FileSystem = fileSystem;
 
             Dte = (DTE)serviceProvider.GetService(typeof(DTE));
             DeveroomOutputPaneServices = new VsDeveroomOutputPaneServices(this);
