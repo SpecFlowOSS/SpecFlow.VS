@@ -469,7 +469,7 @@ namespace SpecFlow.VisualStudio
 
         public static string GetVsMainVersion(IServiceProvider serviceProvider)
         {
-            const string defaultMainVersion = "15.0";
+            const string defaultMainVersion = "17.0";
             try
             {
                 var dte = (DTE)serviceProvider.GetService(typeof(DTE));
@@ -490,6 +490,7 @@ namespace SpecFlow.VisualStudio
 
                 vsAppId.GetProperty((int)VSAPropID.VSAPROPID_ProductSemanticVersion, out var semanticVersionObj);
 
+                //todo decide which version we want
                 var semanticVersion = semanticVersionObj as string;
                 if (semanticVersion != null)
                     return semanticVersion.Split('+', '-')[0];

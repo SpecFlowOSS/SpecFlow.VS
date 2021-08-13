@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.ApplicationInsights.Extensibility;
+using SpecFlow.VisualStudio.Analytics;
 using SpecFlow.VisualStudio.EventTracking;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
@@ -10,8 +12,19 @@ namespace SpecFlow.VisualStudio.Monitoring
     [Export(typeof(IMonitoringService))]
     public class MonitoringService : IMonitoringService
     {
-        // OPEN
+        private readonly IAnalyticsTransmitter _analyticsTransmitter;
+        
+        [ImportingConstructor]
+        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter)
+        {
+            //todo: where to set the InstrumentationKey
+            TelemetryConfiguration.Active.InstrumentationKey = "27cfb992-6c29-4bc8-8093-78d95e275b3a";
 
+            _analyticsTransmitter = analyticsTransmitter;
+        }
+        
+        // OPEN
+        
         public void MonitorLoadProjectSystem(string vsVersion)
         {
             EventTracker.SetVsVersion(vsVersion);
@@ -30,6 +43,7 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         public void MonitorOpenFeatureFile(ProjectSettings projectSettings)
         {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Feature file opened"));
             EventTracker.TrackOpenFeatureFile(projectSettings);
         }
 
