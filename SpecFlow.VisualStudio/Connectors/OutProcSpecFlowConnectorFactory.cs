@@ -20,7 +20,8 @@ namespace SpecFlow.VisualStudio.Connectors
                 ideScope.Logger, 
                 projectSettings.TargetFrameworkMoniker, 
                 projectScope.IdeScope.GetExtensionFolder(),
-                processorArchitecture);
+                processorArchitecture,
+                projectSettings.SpecFlowVersion);
         }
 
         private static ProcessorArchitectureSetting GetProcessorArchitecture(DeveroomConfiguration deveroomConfiguration, ProjectSettings projectSettings)

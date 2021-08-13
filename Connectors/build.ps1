@@ -47,3 +47,21 @@ dotnet publish -f net5.0 -c $configuration
 Copy-Item bin\$configuration\net5.0\publish\ $outputFolder\V2-net5.0\ -Recurse
 
 cd ..
+
+# build V3 any cpu
+
+cd SpecFlow.VisualStudio.SpecFlowConnector.V3
+
+dotnet publish -f netcoreapp2.1 -c $configuration
+
+Copy-Item bin\$configuration\netcoreapp2.1\publish\ $outputFolder\V3-netcoreapp2.1\ -Recurse
+
+dotnet publish -f netcoreapp3.1 -c $configuration
+
+Copy-Item bin\$configuration\netcoreapp3.1\publish\ $outputFolder\V3-netcoreapp3.1\ -Recurse
+
+dotnet publish -f net5.0 -c $configuration
+
+Copy-Item bin\$configuration\net5.0\publish\ $outputFolder\V3-net5.0\ -Recurse
+
+cd ..
