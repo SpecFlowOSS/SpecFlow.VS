@@ -12,11 +12,11 @@ namespace SpecFlow.VisualStudio.Connectors
 {
     public class OutProcSpecFlowConnector
     {
-        private const string ConnectorV1AnyCpu = @"V1\specflow-vs-v1.exe";
-        private const string ConnectorV1X86 = @"V1\specflow-vs-v1.x86.exe";
-        private const string ConnectorV2AnyCpu = @"V2\specflow-vs.dll";
-        private const string ConnectorV3AnyCpu = @"V3\specflow-vs.dll";
-        private const string ConnectorV5AnyCpu = @"V5\specflow-vs.dll";
+        private const string ConnectorV1AnyCpu = @"V1\specflow-vs.exe";
+        private const string ConnectorV1X86 = @"V1\specflow-vs-x86.exe";
+        private const string ConnectorV2NetCore21 = @"V2-netcoreapp2.1\specflow-vs.dll";
+        private const string ConnectorV2NetCore31 = @"V2-netcoreapp3.1\specflow-vs.dll";
+        private const string ConnectorV2Net50 = @"V2-net5.0\specflow-vs.dll";
         private const string GenerationCommandName = "generation";
         private const string BindingDiscoveryCommandName = "binding discovery";
 
@@ -128,38 +128,34 @@ namespace SpecFlow.VisualStudio.Connectors
         {
             var connectorsFolder = GetConnectorsFolder();
 
-            //V5
+            //V2-net5.0
             if (_targetFrameworkMoniker != null &&
                 _targetFrameworkMoniker.IsNetCore &&
                 _targetFrameworkMoniker.HasVersion &&
                 _targetFrameworkMoniker.Version >= new Version(5, 0))
             {
                 arguments.Add("exec");
-                arguments.Add(Path.Combine(connectorsFolder, ConnectorV5AnyCpu));
+                arguments.Add(Path.Combine(connectorsFolder, ConnectorV2Net50));
                 return GetDotNetCommand();
             }
 
-            //V3
+            //V2-netcoreapp3.1
             if (_targetFrameworkMoniker != null && 
                 _targetFrameworkMoniker.IsNetCore && 
                 _targetFrameworkMoniker.HasVersion &&
                 _targetFrameworkMoniker.Version >= new Version(3,1))
             {
                 arguments.Add("exec");
-                arguments.Add(Path.Combine(connectorsFolder, ConnectorV3AnyCpu));
+                arguments.Add(Path.Combine(connectorsFolder, ConnectorV2NetCore31));
                 return GetDotNetCommand();
             }
 
-            //V2
+            //V2-netcoreapp2.1
             if (_targetFrameworkMoniker != null && 
                 _targetFrameworkMoniker.IsNetCore)
             {
                 arguments.Add("exec");
-                //arguments.Add("--additionalprobingpath");
-                //arguments.Add(Path.Combine(GetDotNetInstallLocation(), "sdk", "NuGetFallbackFolder"));
-                //arguments.Add("--additionalprobingpath");
-                //arguments.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages"));
-                arguments.Add(Path.Combine(connectorsFolder, ConnectorV2AnyCpu));
+                arguments.Add(Path.Combine(connectorsFolder, ConnectorV2NetCore21));
                 return GetDotNetCommand();
             }
 

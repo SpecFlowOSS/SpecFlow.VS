@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net452</TargetFramework>
-    <AssemblyName>specflow-vs-v1</AssemblyName>
+    <AssemblyName>specflow-vs</AssemblyName>
     <Configurations>Debug;Release;Debug_x86;Release_x86</Configurations>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
