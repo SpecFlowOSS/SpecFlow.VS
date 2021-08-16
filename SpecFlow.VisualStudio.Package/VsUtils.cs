@@ -482,20 +482,16 @@ namespace SpecFlow.VisualStudio
             }
         }
 
+        // https://stackoverflow.com/a/55039958
         public static string GetVsSemanticVersion(IServiceProvider serviceProvider)
         {
             try
             {
                 var vsAppId = serviceProvider.GetService<IVsAppId>(typeof(SVsAppId));
+                vsAppId.GetProperty((int)VSAPropID.VSAPROPID_ProductDisplayVersion, out var productDisplayVersion);
 
-                vsAppId.GetProperty((int)VSAPropID.VSAPROPID_ProductSemanticVersion, out var semanticVersionObj);
-
-                //todo decide which version we want
-                var semanticVersion = semanticVersionObj as string;
-                if (semanticVersion != null)
-                    return semanticVersion.Split('+', '-')[0];
-
-                return GetVsMainVersion(serviceProvider);
+                var displayVersion = productDisplayVersion as string;
+                return displayVersion ?? GetVsMainVersion(serviceProvider);
             }
             catch (Exception ex)
             {
