@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Deveroom.VisualStudio.SpecFlowConnector": {
-      "commandName": "Project",
-      "commandLineArgs": "discovery C:\\Temp\\DeveroomTest\\DS_Dis20re_3.1.44-beta_nunit_nprj_netcoreapp2.1_bt_1194832604\\bin\\Debug\\netcoreapp2.1\\DeveroomSample.dll C:\\Temp\\DeveroomTest\\DS_Dis20re_3.1.44-beta_nunit_nprj_netcoreapp2.1_bt_1194832604\\App.config",
-      "workingDirectory": "C:\\Temp\\DeveroomTest\\DS_Dis20re_3.1.44-beta_nunit_nprj_netcoreapp2.1_bt_1194832604\\bin\\Debug\\netcoreapp2.1"
-    }
-  }
-}

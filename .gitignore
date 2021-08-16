@@ -265,3 +265,4 @@ Deveroom.VisualStudio.Package/Changelog.txt
 
 !**/ExternalPackages/*.nupkg
 !**/LocalNuGetFeed/*.nupkg
+launchSettings.json

@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Deveroom.SampleProjectGenerator": {
-      "commandName": "Project",
-      "commandLineArgs": "--featureFileCount 3 --unitTestProvider xunit"
-    }
-  }
-}

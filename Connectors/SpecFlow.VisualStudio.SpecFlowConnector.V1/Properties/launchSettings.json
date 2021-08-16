@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Deveroom.VisualStudio.SpecFlowConnector": {
-      "commandName": "Project",
-      "commandLineArgs": "discovery \"W:\\Demo\\Sample_MyCalculator\\MyCalculator.Specs\\bin\\Debug\\MyCalculator.Specs.dll\" \"W:\\Demo\\Sample_MyCalculator\\MyCalculator.Specs\\bin\\Debug\\MyCalculator.Specs.dll.config\""
-    }
-  }
-}
