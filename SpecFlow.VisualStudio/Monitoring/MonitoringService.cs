@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.ApplicationInsights.Channel;
 using Microsoft.VisualStudio.ApplicationInsights.Extensibility;
 using SpecFlow.VisualStudio.Analytics;
 using SpecFlow.VisualStudio.EventTracking;
@@ -17,14 +18,15 @@ namespace SpecFlow.VisualStudio.Monitoring
         [ImportingConstructor]
         public MonitoringService(IAnalyticsTransmitter analyticsTransmitter)
         {
-            //todo: where to set the InstrumentationKey
+            //todo: find a better place for the AI configuration
             TelemetryConfiguration.Active.InstrumentationKey = "27cfb992-6c29-4bc8-8093-78d95e275b3a";
+            TelemetryConfiguration.Active.TelemetryChannel = new InMemoryChannel();
 
             _analyticsTransmitter = analyticsTransmitter;
         }
-        
+
         // OPEN
-        
+
         public void MonitorLoadProjectSystem(string vsVersion)
         {
             EventTracker.SetVsVersion(vsVersion);
