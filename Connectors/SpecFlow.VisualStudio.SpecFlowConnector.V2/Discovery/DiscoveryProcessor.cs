@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Runtime.Loader;
-using SpecFlow.VisualStudio.Common;
-using McMaster.NETCore.Plugins;
+using System.Linq;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
 {
@@ -19,28 +15,15 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
 
         public string Process()
         {
-            var pluginLoader = PluginLoader.CreateFromAssemblyFile(_options.AssemblyFilePath, PluginLoaderOptions.IncludeCompileLibraries);
             var targetFolder = Path.GetDirectoryName(_options.AssemblyFilePath);
             if (targetFolder == null)
                 return null;
 
-            var connectorFolder = Path.GetDirectoryName(typeof(ConsoleRunner).Assembly.GetLocalCodeBase());
-            Debug.Assert(connectorFolder != null);
+            var loadContext = new TestAssemblyLoadContext(_options.AssemblyFilePath);
+            var testAssembly = loadContext.Assembly;
 
-            using (var discoverer = new ReflectionSpecFlowDiscoverer(GetLoadContext(pluginLoader), 
-                typeof(VersionSelectorDiscoverer)))
-            {
-                var testAssembly = pluginLoader.LoadDefaultAssembly();
-                return discoverer.Discover(testAssembly, _options.AssemblyFilePath, _options.ConfigFilePath);
-            }
-        }
-
-        private AssemblyLoadContext GetLoadContext(PluginLoader pluginLoader)
-        {
-            // ReSharper disable once PossibleNullReferenceException
-            return (AssemblyLoadContext)pluginLoader.GetType()
-                .GetField("_context", BindingFlags.Instance | BindingFlags.NonPublic)
-                .GetValue(pluginLoader);
+            using var discoverer = new ReflectionSpecFlowDiscoverer(loadContext, typeof(VersionSelectorDiscoverer));
+            return discoverer.Discover(testAssembly, _options.AssemblyFilePath, _options.ConfigFilePath);
         }
     }
 }
