@@ -42,9 +42,11 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
                 if (versionParts.Length < 2)
                     return false;
 
-                var assemblyFileName = library.Assemblies?.FirstOrDefault();
-                if (assemblyFileName == null)
+                var assemblyFileAsset = library.Assemblies?.FirstOrDefault();
+                if (assemblyFileAsset == null)
                     return false;
+
+                var assemblyFileName = Path.GetFileName(assemblyFileAsset);
 
                 var searchPattern = $"{versionParts[0]}.{versionParts[1]}.*";
                 var aspNetDirectory =
