@@ -12,7 +12,7 @@ namespace SpecFlow.VisualStudio.Monitoring
         void MonitorOpenProject(ProjectSettings settings, int? featureFileCount);
         void MonitorOpenFeatureFile(ProjectSettings projectSettings);
 
-        void MonitorParserParse(int parseCount, int scenarioDefinitionCount);
+        void MonitorParserParse(ProjectSettings settings, int parseCount, int scenarioDefinitionCount);
 
         void MonitorCommandCommentUncomment();
         void MonitorCommandDefineSteps(CreateStepDefinitionsDialogResult action, int snippetCount);

@@ -193,8 +193,9 @@ namespace SpecFlow.VisualStudio.Editor.Services
                 var scenarioDefinitionCount = deveroomTags.Count(t => t.Type == DeveroomTagTypes.ScenarioDefinitionBlock);
                 if (scenarioDefinitionCount > 0 || deveroomTags.Any(t => t.Type == DeveroomTagTypes.FeatureBlock))
                 {
+                    var projectSettings = _projectSettingsProvider?.GetProjectSettings();
                     // valid feature file
-                    _ideScope.MonitoringService.MonitorParserParse(counter, scenarioDefinitionCount);
+                    _ideScope.MonitoringService.MonitorParserParse(projectSettings, counter, scenarioDefinitionCount);
                 }
                 else
                 {

@@ -65,7 +65,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
             }
 
-            public void MonitorParserParse(int parseCount, int scenarioDefinitionCount)
+            public void MonitorParserParse(ProjectSettings settings, int parseCount, int scenarioDefinitionCount)
             {
             }
 
