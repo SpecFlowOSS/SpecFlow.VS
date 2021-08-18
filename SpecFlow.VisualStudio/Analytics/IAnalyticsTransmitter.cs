@@ -62,21 +62,10 @@ namespace SpecFlow.VisualStudio.Analytics
             try
             {
                 additionalProps ??= new Dictionary<string, string>();
-                var errorMessage = exception.Message;
-
-                if (anonymize)
-                {
-                    errorMessage = ErrorAnonymizer.AnonymizeException(exception);
-                }
-
-                var anonymException = new Exception(errorMessage);
                 
-                additionalProps.Add("ExceptionDetail", errorMessage);
-                additionalProps.Add("ExceptionType", exception.GetType().ToString());
-                additionalProps.Add("ExceptionStackTrace", exception.StackTrace);
                 additionalProps.Add("IsFatal", isFatal.ToString());
 
-                _analyticsTransmitterSink.TransmitException(anonymException, additionalProps);
+                _analyticsTransmitterSink.TransmitException(exception, additionalProps);
             }
             catch (Exception)
             {
