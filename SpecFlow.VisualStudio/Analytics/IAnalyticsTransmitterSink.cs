@@ -16,14 +16,14 @@ namespace SpecFlow.VisualStudio.Analytics
     {
         private readonly IEnableAnalyticsChecker _enableAnalyticsChecker;
         private readonly IUserUniqueIdStore _userUniqueIdStore;
-        private readonly IVsVersionProvider _vsVersionProvider;
+        private readonly IVersionProvider _versionProvider;
 
         [ImportingConstructor]
-        public AppInsightsAnalyticsTransmitterSink(IEnableAnalyticsChecker enableAnalyticsChecker, IUserUniqueIdStore userUniqueIdStore, IVsVersionProvider vsVersionProvider)
+        public AppInsightsAnalyticsTransmitterSink(IEnableAnalyticsChecker enableAnalyticsChecker, IUserUniqueIdStore userUniqueIdStore, IVersionProvider versionProvider)
         {
             _enableAnalyticsChecker = enableAnalyticsChecker;
             _userUniqueIdStore = userUniqueIdStore;
-            _vsVersionProvider = vsVersionProvider;
+            _versionProvider = versionProvider;
         }
 
         public void TransmitEvent(IAnalyticsEvent analyticsEvent)
@@ -41,7 +41,7 @@ namespace SpecFlow.VisualStudio.Analytics
                     { "Ide", "Microsoft Visual Studio" },
                     { "UserId", userUniqueId },
                     { "UtcDate", DateTime.UtcNow.ToString("O") },
-                    { "IdeVersion", _vsVersionProvider.GetVersion() },
+                    { "IdeVersion", _versionProvider.GetVsVersion() },
                     { "ExtensionVersion", "TODO" }
                 }
             };
