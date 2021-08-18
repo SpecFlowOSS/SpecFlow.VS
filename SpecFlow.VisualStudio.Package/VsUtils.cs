@@ -483,7 +483,7 @@ namespace SpecFlow.VisualStudio
         }
 
         // https://stackoverflow.com/a/55039958
-        public static string GetVsSemanticVersion(IServiceProvider serviceProvider)
+        public static string GetVsProductDisplayVersion(IServiceProvider serviceProvider)
         {
             try
             {

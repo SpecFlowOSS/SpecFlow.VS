@@ -81,7 +81,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         {
             try
             {
-                var vsVersion = VsUtils.GetVsSemanticVersion(_serviceProvider);
+                var vsVersion = VsUtils.GetVsProductDisplayVersion(_serviceProvider);
                 _safeMonitoringService.MonitorLoadProjectSystem(vsVersion);
             }
             catch (Exception ex)
