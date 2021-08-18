@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.ApplicationInsights.Channel;
 using Microsoft.VisualStudio.ApplicationInsights.Extensibility;
 using SpecFlow.VisualStudio.Analytics;
+using SpecFlow.VisualStudio.Common;
 using SpecFlow.VisualStudio.EventTracking;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
@@ -207,7 +208,8 @@ namespace SpecFlow.VisualStudio.Monitoring
         {
             if (isFailed && !string.IsNullOrWhiteSpace(errorMessage))
             {
-                EventTracker.TrackError(errorMessage, projectSettings);
+                var discoveryException = new DiscoveryException(errorMessage);
+                _analyticsTransmitter.TransmitExceptionEvent(discoveryException, GetProjectSettingsProps(projectSettings));
             }
 
             var additionalProps = new Dictionary<string, string>()
@@ -235,12 +237,7 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         public void MonitorError(Exception exception, bool? isFatal = null)
         {
-            if (exception is InvalidOperationException && exception.StackTrace.Contains("MatchToken"))
-            {
-                // gather extra information about this error
-                EventTracker.TrackError($"MT:{exception.GetFlattenedMessage()}", anonymize: false);
-            }
-            EventTracker.TrackError(exception, isFatal);
+            _analyticsTransmitter.TransmitExceptionEvent(exception, isFatal);
         }
 
         private Dictionary<string, string> GetProjectSettingsProps(ProjectSettings settings, Dictionary<string, string> additionalSettings = null)
@@ -252,8 +249,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                 {
                     { "SpecFlowVersion", settings.GetSpecFlowVersionLabel() },
                     //{ "net", settings.TargetFrameworkMoniker.ToShortString() },
-                    //todo: singlefile generation?
-                    //{ "g", settings.DesignTimeFeatureFileGenerationEnabled.ToString() },
+                    { "SingleFileGeneratorUsed", settings.DesignTimeFeatureFileGenerationEnabled.ToString() },
                 };
             }
             if (additionalSettings != null && additionalSettings.Any())

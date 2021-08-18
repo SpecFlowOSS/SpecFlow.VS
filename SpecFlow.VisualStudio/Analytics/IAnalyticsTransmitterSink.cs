@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Composition;
 using System.Linq;
 using Microsoft.VisualStudio.ApplicationInsights;
+using Microsoft.VisualStudio.ApplicationInsights.Channel;
 using Microsoft.VisualStudio.ApplicationInsights.DataContracts;
 
 namespace SpecFlow.VisualStudio.Analytics
@@ -9,21 +11,20 @@ namespace SpecFlow.VisualStudio.Analytics
     public interface IAnalyticsTransmitterSink
     {
         void TransmitEvent(IAnalyticsEvent analyticsEvent);
+        void TransmitException(Exception exception, Dictionary<string, string> eventName);
     }
-    
+
     [Export(typeof(IAnalyticsTransmitterSink))]
     public class AppInsightsAnalyticsTransmitterSink : IAnalyticsTransmitterSink
     {
         private readonly IEnableAnalyticsChecker _enableAnalyticsChecker;
-        private readonly IUserUniqueIdStore _userUniqueIdStore;
-        private readonly IVersionProvider _versionProvider;
+        private readonly Lazy<TelemetryClient> _telemetryClient;
 
         [ImportingConstructor]
-        public AppInsightsAnalyticsTransmitterSink(IEnableAnalyticsChecker enableAnalyticsChecker, IUserUniqueIdStore userUniqueIdStore, IVersionProvider versionProvider)
+        public AppInsightsAnalyticsTransmitterSink(IEnableAnalyticsChecker enableAnalyticsChecker, IUserUniqueIdStore userUniqueIdStore)
         {
             _enableAnalyticsChecker = enableAnalyticsChecker;
-            _userUniqueIdStore = userUniqueIdStore;
-            _versionProvider = versionProvider;
+            _telemetryClient = new Lazy<TelemetryClient>(() => GetTelemetryClient(userUniqueIdStore.GetUserId()));
         }
 
         public void TransmitEvent(IAnalyticsEvent analyticsEvent)
@@ -31,28 +32,52 @@ namespace SpecFlow.VisualStudio.Analytics
             if (!_enableAnalyticsChecker.IsEnabled())
                 return;
 
-            var userUniqueId = _userUniqueIdStore.GetUserId();
             var appInsightsEvent = new EventTelemetry(analyticsEvent.EventName)
             {
                 Timestamp = DateTime.UtcNow,
-                Properties =
-                {
-                    
-                    { "Ide", "Microsoft Visual Studio" },
-                    { "UserId", userUniqueId },
-                    { "UtcDate", DateTime.UtcNow.ToString("O") },
-                    { "IdeVersion", _versionProvider.GetVsVersion() },
-                    { "ExtensionVersion", "TODO" }
-                }
             };
-            foreach (var analyticsEventProperty in analyticsEvent.Properties)
+
+            AddProps(appInsightsEvent, analyticsEvent.Properties);
+
+            TrackTelemetry(appInsightsEvent);
+        }
+
+        public void TransmitException(Exception exception, Dictionary<string, string> additionalProps)
+        {
+            if (!_enableAnalyticsChecker.IsEnabled())
+                return;
+
+            var exceptionTelemetry = new ExceptionTelemetry(exception)
             {
-                appInsightsEvent.Properties.Add(analyticsEventProperty);
+                Timestamp = DateTime.UtcNow
+            };
+
+            AddProps(exceptionTelemetry, additionalProps);
+
+            TrackTelemetry(exceptionTelemetry);
+        }
+        
+        private void AddProps(ISupportProperties telemetry, Dictionary<string, string> additionalProps)
+        {
+            foreach (var prop in additionalProps)
+            {
+                telemetry.Properties.Add(prop);
+            }
+        }
+
+        private void TrackTelemetry(ITelemetry telemetry)
+        {
+            switch (telemetry)
+            {
+                case EventTelemetry eventTelemetry:
+                    _telemetryClient.Value.TrackEvent(eventTelemetry);
+                    break;
+                case ExceptionTelemetry exceptionTelemetry:
+                    _telemetryClient.Value.TrackException(exceptionTelemetry);
+                    break;
             }
 
-            var telemetryClient = GetTelemetryClient(userUniqueId);
-            telemetryClient.TrackEvent(appInsightsEvent);
-            telemetryClient.Flush();
+            _telemetryClient.Value.Flush();
         }
 
         private TelemetryClient GetTelemetryClient(string userUniqueId)
