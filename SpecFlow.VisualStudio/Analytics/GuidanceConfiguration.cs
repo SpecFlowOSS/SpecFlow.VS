@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using SpecFlow.VisualStudio.EventTracking;
 
 namespace SpecFlow.VisualStudio.Analytics
 {

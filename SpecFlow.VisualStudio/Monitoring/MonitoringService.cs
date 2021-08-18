@@ -16,18 +16,18 @@ namespace SpecFlow.VisualStudio.Monitoring
     public class MonitoringService : IMonitoringService
     {
         private readonly IAnalyticsTransmitter _analyticsTransmitter;
-        private readonly IStatusAccessor _statusAccessor;
+        private readonly IRegistryManager _registryManager;
         private readonly IGuidanceConfiguration _guidanceConfiguration;
 
         [ImportingConstructor]
-        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter, IStatusAccessor statusAccessor, IGuidanceConfiguration guidanceConfiguration, IContextInitializer contextInitializer)
+        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter, IRegistryManager registryManager, IGuidanceConfiguration guidanceConfiguration, IContextInitializer contextInitializer)
         {
             TelemetryConfiguration.Active.InstrumentationKey = "27cfb992-6c29-4bc8-8093-78d95e275b3a";
             TelemetryConfiguration.Active.TelemetryChannel = new InMemoryChannel();
             TelemetryConfiguration.Active.ContextInitializers.Add(contextInitializer);
 
             _analyticsTransmitter = analyticsTransmitter;
-            _statusAccessor = statusAccessor;
+            _registryManager = registryManager;
             _guidanceConfiguration = guidanceConfiguration;
         }
 
@@ -72,7 +72,7 @@ namespace SpecFlow.VisualStudio.Monitoring
         private void UpdateUsageOfExtension()
         {
             var today = DateTime.Today;
-            var status = _statusAccessor.GetInstallStatus();
+            var status = _registryManager.GetInstallStatus();
             //todo: discuss extension versioning
             var CurrentVersion = new Version(1, 0);
 
@@ -88,7 +88,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                 status.InstalledVersion = CurrentVersion;
                 status.LastUsedDate = today;
 
-                _statusAccessor.UpdateStatus(status);
+                _registryManager.UpdateStatus(status);
                 //todo
                 //CheckFileAssociation();
                 //}
@@ -100,7 +100,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                     //a shiny new day with SpecFlow
                     status.UsageDays++;
                     status.LastUsedDate = today;
-                    _statusAccessor.UpdateStatus(status);
+                    _registryManager.UpdateStatus(status);
                 }
 
                 if (status.InstalledVersion < CurrentVersion)
@@ -116,7 +116,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                     status.InstallDate = today;
                     status.InstalledVersion = CurrentVersion;
 
-                    _statusAccessor.UpdateStatus(status);
+                    _registryManager.UpdateStatus(status);
                 }
                 else
                 {
@@ -132,7 +132,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                         _analyticsTransmitter.TransmitEvent(new GenericEvent($"{usageDays} day usage"));
 
                         status.UserLevel = (int)guidance.UserLevel;
-                        _statusAccessor.UpdateStatus(status);
+                        _registryManager.UpdateStatus(status);
                         //}
                     }
                 }

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using SpecFlow.VisualStudio.Common;
-using SpecFlow.VisualStudio.EventTracking;
 
 namespace SpecFlow.VisualStudio.Analytics
 {

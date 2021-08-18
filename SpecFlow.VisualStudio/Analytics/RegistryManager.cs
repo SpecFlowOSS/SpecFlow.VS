@@ -4,14 +4,15 @@ using Microsoft.Win32;
 
 namespace SpecFlow.VisualStudio.Analytics
 {
-    public interface IStatusAccessor
+    public interface IRegistryManager
     {
         bool UpdateStatus(SpecFlowInstallationStatus status);
         SpecFlowInstallationStatus GetInstallStatus();
+        object GetValueForKey(string configRoot, string registryValueName);
     }
 
-    [Export(typeof(IStatusAccessor))]
-    public class RegistryStatusAccessor : IStatusAccessor
+    [Export(typeof(IRegistryManager))]
+    public class RegistryManager : IRegistryManager
     {
         private const string REG_PATH = @"Software\TechTalk\SpecFlow";
 
@@ -22,6 +23,23 @@ namespace SpecFlow.VisualStudio.Analytics
                 var regPath = REG_PATH;
                 return regPath;
             }
+        }
+
+        private RegistryKey OpenKey(string configRoot)
+        {
+            return Registry.CurrentUser.OpenSubKey(configRoot, RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl);
+        }
+
+        public object GetValueForKey(string configRoot, string registryValueName)
+        {
+            var key = OpenKey(configRoot);
+            if (key != null)
+            {
+                var keyValue = key.GetValue(registryValueName, null);
+                return keyValue;
+            }
+
+            return null;
         }
 
         public SpecFlowInstallationStatus GetInstallStatus()

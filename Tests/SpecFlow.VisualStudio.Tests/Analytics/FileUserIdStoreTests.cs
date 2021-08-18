@@ -2,7 +2,6 @@
 using FluentAssertions;
 using Moq;
 using SpecFlow.VisualStudio.Analytics;
-using SpecFlow.VisualStudio.EventTracking;
 using Xunit;
 
 namespace SpecFlow.VisualStudio.Tests.Analytics

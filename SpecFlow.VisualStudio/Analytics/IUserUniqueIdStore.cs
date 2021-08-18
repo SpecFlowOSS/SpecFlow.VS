@@ -1,5 +1,4 @@
-﻿using SpecFlow.VisualStudio.EventTracking;
-using System;
+﻿using System;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.IO.Abstractions;

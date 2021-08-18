@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows.Navigation;
-using SpecFlow.VisualStudio.EventTracking;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.UI.ViewModels;
 using SpecFlow.VisualStudio.UI.Dialogs;
@@ -42,7 +41,7 @@ namespace SpecFlow.VisualStudio.UI
             var uriString = e.Uri.ToString();
             if (!uriString.StartsWith("file"))
             {
-                EventTracker.TrackWelcomeLinkClick(uriString);
+                //todo: track link click if needed
             }
         }
 
