@@ -6,7 +6,6 @@ using Microsoft.VisualStudio.ApplicationInsights.Channel;
 using Microsoft.VisualStudio.ApplicationInsights.Extensibility;
 using SpecFlow.VisualStudio.Analytics;
 using SpecFlow.VisualStudio.Common;
-using SpecFlow.VisualStudio.EventTracking;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.UI.ViewModels;
@@ -64,16 +63,10 @@ namespace SpecFlow.VisualStudio.Monitoring
                 GetProjectSettingsProps(projectSettings)));
         }
 
-        public void MonitorParserParse(ProjectSettings settings, int parseCount, int scenarioDefinitionCount)
+        public void MonitorParserParse(ProjectSettings settings, Dictionary<string, string> additionalProps)
         {
             _analyticsTransmitter.TransmitEvent(new GenericEvent("Feature file parsed", 
-                GetProjectSettingsProps(settings,
-                    new Dictionary<string, string>()
-                    {
-                        { "ParseCount", parseCount.ToString() },
-                        { "ScenarioDefinitionsCount", scenarioDefinitionCount.ToString() }
-                    })));
-            EventTracker.TrackParserParse(parseCount, scenarioDefinitionCount);
+                GetProjectSettingsProps(settings, additionalProps)));
         }
 
         private void UpdateUsageOfExtension()

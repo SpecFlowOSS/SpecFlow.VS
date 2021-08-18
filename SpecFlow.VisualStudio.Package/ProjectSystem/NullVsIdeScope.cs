@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Threading;
 using SpecFlow.VisualStudio.Diagnostics;
@@ -65,7 +66,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
             }
 
-            public void MonitorParserParse(ProjectSettings settings, int parseCount, int scenarioDefinitionCount)
+            public void MonitorParserParse(ProjectSettings settings, Dictionary<string, string> additionalProps = null)
             {
             }
 
