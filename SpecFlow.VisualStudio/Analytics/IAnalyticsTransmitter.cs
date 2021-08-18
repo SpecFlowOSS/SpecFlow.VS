@@ -49,46 +49,34 @@ namespace SpecFlow.VisualStudio.Analytics
         public void TransmitExceptionEvent(Exception exception, bool? isFatal = null, bool anonymize = true)
         {
             var isNormalError = IsNormalError(exception);
-            TransmitException(exception.Message, isFatal ?? !isNormalError, exception, anonymize: anonymize);
+            TransmitException(exception, isFatal ?? !isNormalError, anonymize: anonymize);
         }
 
         public void TransmitExceptionEvent(Exception exception, Dictionary<string, string> additionalProps, bool? isFatal = null, bool anonymize = true)
         {
-            TransmitException(exception.Message, isFatal ?? false, exception, additionalProps, anonymize);
+            TransmitException(exception, isFatal ?? false, additionalProps, anonymize);
         }
         
-        private void TransmitException(string errorMessage, bool isFatal, Exception exception = null, Dictionary<string, string> additionalProps = null, bool anonymize = true)
+        private void TransmitException(Exception exception, bool isFatal, Dictionary<string, string> additionalProps = null, bool anonymize = true)
         {
             try
             {
+                additionalProps ??= new Dictionary<string, string>();
+                var errorMessage = exception.Message;
+
                 if (anonymize)
                 {
-                    errorMessage = exception != null ? ErrorAnonymizer.AnonymizeException(exception) : 
-                        ErrorAnonymizer.AnonymizeErrorMessage(errorMessage);
+                    errorMessage = ErrorAnonymizer.AnonymizeException(exception);
                 }
 
-                var exceptionAnalyticsEvent = new GenericEvent("Visual Studio Extension Exception",
-                    new Dictionary<string, string>
-                    {
-                        { "ExceptionDetail", errorMessage },
-                        { "IsFatal", isFatal.ToString() }
-                    }
-                );
-                if (exception != null)
-                {
-                    exceptionAnalyticsEvent.Properties.Add("ExceptionType", exception.GetType().ToString());
-                    exceptionAnalyticsEvent.Properties.Add("ExceptionStackTrace", exception.StackTrace);
-                }
-
-                if (additionalProps != null)
-                {
-                    foreach (var prop in additionalProps)
-                    {
-                        exceptionAnalyticsEvent.Properties.Add(prop.Key, prop.Value);
-                    }
-                }
+                var anonymException = new Exception(errorMessage);
                 
-                _analyticsTransmitterSink.TransmitException(exception, additionalProps);
+                additionalProps.Add("ExceptionDetail", errorMessage);
+                additionalProps.Add("ExceptionType", exception.GetType().ToString());
+                additionalProps.Add("ExceptionStackTrace", exception.StackTrace);
+                additionalProps.Add("IsFatal", isFatal.ToString());
+
+                _analyticsTransmitterSink.TransmitException(anonymException, additionalProps);
             }
             catch (Exception)
             {
