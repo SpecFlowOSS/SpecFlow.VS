@@ -20,10 +20,11 @@ namespace SpecFlow.VisualStudio.Monitoring
         private readonly IGuidanceConfiguration _guidanceConfiguration;
 
         [ImportingConstructor]
-        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter, IStatusAccessor statusAccessor, IGuidanceConfiguration guidanceConfiguration)
+        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter, IStatusAccessor statusAccessor, IGuidanceConfiguration guidanceConfiguration, IContextInitializer contextInitializer)
         {
             TelemetryConfiguration.Active.InstrumentationKey = "27cfb992-6c29-4bc8-8093-78d95e275b3a";
             TelemetryConfiguration.Active.TelemetryChannel = new InMemoryChannel();
+            TelemetryConfiguration.Active.ContextInitializers.Add(contextInitializer);
 
             _analyticsTransmitter = analyticsTransmitter;
             _statusAccessor = statusAccessor;
