@@ -32,12 +32,12 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         // OPEN
 
-        public void MonitorLoadProjectSystem(string vsVersion)
+        public void MonitorLoadProjectSystem()
         {
             //currently we do nothing at this point
         }
 
-        public void MonitorOpenProjectSystem(string vsVersion, IIdeScope ideScope)
+        public void MonitorOpenProjectSystem(IIdeScope ideScope)
         {
             UpdateUsageOfExtension();
 

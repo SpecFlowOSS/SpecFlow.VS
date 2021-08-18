@@ -49,11 +49,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
         class NullMonitoringService : IMonitoringService
         {
-            public void MonitorLoadProjectSystem(string vsVersion)
+            public void MonitorLoadProjectSystem()
             {
             }
 
-            public void MonitorOpenProjectSystem(string vsVersion, IIdeScope ideScope)
+            public void MonitorOpenProjectSystem(IIdeScope ideScope)
             {
             }
 

@@ -107,7 +107,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
             _acivityStarted = true;
             Logger.LogInfo("Starting Deveroom...");
-            MonitoringService.MonitorOpenProjectSystem(VsUtils.GetVsProductDisplayVersion(ServiceProvider), this);
+            MonitoringService.MonitorOpenProjectSystem(this);
         }
 
         public IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation)

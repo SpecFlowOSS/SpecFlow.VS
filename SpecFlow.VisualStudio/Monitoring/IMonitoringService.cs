@@ -7,8 +7,8 @@ namespace SpecFlow.VisualStudio.Monitoring
 {
     public interface IMonitoringService
     {
-        void MonitorLoadProjectSystem(string vsVersion);
-        void MonitorOpenProjectSystem(string vsVersion, IIdeScope ideScope);
+        void MonitorLoadProjectSystem();
+        void MonitorOpenProjectSystem(IIdeScope ideScope);
         void MonitorOpenProject(ProjectSettings settings, int? featureFileCount);
         void MonitorOpenFeatureFile(ProjectSettings projectSettings);
 
