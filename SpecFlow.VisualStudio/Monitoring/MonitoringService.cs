@@ -233,6 +233,26 @@ namespace SpecFlow.VisualStudio.Monitoring
             _analyticsTransmitter.TransmitExceptionEvent(exception, isFatal);
         }
 
+
+        // PROJECT TEMPLATE WIZARD
+
+        public void MonitorProjectTemplateWizardStarted()
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Project Template Wizard Started"));
+        }
+
+        public void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions)
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Project Template Wizard Completed",
+                new Dictionary<string, string>()
+                {
+                    { "SelectedDotNetFramework", dotNetFramework },
+                    { "SelectedUnitTestFramework", unitTestFramework },
+                    { "AddFluentAssertions", addFluentAssertions.ToString() },
+                }));
+        }
+
+
         private Dictionary<string, string> GetProjectSettingsProps(ProjectSettings settings, Dictionary<string, string> additionalSettings = null)
         {
             Dictionary<string, string> props = null;

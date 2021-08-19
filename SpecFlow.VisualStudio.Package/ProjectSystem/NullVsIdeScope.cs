@@ -105,6 +105,14 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             public void MonitorError(Exception exception, bool? isFatal = null)
             {
             }
+
+            public void MonitorProjectTemplateWizardStarted()
+            {
+            }
+
+            public void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions)
+            {
+            }
         }
 
         public bool IsSolutionLoaded { get; } = false;

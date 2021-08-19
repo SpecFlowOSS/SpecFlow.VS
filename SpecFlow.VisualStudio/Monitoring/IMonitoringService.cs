@@ -26,5 +26,8 @@ namespace SpecFlow.VisualStudio.Monitoring
         void MonitorSpecFlowGeneration(bool isFailed, ProjectSettings projectSettings);
 
         void MonitorError(Exception exception, bool? isFatal = null);
+
+        void MonitorProjectTemplateWizardStarted();
+        void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions);
     }
 }

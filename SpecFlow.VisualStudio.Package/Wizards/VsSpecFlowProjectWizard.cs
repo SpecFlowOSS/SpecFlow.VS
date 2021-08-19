@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EnvDTE;
+using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.Wizards.Infrastructure;
 
@@ -14,7 +12,8 @@ namespace SpecFlow.VisualStudio.Wizards
         protected override SpecFlowProjectWizard ResolveWizard(DTE dte)
         {
             var windowManager = VsUtils.SafeResolveMefDependency<IDeveroomWindowManager>(dte);
-            return new SpecFlowProjectWizard(windowManager);
+            var monitoringService = VsUtils.SafeResolveMefDependency<IMonitoringService>(dte);
+            return new SpecFlowProjectWizard(windowManager, monitoringService);
         }
     }
 }
