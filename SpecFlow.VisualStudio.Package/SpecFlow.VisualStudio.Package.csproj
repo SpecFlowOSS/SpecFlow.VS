@@ -81,4 +81,32 @@
   </ItemGroup>
 
   <Import Project="..\Connectors\DeploymentAssets.props" />
+
+  <Target Name="ReplaceVersions" AfterTargets="GetBuildVersion">
+    <ItemGroup>
+      <TemplateFiles Include="$(MSBuildThisFileDirectory)..\SpecFlow.VisualStudio.ItemTemplates\**\*.vstemplate" />
+      <TemplateFiles Include="$(MSBuildThisFileDirectory)..\SpecFlow.VisualStudio.ProjectTemplate\**\*.vstemplate" />
+      <VsChangeLog Include="$(MSBuildThisFileDirectory)..\Changelog.md" />
+    </ItemGroup>
+
+    <Warning Text="Replace version to '$(AssemblyVersion)' in file: '%(TemplateFiles.FullPath)'." />
+
+    <WriteLinesToFile
+      File="%(TemplateFiles.FullPath)"
+      Lines="$([System.Text.RegularExpressions.Regex]::Replace(
+         $([System.IO.File]::ReadAllText(%(TemplateFiles.FullPath))), 
+         'Version=(\d+).(\d+).(\d+).(\d+),', 
+         'Version=$(AssemblyVersion),'))"
+      Overwrite="true"
+      Encoding="UTF-8"/>
+
+    <WriteLinesToFile
+      Condition=" '$(Configuration)' == 'Release' "
+      File="%(VsChangeLog.FullPath)"
+      Lines="$([System.IO.File]::ReadAllText(%(VsChangeLog.FullPath)).Replace('$vNext$','$(BuildVersionSimple)')
+        .Replace('$buildDate$','$([System.DateTime]::Now.ToString('yyyy-MM-dd'))'))"
+      Overwrite="true"
+      Encoding="Unicode"/>
+
+  </Target>
 </Project>
