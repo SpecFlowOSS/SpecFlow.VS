@@ -72,6 +72,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repo", "Repo", "{31ACD27E-7410-40B8-8E7D-3C0E787C0814}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
+		Directory.Build.props = Directory.Build.props
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlow30P220NetCoreConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlow30P220NetCoreConnector.Tests\SpecFlow.VisualStudio.SpecFlow30P220NetCoreConnector.Tests.csproj", "{C4DF9612-4416-4BD3-A67B-EC4115C97A44}"
