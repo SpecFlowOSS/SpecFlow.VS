@@ -1,20 +1,28 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using FluentAssertions;
-using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V21;
+using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow;
 using Xunit;
 
-namespace SpecFlow.VisualStudio.SpecFlow21Connector.Tests
+namespace SpecFlow.VisualStudio.SpecFlowConnector.V3.Tests
 {
-    public class SpecFlowV21DiscovererTests
+    // This test class is primarily for debugging connectors. The full compatibility matrix is verified by the
+    // scenarios in DiscoverySpecFlowVersionCompatibility.feature. 
+    // In order to debug a particular SpecFlow version and test execution framework, set the TestedSpecFlowVersion
+    // and TestedSpecFlowTestFramework properties in the project file.
+
+    public class SpecFlowV3ConnectorTests
     {
-        private SpecFlowV21Discoverer CreateSut()
+        private IDiscoveryResultDiscoverer CreateSut()
         {
-            var stubDiscoverer = new SpecFlowV21Discoverer();
-            return stubDiscoverer;
+            var versionSelectorDiscoverer = new VersionSelectorDiscoverer(AssemblyLoadContext.Default);
+            versionSelectorDiscoverer.EnsureDiscoverer();
+            versionSelectorDiscoverer.Discoverer.Should().BeAssignableTo<IDiscoveryResultDiscoverer>();
+            return (IDiscoveryResultDiscoverer)versionSelectorDiscoverer.Discoverer;
         }
 
         private string GetTestAssemblyPath()
@@ -22,7 +30,7 @@ namespace SpecFlow.VisualStudio.SpecFlow21Connector.Tests
             return Assembly.GetExecutingAssembly().Location;
         }
 
-        private DiscoveryResult PerformDiscover(SpecFlowV21Discoverer sut)
+        private DiscoveryResult PerformDiscover(IDiscoveryResultDiscoverer sut)
         {
             var testAssemblyPath = GetTestAssemblyPath();
             var testAssembly = Assembly.LoadFrom(testAssemblyPath);

@@ -11,7 +11,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
     public class VersionSelectorDiscoverer : ISpecFlowDiscoverer
     {
         private readonly AssemblyLoadContext _loadContext;
-        private ISpecFlowDiscoverer _discoverer;
+        internal ISpecFlowDiscoverer Discoverer { get; private set; }
 
         public VersionSelectorDiscoverer(AssemblyLoadContext loadContext)
         {
@@ -20,16 +20,20 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
 
         public string Discover(Assembly testAssembly, string testAssemblyPath, string configFilePath)
         {
-            if (_discoverer == null)
-                _discoverer = CreateDiscoverer();
+            EnsureDiscoverer();
 
-            return _discoverer.Discover(testAssembly, testAssemblyPath, configFilePath);
+            return Discoverer.Discover(testAssembly, testAssemblyPath, configFilePath);
+        }
+
+        internal void EnsureDiscoverer()
+        {
+            Discoverer ??= CreateDiscoverer();
         }
 
         public void Dispose()
         {
-            _discoverer?.Dispose();
-            _discoverer = null;
+            Discoverer?.Dispose();
+            Discoverer = null;
         }
 
         private ISpecFlowDiscoverer CreateDiscoverer()

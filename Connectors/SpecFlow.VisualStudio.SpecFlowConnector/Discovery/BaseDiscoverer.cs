@@ -10,7 +10,7 @@ using TechTalk.SpecFlow.Bindings.Reflection;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
 {
-    public abstract class BaseDiscoverer : RemoteContextObject, ISpecFlowDiscoverer
+    public abstract class BaseDiscoverer : RemoteContextObject, ISpecFlowDiscoverer, IDiscoveryResultDiscoverer
     {
         private readonly Dictionary<Assembly, IDeveroomSymbolReader> _symbolReaders = new Dictionary<Assembly, IDeveroomSymbolReader>(2);
         private readonly Dictionary<string, int> _sourceFiles = new Dictionary<string, int>();
@@ -24,7 +24,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
             return resultJson;
         }
 
-        internal DiscoveryResult DiscoverInternal(Assembly testAssembly, string testAssemblyPath, string configFilePath)
+        public DiscoveryResult DiscoverInternal(Assembly testAssembly, string testAssemblyPath, string configFilePath)
         {
             try
             {
