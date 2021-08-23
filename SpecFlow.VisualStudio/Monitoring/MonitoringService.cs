@@ -217,7 +217,7 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         public void MonitorSpecFlowGeneration(bool isFailed, ProjectSettings projectSettings)
         {
-            _analyticsTransmitter.TransmitEvent(new GenericEvent("SpecFlow Discovery executed",
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("SpecFlow Generation executed",
                 GetProjectSettingsProps(projectSettings,
                     new Dictionary<string, string>()
                     {
@@ -261,6 +261,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                 props = new Dictionary<string, string>
                 {
                     { "SpecFlowVersion", settings.GetSpecFlowVersionLabel() },
+                    //todo: add TFM(s) to the events
                     //{ "net", settings.TargetFrameworkMoniker.ToShortString() },
                     { "SingleFileGeneratorUsed", settings.DesignTimeFeatureFileGenerationEnabled.ToString() },
                 };

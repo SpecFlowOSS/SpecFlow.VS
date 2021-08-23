@@ -29,7 +29,7 @@ namespace SpecFlow.VisualStudio
 
         private string GetVsProductDisplayVersion()
         {
-            return VsUtils.GetVsProductDisplayVersion(_serviceProvider);
+            return VsUtils.GetVsProductDisplayVersionSafe(_serviceProvider);
         }
 
         public string GetExtensionVersion()

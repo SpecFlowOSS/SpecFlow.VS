@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
 using SpecFlow.VisualStudio.Monitoring;
@@ -8,11 +9,13 @@ using SpecFlow.VisualStudio.Wizards.Infrastructure;
 
 namespace SpecFlow.VisualStudio.Wizards
 {
+    [Export(typeof(SpecFlowProjectWizard))]
     public class SpecFlowProjectWizard : IDeveroomWizard
     {
         private readonly IDeveroomWindowManager _deveroomWindowManager;
         private readonly IMonitoringService _monitoringService;
 
+        [ImportingConstructor]
         public SpecFlowProjectWizard(IDeveroomWindowManager deveroomWindowManager, IMonitoringService monitoringService)
         {
             _deveroomWindowManager = deveroomWindowManager;

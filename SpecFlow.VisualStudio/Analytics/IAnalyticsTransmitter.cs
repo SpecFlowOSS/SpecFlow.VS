@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -66,9 +67,10 @@ namespace SpecFlow.VisualStudio.Analytics
 
                 _analyticsTransmitterSink.TransmitException(exception, additionalProps);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // catch all exceptions since we do not want to break the whole extension simply because data transmission failed
+                Debug.WriteLine(ex, "Error during transmitting analytics event.");
             }
         }
 
