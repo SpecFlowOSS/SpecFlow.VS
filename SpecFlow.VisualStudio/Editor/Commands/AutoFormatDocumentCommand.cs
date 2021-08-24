@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -58,26 +59,40 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 endLine = selectionSpan.End.GetContainingLine().LineNumber;
             }
 
-            var formatSettings = new GherkinFormatSettings();//todo: take from config
+            var formatSettings = LoadFormatSettings(textView.Options);
 
             var lines = new DocumentLinesEditBuffer(textSnapshot, startLine, endLine);
             if (lines.IsEmpty)
                 return false;
-            
+
+            _gherkinDocumentFormatter.FormatGherkinDocument(gherkinDocument, lines, formatSettings);
+            var changeSpan = lines.GetSnapshotSpan();
+            var newLine = GetNewLine(textView);
+            var replacementText = lines.GetModifiedText(newLine);
+
+            if (changeSpan.GetText().Equals(replacementText)) // no change
+                return false;
+
             using (var textEdit = textSnapshot.TextBuffer.CreateEdit())
             {
-                _gherkinDocumentFormatter.FormatGherkinDocument(gherkinDocument, lines, formatSettings);
-
-                var newLine = GetNewLine(textView);
-                var replacementText = lines.GetModifiedText(newLine);
-
-                textEdit.Replace(lines.GetSnapshotSpan(), replacementText);
+                textEdit.Replace(changeSpan, replacementText);
                 textEdit.Apply();
             }
 
             textView.Caret.MoveTo(textView.TextSnapshot.GetLineFromLineNumber(caretLineNumber).End);
 
             return true;
+        }
+
+        private static GherkinFormatSettings LoadFormatSettings(IEditorOptions editorOptions)
+        {
+            var formatSettings = new GherkinFormatSettings();
+
+            var convertTabsToSpaces = editorOptions.GetOptionValue(DefaultOptions.ConvertTabsToSpacesOptionId);
+            var indentSize = editorOptions.GetOptionValue(DefaultOptions.IndentSizeOptionId);
+            formatSettings.Indent = convertTabsToSpaces ? new string(' ', indentSize) : new string('\t', 1);
+
+            return formatSettings;
         }
     }
 }
