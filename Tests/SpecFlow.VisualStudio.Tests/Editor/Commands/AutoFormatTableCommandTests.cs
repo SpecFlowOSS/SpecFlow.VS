@@ -1,6 +1,7 @@
 ﻿using System;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Editor.Commands;
+using SpecFlow.VisualStudio.Editor.Services.Formatting;
 using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using Xunit;
@@ -90,7 +91,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         }
 
         [Fact]
-        public void Should_not_remove_unfinished_cells_when_formattig_table()
+        public void Should_not_remove_unfinished_cells_when_formatting_table()
         {
             var command = CreateSUT();
             var inputText = new TestText(
@@ -306,7 +307,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
         private AutoFormatTableCommand CreateSUT()
         {
-            return new AutoFormatTableCommand(_ideScope, new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+            return new AutoFormatTableCommand(_ideScope, new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService, new GherkinDocumentFormatter());
         }
     }
 }

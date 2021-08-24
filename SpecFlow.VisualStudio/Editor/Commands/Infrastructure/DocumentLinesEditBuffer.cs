@@ -22,6 +22,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
         {
         }
 
+        public DocumentLinesEditBuffer(SnapshotSpan snapshotSpan)
+            : this(snapshotSpan.Snapshot, snapshotSpan.Start.GetContainingLine().LineNumber, snapshotSpan.End.GetContainingLine().LineNumber)
+        {
+        }
+
         internal DocumentLinesEditBuffer(ITextSnapshot textSnapshot, int startLine, int endLine, string[] lines)
         {
             _textSnapshot = textSnapshot;

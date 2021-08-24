@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.Text;
 using Moq;
 using SpecFlow.VisualStudio.Diagnostics;
+using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services.Formatting;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
@@ -109,6 +110,47 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Services
                 @"        ```",
                 @"         ",
                 @"        ```",
+                @"");
+            Assert.Equal(expectedText.ToString(), linesBuffer.GetModifiedText(Environment.NewLine));
+        }
+
+
+        [Fact]
+        public void Should_not_remove_unfinished_cells_when_formatting_table()
+        {
+            var sut = CreateSUT();
+            var inputText = new TestText(
+                @"Feature: foo",
+                @"Scenario: bar",
+                @"Given table",
+                @"    | foo |    bar  ",
+                @"    | foo  |  bar baz  ",
+                @"    | foo   ",
+                @"    |   ",
+                @"    | foo   |    ",
+                @"    | foo   | \|   ",
+                @"    | foo   | \|",
+                @"    | foo   | bar \\|   ",
+                @"    | foo   | bar |",
+                @"");
+
+            var linesBuffer = GetLinesBuffer(inputText);
+
+            sut.FormatGherkinDocument(ParseGherkinDocument(inputText), linesBuffer, _formatSettings);
+
+            var expectedText = new TestText(
+                @"Feature: foo",
+                @"Scenario: bar",
+                @"    Given table",
+                @"        | foo | bar",
+                @"        | foo | bar baz",
+                @"        | foo",
+                @"        |",
+                @"        | foo |",
+                @"        | foo | \|",
+                @"        | foo | \|",
+                @"        | foo | bar \\ |",
+                @"        | foo | bar    |",
                 @"");
             Assert.Equal(expectedText.ToString(), linesBuffer.GetModifiedText(Environment.NewLine));
         }

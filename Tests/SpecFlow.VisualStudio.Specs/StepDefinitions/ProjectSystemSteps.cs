@@ -300,7 +300,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                 case "Auto Format Table":
                 {
                     var command = new AutoFormatTableCommand(_ideScope,
-                        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService, new GherkinDocumentFormatter());
                     _wpfTextView.SimulateType(command, parameter?[0] ?? '|');
                     break;
                 }

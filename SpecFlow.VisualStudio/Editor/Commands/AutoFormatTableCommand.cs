@@ -2,7 +2,6 @@
 using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services;
@@ -11,15 +10,15 @@ using SpecFlow.VisualStudio.ProjectSystem;
 using Gherkin.Ast;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Text.Tagging;
+using SpecFlow.VisualStudio.Editor.Services.Formatting;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
     [Export(typeof(IDeveroomFeatureEditorCommand))]
     public class AutoFormatTableCommand : DeveroomEditorTypeCharCommandBase, IDeveroomFeatureEditorCommand
     {
-        private struct TableCaretPosition
+        private readonly struct TableCaretPosition
         {
             public readonly int Line;
             public readonly int Column;
@@ -37,18 +36,18 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 Cell = cell;
             }
 
-            public static TableCaretPosition CreateUnknown(int line, int column) => new TableCaretPosition(line, column, null);
-            public static TableCaretPosition CreateBeforeFirstCell(int line, int column) => new TableCaretPosition(line, column, null);
-            public static TableCaretPosition CreateInCell(int line, int cell, int withinCellColumn) => new TableCaretPosition(line, withinCellColumn, cell);
-            public static TableCaretPosition CreateAfterLastCell(int line) => new TableCaretPosition(line, 0, int.MaxValue);
+            public static TableCaretPosition CreateUnknown(int line, int column) => new(line, column, null);
+            public static TableCaretPosition CreateBeforeFirstCell(int line, int column) => new(line, column, null);
+            public static TableCaretPosition CreateInCell(int line, int cell, int withinCellColumn) => new(line, withinCellColumn, cell);
+            public static TableCaretPosition CreateAfterLastCell(int line) => new(line, 0, int.MaxValue);
         }
 
-        private const int PADDING_LENGHT = 1;
-        private const int PIPE_LENGHT = 1;
+        private readonly GherkinDocumentFormatter _gherkinDocumentFormatter;
 
         [ImportingConstructor]
-        public AutoFormatTableCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService) : base(ideScope, aggregatorFactory, monitoringService)
+        public AutoFormatTableCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService, GherkinDocumentFormatter gherkinDocumentFormatter) : base(ideScope, aggregatorFactory, monitoringService)
         {
+            _gherkinDocumentFormatter = gherkinDocumentFormatter;
         }
 
         protected internal override bool PostExec(IWpfTextView textView, char ch)
@@ -61,14 +60,24 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 return false;
 
             var currentText = dataTableTag.Span.GetText();
-            if (IsEscapedPipeTyped(currentText, textView.Caret.Position.BufferPosition))
+            if (IsEscapedPipeTyped(textView.Caret.Position.BufferPosition))
+                return false;
+
+            var lines = new DocumentLinesEditBuffer(dataTableTag.Span);
+            if (lines.IsEmpty)
                 return false;
 
             var indent = GetIndent(textView.TextSnapshot, hasRows);
             var newLine = GetNewLine(textView);
+            var formatSettings = new GherkinFormatSettings();
 
             var caretPosition = GetCaretPosition(textView.Caret.Position, hasRows);
-            var formattedTableText = GetFormattedTableText(hasRows, indent, newLine, caretPosition, textView.TextSnapshot, out var newCaretLineColumn);
+            var widths = _gherkinDocumentFormatter.GetTableWidths(hasRows);
+            _gherkinDocumentFormatter.FormatTable(lines, hasRows, formatSettings, indent, widths);
+
+            var formattedTableText = lines.GetModifiedText(newLine);
+
+            var newCaretLineColumn = CalculateNewCaretLinePosition(caretPosition, widths, indent, formatSettings);
             if (currentText.Equals(formattedTableText))
                 return false;
 
@@ -84,7 +93,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return true;
         }
 
-        private bool IsEscapedPipeTyped(string currentText, SnapshotPoint positionBufferPosition)
+        private bool IsEscapedPipeTyped(SnapshotPoint positionBufferPosition)
         {
             positionBufferPosition = positionBufferPosition.Subtract(1);
             int backslashCount = 0;
@@ -171,77 +180,9 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return pipeMatch.Success ? pipeMatch.Index : -1;
         }
 
-        private string GetFormattedTableText(IHasRows hasRows, string indent, string newLine, TableCaretPosition caretPosition, ITextSnapshot textSnapshot, out int newCaretLinePosition)
+        private int CalculateNewCaretLinePosition(TableCaretPosition caretPosition, int[] widths, string indent, GherkinFormatSettings formatSettings)
         {
-            var widths = GetWidths(hasRows);
-
-            int nextLine = ((IHasLocation)hasRows).Location.Line;
-            var result = new StringBuilder();
-            foreach (var row in hasRows.Rows)
-            {
-                while (row.Location.Line > nextLine)
-                {
-                    var nonRowLine = textSnapshot.GetLineFromLineNumber(nextLine - 1);
-                    result.Append(nonRowLine.GetText());
-                    result.Append(newLine);
-                    nextLine++;
-                }
-
-                result.Append(indent);
-                result.Append("|");
-                foreach (var item in row.Cells.Select((c, i) => new { c, i }))
-                {
-                    result.Append(new string(' ', PADDING_LENGHT));
-                    result.Append(Escape(item.c.Value).PadRight(widths[item.i]));
-                    result.Append(new string(' ', PADDING_LENGHT));
-                    result.Append('|');
-                }
-
-                var lineText = textSnapshot.GetLineFromLineNumber(nextLine - 1).GetText();
-                var unfinishedCell = GetUnfinishedCell(lineText);
-                if (unfinishedCell != null)
-                {
-                    result.Append(' ');
-                    result.Append(unfinishedCell);
-                }
-
-                result.Append(newLine);
-                nextLine++;
-            }
-            result.Remove(result.Length - newLine.Length, newLine.Length);
-
-            newCaretLinePosition = CalculateNewCaretLinePosition(caretPosition, widths, indent);
-
-            return result.ToString();
-        }
-
-        private static string GetUnfinishedCell(string lineText)
-        {
-            var match = Regex.Match(lineText, @"(?<!\\)(\\\\)*\|(?<remaining>.*?)$", RegexOptions.RightToLeft);
-            string unfinishedCell = null;
-            if (match.Success && !string.IsNullOrWhiteSpace(match.Groups["remaining"].Value))
-            {
-                unfinishedCell = match.Groups["remaining"].Value.Trim();
-            }
-
-            return unfinishedCell;
-        }
-
-        internal static int[] GetWidths(IHasRows hasRows)
-        {
-            var widths = new int[hasRows.Rows.Max(r => r.Cells.Count())];
-            foreach (var row in hasRows.Rows)
-            {
-                foreach (var item in row.Cells.Select((c, i) => new {c, i}))
-                {
-                    widths[item.i] = Math.Max(widths[item.i], Escape(item.c.Value).Length);
-                }
-            }
-            return widths;
-        }
-
-        private int CalculateNewCaretLinePosition(TableCaretPosition caretPosition, int[] widths, string indent)
-        {
+            const int PIPE_LENGTH = 1;
             if (caretPosition.IsUnknown)
             {
                 return caretPosition.Column;
@@ -255,27 +196,18 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var positionAfterCellOpenPipe =
                 indent.Length +
                 widths.Take(Math.Min(widths.Length, caretPosition.Cell.Value))
-                    .Sum(w => w + PADDING_LENGHT * 2 + PIPE_LENGHT) +
-                PIPE_LENGHT;
+                    .Sum(w => w + formatSettings.TableCellPadding.Length * 2 + PIPE_LENGTH) +
+                PIPE_LENGTH;
 
             if (caretPosition.IsAfterLastCell)
                 return positionAfterCellOpenPipe; // position after the last cell pipe (position of the open pipe of the one after last cell)
 
             Debug.Assert(caretPosition.IsInCell);
-            // position within the cell + 2*padding, if cell has been shrinked, we move position to end of cell (Math.Min)
+            // position within the cell + 2*padding, if cell has been shrunk, we move position to end of cell (Math.Min)
             return positionAfterCellOpenPipe +
-                PADDING_LENGHT + 
-                Math.Min(caretPosition.Column, widths[caretPosition.Cell.Value] + 
-                    PADDING_LENGHT);
-        }
-
-        internal static string Escape(string cellValue)
-        {
-            return cellValue
-                .Replace("\\", "\\\\")
-                .Replace("\r", "\\r")
-                .Replace("\n", "\\n")
-                .Replace("|", "\\|");
+                   formatSettings.TableCellPadding.Length + 
+                Math.Min(caretPosition.Column, 
+                    widths[caretPosition.Cell.Value] + formatSettings.TableCellPadding.Length);
         }
     }
 }

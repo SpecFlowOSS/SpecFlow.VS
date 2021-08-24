@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Gherkin.Ast;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
@@ -78,20 +79,20 @@ namespace SpecFlow.VisualStudio.Editor.Services.Formatting
                 SetLine(lines, hasLocation, GetHasDescriptionLine(hasDescription, indent));
             }
         }
-        internal static int[] GetWidths(IHasRows hasRows)
+        internal int[] GetTableWidths(IHasRows hasRows)
         {
             var widths = new int[hasRows.Rows.Max(r => r.Cells.Count())];
             foreach (var row in hasRows.Rows)
             {
                 foreach (var item in row.Cells.Select((c, i) => new { c, i }))
                 {
-                    widths[item.i] = Math.Max(widths[item.i], Escape(item.c.Value).Length);
+                    widths[item.i] = Math.Max(widths[item.i], EscapeTableCellValue(item.c.Value).Length);
                 }
             }
             return widths;
         }
 
-        internal static string Escape(string cellValue)
+        private string EscapeTableCellValue(string cellValue)
         {
             return cellValue
                 .Replace("\\", "\\\\")
@@ -100,10 +101,27 @@ namespace SpecFlow.VisualStudio.Editor.Services.Formatting
                 .Replace("|", "\\|");
         }
 
+        private string GetUnfinishedTableCell(string lineText)
+        {
+            var match = Regex.Match(lineText, @"(?<!\\)(\\\\)*\|(?<remaining>.*?)$", RegexOptions.RightToLeft);
+            string unfinishedCell = null;
+            if (match.Success && !string.IsNullOrWhiteSpace(match.Groups["remaining"].Value))
+            {
+                unfinishedCell = match.Groups["remaining"].Value.Trim();
+            }
+
+            return unfinishedCell;
+        }
+
         private void FormatTable(DocumentLinesEditBuffer lines, IHasRows hasRows, GherkinFormatSettings formatSettings, int indentLevel)
         {
             var indent = GetIndent(formatSettings, indentLevel);
-            var widths = GetWidths(hasRows);
+            FormatTable(lines, hasRows, formatSettings, indent);
+        }
+
+        public void FormatTable(DocumentLinesEditBuffer lines, IHasRows hasRows, GherkinFormatSettings formatSettings, string indent, int[] widths = null)
+        {
+            widths ??= GetTableWidths(hasRows);
             foreach (var row in hasRows.Rows)
             {
                 var result = new StringBuilder();
@@ -112,9 +130,16 @@ namespace SpecFlow.VisualStudio.Editor.Services.Formatting
                 foreach (var item in row.Cells.Select((c, i) => new { c, i }))
                 {
                     result.Append(formatSettings.TableCellPadding);
-                    result.Append(Escape(item.c.Value).PadRight(widths[item.i]));
+                    result.Append(EscapeTableCellValue(item.c.Value).PadRight(widths[item.i]));
                     result.Append(formatSettings.TableCellPadding);
                     result.Append('|');
+                }
+
+                var unfinishedCell = GetUnfinishedTableCell(lines.GetLineOneBased(row.Location.Line));
+                if (unfinishedCell != null)
+                {
+                    result.Append(formatSettings.TableCellPadding);
+                    result.Append(unfinishedCell);
                 }
 
                 SetLine(lines, row, result.ToString());
