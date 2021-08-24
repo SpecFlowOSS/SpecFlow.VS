@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services;
+using SpecFlow.VisualStudio.Editor.Services.EditorConfig;
 using SpecFlow.VisualStudio.Editor.Services.Formatting;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
 using SpecFlow.VisualStudio.Monitoring;
@@ -28,11 +29,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         };
 
         private readonly GherkinDocumentFormatter _gherkinDocumentFormatter;
+        private readonly EditorConfigOptionsProvider _editorConfigOptionsProvider;
 
         [ImportingConstructor]
-        public AutoFormatDocumentCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService, GherkinDocumentFormatter gherkinDocumentFormatter) : base(ideScope, aggregatorFactory, monitoringService)
+        public AutoFormatDocumentCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService, GherkinDocumentFormatter gherkinDocumentFormatter, EditorConfigOptionsProvider editorConfigOptionsProvider = null) : base(ideScope, aggregatorFactory, monitoringService)
         {
             _gherkinDocumentFormatter = gherkinDocumentFormatter;
+            _editorConfigOptionsProvider = editorConfigOptionsProvider;
         }
 
         public override bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs = default(IntPtr))
@@ -59,7 +62,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 endLine = selectionSpan.End.GetContainingLine().LineNumber;
             }
 
-            var formatSettings = LoadFormatSettings(textView.Options);
+            var formatSettings = LoadFormatSettings(textView);
 
             var lines = new DocumentLinesEditBuffer(textSnapshot, startLine, endLine);
             if (lines.IsEmpty)
@@ -84,13 +87,21 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return true;
         }
 
-        private static GherkinFormatSettings LoadFormatSettings(IEditorOptions editorOptions)
+        private GherkinFormatSettings LoadFormatSettings(IWpfTextView textView)
         {
             var formatSettings = new GherkinFormatSettings();
 
+            var editorOptions = textView.Options;
             var convertTabsToSpaces = editorOptions.GetOptionValue(DefaultOptions.ConvertTabsToSpacesOptionId);
             var indentSize = editorOptions.GetOptionValue(DefaultOptions.IndentSizeOptionId);
             formatSettings.Indent = convertTabsToSpaces ? new string(' ', indentSize) : new string('\t', 1);
+
+            var editorConfigOptions = _editorConfigOptionsProvider?.GetEditorConfigOptions(textView);
+            if (editorConfigOptions != null)
+            {
+                formatSettings.FeatureChildrenIndentLevel =
+                    editorConfigOptions.GetBoolOption("gherkin_indent_feature_children", false) ? 1 : 0;
+            }
 
             return formatSettings;
         }
