@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 
 namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
@@ -35,16 +32,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
             _lines = lines;
         }
 
-        private string GetLine(int zeroBasedLineNumber)
+        public string GetLine(int zeroBasedLineNumber)
         {
             if (zeroBasedLineNumber < _startLine || zeroBasedLineNumber > _endLine)
-                return string.Empty;
+                return _textSnapshot.GetLineFromLineNumber(zeroBasedLineNumber).GetText();
             return _lines[zeroBasedLineNumber - _startLine];
         }
 
         public string GetLineOneBased(int oneBasedLineNumber) => GetLine(oneBasedLineNumber - 1);
 
-        private void SetLine(int zeroBasedLineNumber, string line)
+        public void SetLine(int zeroBasedLineNumber, string line)
         {
             if (zeroBasedLineNumber < _startLine || zeroBasedLineNumber > _endLine)
                 return;
