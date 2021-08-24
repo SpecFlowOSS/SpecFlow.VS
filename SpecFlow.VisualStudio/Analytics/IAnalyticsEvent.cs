@@ -7,19 +7,19 @@ namespace SpecFlow.VisualStudio.Analytics
     {
         string EventName { get; }
 
-        Dictionary<string, string> Properties { get; }
+        Dictionary<string, object> Properties { get; }
     }
 
     [Export(typeof(IAnalyticsEvent))]
     public class GenericEvent : IAnalyticsEvent
     {
-        public GenericEvent(string eventName, Dictionary<string, string> properties = null)
+        public GenericEvent(string eventName, Dictionary<string, object> properties = null)
         {
             EventName = eventName;
-            Properties = properties ?? new Dictionary<string, string>();
+            Properties = properties ?? new Dictionary<string, object>();
         }
 
         public string EventName { get; }
-        public Dictionary<string, string> Properties { get; }
+        public Dictionary<string, object> Properties { get; }
     }
 }

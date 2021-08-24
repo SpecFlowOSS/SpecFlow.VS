@@ -66,7 +66,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
             }
 
-            public void MonitorParserParse(ProjectSettings settings, Dictionary<string, string> additionalProps = null)
+            public void MonitorParserParse(ProjectSettings settings, Dictionary<string, object> additionalProps = null)
             {
             }
 

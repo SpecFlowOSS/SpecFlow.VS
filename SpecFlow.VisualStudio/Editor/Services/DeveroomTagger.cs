@@ -207,17 +207,17 @@ namespace SpecFlow.VisualStudio.Editor.Services
             }
         }
 
-        private Dictionary<string, string> PrepareParsingResultProps(List<DeveroomTag> deveroomTags, int parseCount, int scenarioDefinitionCount)
+        private Dictionary<string, object> PrepareParsingResultProps(List<DeveroomTag> deveroomTags, int parseCount, int scenarioDefinitionCount)
         {
             var stepsCount = deveroomTags.Count(t => t.Type == DeveroomTagTypes.StepBlock);
             var rulesCount = deveroomTags.Count(t => t.Type == DeveroomTagTypes.RuleBlock);
 
-            return new Dictionary<string, string>
+            return new Dictionary<string, object>
             {
-                { "ScenarioDefinitionsCount", scenarioDefinitionCount.ToString() },
-                { "ParseCount", parseCount.ToString() },
-                { "StepsCount", stepsCount.ToString() },
-                { "RulesCount", rulesCount.ToString() },
+                { "ScenarioDefinitionsCount", scenarioDefinitionCount },
+                { "ParseCount", parseCount },
+                { "StepsCount", stepsCount },
+                { "RulesCount", rulesCount },
             };
         }
 

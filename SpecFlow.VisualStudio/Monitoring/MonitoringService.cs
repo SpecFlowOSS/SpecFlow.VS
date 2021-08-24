@@ -50,9 +50,9 @@ namespace SpecFlow.VisualStudio.Monitoring
         {
             _analyticsTransmitter.TransmitEvent(new GenericEvent("Project loaded",
                 GetProjectSettingsProps(settings,
-                    new Dictionary<string, string>()
+                    new Dictionary<string, object>()
                     {
-                        { "FeatureFileCount", featureFileCount.ToString() }
+                        { "FeatureFileCount", featureFileCount }
                     }
                     )));
         }
@@ -63,7 +63,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                 GetProjectSettingsProps(projectSettings)));
         }
 
-        public void MonitorParserParse(ProjectSettings settings, Dictionary<string, string> additionalProps)
+        public void MonitorParserParse(ProjectSettings settings, Dictionary<string, object> additionalProps)
         {
             _analyticsTransmitter.TransmitEvent(new GenericEvent("Feature file parsed", 
                 GetProjectSettingsProps(settings, additionalProps)));
@@ -108,7 +108,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                     //upgrading user
                     var installedVersion = status.InstalledVersion.ToString();
                     _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension upgraded",
-                        new Dictionary<string, string>
+                        new Dictionary<string, object>
                         {
                             { "OldExtensionVersion", installedVersion }
                         }));
@@ -156,29 +156,29 @@ namespace SpecFlow.VisualStudio.Monitoring
         public void MonitorCommandDefineSteps(CreateStepDefinitionsDialogResult action, int snippetCount)
         {
             _analyticsTransmitter.TransmitEvent(new GenericEvent("DefineSteps command executed",
-                new Dictionary<string, string>()
+                new Dictionary<string, object>()
                 {
-                    { "Action", action.ToString() },
-                    { "SnippetCount", snippetCount.ToString() }
+                    { "Action", action },
+                    { "SnippetCount", snippetCount }
                 }));
         }
 
         public void MonitorCommandFindStepDefinitionUsages(int usagesCount, bool isCancelled)
         {
             _analyticsTransmitter.TransmitEvent(new GenericEvent("FindStepDefinitionUsages command executed",
-                new Dictionary<string, string>()
+                new Dictionary<string, object>()
                 {
-                    { "UsagesFound", usagesCount.ToString() },
-                    { "IsCancelled", isCancelled.ToString() }
+                    { "UsagesFound", usagesCount },
+                    { "IsCancelled", isCancelled }
                 }));
         }
 
         public void MonitorCommandGoToStepDefinition(bool generateSnippet)
         {
             _analyticsTransmitter.TransmitEvent(new GenericEvent("GoToStepDefinition command executed",
-                new Dictionary<string, string>()
+                new Dictionary<string, object>()
                 {
-                    { "GenerateSnippet", generateSnippet.ToString() }
+                    { "GenerateSnippet", generateSnippet }
                 }));
         }
 
@@ -205,10 +205,10 @@ namespace SpecFlow.VisualStudio.Monitoring
                 _analyticsTransmitter.TransmitExceptionEvent(discoveryException, GetProjectSettingsProps(projectSettings));
             }
 
-            var additionalProps = new Dictionary<string, string>()
+            var additionalProps = new Dictionary<string, object>()
             {
-                { "IsFailed", isFailed.ToString() },
-                { "StepDefinitionCount", stepDefinitionCount.ToString() }
+                { "IsFailed", isFailed },
+                { "StepDefinitionCount", stepDefinitionCount }
             };
             _analyticsTransmitter.TransmitEvent(new GenericEvent("SpecFlow Discovery executed",
                 GetProjectSettingsProps(projectSettings,
@@ -219,9 +219,9 @@ namespace SpecFlow.VisualStudio.Monitoring
         {
             _analyticsTransmitter.TransmitEvent(new GenericEvent("SpecFlow Generation executed",
                 GetProjectSettingsProps(projectSettings,
-                    new Dictionary<string, string>()
+                    new Dictionary<string, object>()
                     {
-                        { "IsFailed", isFailed.ToString() }
+                        { "IsFailed", isFailed }
                     })));
         }
 
@@ -244,31 +244,31 @@ namespace SpecFlow.VisualStudio.Monitoring
         public void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions)
         {
             _analyticsTransmitter.TransmitEvent(new GenericEvent("Project Template Wizard Completed",
-                new Dictionary<string, string>()
+                new Dictionary<string, object>()
                 {
                     { "SelectedDotNetFramework", dotNetFramework },
                     { "SelectedUnitTestFramework", unitTestFramework },
-                    { "AddFluentAssertions", addFluentAssertions.ToString() },
+                    { "AddFluentAssertions", addFluentAssertions },
                 }));
         }
 
 
-        private Dictionary<string, string> GetProjectSettingsProps(ProjectSettings settings, Dictionary<string, string> additionalSettings = null)
+        private Dictionary<string, object> GetProjectSettingsProps(ProjectSettings settings, Dictionary<string, object> additionalSettings = null)
         {
-            Dictionary<string, string> props = null;
+            Dictionary<string, object> props = null;
             if (settings != null)
             {
-                props = new Dictionary<string, string>
+                props = new Dictionary<string, object>
                 {
                     { "SpecFlowVersion", settings.GetSpecFlowVersionLabel() },
                     //todo: add TFM(s) to the events
                     //{ "net", settings.TargetFrameworkMoniker.ToShortString() },
-                    { "SingleFileGeneratorUsed", settings.DesignTimeFeatureFileGenerationEnabled.ToString() },
+                    { "SingleFileGeneratorUsed", settings.DesignTimeFeatureFileGenerationEnabled },
                 };
             }
             if (additionalSettings != null && additionalSettings.Any())
             {
-                props ??= new Dictionary<string, string>();
+                props ??= new Dictionary<string, object>();
                 foreach (var additionalSetting in additionalSettings)
                 {
                     props.Add(additionalSetting.Key, additionalSetting.Value);

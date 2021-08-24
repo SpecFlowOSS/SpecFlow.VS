@@ -11,7 +11,7 @@ namespace SpecFlow.VisualStudio.Analytics
     public interface IAnalyticsTransmitterSink
     {
         void TransmitEvent(IAnalyticsEvent analyticsEvent);
-        void TransmitException(Exception exception, Dictionary<string, string> eventName);
+        void TransmitException(Exception exception, Dictionary<string, object> eventName);
     }
 
     [Export(typeof(IAnalyticsTransmitterSink))]
@@ -42,7 +42,7 @@ namespace SpecFlow.VisualStudio.Analytics
             TrackTelemetry(appInsightsEvent);
         }
 
-        public void TransmitException(Exception exception, Dictionary<string, string> additionalProps)
+        public void TransmitException(Exception exception, Dictionary<string, object> additionalProps)
         {
             if (!_enableAnalyticsChecker.IsEnabled())
                 return;
@@ -57,11 +57,11 @@ namespace SpecFlow.VisualStudio.Analytics
             TrackTelemetry(exceptionTelemetry);
         }
         
-        private void AddProps(ISupportProperties telemetry, Dictionary<string, string> additionalProps)
+        private void AddProps(ISupportProperties telemetry, Dictionary<string, object> additionalProps)
         {
             foreach (var prop in additionalProps)
             {
-                telemetry.Properties.Add(prop);
+                telemetry.Properties.Add(prop.Key, prop.Value.ToString());
             }
         }
 
