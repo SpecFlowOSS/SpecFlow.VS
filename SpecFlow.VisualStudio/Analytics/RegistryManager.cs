@@ -8,7 +8,6 @@ namespace SpecFlow.VisualStudio.Analytics
     {
         bool UpdateStatus(SpecFlowInstallationStatus status);
         SpecFlowInstallationStatus GetInstallStatus();
-        object GetValueForKey(string configRoot, string registryValueName);
     }
 
     [Export(typeof(IRegistryManager))]
@@ -23,23 +22,6 @@ namespace SpecFlow.VisualStudio.Analytics
                 var regPath = REG_PATH;
                 return regPath;
             }
-        }
-
-        private RegistryKey OpenKey(string configRoot)
-        {
-            return Registry.CurrentUser.OpenSubKey(configRoot, RegistryKeyPermissionCheck.ReadWriteSubTree, System.Security.AccessControl.RegistryRights.FullControl);
-        }
-
-        public object GetValueForKey(string configRoot, string registryValueName)
-        {
-            var key = OpenKey(configRoot);
-            if (key != null)
-            {
-                var keyValue = key.GetValue(registryValueName, null);
-                return keyValue;
-            }
-
-            return null;
         }
 
         public SpecFlowInstallationStatus GetInstallStatus()

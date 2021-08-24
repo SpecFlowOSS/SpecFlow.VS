@@ -13,18 +13,14 @@ namespace SpecFlow.VisualStudio.Analytics
     [Export(typeof(IUserUniqueIdStore))]
     public class FileUserIdStore : IUserUniqueIdStore
     {
-        public const string UserIdRegistryPath = @"Software\TechTalk\SpecFlow\Vsix";
-        public const string UserIdRegistryValueName = @"UserUniqueId";
         public static readonly string UserIdFilePath = Environment.ExpandEnvironmentVariables(@"%APPDATA%\SpecFlow\userid");
 
         private readonly Lazy<string> _lazyUniqueUserId;
-        private readonly IRegistryManager _registryManager;
         private readonly IFileSystem _fileSystem;
 
         [ImportingConstructor]
-        public FileUserIdStore(IRegistryManager registryManager, IFileSystem fileSystem)
+        public FileUserIdStore(IFileSystem fileSystem)
         {
-            _registryManager = registryManager;
             _fileSystem = fileSystem;
             _lazyUniqueUserId = new Lazy<string>(FetchAndPersistUserId);
         }
@@ -33,22 +29,7 @@ namespace SpecFlow.VisualStudio.Analytics
         {
             return _lazyUniqueUserId.Value;
         }
-
-        private string TryFetchUserIdFromRegistry()
-        {
-            var val1 = _registryManager.GetValueForKey(UserIdRegistryPath, UserIdRegistryValueName);
-
-            if (val1 is string uniqueUserIdString)
-            {
-                if (Guid.TryParseExact(uniqueUserIdString, "B", out var parsedGuid))
-                {
-                    return parsedGuid.ToString();
-                }
-            }
-
-            return null;
-        }
-
+        
         private string FetchAndPersistUserId()
         {
             if (_fileSystem.File.Exists(UserIdFilePath))
@@ -58,13 +39,6 @@ namespace SpecFlow.VisualStudio.Analytics
                 {
                     return userIdStringFromFile;
                 }
-            }
-
-            var maybeUserIdFromRegistry = TryFetchUserIdFromRegistry();
-            if (IsValidGuid(maybeUserIdFromRegistry))
-            {
-                PersistUserId(maybeUserIdFromRegistry);
-                return maybeUserIdFromRegistry;
             }
 
             return GenerateAndPersistUserId();
