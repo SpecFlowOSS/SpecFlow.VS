@@ -119,11 +119,17 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
         {
             var selectionStartLine = span.Start.GetContainingLine();
             var selectionEndLine = GetSelectionEndLine(selectionStartLine, span);
-            for (int lineNumber = selectionStartLine.LineNumber; lineNumber <= selectionEndLine.LineNumber; lineNumber++)
+            return GetSpanFullLines(selectionStartLine.Snapshot, selectionStartLine.LineNumber, selectionEndLine.LineNumber);
+        }
+
+        internal static IEnumerable<ITextSnapshotLine> GetSpanFullLines(ITextSnapshot textSnapshot, int startLine, int endLine)
+        {
+            for (int lineNumber = startLine; lineNumber <= endLine; lineNumber++)
             {
-                yield return selectionStartLine.Snapshot.GetLineFromLineNumber(lineNumber);
+                yield return textSnapshot.GetLineFromLineNumber(lineNumber);
             }
         }
+
         protected IEnumerable<ITextSnapshotLine> GetSpanFullLines(ITextSnapshot textSnapshot)
         {
             for (int lineNumber = 0; lineNumber < textSnapshot.LineCount; lineNumber++)
