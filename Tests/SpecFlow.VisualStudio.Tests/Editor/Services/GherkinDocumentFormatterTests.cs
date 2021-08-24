@@ -2,7 +2,6 @@
 using Microsoft.VisualStudio.Text;
 using Moq;
 using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services.Formatting;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
