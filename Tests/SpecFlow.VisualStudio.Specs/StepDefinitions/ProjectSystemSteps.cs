@@ -23,6 +23,7 @@ using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
+using SpecFlow.VisualStudio.Editor.Services.Formatting;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
@@ -285,14 +286,14 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                 case "Auto Format Document":
                 {
                     var command = new AutoFormatDocumentCommand(_ideScope,
-                        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService, new GherkinDocumentFormatter());
                     command.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatDocumentKey);
                     break;
                 }
                 case "Auto Format Selection":
                 {
                     var command = new AutoFormatDocumentCommand(_ideScope,
-                        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService, new GherkinDocumentFormatter());
                     command.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatSelectionKey);
                     break;
                 }

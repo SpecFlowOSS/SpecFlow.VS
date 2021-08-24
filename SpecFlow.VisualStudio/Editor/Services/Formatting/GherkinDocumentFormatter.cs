@@ -1,0 +1,184 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
+using System.Linq;
+using System.Text;
+using Gherkin.Ast;
+using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
+using SpecFlow.VisualStudio.Editor.Services.Parser;
+
+namespace SpecFlow.VisualStudio.Editor.Services.Formatting
+{
+    [Export(typeof(GherkinDocumentFormatter))]
+    public class GherkinDocumentFormatter
+    {
+        public void FormatGherkinDocument(DeveroomGherkinDocument gherkinDocument, DocumentLinesEditBuffer lines, GherkinFormatSettings formatSettings)
+        {
+            if (gherkinDocument.Feature != null)
+            {
+                SetTagsAndLine(lines, gherkinDocument.Feature, string.Empty);
+                SetLinesForChildren(lines, gherkinDocument.Feature.Children, formatSettings, formatSettings.FeatureChildrenIndentLevel);
+            }
+        }
+
+        private void SetLinesForChildren(DocumentLinesEditBuffer lines, IEnumerable<IHasLocation> hasLocation, GherkinFormatSettings formatSettings, int indentLevel)
+        {
+            foreach (var featureChild in hasLocation)
+            {
+                SetTagsAndLine(lines, featureChild, GetIndent(formatSettings, indentLevel));
+
+                if (featureChild is Rule rule)
+                {
+                    SetLinesForChildren(lines, rule.Children, formatSettings, indentLevel + formatSettings.RuleChildrenIndentLevelWithinRule);
+                }
+
+                if (featureChild is ScenarioOutline scenarioOutline)
+                {
+                    foreach (var example in scenarioOutline.Examples)
+                    {
+                        var examplesBlockIndentLevel = indentLevel + formatSettings.ExamplesBlockIndentLevelWithinScenarioOutline;
+                        SetTagsAndLine(lines, example, GetIndent(formatSettings, examplesBlockIndentLevel));
+                        FormatTable(lines, example, formatSettings, examplesBlockIndentLevel + formatSettings.ExamplesTableIndentLevelWithinExamplesBlock);
+                    }
+                }
+
+                if (featureChild is IHasSteps hasSteps)
+                {
+                    foreach (var step in hasSteps.Steps)
+                    {
+                        var stepIndentLevel = indentLevel + formatSettings.StepIndentLevelWithinStepContainer;
+                        if (step is DeveroomGherkinStep deveroomGherkinStep &&
+                            (deveroomGherkinStep.StepKeyword == StepKeyword.And ||
+                             deveroomGherkinStep.StepKeyword == StepKeyword.But))
+                            stepIndentLevel += formatSettings.AndStepIndentLevelWithinSteps;
+                        SetLine(lines, step, $"{GetIndent(formatSettings, stepIndentLevel)}{step.Keyword}{step.Text}");
+                        if (step.Argument is DataTable dataTable)
+                        {
+                            FormatTable(lines, dataTable, formatSettings, stepIndentLevel + formatSettings.DataTableIndentLevelWithinStep);
+                        }
+
+                        if (step.Argument is DocString docString)
+                        {
+                            FormatDocString(lines, docString, formatSettings, stepIndentLevel + formatSettings.DocStringIndentLevelWithinStep);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void SetTagsAndLine(DocumentLinesEditBuffer lines, IHasLocation hasLocation, string indent)
+        {
+            if (hasLocation is IHasTags hasTags)
+            {
+                SetTags(lines, hasTags.Tags, indent);
+            }
+
+            if (hasLocation is IHasDescription hasDescription)
+            {
+                SetLine(lines, hasLocation, GetHasDescriptionLine(hasDescription, indent));
+            }
+        }
+        internal static int[] GetWidths(IHasRows hasRows)
+        {
+            var widths = new int[hasRows.Rows.Max(r => r.Cells.Count())];
+            foreach (var row in hasRows.Rows)
+            {
+                foreach (var item in row.Cells.Select((c, i) => new { c, i }))
+                {
+                    widths[item.i] = Math.Max(widths[item.i], Escape(item.c.Value).Length);
+                }
+            }
+            return widths;
+        }
+
+        internal static string Escape(string cellValue)
+        {
+            return cellValue
+                .Replace("\\", "\\\\")
+                .Replace("\r", "\\r")
+                .Replace("\n", "\\n")
+                .Replace("|", "\\|");
+        }
+
+        private void FormatTable(DocumentLinesEditBuffer lines, IHasRows hasRows, GherkinFormatSettings formatSettings, int indentLevel)
+        {
+            var indent = GetIndent(formatSettings, indentLevel);
+            var widths = GetWidths(hasRows);
+            foreach (var row in hasRows.Rows)
+            {
+                var result = new StringBuilder();
+                result.Append(indent);
+                result.Append("|");
+                foreach (var item in row.Cells.Select((c, i) => new { c, i }))
+                {
+                    result.Append(formatSettings.TableCellPadding);
+                    result.Append(Escape(item.c.Value).PadRight(widths[item.i]));
+                    result.Append(formatSettings.TableCellPadding);
+                    result.Append('|');
+                }
+
+                SetLine(lines, row, result.ToString());
+            }
+        }
+
+        private void FormatDocString(DocumentLinesEditBuffer lines, DocString docString, GherkinFormatSettings formatSettings, int indentLevel)
+        {
+            var indent = GetIndent(formatSettings, indentLevel);
+            var docStringStartLine = docString.Location.Line;
+            var docStringContentLines = DeveroomTagParser.NewLineRe.Split(docString.Content);
+            if (string.IsNullOrEmpty(docString.Content) &&
+                !string.IsNullOrWhiteSpace(lines.GetLineOneBased(docStringStartLine + 1)))
+            {
+                docStringContentLines = Array.Empty<string>();
+            }
+
+            var docStringEndLine = docStringStartLine + docStringContentLines.Length + 1;
+            var delimiterLine = $"{indent}{docString.Delimiter}";
+
+            lines.SetLineOneBased(docStringStartLine, delimiterLine);
+            var docStringRow = 1;
+            foreach (var contentLine in docStringContentLines)
+            {
+                var line = $"{indent}{contentLine}";
+                lines.SetLineOneBased(docStringStartLine + docStringRow++, line);
+            }
+            lines.SetLineOneBased(docStringEndLine, delimiterLine);
+        }
+
+        private string GetHasDescriptionLine(IHasDescription hasDescription, string indent)
+        {
+            var line = $"{indent}{hasDescription.Keyword}:";
+            if (!string.IsNullOrEmpty(hasDescription.Name))
+                line += $" {hasDescription.Name}";
+            return line;
+        }
+
+        private void SetTags(DocumentLinesEditBuffer lines, IEnumerable<Tag> tags, string indent)
+        {
+            var tagGroup = tags.GroupBy(t => t.Location.Line);
+            foreach (var tag in tagGroup)
+            {
+                var line = indent + string.Join(" ", tag.Select(t => t.Name));
+                lines.SetLineOneBased(tag.Key, line);
+            }
+        }
+
+        private void SetLine(DocumentLinesEditBuffer lines, IHasLocation hasLocation, string line)
+        {
+            if (hasLocation?.Location != null && hasLocation.Location.Line >= 1
+                                              && hasLocation.Location.Column - 1 < line.Length)
+            {
+                lines.SetLineOneBased(hasLocation.Location.Line, line);
+            }
+        }
+
+        private string GetIndent(GherkinFormatSettings formatSettings, int indentLevel)
+        {
+            if (indentLevel == 0)
+                return string.Empty;
+            if (indentLevel == 1)
+                return formatSettings.Indent;
+            return string.Join(string.Empty, Enumerable.Range(0, indentLevel).Select(_ => formatSettings.Indent));
+        }
+    }
+}
