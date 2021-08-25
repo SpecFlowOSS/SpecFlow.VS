@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using SpecFlow.VisualStudio.EventTracking;
 using FluentAssertions;
@@ -195,6 +196,7 @@ Exception rethrown at [0]:
             result.Should().Be("SE");
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private void Method2()
         {
             Method1();

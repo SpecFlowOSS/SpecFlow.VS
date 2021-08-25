@@ -35,7 +35,7 @@ steps:
     targetType: 'inline'
     script: |
         cd .\Connectors
-        .\build.ps1
+        .\build.ps1 $(buildConfiguration)
 
 - task: VSBuild@1
   displayName: 'Build Solution'

@@ -24,6 +24,10 @@ namespace SpecFlow.VisualStudio.VsxStubs
                 return (T)(object)ReplicateNewLineCharacterOption;
             if (key.Equals(DefaultOptions.NewLineCharacterOptionId))
                 return (T)(object)NewLineCharacterOption;
+            if (key.Equals(DefaultOptions.ConvertTabsToSpacesOptionId))
+                return (T)(object)true;
+            if (key.Equals(DefaultOptions.IndentSizeOptionId))
+                return (T)(object)4;
             throw new NotImplementedException(key.ToString());
         }
 
