@@ -16,19 +16,17 @@ namespace SpecFlow.VisualStudio.Monitoring
     public class MonitoringService : IMonitoringService
     {
         private readonly IAnalyticsTransmitter _analyticsTransmitter;
-        private readonly IRegistryManager _registryManager;
-        private readonly IGuidanceConfiguration _guidanceConfiguration;
+        private readonly IWelcomeService _welcomeService;
 
         [ImportingConstructor]
-        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter, IRegistryManager registryManager, IGuidanceConfiguration guidanceConfiguration, IContextInitializer contextInitializer)
+        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter, IContextInitializer contextInitializer, IWelcomeService welcomeService)
         {
             TelemetryConfiguration.Active.InstrumentationKey = "27cfb992-6c29-4bc8-8093-78d95e275b3a";
             TelemetryConfiguration.Active.TelemetryChannel = new InMemoryChannel();
             TelemetryConfiguration.Active.ContextInitializers.Add(contextInitializer);
 
             _analyticsTransmitter = analyticsTransmitter;
-            _registryManager = registryManager;
-            _guidanceConfiguration = guidanceConfiguration;
+            _welcomeService = welcomeService;
         }
 
         // OPEN
@@ -40,7 +38,7 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         public void MonitorOpenProjectSystem(IIdeScope ideScope)
         {
-            UpdateUsageOfExtension();
+            _welcomeService.OnIdeScopeActivityStarted(ideScope);
 
             //todo: add tfms
             _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension loaded"));
@@ -69,82 +67,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                 GetProjectSettingsProps(settings, additionalProps)));
         }
 
-        private void UpdateUsageOfExtension()
-        {
-            var today = DateTime.Today;
-            var status = _registryManager.GetInstallStatus();
-            //todo: discuss extension versioning
-            var CurrentVersion = new Version(1, 0);
-
-            if (!status.IsInstalled)
-            {
-                // new user
-                // todo: missing implementation of browser notification
-                //if (ShowNotification(_guidanceConfiguration.Installation))
-                //{
-                _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension installed"));
-
-                status.InstallDate = today;
-                status.InstalledVersion = CurrentVersion;
-                status.LastUsedDate = today;
-
-                _registryManager.UpdateStatus(status);
-                //todo
-                //CheckFileAssociation();
-                //}
-            }
-            else
-            {
-                if (status.LastUsedDate != today)
-                {
-                    //a shiny new day with SpecFlow
-                    status.UsageDays++;
-                    status.LastUsedDate = today;
-                    _registryManager.UpdateStatus(status);
-                }
-
-                if (status.InstalledVersion < CurrentVersion)
-                {
-                    //upgrading user
-                    var installedVersion = status.InstalledVersion.ToString();
-                    _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension upgraded",
-                        new Dictionary<string, object>
-                        {
-                            { "OldExtensionVersion", installedVersion }
-                        }));
-
-                    status.InstallDate = today;
-                    status.InstalledVersion = CurrentVersion;
-
-                    _registryManager.UpdateStatus(status);
-                }
-                else
-                {
-                    var guidance = _guidanceConfiguration.UsageSequence
-                        .FirstOrDefault(i => status.UsageDays >= i.UsageDays && status.UserLevel < (int)i.UserLevel);
-
-                    if (guidance?.UsageDays != null)
-                    {
-                        // todo: missing implementation of browser notification
-                        //if (guidance.Url == null || ShowNotification(guidance))
-                        //{
-                        var usageDays = guidance.UsageDays.Value;
-                        _analyticsTransmitter.TransmitEvent(new GenericEvent($"{usageDays} day usage"));
-
-                        status.UserLevel = (int)guidance.UserLevel;
-                        _registryManager.UpdateStatus(status);
-                        //}
-                    }
-                }
-            }
-        }
-
-        //private bool ShowNotification(GuidanceStep guidance)
-        //{
-        //    var url = guidance.Url;
-
-        //    return notificationService.ShowPage(url);
-        //}
+        
 
         //COMMAND
 
