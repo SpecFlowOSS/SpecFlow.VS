@@ -70,7 +70,9 @@ steps:
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(system.defaultworkingdirectory)'
-    Contents: '**\bin\$(buildConfiguration)\**'
+    Contents: |
+     '**\bin\$(buildConfiguration)\**'
+     '**\Changelog.md'
     TargetFolder: '$(build.artifactstagingdirectory)\drop'
   condition: succeededOrFailed()
 
