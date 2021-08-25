@@ -153,7 +153,7 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         public void MonitorError(Exception exception, bool? isFatal = null)
         {
-            _analyticsTransmitter.TransmitExceptionEvent(exception, isFatal);
+            _analyticsTransmitter.TransmitExceptionEvent(exception, isFatal: isFatal);
         }
 
 

@@ -12,8 +12,7 @@ namespace SpecFlow.VisualStudio.Analytics
     public interface IAnalyticsTransmitter
     {
         void TransmitEvent(IAnalyticsEvent runtimeEvent);
-        void TransmitExceptionEvent(Exception exception, bool? isFatal = null, bool anonymize = true);
-        void TransmitExceptionEvent(Exception exception, Dictionary<string, object> additionalProps, bool? isFatal = null, bool anonymize = true);
+        void TransmitExceptionEvent(Exception exception, Dictionary<string, object> additionalProps = null, bool? isFatal = null, bool anonymize = true);
     }
 
     [Export(typeof(IAnalyticsTransmitter))]
@@ -46,15 +45,10 @@ namespace SpecFlow.VisualStudio.Analytics
             }
         }
 
-        public void TransmitExceptionEvent(Exception exception, bool? isFatal = null, bool anonymize = true)
+        public void TransmitExceptionEvent(Exception exception, Dictionary<string, object> additionalProps = null, bool? isFatal = null, bool anonymize = true)
         {
             var isNormalError = IsNormalError(exception);
-            TransmitException(exception, isFatal ?? !isNormalError, anonymize: anonymize);
-        }
-
-        public void TransmitExceptionEvent(Exception exception, Dictionary<string, object> additionalProps, bool? isFatal = null, bool anonymize = true)
-        {
-            TransmitException(exception, isFatal ?? false, additionalProps, anonymize);
+            TransmitException(exception, isFatal ?? !isNormalError, additionalProps, anonymize);
         }
         
         private void TransmitException(Exception exception, bool isFatal, Dictionary<string, object> additionalProps = null, bool anonymize = true)
