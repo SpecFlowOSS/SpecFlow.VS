@@ -14,6 +14,11 @@ namespace SpecFlow.VisualStudio.Analytics
     public class RegistryManager : IRegistryManager
     {
         private const string REG_PATH = @"Software\TechTalk\SpecFlow";
+        private const string Version = "version.vs2022";
+        private const string InstallDate = "installDate";
+        private const string LastUsedDate = "lastUsedDate";
+        private const string UsageDays = "usageDays";
+        private const string UserLevel = "userLevel";
 
         private string RegPath
         {
@@ -33,11 +38,11 @@ namespace SpecFlow.VisualStudio.Analytics
                 if (key == null)
                     return status;
 
-                status.InstalledVersion = ReadStringValue(key, "version", s => new Version(s));
-                status.InstallDate = ReadIntValue(key, "installDate", DeserializeDate);
-                status.LastUsedDate = ReadIntValue(key, "lastUsedDate", DeserializeDate);
-                status.UsageDays = ReadIntValue(key, "usageDays", i => i);
-                status.UserLevel = ReadIntValue(key, "userLevel", i => i);
+                status.InstalledVersion = ReadStringValue(key, Version, s => new Version(s));
+                status.InstallDate = ReadIntValue(key, InstallDate, DeserializeDate);
+                status.LastUsedDate = ReadIntValue(key, LastUsedDate, DeserializeDate);
+                status.UsageDays = ReadIntValue(key, UsageDays, i => i);
+                status.UserLevel = ReadIntValue(key, UserLevel, i => i);
             }
 
             return status;
@@ -51,13 +56,13 @@ namespace SpecFlow.VisualStudio.Analytics
                     return false;
 
                 if (status.InstalledVersion != null)
-                    key.SetValue("version", status.InstalledVersion);
+                    key.SetValue(Version, status.InstalledVersion);
                 if (status.InstallDate != null)
-                    key.SetValue("installDate", SerializeDate(status.InstallDate));
+                    key.SetValue(InstallDate, SerializeDate(status.InstallDate));
                 if (status.LastUsedDate != null)
-                    key.SetValue("lastUsedDate", SerializeDate(status.LastUsedDate));
-                key.SetValue("usageDays", status.UsageDays);
-                key.SetValue("userLevel", status.UserLevel);
+                    key.SetValue(LastUsedDate, SerializeDate(status.LastUsedDate));
+                key.SetValue(UsageDays, status.UsageDays);
+                key.SetValue(UserLevel, status.UserLevel);
             }
             return true;
         }
