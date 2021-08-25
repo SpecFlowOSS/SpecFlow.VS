@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using Microsoft.VisualStudio.ApplicationInsights.Channel;
-using Microsoft.VisualStudio.ApplicationInsights.Extensibility;
 using SpecFlow.VisualStudio.Analytics;
 using SpecFlow.VisualStudio.Common;
 using SpecFlow.VisualStudio.ProjectSystem;
@@ -19,14 +17,12 @@ namespace SpecFlow.VisualStudio.Monitoring
         private readonly IWelcomeService _welcomeService;
 
         [ImportingConstructor]
-        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter, IContextInitializer contextInitializer, IWelcomeService welcomeService)
+        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter, IWelcomeService welcomeService, ITelemetryConfigurationHolder telemetryConfigurationHolder)
         {
-            TelemetryConfiguration.Active.InstrumentationKey = "27cfb992-6c29-4bc8-8093-78d95e275b3a";
-            TelemetryConfiguration.Active.TelemetryChannel = new InMemoryChannel();
-            TelemetryConfiguration.Active.ContextInitializers.Add(contextInitializer);
-
             _analyticsTransmitter = analyticsTransmitter;
             _welcomeService = welcomeService;
+
+            telemetryConfigurationHolder.ApplyConfiguration();
         }
 
         // OPEN

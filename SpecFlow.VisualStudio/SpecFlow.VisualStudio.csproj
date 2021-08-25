@@ -10,6 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Analytics\InstrumentationKey.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Gherkin" Version="20.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.LanguageServices" Version="4.0.0-3.final" />
     <PackageReference Include="System.IO.Abstractions" Version="4.2.10" />
