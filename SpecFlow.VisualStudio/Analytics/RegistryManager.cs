@@ -15,7 +15,7 @@ namespace SpecFlow.VisualStudio.Analytics
     {
         private const string REG_PATH = @"Software\TechTalk\SpecFlow";
         private const string Version = "version.vs2022";
-        private const string InstallDate = "installDate";
+        private const string InstallDate = "installDate.vs2022";
         private const string LastUsedDate = "lastUsedDate";
         private const string UsageDays = "usageDays";
         private const string UserLevel = "userLevel";
