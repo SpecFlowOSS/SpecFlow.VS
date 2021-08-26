@@ -67,25 +67,6 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "dependencies": {
-          "description": "Specifies custom dependencies for the SpecFlow runtime.",
-          "type": "array",
-          "default": [],
-          "items": {
-            "type": "object",
-            "additionalProperties": true,
-            "properties": {
-              "type": {
-                "description": "The implementation to use",
-                "type": "string"
-              },
-              "as": {
-                "description": "The interface to override",
-                "type": "string"
-              }
-            }
-          }
-        },
         "missingOrPendingStepsOutcome": {
           "description": "Determines how SpecFlow behaves if a step binding is not implemented or pending.",
           "type": "string",

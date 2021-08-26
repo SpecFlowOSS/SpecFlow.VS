@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Threading;
 using SpecFlow.VisualStudio.Diagnostics;
@@ -49,11 +50,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
         class NullMonitoringService : IMonitoringService
         {
-            public void MonitorLoadProjectSystem(string vsVersion)
+            public void MonitorLoadProjectSystem()
             {
             }
 
-            public void MonitorOpenProjectSystem(string vsVersion, IIdeScope ideScope)
+            public void MonitorOpenProjectSystem(IIdeScope ideScope)
             {
             }
 
@@ -65,7 +66,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
             }
 
-            public void MonitorParserParse(int parseCount, int scenarioDefinitionCount)
+            public void MonitorParserParse(ProjectSettings settings, Dictionary<string, object> additionalProps = null)
             {
             }
 
@@ -102,6 +103,14 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             }
 
             public void MonitorError(Exception exception, bool? isFatal = null)
+            {
+            }
+
+            public void MonitorProjectTemplateWizardStarted()
+            {
+            }
+
+            public void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions)
             {
             }
         }

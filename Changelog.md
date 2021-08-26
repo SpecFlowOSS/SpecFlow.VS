@@ -1,4 +1,4 @@
-# $vNext$ - $buildDate$
+# v$vNext$ - $buildDate$
 
 
 # v1.6.2 - 2021-02-22

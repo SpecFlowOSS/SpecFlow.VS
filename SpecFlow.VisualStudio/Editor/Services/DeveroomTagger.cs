@@ -193,8 +193,11 @@ namespace SpecFlow.VisualStudio.Editor.Services
                 var scenarioDefinitionCount = deveroomTags.Count(t => t.Type == DeveroomTagTypes.ScenarioDefinitionBlock);
                 if (scenarioDefinitionCount > 0 || deveroomTags.Any(t => t.Type == DeveroomTagTypes.FeatureBlock))
                 {
+                    var projectSettings = _projectSettingsProvider?.GetProjectSettings();
+                    
                     // valid feature file
-                    _ideScope.MonitoringService.MonitorParserParse(counter, scenarioDefinitionCount);
+                    _ideScope.MonitoringService.MonitorParserParse(projectSettings,
+                        PrepareParsingResultProps(deveroomTags, counter, scenarioDefinitionCount));
                 }
                 else
                 {
@@ -202,6 +205,20 @@ namespace SpecFlow.VisualStudio.Editor.Services
                     _trackParseCounter--;
                 }
             }
+        }
+
+        private Dictionary<string, object> PrepareParsingResultProps(List<DeveroomTag> deveroomTags, int parseCount, int scenarioDefinitionCount)
+        {
+            var stepsCount = deveroomTags.Count(t => t.Type == DeveroomTagTypes.StepBlock);
+            var rulesCount = deveroomTags.Count(t => t.Type == DeveroomTagTypes.RuleBlock);
+
+            return new Dictionary<string, object>
+            {
+                { "ScenarioDefinitionsCount", scenarioDefinitionCount },
+                { "ParseCount", parseCount },
+                { "StepsCount", stepsCount },
+                { "RulesCount", rulesCount },
+            };
         }
 
         private void RaiseTagsChanged(ITextSnapshot fileSnapshot = null)

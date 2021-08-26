@@ -24,13 +24,17 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DeployExtension>true</DeployExtension>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <VSIXSourceItem Include="..\Changelog.md">
       <IncludeInVSIX>true</IncludeInVSIX>
       <TargetPath>Changelog.txt</TargetPath>
     </VSIXSourceItem>
     <Content Include="Package\Resources\SpecFlowIcon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Package\Resources\gherkin_specflowvs.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -89,8 +93,6 @@
       <VsChangeLog Include="$(MSBuildThisFileDirectory)..\Changelog.md" />
     </ItemGroup>
 
-    <Warning Text="Replace version to '$(AssemblyVersion)' in file: '%(TemplateFiles.FullPath)'." />
-
     <WriteLinesToFile
       File="%(TemplateFiles.FullPath)"
       Lines="$([System.Text.RegularExpressions.Regex]::Replace(
@@ -106,7 +108,7 @@
       Lines="$([System.IO.File]::ReadAllText(%(VsChangeLog.FullPath)).Replace('$vNext$','$(BuildVersionSimple)')
         .Replace('$buildDate$','$([System.DateTime]::Now.ToString('yyyy-MM-dd'))'))"
       Overwrite="true"
-      Encoding="Unicode"/>
+      Encoding="UTF-8"/>
 
   </Target>
 </Project>

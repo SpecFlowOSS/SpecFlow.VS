@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using SpecFlow.VisualStudio.EventTracking;
+using System.Linq;
+using SpecFlow.VisualStudio.Analytics;
+using SpecFlow.VisualStudio.Common;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.UI.ViewModels;
@@ -10,54 +13,92 @@ namespace SpecFlow.VisualStudio.Monitoring
     [Export(typeof(IMonitoringService))]
     public class MonitoringService : IMonitoringService
     {
-        // OPEN
+        private readonly IAnalyticsTransmitter _analyticsTransmitter;
+        private readonly IWelcomeService _welcomeService;
 
-        public void MonitorLoadProjectSystem(string vsVersion)
+        [ImportingConstructor]
+        public MonitoringService(IAnalyticsTransmitter analyticsTransmitter, IWelcomeService welcomeService, ITelemetryConfigurationHolder telemetryConfigurationHolder)
         {
-            EventTracker.SetVsVersion(vsVersion);
+            _analyticsTransmitter = analyticsTransmitter;
+            _welcomeService = welcomeService;
+
+            telemetryConfigurationHolder.ApplyConfiguration();
         }
 
-        public void MonitorOpenProjectSystem(string vsVersion, IIdeScope ideScope)
+        // OPEN
+
+        public void MonitorLoadProjectSystem()
         {
-            EventTracker.TrackOpenProjectSystem(vsVersion, ActivityTracker.ActiveDays);
-            WelcomeService.OnIdeScopeActivityStarted(ideScope);
+            //currently we do nothing at this point
+        }
+
+        public void MonitorOpenProjectSystem(IIdeScope ideScope)
+        {
+            _welcomeService.OnIdeScopeActivityStarted(ideScope);
+
+            //todo: add tfms
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension loaded"));
         }
 
         public void MonitorOpenProject(ProjectSettings settings, int? featureFileCount)
         {
-            EventTracker.TrackOpenProject(settings, featureFileCount);
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Project loaded",
+                GetProjectSettingsProps(settings,
+                    new Dictionary<string, object>()
+                    {
+                        { "FeatureFileCount", featureFileCount }
+                    }
+                    )));
         }
 
         public void MonitorOpenFeatureFile(ProjectSettings projectSettings)
         {
-            EventTracker.TrackOpenFeatureFile(projectSettings);
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Feature file opened",
+                GetProjectSettingsProps(projectSettings)));
         }
 
-        public void MonitorParserParse(int parseCount, int scenarioDefinitionCount)
+        public void MonitorParserParse(ProjectSettings settings, Dictionary<string, object> additionalProps)
         {
-            EventTracker.TrackParserParse(parseCount, scenarioDefinitionCount);
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Feature file parsed", 
+                GetProjectSettingsProps(settings, additionalProps)));
         }
+
+        
 
         //COMMAND
 
         public void MonitorCommandCommentUncomment()
         {
-            EventTracker.TrackCommandCommentUncomment();
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("CommentUncomment command executed"));
         }
 
         public void MonitorCommandDefineSteps(CreateStepDefinitionsDialogResult action, int snippetCount)
         {
-            EventTracker.TrackCommandDefineSteps(action, snippetCount);
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("DefineSteps command executed",
+                new Dictionary<string, object>()
+                {
+                    { "Action", action },
+                    { "SnippetCount", snippetCount }
+                }));
         }
 
         public void MonitorCommandFindStepDefinitionUsages(int usagesCount, bool isCancelled)
         {
-            EventTracker.TrackCommandFindStepDefinitionUsages(usagesCount, isCancelled);
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("FindStepDefinitionUsages command executed",
+                new Dictionary<string, object>()
+                {
+                    { "UsagesFound", usagesCount },
+                    { "IsCancelled", isCancelled }
+                }));
         }
 
         public void MonitorCommandGoToStepDefinition(bool generateSnippet)
         {
-            EventTracker.TrackCommandGoToStepDefinition(generateSnippet);
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("GoToStepDefinition command executed",
+                new Dictionary<string, object>()
+                {
+                    { "GenerateSnippet", generateSnippet }
+                }));
         }
 
         public void MonitorCommandAutoFormatTable()
@@ -66,9 +107,10 @@ namespace SpecFlow.VisualStudio.Monitoring
             //nop
         }
 
-        public void MonitorCommandAddFeatureFile(ProjectSettings projectSettings)
+        public void MonitorCommandAddFeatureFile(ProjectSettings settings)
         {
-            EventTracker.TrackCommandAddFeatureFile(projectSettings);
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Feature file added",
+                GetProjectSettingsProps(settings)));
         }
 
 
@@ -78,15 +120,28 @@ namespace SpecFlow.VisualStudio.Monitoring
         {
             if (isFailed && !string.IsNullOrWhiteSpace(errorMessage))
             {
-                EventTracker.TrackError(errorMessage, projectSettings);
+                var discoveryException = new DiscoveryException(errorMessage);
+                _analyticsTransmitter.TransmitExceptionEvent(discoveryException, GetProjectSettingsProps(projectSettings));
             }
 
-            EventTracker.TrackSpecFlowDiscovery(isFailed, stepDefinitionCount, projectSettings);
+            var additionalProps = new Dictionary<string, object>()
+            {
+                { "IsFailed", isFailed },
+                { "StepDefinitionCount", stepDefinitionCount }
+            };
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("SpecFlow Discovery executed",
+                GetProjectSettingsProps(projectSettings,
+                    additionalProps)));
         }
 
         public void MonitorSpecFlowGeneration(bool isFailed, ProjectSettings projectSettings)
         {
-            EventTracker.TrackSpecFlowGeneration(isFailed, projectSettings);
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("SpecFlow Generation executed",
+                GetProjectSettingsProps(projectSettings,
+                    new Dictionary<string, object>()
+                    {
+                        { "IsFailed", isFailed }
+                    })));
         }
 
 
@@ -94,12 +149,51 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         public void MonitorError(Exception exception, bool? isFatal = null)
         {
-            if (exception is InvalidOperationException && exception.StackTrace.Contains("MatchToken"))
+            _analyticsTransmitter.TransmitExceptionEvent(exception, isFatal: isFatal);
+        }
+
+
+        // PROJECT TEMPLATE WIZARD
+
+        public void MonitorProjectTemplateWizardStarted()
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Project Template Wizard Started"));
+        }
+
+        public void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions)
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Project Template Wizard Completed",
+                new Dictionary<string, object>()
+                {
+                    { "SelectedDotNetFramework", dotNetFramework },
+                    { "SelectedUnitTestFramework", unitTestFramework },
+                    { "AddFluentAssertions", addFluentAssertions },
+                }));
+        }
+
+
+        private Dictionary<string, object> GetProjectSettingsProps(ProjectSettings settings, Dictionary<string, object> additionalSettings = null)
+        {
+            Dictionary<string, object> props = null;
+            if (settings != null)
             {
-                // gather extra information about this error
-                EventTracker.TrackError($"MT:{exception.GetFlattenedMessage()}", anonymize: false);
+                props = new Dictionary<string, object>
+                {
+                    { "SpecFlowVersion", settings.GetSpecFlowVersionLabel() },
+                    //todo: add TFM(s) to the events
+                    //{ "net", settings.TargetFrameworkMoniker.ToShortString() },
+                    { "SingleFileGeneratorUsed", settings.DesignTimeFeatureFileGenerationEnabled },
+                };
             }
-            EventTracker.TrackError(exception, isFatal);
+            if (additionalSettings != null && additionalSettings.Any())
+            {
+                props ??= new Dictionary<string, object>();
+                foreach (var additionalSetting in additionalSettings)
+                {
+                    props.Add(additionalSetting.Key, additionalSetting.Value);
+                }
+            }
+            return props;
         }
     }
 }

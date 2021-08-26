@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace SpecFlow.VisualStudio.EventTracking
+namespace SpecFlow.VisualStudio.Analytics
 {
     public static class ErrorAnonymizer
     {

@@ -3,12 +3,12 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using SpecFlow.VisualStudio.EventTracking;
 using FluentAssertions;
+using SpecFlow.VisualStudio.Analytics;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace SpecFlow.VisualStudio.Tests.EventTracking
+namespace SpecFlow.VisualStudio.Tests.Analytics
 {
     public class ErrorAnonymizerTests
     {
