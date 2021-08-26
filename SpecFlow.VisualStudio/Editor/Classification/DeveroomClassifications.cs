@@ -182,7 +182,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
             public GherkinUndefinedStepClassificationFormat()
             {
                 this.DisplayName = "Deveroom Undefined Step";
-                this.ForegroundColor = Colors.Coral;
+                this.ForegroundColor = (Color)ColorConverter.ConvertFromString("#887DBA");
             }
         }
 
