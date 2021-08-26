@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Navigation;
 using SpecFlow.VisualStudio.UI.Controls;
@@ -50,6 +51,7 @@ namespace SpecFlow.VisualStudio.UI
         {
             base.OnInitialized(e);
             AddHandler(MarkDownTextBlock.LinkClickedEvent, new RequestNavigateEventHandler(OnLinkClicked));
+            AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(OnMouseLeftButtonDown));
         }
 
         protected virtual void OnLinkClicked(object sender, RequestNavigateEventArgs e)
@@ -57,6 +59,14 @@ namespace SpecFlow.VisualStudio.UI
             e.Handled = true;
             Process.Start(e.Uri.ToString());
             LinkClicked?.Invoke(sender, e);
+        }
+
+        public void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            base.OnMouseLeftButtonDown(e);
+
+            // Begin dragging the window
+            this.DragMove();
         }
 
         #region VsDialogWindow
