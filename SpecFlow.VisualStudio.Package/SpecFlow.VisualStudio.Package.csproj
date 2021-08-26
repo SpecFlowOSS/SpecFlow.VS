@@ -91,7 +91,6 @@
       <TemplateFiles Include="$(MSBuildThisFileDirectory)..\SpecFlow.VisualStudio.ItemTemplates\**\*.vstemplate" />
       <TemplateFiles Include="$(MSBuildThisFileDirectory)..\SpecFlow.VisualStudio.ProjectTemplate\**\*.vstemplate" />
       <VsChangeLog Include="$(MSBuildThisFileDirectory)..\Changelog.md" />
-      <InstrumentationKey Include="$(MSBuildThisFileDirectory)..\SpecFlow.VisualStudio\Analytics\InstrumentationKey.txt" />
     </ItemGroup>
 
     <WriteLinesToFile
@@ -108,13 +107,6 @@
       File="%(VsChangeLog.FullPath)"
       Lines="$([System.IO.File]::ReadAllText(%(VsChangeLog.FullPath)).Replace('$vNext$','$(BuildVersionSimple)')
         .Replace('$buildDate$','$([System.DateTime]::Now.ToString('yyyy-MM-dd'))'))"
-      Overwrite="true"
-      Encoding="UTF-8"/>
-
-    <WriteLinesToFile
-      Condition=" '$(Configuration)' == 'Release' AND '$(AppInsightsInstrumentationKey)' != ''"
-      File="%(InstrumentationKey.FullPath)"
-      Lines="$(AppInsightsInstrumentationKey)"
       Overwrite="true"
       Encoding="UTF-8"/>
 
