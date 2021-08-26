@@ -202,6 +202,7 @@ Exception rethrown at [0]:
             Method1();
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private void Method1()
         {
             throw new NotImplementedException(@"test error for path C:\Foo\Bar");
