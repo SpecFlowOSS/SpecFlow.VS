@@ -41,7 +41,7 @@ steps:
   displayName: 'Build Solution'
   inputs:
     solution: '$(solution)'
-    msbuildArgs: '/p:DeployExtension=false /nowarn:VSTHRD010'
+    msbuildArgs: '/p:DeployExtension=false /p:AppInsightsInstrumentationKey=$(AppInsightsInstrumentationKey) /nowarn:VSTHRD010'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
@@ -68,15 +68,17 @@ steps:
     rerunFailedTests: true
 
 - task: CopyFiles@2
+  displayName: 'Copy dlls and changelog'
   inputs:
     SourceFolder: '$(system.defaultworkingdirectory)'
     Contents: |
-     '**\bin\$(buildConfiguration)\**'
-     '**\Changelog.md'
+     **\bin\$(buildConfiguration)\**
+     Changelog.md
     TargetFolder: '$(build.artifactstagingdirectory)\drop'
   condition: succeededOrFailed()
 
 - task: CopyFiles@2
+  displayName: 'Copy NuGet folder'
   inputs:
     SourceFolder: 'd:\a\1\Nuget'
     Contents: '**'
@@ -84,6 +86,7 @@ steps:
   condition: succeededOrFailed()
 
 - task: CopyFiles@2
+  displayName: 'Copy VSIX'
   inputs:
     SourceFolder: '$(system.defaultworkingdirectory)'
     Contents: '**\bin\$(buildConfiguration)\**\*.vsix'
