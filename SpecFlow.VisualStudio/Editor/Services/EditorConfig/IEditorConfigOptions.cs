@@ -2,6 +2,6 @@
 {
     public interface IEditorConfigOptions
     {
-        bool GetBoolOption(string editorConfigKey, bool defaultValue);
+        TResult GetOption<TResult>(string editorConfigKey, TResult defaultValue);
     }
 }

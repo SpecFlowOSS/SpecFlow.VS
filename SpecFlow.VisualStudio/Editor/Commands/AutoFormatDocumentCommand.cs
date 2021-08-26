@@ -98,7 +98,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             if (editorConfigOptions != null)
             {
                 formatSettings.FeatureChildrenIndentLevel =
-                    editorConfigOptions.GetBoolOption("gherkin_indent_feature_children", false) ? 1 : 0;
+                    editorConfigOptions.GetOption("gherkin_indent_feature_children", false) ? 1 : 0;
             }
 
             return formatSettings;

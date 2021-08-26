@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis.Options;
 
 namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig
@@ -12,19 +14,23 @@ namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig
             _options = options;
         }
 
-        public bool GetBoolOption(string editorConfigKey, bool defaultValue)
+        public TResult GetOption<TResult>(string editorConfigKey, TResult defaultValue)
         {
-            var storageLocation = CreateBoolStorageLocation(editorConfigKey);
+            var storageLocation = CreateStorageLocation<TResult>(editorConfigKey);
             if (storageLocation == null)
                 return defaultValue;
-            return _options.GetOption(new Option<bool>("specflow.vs", editorConfigKey, defaultValue, storageLocation));
+            return _options.GetOption(new Option<TResult>("specflow.vs", editorConfigKey, defaultValue, storageLocation));
         }
 
-        private OptionStorageLocation CreateBoolStorageLocation(string editorConfigKey)
+        private OptionStorageLocation CreateStorageLocation<TResult>(string editorConfigKey)
         {
+            var supportedTypes = new[] { typeof(bool), typeof(string), typeof(int) };
+            if (!supportedTypes.Contains(typeof(TResult)))
+                throw new NotSupportedException($"Editor config setting type {typeof(TResult).Name} is not supported.");
+            var typeName = typeof(TResult).Name;
             return
                 typeof(OptionSet).Assembly.GetType("Microsoft.CodeAnalysis.Options.EditorConfigStorageLocation", false)?
-                        .GetMethod("ForBoolOption", BindingFlags.Public | BindingFlags.Static)?
+                        .GetMethod($"For{typeName}Option", BindingFlags.Public | BindingFlags.Static)?
                         .Invoke(null, new object[] { editorConfigKey })
                     as OptionStorageLocation;
         }

@@ -6,5 +6,8 @@
 
         public bool GetBoolOption(string editorConfigKey, bool defaultValue)
             => defaultValue;
+
+        public TResult GetOption<TResult>(string editorConfigKey, TResult defaultValue)
+            => default;
     }
 }
