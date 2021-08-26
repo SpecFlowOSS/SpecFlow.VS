@@ -20,17 +20,21 @@ namespace SpecFlow.VisualStudio.Editor.Completions
         {
         }
 
-        protected override bool ShouldStartSessionOnTyping(IWpfTextView textView, char ch)
+        protected override bool ShouldStartSessionOnTyping(IWpfTextView textView, char? ch, bool isSessionActive)
         {
-            if (char.IsWhiteSpace(ch))
-                return false;
-
-            if (ch == '|' || ch == '#' || ch == '*' || ch == '@') //TODO: get this from parser?
-                return false;
-
             var caretBufferPosition = textView.Caret.Position.BufferPosition;
-
             var line = caretBufferPosition.GetContainingLine();
+            if (ch == null || char.IsWhiteSpace(ch.Value))
+            {
+                var lineText = new SnapshotSpan(line.Start, caretBufferPosition).GetText().Trim();
+                //todo: handle other keywords
+                if (lineText == "Given")
+                    return true;
+            }
+
+            if (ch == null || ch == '|' || ch == '#' || ch == '*' || ch == '@' || isSessionActive) //TODO: get this from parser?
+                return false;
+            
             if (caretBufferPosition == line.Start)
                 return false; // we are at the beginning of a line (after an enter?)
 

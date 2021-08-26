@@ -44,7 +44,7 @@ namespace SpecFlow.VisualStudio.Editor.Completions.Infrastructure
             _completionBroker = completionBroker;
         }
 
-        protected abstract bool ShouldStartSessionOnTyping(IWpfTextView textView, char ch);
+        protected abstract bool ShouldStartSessionOnTyping(IWpfTextView textView, char? ch, bool isSessionActive);
 
         protected virtual CompletionSessionManager CreateCompletionSessionManager(IWpfTextView textView)
         {
@@ -80,6 +80,11 @@ namespace SpecFlow.VisualStudio.Editor.Completions.Infrastructure
             if (commandKey.Equals(BackspaceCommand))
                 return sessionManager.Filter();
 
+            if (!sessionManager.IsActive && 
+                (commandKey.Equals(ReturnCommand) || commandKey.Equals(TabCommand) || AutoCompleteCommands.Contains(commandKey)) &&
+                ShouldStartSessionOnTyping(textView, null, sessionManager.IsActive))
+                return sessionManager.TriggerCompletion();
+
             return false;
         }
 
@@ -87,8 +92,12 @@ namespace SpecFlow.VisualStudio.Editor.Completions.Infrastructure
         {
             var sessionManager = GetCompletionSessionManager(textView);
 
-            if (!sessionManager.IsActive && ShouldStartSessionOnTyping(textView, ch))
+            if (ShouldStartSessionOnTyping(textView, ch, sessionManager.IsActive))
+            {
+                if (sessionManager.IsActive)
+                    sessionManager.Cancel();
                 return sessionManager.TriggerCompletion();
+            }
 
             if (sessionManager.IsActive)
                 return sessionManager.Filter();
