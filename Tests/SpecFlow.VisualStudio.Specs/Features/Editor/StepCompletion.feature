@@ -15,6 +15,21 @@ Scenario: Offers step definitions of the scenario block at the caret
 		| item        |
 		| I press add |
 
+Scenario: Offers step definitions when space pressed after a step keyword
+	Given there is a SpecFlow project scope with calculator step definitions
+	And the following feature file in the editor
+		"""
+		Feature: Addition
+		Scenario: Add two numbers
+		  Given I have entered 50 into the calculator
+		  When{caret}
+		"""
+	And the initial binding discovery is performed
+	When I invoke the "Complete" command by typing " "	
+	Then a completion list should pop up with the following items
+		| item        |
+		| I press add |
+
 Scenario: Completes step at the caret position
 	Given there is a SpecFlow project scope with calculator step definitions
 	And the following feature file in the editor
