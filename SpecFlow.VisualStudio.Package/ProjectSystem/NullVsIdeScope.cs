@@ -90,7 +90,15 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
             }
 
+            public void MonitorCommandAutoFormatDocument(bool isSelectionFormatting)
+            {
+            }
+
             public void MonitorCommandAddFeatureFile(ProjectSettings projectSettings)
+            {
+            }
+
+            public void MonitorCommandAddSpecFlowConfigFile()
             {
             }
 

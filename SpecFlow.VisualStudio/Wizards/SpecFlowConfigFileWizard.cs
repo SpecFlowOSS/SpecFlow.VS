@@ -8,7 +8,7 @@ namespace SpecFlow.VisualStudio.Wizards
     {
         public bool RunStarted(WizardRunParameters wizardRunParameters)
         {
-            //wizardRunParameters.MonitoringService.MonitorCommandAddSpecFlowConfigFile(projectSettings);
+            wizardRunParameters.MonitoringService.MonitorCommandAddSpecFlowConfigFile();
 
             var projectSettings = wizardRunParameters.ProjectScope.GetProjectSettings();
 
