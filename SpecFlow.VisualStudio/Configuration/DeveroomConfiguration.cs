@@ -8,8 +8,9 @@ namespace SpecFlow.VisualStudio.Configuration
 
         public string ConfigurationBaseFolder { get; set; }
 
-        public SpecFlowConfiguration SpecFlow { get; set; } = new SpecFlowConfiguration();
-        public TraceabilityConfiguration Traceability { get; set; } = new TraceabilityConfiguration();
+        public SpecFlowConfiguration SpecFlow { get; set; } = new ();
+        public TraceabilityConfiguration Traceability { get; set; } = new ();
+        public EditorConfiguration Editor { get; set; } = new ();
 
         // old settings to be reviewed
         public ProcessorArchitectureSetting ProcessorArchitecture { get; set; } = ProcessorArchitectureSetting.AutoDetect;
@@ -24,8 +25,9 @@ namespace SpecFlow.VisualStudio.Configuration
 
         private void FixEmptyContainers()
         {
-            SpecFlow = SpecFlow ?? new SpecFlowConfiguration();
-            Traceability = Traceability ?? new TraceabilityConfiguration();
+            SpecFlow ??= new ();
+            Traceability ??= new ();
+            Editor ??= new ();
         }
 
         public void CheckConfiguration()
@@ -34,13 +36,14 @@ namespace SpecFlow.VisualStudio.Configuration
 
             SpecFlow.CheckConfiguration();
             Traceability.CheckConfiguration();
+            Editor.CheckConfiguration();
         }
 
         #region Equality
 
         protected bool Equals(DeveroomConfiguration other)
         {
-            return string.Equals(ConfigurationBaseFolder, other.ConfigurationBaseFolder) && Equals(SpecFlow, other.SpecFlow) && Equals(Traceability, other.Traceability) && ProcessorArchitecture == other.ProcessorArchitecture && DebugConnector == other.DebugConnector && string.Equals(DefaultFeatureLanguage, other.DefaultFeatureLanguage) && string.Equals(ConfiguredBindingCulture, other.ConfiguredBindingCulture);
+            return string.Equals(ConfigurationBaseFolder, other.ConfigurationBaseFolder) && Equals(SpecFlow, other.SpecFlow) && Equals(Traceability, other.Traceability) && Equals(Editor, other.Editor) && ProcessorArchitecture == other.ProcessorArchitecture && DebugConnector == other.DebugConnector && string.Equals(DefaultFeatureLanguage, other.DefaultFeatureLanguage) && string.Equals(ConfiguredBindingCulture, other.ConfiguredBindingCulture);
         }
 
         public override bool Equals(object obj)
@@ -58,6 +61,7 @@ namespace SpecFlow.VisualStudio.Configuration
                 var hashCode = (ConfigurationBaseFolder != null ? ConfigurationBaseFolder.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (SpecFlow != null ? SpecFlow.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (Traceability != null ? Traceability.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Editor != null ? Editor.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (int) ProcessorArchitecture;
                 hashCode = (hashCode * 397) ^ DebugConnector.GetHashCode();
                 hashCode = (hashCode * 397) ^ (DefaultFeatureLanguage != null ? DefaultFeatureLanguage.GetHashCode() : 0);

@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using SpecFlow.VisualStudio.Editor.Services;
+using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 
 namespace SpecFlow.VisualStudio.Editor.Completions
 {
@@ -25,7 +26,8 @@ namespace SpecFlow.VisualStudio.Editor.Completions
         {
             if (ch == null || char.IsWhiteSpace(ch.Value))
             {
-                if (GetDeveroomTagForCaret(textView, DeveroomTagTypes.StepKeyword) != null)
+                var showStepCompletionAfterStepKeywords = GetConfiguration(textView).Editor.ShowStepCompletionAfterStepKeywords;
+                if (showStepCompletionAfterStepKeywords && GetDeveroomTagForCaret(textView, DeveroomTagTypes.StepKeyword) != null)
                     return true;
             }
 

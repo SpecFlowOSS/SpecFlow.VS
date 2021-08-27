@@ -139,7 +139,10 @@
         },
         "traceability": {
           "$ref": "#/definitions/Traceability"
-        }
+        },
+        "editor": {
+          "$ref":  "#/definitions/Editor"
+        } 
       }
     },
     "$schema": {
@@ -205,6 +208,18 @@
           }
         }
       }
-    }
+    },
+    "Editor": {
+      "description": "TODO",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "showStepCompletionAfterStepKeywords": {
+          "description": "TODO",
+          "type": "boolean",
+          "default": true
+        }
+      }
+    } 
   }
 }

@@ -12,6 +12,8 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Editor.OptionsExtensionMethods;
 using Microsoft.VisualStudio.Text.Tagging;
 using Microsoft.VisualStudio.TextManager.Interop;
+using SpecFlow.VisualStudio.Configuration;
+using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 
 namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
 {
@@ -81,6 +83,12 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
                 return null;
 
             return filePath;
+        }
+
+        protected DeveroomConfiguration GetConfiguration(IWpfTextView textView)
+        {
+            var configuration = IdeScope.GetDeveroomConfiguration(IdeScope.GetProject(textView.TextBuffer));
+            return configuration;
         }
 
         public virtual DeveroomEditorCommandStatus QueryStatus(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey)
