@@ -7,8 +7,10 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Threading;
+using Microsoft.VisualStudio.Shell;
 using SpecFlow.VisualStudio.Analytics;
 using SpecFlow.VisualStudio.Diagnostics;
+using SpecFlow.VisualStudio.Notifications;
 using SpecFlow.VisualStudio.UI.ViewModels;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
@@ -21,18 +23,22 @@ namespace SpecFlow.VisualStudio.ProjectSystem
     [Export(typeof(IWelcomeService))]
     public class WelcomeService : IWelcomeService
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly IRegistryManager _registryManager;
         private readonly IVersionProvider _versionProvider;
         private readonly IAnalyticsTransmitter _analyticsTransmitter;
         private readonly IGuidanceConfiguration _guidanceConfiguration;
         private readonly IFileSystem _fileSystem;
-        
+
+        private NotificationService _notificationService;
+
         private static DispatcherTimer _welcomeMessageTimer;
         private static string _deveroomNews = null;
 
         [ImportingConstructor]
-        public WelcomeService(IRegistryManager registryManager, IVersionProvider versionProvider, IAnalyticsTransmitter analyticsTransmitter, IGuidanceConfiguration guidanceConfiguration, IFileSystem fileSystem)
+        public WelcomeService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IRegistryManager registryManager, IVersionProvider versionProvider, IAnalyticsTransmitter analyticsTransmitter, IGuidanceConfiguration guidanceConfiguration, IFileSystem fileSystem)
         {
+            _serviceProvider = serviceProvider;
             _registryManager = registryManager;
             _versionProvider = versionProvider;
             _analyticsTransmitter = analyticsTransmitter;
@@ -43,6 +49,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         public void OnIdeScopeActivityStarted(IIdeScope ideScope)
         {
             UpdateUsageOfExtension(ideScope);
+
+            var notificationDataStore = new NotificationDataStore();
+            _notificationService = new NotificationService(notificationDataStore,
+                    new NotificationInfoBarFactory(_serviceProvider, ideScope, notificationDataStore, _analyticsTransmitter));
+            _notificationService.Initialize();
         }
 
         private void UpdateUsageOfExtension(IIdeScope ideScope)
