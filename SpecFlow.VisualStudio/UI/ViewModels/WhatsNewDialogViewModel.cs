@@ -8,7 +8,7 @@ namespace SpecFlow.VisualStudio.UI.ViewModels
     public class WhatsNewDialogViewModel : WizardViewModel
     {
         public const string UPGRADE_HEADER_TEMPLATE = @"
-# Deveroom Updated to v{newVersion}
+# SpecFlow Updated to v{newVersion}
 
 Please have a look at the changes since the last installed version.
 
@@ -31,7 +31,7 @@ Check out the past issues and subscribe at http://bddaddict.com.
 
         public MarkDownWizardPageViewModel OtherNewsPage => Pages.OfType<MarkDownWizardPageViewModel>().FirstOrDefault(p => p.Name == "Other News");
 
-        public WhatsNewDialogViewModel(string newVersion, string changeLog) : base("Close", "Welcome to Deveroom",
+        public WhatsNewDialogViewModel(string newVersion, string changeLog) : base("Close", "Welcome to SpecFlow",
             new MarkDownWizardPageViewModel("Changes")
             {
                 Text = GetChangesText(newVersion, changeLog)
