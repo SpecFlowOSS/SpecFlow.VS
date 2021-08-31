@@ -24,7 +24,7 @@ namespace SpecFlow.VisualStudio.Analytics
             {
                 using (var reader = new StreamReader(stream))
                 {
-                    var instrumentationKey = reader.ReadToEnd();
+                    var instrumentationKey = reader.ReadLine();
 
                     TelemetryConfiguration.Active.InstrumentationKey = instrumentationKey;
                     TelemetryConfiguration.Active.TelemetryChannel = new InMemoryChannel();
