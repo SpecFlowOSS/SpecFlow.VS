@@ -78,6 +78,16 @@ steps:
   condition: succeededOrFailed()
 
 - task: CopyFiles@2
+  displayName: 'Copy marketplace scripts'
+  inputs:
+    SourceFolder: '$(system.defaultworkingdirectory)'
+    Contents: |
+     publish*.ps1
+     .marketplace\**
+    TargetFolder: '$(build.artifactstagingdirectory)\marketplace'
+  condition: succeededOrFailed()
+
+- task: CopyFiles@2
   displayName: 'Copy NuGet folder'
   inputs:
     SourceFolder: 'd:\a\1\Nuget'
@@ -98,6 +108,13 @@ steps:
   displayName: 'Publish Artifact: drop'
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)\drop'
+  condition: succeededOrFailed()
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: marketplace'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)\marketplace'
+    ArtifactName: marketplace
   condition: succeededOrFailed()
  
 - task: PublishBuildArtifacts@1
