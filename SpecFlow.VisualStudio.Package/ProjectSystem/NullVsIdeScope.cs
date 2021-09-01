@@ -98,7 +98,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
             }
 
-            public void MonitorCommandAddSpecFlowConfigFile()
+            public void MonitorCommandAddSpecFlowConfigFile(ProjectSettings projectSettings)
             {
             }
 

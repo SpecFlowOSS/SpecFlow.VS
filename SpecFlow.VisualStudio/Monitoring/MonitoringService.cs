@@ -106,15 +106,25 @@ namespace SpecFlow.VisualStudio.Monitoring
             //nop
         }
 
+        public void MonitorCommandAutoFormatDocument(bool isSelectionFormatting)
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("AutoFormatDocument command executed",
+                new Dictionary<string, object>()
+                {
+                    { "IsSelectionFormatting", isSelectionFormatting }
+                }));
+        }
+
         public void MonitorCommandAddFeatureFile(ProjectSettings settings)
         {
             _analyticsTransmitter.TransmitEvent(new GenericEvent("Feature file added",
                 GetProjectSettingsProps(settings)));
         }
 
-        public void MonitorCommandAddSpecFlowConfigFile()
+        public void MonitorCommandAddSpecFlowConfigFile(ProjectSettings settings)
         {
-            _analyticsTransmitter.TransmitEvent(new GenericEvent("Specflow config added"));
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Specflow config added",
+                GetProjectSettingsProps(settings)));
         }
 
 
@@ -173,15 +183,6 @@ namespace SpecFlow.VisualStudio.Monitoring
                     { "SelectedUnitTestFramework", unitTestFramework },
                     { "AddFluentAssertions", addFluentAssertions },
                 }));
-        }
-
-        public void MonitorCommandAutoFormatDocument(bool isSelectionFormatting)
-        {
-            _analyticsTransmitter.TransmitEvent(new GenericEvent("AutoFormatDocument command executed",
-                new Dictionary<string, object>()
-                    {
-                        { "IsSelectionFormatting", isSelectionFormatting }
-                    }));
         }
 
 

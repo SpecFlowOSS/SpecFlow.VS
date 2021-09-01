@@ -22,7 +22,7 @@ namespace SpecFlow.VisualStudio.Monitoring
         void MonitorCommandAutoFormatTable();
         void MonitorCommandAutoFormatDocument(bool isSelectionFormatting);
         void MonitorCommandAddFeatureFile(ProjectSettings projectSettings);
-        void MonitorCommandAddSpecFlowConfigFile();
+        void MonitorCommandAddSpecFlowConfigFile(ProjectSettings projectSettings);
 
         void MonitorSpecFlowDiscovery(bool isFailed, string errorMessage, int stepDefinitionCount, ProjectSettings projectSettings);
         void MonitorSpecFlowGeneration(bool isFailed, ProjectSettings projectSettings);
