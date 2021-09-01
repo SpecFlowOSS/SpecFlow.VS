@@ -16,6 +16,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public string ProjectFolder { get; }
         public string OutputAssemblyPath { get; }
         public string TargetFrameworkMoniker { get; } = null;
+        public string TargetFrameworkMonikers { get; } = null;
         public string PlatformTargetName { get; } = "Any CPU";
         public string ProjectName { get; set; } = "Test Project";
         public string DefaultNamespace => ProjectName.Replace(" ", "");

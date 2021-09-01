@@ -6,6 +6,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Settings
     {
         public DeveroomProjectKind Kind { get; }
         public TargetFrameworkMoniker TargetFrameworkMoniker { get; }
+        public string TargetFrameworkMonikers { get; }
         public ProjectPlatformTarget PlatformTarget { get; }
         public string OutputAssemblyPath { get; }
         public string DefaultNamespace { get; }
@@ -14,11 +15,12 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Settings
         public string SpecFlowConfigFilePath { get; }
         public SpecFlowProjectTraits SpecFlowProjectTraits { get; }
 
-        public ProjectSettings(DeveroomProjectKind kind, string outputAssemblyPath, TargetFrameworkMoniker targetFrameworkMoniker, ProjectPlatformTarget platformTarget, string defaultNamespace,
+        public ProjectSettings(DeveroomProjectKind kind, string outputAssemblyPath, TargetFrameworkMoniker targetFrameworkMoniker, string targetFrameworkMonikers, ProjectPlatformTarget platformTarget, string defaultNamespace,
             NuGetVersion specFlowVersion, string specFlowGeneratorFolder, string specFlowConfigFilePath, SpecFlowProjectTraits specFlowProjectTraits)
         {
             Kind = kind;
             TargetFrameworkMoniker = targetFrameworkMoniker;
+            TargetFrameworkMonikers = targetFrameworkMonikers ?? targetFrameworkMoniker.Value;
             PlatformTarget = platformTarget;
             OutputAssemblyPath = outputAssemblyPath;
             DefaultNamespace = defaultNamespace;

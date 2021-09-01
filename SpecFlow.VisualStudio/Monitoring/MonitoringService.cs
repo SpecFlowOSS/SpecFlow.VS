@@ -35,8 +35,7 @@ namespace SpecFlow.VisualStudio.Monitoring
         public void MonitorOpenProjectSystem(IIdeScope ideScope)
         {
             _welcomeService.OnIdeScopeActivityStarted(ideScope);
-
-            //todo: add tfms
+            
             _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension loaded"));
         }
 
@@ -194,8 +193,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                 props = new Dictionary<string, object>
                 {
                     { "SpecFlowVersion", settings.GetSpecFlowVersionLabel() },
-                    //todo: add TFM(s) to the events
-                    //{ "net", settings.TargetFrameworkMoniker.ToShortString() },
+                    { "ProjectTargetFramework", settings.TargetFrameworkMonikers },
                     { "SingleFileGeneratorUsed", settings.DesignTimeFeatureFileGenerationEnabled },
                 };
             }

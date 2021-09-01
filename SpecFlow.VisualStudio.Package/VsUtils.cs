@@ -226,6 +226,19 @@ namespace SpecFlow.VisualStudio
             }
         }
 
+        public static string GetTargetFrameworkMonikers(Project project)
+        {
+            try
+            {
+                return project.Properties.Item("TargetFrameworkMonikers").Value.ToString();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex, $"{nameof(VsUtils)}.{nameof(GetTargetFrameworkMonikers)}");
+                return null;
+            }
+        }
+
         private static void DumpProperties(Properties props, string category)
         {
             if (props == null)

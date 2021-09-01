@@ -142,11 +142,12 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Settings
             var hasFeatureFiles = (featureFileCount ?? 0) > 0;
             var kind = GetKind(isInvalid, specFlowSettings != null, hasFeatureFiles);
             var platformTarget = GetPlatformTarget(_projectScope.PlatformTargetName);
-
+            
             var settings = new ProjectSettings(
                 kind,
                 _projectScope.OutputAssemblyPath,
                 TargetFrameworkMoniker.Create(_projectScope.TargetFrameworkMoniker),
+                _projectScope.TargetFrameworkMonikers,
                 platformTarget,
                 _projectScope.DefaultNamespace,
                 specFlowSettings?.Version, 
