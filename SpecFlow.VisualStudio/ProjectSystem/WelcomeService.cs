@@ -106,10 +106,14 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                     ScheduleWelcomeDialog(ideScope, new WhatsNewDialogViewModel(currentVersion.ToString(), selectedChangelog),
                         (viewModel, elapsed) =>
                         {
-                            //todo: decide if event is needed
-                            //EventTracker.TrackWelcomeUpgrade(
-                            //    ActivityTracker.LastInstalledVersion ?? "na", ActivityTracker.AppVersion,
-                            //    (int)elapsed.TotalSeconds, viewModel.VisitedPages.Count);
+                            _analyticsTransmitter.TransmitEvent(new GenericEvent("Upgrade dialog dismissed",
+                                new Dictionary<string, object>
+                                {
+                                    { "OldExtensionVersion", installedVersion },
+                                    { "NewExtensionVersion", currentVersion },
+                                    { "WelcomeScreenSeconds", (int)elapsed.TotalSeconds },
+                                    { "VisitedPages", viewModel.VisitedPages.Count },
+                                }));
                         },
                         viewModel =>
                         {
