@@ -30,6 +30,10 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <TargetPath>Changelog.txt</TargetPath>
     </VSIXSourceItem>
+    <VSIXSourceItem Include="..\LICENSE.txt">
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <TargetPath>LICENSE.txt</TargetPath>
+    </VSIXSourceItem>
     <Content Include="Package\Resources\SpecFlowIcon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
