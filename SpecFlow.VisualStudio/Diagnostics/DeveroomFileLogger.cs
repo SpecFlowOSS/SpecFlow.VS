@@ -80,8 +80,8 @@ namespace SpecFlow.VisualStudio.Diagnostics
         {
             return Path.Combine(Environment.GetFolderPath(
                     Environment.SpecialFolder.LocalApplicationData),
-                "Deveroom",
-                $"deveroom-vs-{DateTime.Now:yyyyMMdd}.log");
+                "SpecFlow",
+                $"specflow-vs-{DateTime.Now:yyyyMMdd}.log");
         }
 
     }

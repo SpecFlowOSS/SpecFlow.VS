@@ -10,7 +10,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
     public class VsDeveroomOutputPaneServices : VsServiceBase, IDeveroomOutputPaneServices
     {
         private static Guid _outputPaneGuid = Guid.NewGuid();
-        private const string PaneName = "Deveroom";
+        private const string PaneName = "SpecFlow";
 
         private readonly Lazy<IVsOutputWindowPane> _outputWindowPane;
 
@@ -36,7 +36,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex, "Create Deveroom Pane Error");
+                Debug.WriteLine(ex, "Create SpecFlow Pane Error");
                 return null;
             }
         }
