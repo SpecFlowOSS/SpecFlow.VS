@@ -56,8 +56,8 @@ namespace SpecFlow.VisualStudio.UI
             if ((object)viewModel is WelcomeDialogViewModel welcomeDialogViewModel)
                 return new WelcomeDialog(welcomeDialogViewModel, _vsUiShell);
 
-            if ((object)viewModel is WhatsNewDialogViewModel whatsNewDialogViewModel)
-                return new WelcomeDialog(whatsNewDialogViewModel, _vsUiShell);
+            if ((object)viewModel is UpgradeDialogViewModel upgradeDialogViewModel)
+                return new WelcomeDialog(upgradeDialogViewModel, _vsUiShell);
 
             if ((object)viewModel is AddNewSpecFlowProjectViewModel addNewSpecFlowProjectViewModel)
                 return new AddNewSpecFlowProjectDialog(addNewSpecFlowProjectViewModel, _vsUiShell);

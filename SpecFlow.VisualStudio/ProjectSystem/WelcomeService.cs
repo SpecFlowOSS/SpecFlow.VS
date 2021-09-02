@@ -103,7 +103,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                     CheckFileAssociation(ideScope);
 
                     var selectedChangelog = GetSelectedChangelog(ideScope, installedVersion);
-                    ScheduleWelcomeDialog(ideScope, new WhatsNewDialogViewModel(currentVersion.ToString(), selectedChangelog),
+                    ScheduleWelcomeDialog(ideScope, new UpgradeDialogViewModel(currentVersion.ToString(), selectedChangelog),
                         (viewModel, elapsed) =>
                         {
                             _analyticsTransmitter.TransmitEvent(new GenericEvent("Upgrade dialog dismissed",
@@ -122,7 +122,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                             //if (_deveroomNews != null && newsPage != null)
                             //{
                             //    //EventTracker.TrackWelcomeNewsLoaded(_deveroomNews);
-                            //    newsPage.Text = WhatsNewDialogViewModel.ACTUAL_INFO_HEADER + _deveroomNews;
+                            //    newsPage.Text = UpgradeDialogViewModel.COMMUNITY_INFO_HEADER + _deveroomNews;
                             //}
                         });
                 }

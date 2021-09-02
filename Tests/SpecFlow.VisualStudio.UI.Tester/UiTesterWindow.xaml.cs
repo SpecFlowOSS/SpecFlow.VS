@@ -72,7 +72,7 @@ namespace SpecFlow.VisualStudio.UI.Tester
 
         private void Test_UpgradeDialog(object sender, RoutedEventArgs e)
         {
-            var viewModel = WhatsNewDialogViewModel.DesignData;
+            var viewModel = UpgradeDialogViewModel.DesignData;
             var dialog = new WelcomeDialog(viewModel);
             dialog.ShowDialog();
         }
