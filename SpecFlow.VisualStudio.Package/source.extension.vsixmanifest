@@ -5,6 +5,7 @@
         <DisplayName>SpecFlow for Visual Studio 2022</DisplayName>
         <Description xml:space="preserve">Visual Studio extension for working with SpecFlow projects and Gherkin feature files.</Description>
         <MoreInfo>http://www.specflow.org</MoreInfo>
+        <License>LICENSE.txt</License>
         <GettingStartedGuide>http://go.specflow.org/getting-started</GettingStartedGuide>
         <ReleaseNotes>Changelog.txt</ReleaseNotes>
         <Icon>Package\Resources\SpecFlowIcon.ico</Icon>
