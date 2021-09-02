@@ -150,18 +150,19 @@ namespace SpecFlow.VisualStudio.Discovery
             if (!projectSettings.IsSpecFlowTestProject)
             {
                 _logger.LogVerbose("Non-SpecFlow test project");
-                _logger.LogWarning($"Deveroom could not detect the SpecFlow version of the project that is required for navigation, step completion and other features. {Environment.NewLine}  Currently only NuGet package referenced can be detected. Please check https://github.com/specsolutions/deveroom-visualstudio/issues/14 for details.");
+                _logger.LogWarning($"Could not detect the SpecFlow version of the project that is required for navigation, step completion and other features. {Environment.NewLine}  Currently only NuGet package referenced can be detected. Please check https://github.com/specsolutions/deveroom-visualstudio/issues/14 for details.");
                 return new ProjectBindingRegistryCache(DiscoveryStatus.NonSpecFlowTestProject, projectSettings: projectSettings);
             }
 
             testAssemblySource = GetTestAssemblySource(projectSettings);
             if (testAssemblySource == null)
             {
-                _logger.LogInfo("Test assembly not found. Please build the project to enable Deveroom features.");
+                var message = "Test assembly not found. Please build the project to enable the SpecFlow Visual Studio Extension features.";
+                _logger.LogInfo(message);
                 _errorListServices?.AddErrors(new []{ new DeveroomUserError
                 {
                     Category = DeveroomUserErrorCategory.Discovery,
-                    Message = "Test assembly not found. Please build the project to enable Deveroom features.",
+                    Message = message,
                     Type = TaskErrorCategory.Warning
                 }});
                 return new ProjectBindingRegistryCache(DiscoveryStatus.TestAssemblyNotFound, projectSettings: projectSettings);
@@ -234,7 +235,7 @@ namespace SpecFlow.VisualStudio.Discovery
                 {
                     bindingRegistry.IsFailed = true;
                     _logger.LogWarning(result.ErrorMessage);
-                    _logger.LogWarning($"The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled. {Environment.NewLine}  Please check the error message above and report to https://github.com/specsolutions/deveroom-visualstudio/issues if you cannot fix.");
+                    _logger.LogWarning($"The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled. {Environment.NewLine}  Please check the error message above and report to https://github.com/SpecFlowOSS/SpecFlow.VS/issues if you cannot fix.");
 
                     _errorListServices?.AddErrors(new[]{ new DeveroomUserError
                     {

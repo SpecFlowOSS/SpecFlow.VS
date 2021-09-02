@@ -23,14 +23,14 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         public void ShowProblem(string description, string title = null)
         {
             Logger.LogWarning($"User Notification: {description}");
-            var caption = title == null ? "Deveroom for SpecFlow" : $"Deveroom: {title}";
+            var caption = title == null ? "Visual Studio Extension for SpecFlow" : $"SpecFlow: {title}";
             MessageBox.Show(description, caption, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
         }
 
         public void ShowQuestion(QuestionDescription questionDescription)
         {
             Logger.LogInfo($"User Question: {questionDescription.Description}");
-            var caption = questionDescription.Title == null ? "Deveroom" : $"Deveroom: {questionDescription.Title}";
+            var caption = questionDescription.Title == null ? "SpecFlow" : $"SpecFlow: {questionDescription.Title}";
             var result = MessageBox.Show(questionDescription.Description, caption, questionDescription.IncludeCancel ? MessageBoxButton.YesNoCancel : MessageBoxButton.YesNo,
                 MessageBoxImage.Question, questionDescription.NoCommandIsDefault ? MessageBoxResult.No : MessageBoxResult.Yes);
             if (result == MessageBoxResult.Yes)

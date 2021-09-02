@@ -16,7 +16,7 @@ namespace SpecFlow.VisualStudio.Generator
     public class DeveroomSingleFileGenerator : BaseCodeGeneratorWithSite
     {
         public const string Name = "SpecFlowSingleFileGenerator";
-        public const string Description = "Deveroom feature file generator for SpecFlow";
+        public const string Description = "Feature file generator for SpecFlow";
 
         protected override string GetDefaultExtension()
         {

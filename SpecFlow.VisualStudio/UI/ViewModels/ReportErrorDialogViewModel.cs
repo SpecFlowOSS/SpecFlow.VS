@@ -9,21 +9,21 @@ namespace SpecFlow.VisualStudio.UI.ViewModels
         internal const string ERROR_SUFFIX_TEMPLATE = @"
 
             Please use the '*Copy error to clipboard*' button to copy the following error details to the clipboard. 
-            The error has been also saved to the log file at [%LOCALAPPDATA%\Deveroom](file://{logFilePath}).
+            The error has been also saved to the log file at [%LOCALAPPDATA%\SpecFlow](file://{logFilePath}).
         ";
         internal const string GENERAL_ERROR_SUFFIX = @"
             
             This issue causes instability or blocks important features such as navigation or auto-complete.
             
-            *Please help us and other Deveroom users* by reporting this issue in our issue tracker at 
-            https://github.com/specsolutions/deveroom-visualstudio/issues.
+            *Please help us and other SpecFlow users* by reporting this issue in our issue tracker at 
+            https://github.com/SpecFlowOSS/SpecFlow.VS/issues.
         ";
         internal const string INIT_ERROR = @"
-            Deveroom detected an issue during initialization. Please try updating your Visual Studio to the latest
-            version. (For Visual Studio 2017 versions 15.9.6 or later should work, the version of your Viusal Studio can be found in the '*Help / About*' dialog.) 
+            SpecFlow Visual Studio Extension detected an issue during initialization. Please try updating your Visual Studio to the latest
+            version. (The version of your Viusal Studio can be found in the '*Help / About*' dialog.) 
 
             If the problem persists even after updating Visual Studio, please report the error above in our issue tracker at 
-            https://github.com/specsolutions/deveroom-visualstudio/issues.
+            https://github.com/SpecFlowOSS/SpecFlow.VS/issues.
         ";
 
         public string Message { get; set; }

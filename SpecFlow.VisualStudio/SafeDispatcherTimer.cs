@@ -61,7 +61,7 @@ namespace SpecFlow.VisualStudio
             {
                 _logger?.LogException(_monitoringService, ex);
                 if (_logger == null)
-                    MessageBox.Show("Unhandled exception: " + ex, "Deveroom error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Unhandled exception: " + ex, "SpecFlow error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

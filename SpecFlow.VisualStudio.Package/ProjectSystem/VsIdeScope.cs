@@ -106,7 +106,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                 return;
 
             _acivityStarted = true;
-            Logger.LogInfo("Starting Deveroom...");
+            Logger.LogInfo("Starting Visual Studio Extension...");
             MonitoringService.MonitorOpenProjectSystem(this);
         }
 

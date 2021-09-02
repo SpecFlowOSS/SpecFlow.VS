@@ -44,9 +44,9 @@ Deveroom is still new, so there might be some glitches, but **we are eager to he
 You can open it by choosing *View / Output* from the Visual Studio menu and switch 
 the *Show output* from dropdown to *Deveroom*.
 
-* You can find even more trace information in the **log file** in the [%LOCALAPPDATA%\Deveroom](file://%LOCALAPPDATA%\Deveroom) folder.
+* You can find even more trace information in the **log file** in the [%LOCALAPPDATA%\SpecFlow](file://%LOCALAPPDATA%\SpecFlow) folder.
 
-* Please **register your suggestions and issues** in our [issue tracker on GitHub](https://github.com/specsolutions/deveroom-visualstudio/issues).
+* Please **register your suggestions and issues** in our [issue tracker on GitHub](https://github.com/SpecFlowOSS/SpecFlow.VS/issues).
 ";
 
         public WelcomeDialogViewModel() : base("Close", "Welcome to Deveroom",
