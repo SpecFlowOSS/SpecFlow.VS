@@ -186,6 +186,15 @@ namespace SpecFlow.VisualStudio.Monitoring
         }
 
 
+
+        public void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null)
+        {
+            additionalProps ??= new Dictionary<string, object>();
+            additionalProps.Add("Source", source);
+            additionalProps.Add("URL", url);
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Link clicked",
+                additionalProps));
+        }
         private Dictionary<string, object> GetProjectSettingsProps(ProjectSettings settings, Dictionary<string, object> additionalSettings = null)
         {
             Dictionary<string, object> props = null;

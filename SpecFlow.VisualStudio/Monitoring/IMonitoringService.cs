@@ -31,5 +31,6 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         void MonitorProjectTemplateWizardStarted();
         void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions);
+        void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null);
     }
 }

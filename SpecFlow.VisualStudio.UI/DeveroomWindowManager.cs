@@ -7,6 +7,7 @@ using SpecFlow.VisualStudio.UI.ViewModels;
 using SpecFlow.VisualStudio.UI.Dialogs;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using SpecFlow.VisualStudio.Monitoring;
 
 namespace SpecFlow.VisualStudio.UI
 {
@@ -16,11 +17,13 @@ namespace SpecFlow.VisualStudio.UI
     public class DeveroomWindowManager : IDeveroomWindowManager
     {
         protected readonly IVsUIShell _vsUiShell;
+        protected readonly IMonitoringService _monitoringService;
 
         [ImportingConstructor]
-        public DeveroomWindowManager([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
+        public DeveroomWindowManager([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IMonitoringService monitoringService)
         {
             _vsUiShell = (IVsUIShell)serviceProvider.GetService(typeof(SVsUIShell));
+            _monitoringService = monitoringService;
         }
 
         public bool? ShowDialog<TViewModel>(TViewModel viewModel)
@@ -41,8 +44,25 @@ namespace SpecFlow.VisualStudio.UI
             var uriString = e.Uri.ToString();
             if (!uriString.StartsWith("file"))
             {
-                //todo: track link click if needed
+                _monitoringService.MonitorLinkClicked(GetViewModelName(sender), uriString);
             }
+        }
+
+        private string GetViewModelName(object sender)
+        {
+            if (sender is System.Windows.Window window)
+            {
+                var viewModel = "ViewModel";
+                var name = window.DataContext.GetType().Name; //"UpgradeDialogViewModel"
+                var index = name.IndexOf(viewModel, StringComparison.InvariantCultureIgnoreCase);
+                if (index > -1)
+                {
+                    var val = name.Substring(0, index);
+                    return val;
+                }
+                return name;
+            }
+            return null;
         }
 
         private DialogWindow CreateWindowInternal<TViewModel>(TViewModel viewModel)

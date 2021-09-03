@@ -121,6 +121,10 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             public void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions)
             {
             }
+
+            public void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null)
+            {
+            }
         }
 
         public bool IsSolutionLoaded { get; } = false;
@@ -149,7 +153,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             Logger = logger;
             MonitoringService = monitoringService;
             ServiceProvider = serviceProvider;
-            WindowManager = new DeveroomWindowManager(serviceProvider);
+            WindowManager = new DeveroomWindowManager(serviceProvider, monitoringService);
             FileSystem = new FileSystem();
             Actions = new NullIdeActions(this);
             Dte = null;
