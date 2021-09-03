@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="SpecFlow.VisualStudio.DEV.c6b79b94-5a20-4a5b-8992-0cf181a34779" Version="|%CurrentProject%;GetBuildVersion|" Language="en-US" Publisher="SpecFlow Team" />
+        <Identity Id="SpecFlow.VisualStudio.2022.3c1441cb-29e4-49a6-b430-c98205b95236" Version="|%CurrentProject%;GetBuildVersion|" Language="en-US" Publisher="SpecFlow Team" />
         <DisplayName>SpecFlow for Visual Studio 2022</DisplayName>
         <Description xml:space="preserve">Visual Studio extension for working with SpecFlow projects and Gherkin feature files.</Description>
         <MoreInfo>http://www.specflow.org</MoreInfo>
