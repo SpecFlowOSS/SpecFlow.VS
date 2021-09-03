@@ -30,7 +30,7 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <TargetPath>Changelog.txt</TargetPath>
     </VSIXSourceItem>
-    <VSIXSourceItem Include="..\LICENSE.txt">
+    <VSIXSourceItem Include="..\LICENSE">
       <IncludeInVSIX>true</IncludeInVSIX>
       <TargetPath>LICENSE.txt</TargetPath>
     </VSIXSourceItem>
