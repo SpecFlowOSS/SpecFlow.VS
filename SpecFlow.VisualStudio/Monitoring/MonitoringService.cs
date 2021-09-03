@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using SpecFlow.VisualStudio.Analytics;
 using SpecFlow.VisualStudio.Common;
+using SpecFlow.VisualStudio.Notifications;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.UI.ViewModels;
@@ -34,7 +35,7 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         public void MonitorOpenProjectSystem(IIdeScope ideScope)
         {
-            _welcomeService.OnIdeScopeActivityStarted(ideScope);
+            _welcomeService.OnIdeScopeActivityStarted(ideScope, this);
             
             _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension loaded"));
         }
@@ -62,7 +63,28 @@ namespace SpecFlow.VisualStudio.Monitoring
                 GetProjectSettingsProps(settings, additionalProps)));
         }
 
-        
+
+        // EXTENSION
+
+        public void MonitorExtensionInstalled()
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension installed"));
+        }
+
+        public void MonitorExtensionUpgraded(string oldExtensionVersion)
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension upgraded",
+                new Dictionary<string, object>
+                {
+                    { "OldExtensionVersion", oldExtensionVersion }
+                }));
+        }
+
+        public void MonitorExtensionDaysOfUsage(int usageDays)
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent($"{usageDays} day usage"));
+        }
+
 
         //COMMAND
 
@@ -186,6 +208,17 @@ namespace SpecFlow.VisualStudio.Monitoring
         }
 
 
+        public void MonitorNotificationShown(NotificationData notification)
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Notification shown",
+                GetNotificationProps(notification)));
+        }
+
+        public void MonitorNotificationDismissed(NotificationData notification)
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Notification dismissed",
+                GetNotificationProps(notification)));
+        }
 
         public void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null)
         {
@@ -195,6 +228,14 @@ namespace SpecFlow.VisualStudio.Monitoring
             _analyticsTransmitter.TransmitEvent(new GenericEvent("Link clicked",
                 additionalProps));
         }
+
+        public void MonitorUpgradeDialogDismissed(Dictionary<string, object> additionalProps)
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Upgrade dialog dismissed",
+                additionalProps));
+        }
+
+
         private Dictionary<string, object> GetProjectSettingsProps(ProjectSettings settings, Dictionary<string, object> additionalSettings = null)
         {
             Dictionary<string, object> props = null;
@@ -216,6 +257,15 @@ namespace SpecFlow.VisualStudio.Monitoring
                 }
             }
             return props;
+        }
+
+        private Dictionary<string, object> GetNotificationProps(NotificationData notification)
+        {
+            return new Dictionary<string, object>()
+            {
+                { "NotificationId", notification.Id },
+                { "URL", notification.LinkUrl }
+            };
         }
     }
 }

@@ -12,6 +12,7 @@ using SpecFlow.VisualStudio.UI;
 using SpecFlow.VisualStudio.UI.ViewModels;
 using EnvDTE;
 using Microsoft.VisualStudio.Text;
+using SpecFlow.VisualStudio.Notifications;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
 {
@@ -63,6 +64,18 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             }
 
             public void MonitorOpenFeatureFile(ProjectSettings projectSettings)
+            {
+            }
+
+            public void MonitorExtensionInstalled()
+            {
+            }
+
+            public void MonitorExtensionUpgraded(string oldExtensionVersion)
+            {
+            }
+
+            public void MonitorExtensionDaysOfUsage(int usageDays)
             {
             }
 
@@ -122,7 +135,19 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
             }
 
+            public void MonitorNotificationShown(NotificationData notification)
+            {
+            }
+
+            public void MonitorNotificationDismissed(NotificationData notification)
+            {
+            }
+
             public void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null)
+            {
+            }
+
+            public void MonitorUpgradeDialogDismissed(Dictionary<string, object> additionalProps)
             {
             }
         }

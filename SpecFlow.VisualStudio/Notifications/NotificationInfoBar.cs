@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Imaging;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using SpecFlow.VisualStudio.Analytics;
+using SpecFlow.VisualStudio.Monitoring;
 
 namespace SpecFlow.VisualStudio.Notifications
 {
@@ -14,7 +14,7 @@ namespace SpecFlow.VisualStudio.Notifications
         private readonly IServiceProvider _serviceProvider;
         private readonly ExternalBrowserNotificationService _browserService;
         private readonly NotificationDataStore _notificationDataStore;
-        private readonly IAnalyticsTransmitter _analyticsTransmitter;
+        private readonly IMonitoringService _monitoringService;
         private readonly NotificationData _notification;
         private uint _cookie;
 
@@ -22,13 +22,13 @@ namespace SpecFlow.VisualStudio.Notifications
             IServiceProvider serviceProvider,
             ExternalBrowserNotificationService browserService,
             NotificationDataStore notificationDataStore,
-            IAnalyticsTransmitter analyticsTransmitter,
+            IMonitoringService monitoringService,
             NotificationData notification)
         {
             _serviceProvider = serviceProvider;
             _browserService = browserService;
             _notificationDataStore = notificationDataStore;
-            _analyticsTransmitter = analyticsTransmitter;
+            _monitoringService = monitoringService;
             _notification = notification;
         }
 
@@ -36,8 +36,7 @@ namespace SpecFlow.VisualStudio.Notifications
         {
             infoBarUIElement.Unadvise(_cookie);
             _notificationDataStore.SetDismissed(_notification);
-            _analyticsTransmitter.TransmitEvent(new GenericEvent("Notification dismissed",
-                GetNotificationProps()));
+            _monitoringService.MonitorNotificationDismissed(_notification);
         }
 
         public void OnActionItemClicked(IVsInfoBarUIElement infoBarUIElement, IVsInfoBarActionItem actionItem)
@@ -48,24 +47,18 @@ namespace SpecFlow.VisualStudio.Notifications
             var opened = _browserService.ShowPage(url);
             if (opened)
             {
-                _analyticsTransmitter.TransmitEvent(new GenericEvent("Notification link opened",
-                    GetNotificationProps()));
+                _monitoringService.MonitorLinkClicked("NotificationInfoBar", _notification.LinkUrl,
+                    new Dictionary<string, object>()
+                    {
+                        { "NotificationId", _notification.Id },
+                    });
             }
         }
 
         public async Task ShowInfoBar()
         {
             await ShowInfoBar(_notification.Message, _notification.LinkText, _notification.LinkUrl);
-            _analyticsTransmitter.TransmitEvent(new GenericEvent("Notification shown",
-                GetNotificationProps()));
-        }
-
-        private Dictionary<string, object> GetNotificationProps()
-        {
-            return new Dictionary<string, object>()
-            {
-                { "NotificationId", _notification.Id },
-            };
+            _monitoringService.MonitorNotificationShown(_notification);
         }
 
         private async Task ShowInfoBar(string message, string linkText, string linkUrl)

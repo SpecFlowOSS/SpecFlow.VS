@@ -2,7 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using Microsoft.VisualStudio.Shell;
-using SpecFlow.VisualStudio.Analytics;
+using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
 
 namespace SpecFlow.VisualStudio.Notifications
@@ -12,19 +12,19 @@ namespace SpecFlow.VisualStudio.Notifications
         private readonly IServiceProvider _serviceProvider;
         private readonly NotificationDataStore _notificationDataStore;
         private readonly ExternalBrowserNotificationService _browserNotificationService;
-        private readonly IAnalyticsTransmitter _analyticsTransmitter;
+        private readonly IMonitoringService _monitoringService;
         
-        public NotificationInfoBarFactory([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IIdeScope ideScope, NotificationDataStore notificationDataStore, IAnalyticsTransmitter analyticsTransmitter)
+        public NotificationInfoBarFactory([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IIdeScope ideScope, NotificationDataStore notificationDataStore, IMonitoringService monitoringService)
         {
             _serviceProvider = serviceProvider;
             _notificationDataStore = notificationDataStore;
             _browserNotificationService = new ExternalBrowserNotificationService(ideScope);
-            _analyticsTransmitter = analyticsTransmitter;
+            _monitoringService = monitoringService;
         }
 
         public NotificationInfoBar Create(NotificationData notification)
         {
-            return new NotificationInfoBar(_serviceProvider, _browserNotificationService, _notificationDataStore, _analyticsTransmitter, notification);
+            return new NotificationInfoBar(_serviceProvider, _browserNotificationService, _notificationDataStore, _monitoringService, notification);
         }
     }
 }

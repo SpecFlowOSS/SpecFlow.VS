@@ -10,6 +10,7 @@ using System.Windows.Threading;
 using Microsoft.VisualStudio.Shell;
 using SpecFlow.VisualStudio.Analytics;
 using SpecFlow.VisualStudio.Diagnostics;
+using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.Notifications;
 using SpecFlow.VisualStudio.UI.ViewModels;
 
@@ -17,7 +18,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 {
     public interface IWelcomeService
     {
-        void OnIdeScopeActivityStarted(IIdeScope ideScope);
+        void OnIdeScopeActivityStarted(IIdeScope ideScope, IMonitoringService monitoringService);
     }
 
     [Export(typeof(IWelcomeService))]
@@ -26,7 +27,6 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         private readonly IServiceProvider _serviceProvider;
         private readonly IRegistryManager _registryManager;
         private readonly IVersionProvider _versionProvider;
-        private readonly IAnalyticsTransmitter _analyticsTransmitter;
         private readonly IGuidanceConfiguration _guidanceConfiguration;
         private readonly IFileSystem _fileSystem;
 
@@ -36,27 +36,26 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         private static string _deveroomNews = null;
 
         [ImportingConstructor]
-        public WelcomeService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IRegistryManager registryManager, IVersionProvider versionProvider, IAnalyticsTransmitter analyticsTransmitter, IGuidanceConfiguration guidanceConfiguration, IFileSystem fileSystem)
+        public WelcomeService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IRegistryManager registryManager, IVersionProvider versionProvider, IGuidanceConfiguration guidanceConfiguration, IFileSystem fileSystem)
         {
             _serviceProvider = serviceProvider;
             _registryManager = registryManager;
             _versionProvider = versionProvider;
-            _analyticsTransmitter = analyticsTransmitter;
             _guidanceConfiguration = guidanceConfiguration;
             _fileSystem = fileSystem;
         }
 
-        public void OnIdeScopeActivityStarted(IIdeScope ideScope)
+        public void OnIdeScopeActivityStarted(IIdeScope ideScope, IMonitoringService monitoringService)
         {
-            UpdateUsageOfExtension(ideScope);
+            UpdateUsageOfExtension(ideScope, monitoringService);
 
             var notificationDataStore = new NotificationDataStore();
             _notificationService = new NotificationService(notificationDataStore,
-                    new NotificationInfoBarFactory(_serviceProvider, ideScope, notificationDataStore, _analyticsTransmitter));
+                    new NotificationInfoBarFactory(_serviceProvider, ideScope, notificationDataStore, monitoringService));
             _notificationService.Initialize();
         }
 
-        private void UpdateUsageOfExtension(IIdeScope ideScope)
+        private void UpdateUsageOfExtension(IIdeScope ideScope, IMonitoringService monitoringService)
         {
             var today = DateTime.Today;
             var status = _registryManager.GetInstallStatus();
@@ -67,7 +66,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
                 // new user
                 browserNotificationService.ShowPage(_guidanceConfiguration.Installation.Url);
-                _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension installed"));
+                monitoringService.MonitorExtensionInstalled();
 
                 status.InstallDate = today;
                 status.InstalledVersion = currentVersion;
@@ -90,11 +89,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                 {
                     //upgrading user
                     var installedVersion = status.InstalledVersion.ToString();
-                    _analyticsTransmitter.TransmitEvent(new GenericEvent("Extension upgraded",
-                        new Dictionary<string, object>
-                        {
-                            { "OldExtensionVersion", installedVersion }
-                        }));
+                    monitoringService.MonitorExtensionUpgraded(installedVersion);
 
                     status.InstallDate = today;
                     status.InstalledVersion = currentVersion;
@@ -106,14 +101,13 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                     ScheduleWelcomeDialog(ideScope, new UpgradeDialogViewModel(currentVersion.ToString(), selectedChangelog),
                         (viewModel, elapsed) =>
                         {
-                            _analyticsTransmitter.TransmitEvent(new GenericEvent("Upgrade dialog dismissed",
-                                new Dictionary<string, object>
-                                {
-                                    { "OldExtensionVersion", installedVersion },
-                                    { "NewExtensionVersion", currentVersion },
-                                    { "WelcomeScreenSeconds", (int)elapsed.TotalSeconds },
-                                    { "VisitedPages", viewModel.VisitedPages.Count },
-                                }));
+                            monitoringService.MonitorUpgradeDialogDismissed(new Dictionary<string, object>
+                            {
+                                { "OldExtensionVersion", installedVersion },
+                                { "NewExtensionVersion", currentVersion },
+                                { "WelcomeScreenSeconds", (int)elapsed.TotalSeconds },
+                                { "VisitedPages", viewModel.VisitedPages.Count },
+                            });
                         },
                         viewModel =>
                         {
@@ -134,7 +128,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                     if (guidance?.UsageDays != null)
                     {
                         var usageDays = guidance.UsageDays.Value;
-                        _analyticsTransmitter.TransmitEvent(new GenericEvent($"{usageDays} day usage"));
+                        monitoringService.MonitorExtensionDaysOfUsage(usageDays);
 
                         status.UserLevel = (int)guidance.UserLevel;
                         _registryManager.UpdateStatus(status);
