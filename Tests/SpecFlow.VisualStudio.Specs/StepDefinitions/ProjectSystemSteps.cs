@@ -162,10 +162,10 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             };
         }
 
-        [Given(@"the following C\# step definition class in the editor")]
+        [Given(@"^the following C\# step definition class in the editor$")]
         public void GivenTheFollowingCStepDefinitionClassInTheEditor(string stepDefinitionClass)
         {
-            var fileName = "Steps.cs";
+            var fileName = DomainDefaults.StepDefinitionFileName;
             var stepDefinitionFile =
                 string.Join(Environment.NewLine, new[]
                 {
@@ -322,6 +322,13 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                         command.PreExec(_wpfTextView, commandTargetKey ?? command.Targets.First());
                     else
                         _wpfTextView.SimulateTypeText(command, parameter);
+                    break;
+                }
+                case "Rename Step":
+                {
+                    var command = new RenameStepCommand(_ideScope,
+                        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                    command.PreExec(_wpfTextView, command.Targets.First());
                     break;
                 }
                 default:
@@ -588,12 +595,29 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             WhenIInvokeTheCommand(_commandToInvokeDeferred);
         }
 
+        [When("I specify {string} as renamed step")]
+        public void WhenISpecifyAsRenamedStep(string renamedStep)
+        {
+            _ideScope.StubWindowManager.RegisterWindowAction<RenameStepViewModel>(
+                viewModel =>
+                {
+                    viewModel.StepText = renamedStep;
+                });
+            WhenIInvokeTheCommand(_commandToInvokeDeferred);
+        }
+
         [Then(@"the following step definition snippets should be copied to the clipboard")]
         public void ThenTheFollowingStepDefinitionSnippetsShouldBeCopiedToTheClipboard(Table expectedSnippets)
         {
             ActionsMock.ClipboardText.Should().NotBeNull("snippets should have been copied to clipboard");
             var parsedSnippets = ParseSnippets(ActionsMock.ClipboardText);
             expectedSnippets.CompareToSet(parsedSnippets, false);
+        }
+
+        [Then(@"the following step definition snippets should be in the step definition class")]
+        public void ThenTheFollowingStepDefinitionSnippetsShouldBeInTheStepDefinitionClass(Table expectedSnippets)
+        {
+            ThenTheFollowingStepDefinitionSnippetsShouldBeInFile(DomainDefaults.StepDefinitionFileName, expectedSnippets);
         }
 
         [Then(@"the following step definition snippets should be in file ""(.*)""")]
@@ -636,5 +660,14 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
 
             expectedItemsTable.CompareToSet(actualCompletions, false);
         }
+
+        [Then("the file {string} should be updated to")]
+        public void ThenTheFileShouldBeUpdatedTo(string fileName, string expectedFileContent)
+        {
+            var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
+            var actualContent = File.ReadAllText(filePath);
+            Assert.Equal(expectedFileContent, actualContent);
+        }
+
     }
 }

@@ -18,6 +18,8 @@
     <PackageReference Include="NuGet.CommandLine" Version="4.6.2" CopyTools="true" CopyToolsTarget="Tools-NuGet" />
     
     <PackageReference Include="SpecFlow.xUnit" Version="3.8.14" />
+    <PackageReference Include="SpecFlow" Version="3.8.14" />
+    <PackageReference Include="CucumberExpressions.SpecFlow.3-8" Version="1.0.6" />
 
 
     <!--TODO: fix SpecFlow.xUnitAdapter for sdk-style projects-->
