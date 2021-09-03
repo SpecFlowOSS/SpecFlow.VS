@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
   <TemplateData>
-    <Name>SpecFlow Project (DEV)</Name>
+    <Name>SpecFlow Project</Name>
     <Description>A project template for creating executable specifications with SpecFlow. You can choose from different .NET frameworks and test frameworks.</Description>
     <TemplateID>SpecFlow.ProjectTemplate.CSharp</TemplateID>
     <Icon>specflowproject.ico</Icon>
@@ -25,7 +25,7 @@
     </Project>
   </TemplateContent>
   <WizardExtension>
-    <Assembly>SpecFlow.VisualStudio.Package, Version=2021.0.0.0, Culture=neutral, PublicKeyToken=c392b06fa519a0e0</Assembly>
+    <Assembly>SpecFlow.VisualStudio.Package, Version=2021.0.0.0, Culture=neutral, PublicKeyToken=0778194805d6db41</Assembly>
     <FullClassName>SpecFlow.VisualStudio.Wizards.VsSpecFlowProjectWizard</FullClassName>
   </WizardExtension>
 </VSTemplate>
