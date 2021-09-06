@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -98,9 +102,33 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             if (result != true)
                 return true;
 
-            PerformRenameStep(selectedStepDefinition.Item1, stepDefinitionBinding, viewModel);
+            PerformRenameStepInFeatureFiles(selectedStepDefinition.Item1, stepDefinitionBinding, viewModel);
+            PerformRenameStepInStepDefinitionClass(selectedStepDefinition.Item1, stepDefinitionBinding, textView, viewModel);
 
             return true;
+        }
+
+        private void PerformRenameStepInStepDefinitionClass(IProjectScope projectScope, ProjectStepDefinitionBinding projectStepDefinitionBinding, IWpfTextView textView, RenameStepViewModel viewModel)
+        {
+            var roslynDocument = textView.TextBuffer.GetRelatedDocuments().FirstOrDefault();
+            if (roslynDocument != null && roslynDocument.TryGetSyntaxTree(out var tree))
+            {
+                var rootNode = tree.GetRoot();
+                var methodLine = textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileLine - 1);
+                var node = rootNode.FindNode(new TextSpan(methodLine.Start + projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileColumn - 1, 1));
+                var method = GetMethodDeclaration(node);
+
+                //method.AttributeLists.SelectMany(al => al.Attributes)
+                //    .Select(a => a.ArgumentList)
+                //    .Where(a => a.Arguments.Any(aa => aa.GetText() == ))
+
+                Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
+            }
+        }
+
+        private MethodDeclarationSyntax GetMethodDeclaration(SyntaxNode node)
+        {
+            return node.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
         }
 
         private static RenameStepViewModel PrepareViewModel(ProjectStepDefinitionBinding stepDefinitionBinding)
@@ -114,7 +142,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return viewModel;
         }
 
-        private void PerformRenameStep(IProjectScope projectScope, ProjectStepDefinitionBinding projectStepDefinitionBinding, RenameStepViewModel viewModel)
+        private void PerformRenameStepInFeatureFiles(IProjectScope projectScope, ProjectStepDefinitionBinding projectStepDefinitionBinding, RenameStepViewModel viewModel)
         {
             var featureFiles = projectScope.GetProjectFiles(".feature");
             var configuration = projectScope.GetDeveroomConfiguration();
