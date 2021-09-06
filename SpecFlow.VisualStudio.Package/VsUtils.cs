@@ -57,12 +57,12 @@ namespace SpecFlow.VisualStudio
             }
         }
 
-        public static IWpfTextView GetWpfTextViewFromFilePath(string filePath, IServiceProvider serviceProvider)
+        public static IWpfTextView GetWpfTextViewFromFilePath(string filePath, IServiceProvider serviceProvider, bool openIfNotOpened = false)
         {
             var editorAdaptersFactoryService = ResolveMefDependency<IVsEditorAdaptersFactoryService>(serviceProvider);
 
-            if (VsShellUtilities.IsDocumentOpen(serviceProvider, filePath, Guid.Empty,
-                out var _, out var _, out var windowFrame))
+            var windowFrame = GetVsWindowFrame(filePath, serviceProvider, openIfNotOpened);
+            if (windowFrame != null)
             {
                 // Get the IVsTextView from the windowFrame.
                 IVsTextView textView = VsShellUtilities.GetTextView(windowFrame);
@@ -73,6 +73,22 @@ namespace SpecFlow.VisualStudio
             }
 
             return null;
+        }
+
+        private static IVsWindowFrame GetVsWindowFrame(string filePath, IServiceProvider serviceProvider, bool openIfNotOpened)
+        {
+            if (VsShellUtilities.IsDocumentOpen(serviceProvider, filePath, Guid.Empty,
+                out var _, out var _, out var windowFrame))
+            {
+                return windowFrame;
+            }
+
+            if (!openIfNotOpened)
+                return null;
+
+            VsShellUtilities.OpenDocument(serviceProvider, filePath, Guid.Empty,
+                out var _, out var _, out windowFrame);
+            return windowFrame;
         }
 
         /// <summary>

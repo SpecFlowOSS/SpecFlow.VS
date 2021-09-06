@@ -200,6 +200,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return null;
         }
 
+        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        {
+            return null;
+        }
+
         public IProjectScope GetProject(ITextBuffer textBuffer)
         {
             return null;

@@ -8,6 +8,7 @@ using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.TextManager.Interop;
 using Moq;
 using Xunit.Abstractions;
 
@@ -15,6 +16,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 {
     public class StubIdeScope : IIdeScope
     {
+        public IDictionary<string, StubWpfTextView> OpenViews { get; } = new Dictionary<string, StubWpfTextView>();
         public StubLogger StubLogger { get; } = new StubLogger();
         public DeveroomCompositeLogger CompositeLogger { get; } = new DeveroomCompositeLogger
         {
@@ -44,6 +46,21 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation)
         {
             return null;
+        }
+
+        public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null, string contentType = "deveroom", string filePath = null)
+        {
+            var textView = StubWpfTextView.CreateTextView(this, inputText, newLine, projectScope, contentType, filePath);
+            if (filePath != null)
+                OpenViews[filePath] = textView;
+            return textView;
+        }
+
+        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        {
+            var lines = FileSystem.File.ReadAllLines(sourceLocation.SourceFile);
+            var textView = CreateTextView(new TestText(lines), filePath: sourceLocation.SourceFile);
+            return textView.TextBuffer;
         }
 
         public IProjectScope[] GetProjectsWithFeatureFiles()

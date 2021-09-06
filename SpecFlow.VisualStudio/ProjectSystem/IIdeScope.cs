@@ -26,5 +26,6 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         IProjectScope[] GetProjectsWithFeatureFiles();
 
         IDisposable CreateUndoContext(string undoLabel);
+        ITextBuffer GetTextBuffer(SourceLocation sourceLocation);
     }
 }

@@ -124,6 +124,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return VsIdeScope.CreatePersistentTrackingPosition(sourceLocation);
         }
 
+        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        {
+            return VsIdeScope.GetTextBuffer(sourceLocation);
+        }
+
         public IProjectScope[] GetProjectsWithFeatureFiles()
         {
             return VsIdeScope.GetProjectsWithFeatureFiles();

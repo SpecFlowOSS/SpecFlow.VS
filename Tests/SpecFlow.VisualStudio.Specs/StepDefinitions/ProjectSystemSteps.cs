@@ -665,9 +665,16 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         public void ThenTheFileShouldBeUpdatedTo(string fileName, string expectedFileContent)
         {
             var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
-            var actualContent = File.ReadAllText(filePath);
+            var actualContent = GetActualContent(filePath);
             Assert.Equal(expectedFileContent, actualContent);
         }
 
+        private string GetActualContent(string filePath)
+        {
+            if (_ideScope.OpenViews.TryGetValue(filePath, out var textView))
+                return textView.TextBuffer.CurrentSnapshot.GetText();
+            var actualContent = File.ReadAllText(filePath);
+            return actualContent;
+        }
     }
 }

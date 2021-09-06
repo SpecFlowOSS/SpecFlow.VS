@@ -112,15 +112,28 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var projectUsages = _stepDefinitionUsageFinder.FindUsages(new[] {projectStepDefinitionBinding}, featureFiles, configuration);
             foreach (var fileUsage in projectUsages.GroupBy(u => u.SourceLocation.SourceFile))
             {
-                var contentLines = IdeScope.FileSystem.File.ReadAllLines(fileUsage.Key);
-                foreach (var usage in fileUsage)
+                var firstPosition = fileUsage.First().SourceLocation;
+                EnsureFeatureFileOpen(firstPosition);
+                var textBuffer = IdeScope.GetTextBuffer(firstPosition);
+
+                using (var textEdit = textBuffer.CreateEdit())
                 {
-                    var indentation = contentLines[usage.SourceLocation.SourceFileLine - 1].Substring(0, usage.SourceLocation.SourceFileColumn - 1);
-                    contentLines[usage.SourceLocation.SourceFileLine - 1] =
-                        $"{indentation}{usage.Step.Keyword}{viewModel.StepText}";
+                    foreach (var usage in fileUsage)
+                    {
+                        var line = textBuffer.CurrentSnapshot.GetLineFromLineNumber(usage.SourceLocation.SourceFileLine - 1);
+                        var indentPlusKeywordLength = (usage.SourceLocation.SourceFileColumn - 1) + usage.Step.Keyword.Length;
+                        var startPosition = line.Start.Position + indentPlusKeywordLength;
+                        var replaceSpan = new Span(startPosition, line.End.Position - startPosition);
+                        textEdit.Replace(replaceSpan, viewModel.StepText);
+                    }
+                    textEdit.Apply();
                 }
-                IdeScope.FileSystem.File.WriteAllLines(fileUsage.Key, contentLines);
             }
+        }
+
+        private bool EnsureFeatureFileOpen(SourceLocation sourceLocation)
+        {
+            return IdeScope.Actions.NavigateTo(sourceLocation);
         }
 
         private ProjectStepDefinitionBinding[] GetStepDefinitions(IProjectScope project, string fileName, SnapshotPoint triggerPoint)

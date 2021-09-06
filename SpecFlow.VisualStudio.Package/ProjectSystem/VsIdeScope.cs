@@ -149,6 +149,15 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return new DeveroomUndoContext(Dte, undoLabel);
         }
 
+        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        {
+            if (sourceLocation.SourceLocationSpan?.IsDocumentOpen == true && sourceLocation.SourceLocationSpan?.Document?.TextBuffer != null)
+                return sourceLocation.SourceLocationSpan.Document.TextBuffer;
+
+            var wpfTextView = VsUtils.GetWpfTextViewFromFilePath(sourceLocation.SourceFile, ServiceProvider, true);
+            return wpfTextView?.TextBuffer;
+        }
+
         private void SolutionEventListenerOnLoaded(object sender, EventArgs e)
         {
             Logger.LogVerbose("Solution loaded");
