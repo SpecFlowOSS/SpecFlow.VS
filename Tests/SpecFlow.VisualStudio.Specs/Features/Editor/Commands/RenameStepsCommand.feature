@@ -11,6 +11,7 @@ Scenario: A simple step with a sigle usage is renamed from step definition (code
 
 		Scenario: Add two numbers
 			When I press add
+
 		"""
 	And the following C# step definition class in the editor
 		"""
@@ -32,6 +33,7 @@ Scenario: A simple step with a sigle usage is renamed from step definition (code
 
 		Scenario: Add two numbers
 			When I choose add
+
 		"""
 	And the following step definition snippets should be in the step definition class
 		| type | regex        |

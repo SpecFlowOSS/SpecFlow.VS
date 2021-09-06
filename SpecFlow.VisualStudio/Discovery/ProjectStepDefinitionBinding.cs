@@ -11,18 +11,20 @@ namespace SpecFlow.VisualStudio.Discovery
         public bool IsValid => Regex != null && Error == null;
         public string Error { get; }
         public ScenarioBlock StepDefinitionType { get; }
-        public string Expression { get; set; }
+        public string SpecifiedExpression { get; set; }
         public Regex Regex { get; }
         public Scope Scope { get; }
         public ProjectStepDefinitionImplementation Implementation { get; }
 
-        public ProjectStepDefinitionBinding(ScenarioBlock stepDefinitionType, Regex regex, Scope scope, ProjectStepDefinitionImplementation implementation, string expression = null, string error = null)
+        public string Expression => SpecifiedExpression ?? Regex?.ToString();
+
+        public ProjectStepDefinitionBinding(ScenarioBlock stepDefinitionType, Regex regex, Scope scope, ProjectStepDefinitionImplementation implementation, string specifiedExpression = null, string error = null)
         {
             StepDefinitionType = stepDefinitionType;
             Regex = regex;
             Scope = scope;
             Implementation = implementation;
-            Expression = expression;
+            SpecifiedExpression = specifiedExpression;
             Error = error;
         }
 
@@ -67,7 +69,7 @@ namespace SpecFlow.VisualStudio.Discovery
 
         public override string ToString()
         {
-            return $"[{StepDefinitionType}({Expression ?? Regex?.ToString()})]: {Implementation}";
+            return $"[{StepDefinitionType}({Expression})]: {Implementation}";
         }
     }
 }

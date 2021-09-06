@@ -171,7 +171,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return GetStepDefinitions(fileName, triggerPoint, bindingRegistry);
         }
 
-        private ProjectStepDefinitionBinding[] GetStepDefinitions(string fileName, SnapshotPoint triggerPoint, ProjectBindingRegistry bindingRegistry)
+        internal static ProjectStepDefinitionBinding[] GetStepDefinitions(string fileName, SnapshotPoint triggerPoint, ProjectBindingRegistry bindingRegistry)
         {
             if (bindingRegistry == null)
                 return new ProjectStepDefinitionBinding[0];
@@ -183,7 +183,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 .ToArray();
         }
 
-        private bool IsTriggerPointInStepDefinition(ProjectStepDefinitionBinding stepDefinition, SnapshotPoint triggerPoint)
+        private static bool IsTriggerPointInStepDefinition(ProjectStepDefinitionBinding stepDefinition, SnapshotPoint triggerPoint)
         {
             var sourceLocation = stepDefinition.Implementation.SourceLocation;
             var span = sourceLocation.SourceLocationSpan?.Span;
@@ -202,7 +202,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return triggerPointLine <= sourceLocation.SourceFileLine + 3;
         }
 
-        private bool IsTriggerPointInStepDefinition(ITrackingSpan stepDefinitionSpan, SnapshotPoint triggerPoint)
+        private static bool IsTriggerPointInStepDefinition(ITrackingSpan stepDefinitionSpan, SnapshotPoint triggerPoint)
         {
             var span = stepDefinitionSpan.GetSpan(triggerPoint.Snapshot);
             if (span.Contains(triggerPoint) || span.End == triggerPoint) // Contains is end-exclusive
@@ -214,7 +214,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return false;
         }
 
-        private bool IsTriggerPointWithinExtendedInStepDefinition(SnapshotSpan span, SnapshotPoint triggerPoint)
+        private static bool IsTriggerPointWithinExtendedInStepDefinition(SnapshotSpan span, SnapshotPoint triggerPoint)
         {
             // The debug info infrastructure we use sets the start position to the opening { of the step definition method.
             // To be able to find the definitions also from the attributes, we need to extend the start position.

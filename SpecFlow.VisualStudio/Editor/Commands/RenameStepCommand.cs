@@ -1,12 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using SpecFlow.VisualStudio.Diagnostics;
+using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
+using SpecFlow.VisualStudio.Editor.Services;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.UI.ViewModels;
 
@@ -16,10 +22,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands
     [Export(typeof(IDeveroomFeatureEditorCommand))]
     public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand, IDeveroomFeatureEditorCommand
     {
+        private readonly StepDefinitionUsageFinder _stepDefinitionUsageFinder;
+        
         [ImportingConstructor]
         public RenameStepCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService) :
             base(ideScope, aggregatorFactory, monitoringService)
         {
+            _stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope.FileSystem, ideScope.Logger, ideScope.MonitoringService);
         }
 
         public override DeveroomEditorCommandTargetKey[] Targets => new[]
@@ -32,8 +41,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             Logger.LogVerbose("Rename Step");
 
             var textBuffer = textView.TextBuffer;
-            //var fileName = GetEditorDocumentPath(textView);
-            //var triggerPoint = textView.Caret.Position.BufferPosition;
+            var fileName = GetEditorDocumentPath(textView);
+            var triggerPoint = textView.Caret.Position.BufferPosition;
 
             var project = IdeScope.GetProject(textBuffer);
             if (project == null || !project.GetProjectSettings().IsSpecFlowProject)
@@ -42,17 +51,85 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 return true;
             }
 
+            var specFlowTestProjects = IdeScope.GetProjectsWithFeatureFiles()
+                .Where(p => p.GetProjectSettings().IsSpecFlowTestProject)
+                .ToArray();
+
+            if (specFlowTestProjects.Length == 0)
+            {
+                IdeScope.Actions.ShowProblem("Unable to find step definition usages: could not find any SpecFlow project with feature files.");
+                return true;
+            }
+
+
+            var stepDefinitions = new List<Tuple<IProjectScope, ProjectStepDefinitionBinding>>();
+            foreach (var specFlowTestProject in specFlowTestProjects)
+            {
+                var projectStepDefinitions = GetStepDefinitions(project, fileName, triggerPoint);
+                foreach (var projectStepDefinitionBinding in projectStepDefinitions)
+                {
+                    stepDefinitions.Add(new Tuple<IProjectScope, ProjectStepDefinitionBinding>(specFlowTestProject, projectStepDefinitionBinding));
+                }
+            }
+
+            if (stepDefinitions.Count == 0)
+            {
+                IdeScope.Actions.ShowProblem("No step definition found that is related to this position");
+                return true;
+            }
+
+            if (stepDefinitions.Count != 1)
+            {
+                //TODO: support multiple step defs
+                IdeScope.Actions.ShowProblem("TODO: multiple projects/stepdefs not supported");
+                return true;
+            }
+
+            var selectedStepDefinition = stepDefinitions[0];
+            if (selectedStepDefinition.Item2.Expression == null)
+            {
+                IdeScope.Actions.ShowProblem("Unable to rename step, the step definition expression cannot be detected.");
+                return true;
+            }
+
             var viewModel = new RenameStepViewModel
             {
-                StepText = "TODO"
+                StepText = selectedStepDefinition.Item2.Expression
             };
             var result = IdeScope.WindowManager.ShowDialog(viewModel);
             if (result != true)
                 return true;
 
-
+            PerformRenameStep(selectedStepDefinition.Item1, selectedStepDefinition.Item2, viewModel);
 
             return true;
+        }
+
+        private void PerformRenameStep(IProjectScope projectScope, ProjectStepDefinitionBinding projectStepDefinitionBinding, RenameStepViewModel viewModel)
+        {
+            var featureFiles = projectScope.GetProjectFiles(".feature");
+            var configuration = projectScope.GetDeveroomConfiguration();
+            var projectUsages = _stepDefinitionUsageFinder.FindUsages(new[] {projectStepDefinitionBinding}, featureFiles, configuration);
+            foreach (var fileUsage in projectUsages.GroupBy(u => u.SourceLocation.SourceFile))
+            {
+                var contentLines = IdeScope.FileSystem.File.ReadAllLines(fileUsage.Key);
+                foreach (var usage in fileUsage)
+                {
+                    var indentation = contentLines[usage.SourceLocation.SourceFileLine - 1].Substring(0, usage.SourceLocation.SourceFileColumn - 1);
+                    contentLines[usage.SourceLocation.SourceFileLine - 1] =
+                        $"{indentation}{usage.Step.Keyword}{viewModel.StepText}";
+                }
+                IdeScope.FileSystem.File.WriteAllLines(fileUsage.Key, contentLines);
+            }
+        }
+
+        private ProjectStepDefinitionBinding[] GetStepDefinitions(IProjectScope project, string fileName, SnapshotPoint triggerPoint)
+        {
+            var discoveryService = project.GetDiscoveryService();
+            var bindingRegistry = discoveryService.GetBindingRegistry();
+            if (bindingRegistry == null)
+                Logger.LogWarning($"Unable to get step definitions from project '{project.ProjectName}', usages will not be found for this project.");
+            return FindStepDefinitionCommand.GetStepDefinitions(fileName, triggerPoint, bindingRegistry);
         }
     }
 }
