@@ -86,23 +86,32 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }
 
             var selectedStepDefinition = stepDefinitions[0];
-            if (selectedStepDefinition.Item2.Expression == null)
+            var stepDefinitionBinding = selectedStepDefinition.Item2;
+            if (stepDefinitionBinding.Expression == null)
             {
                 IdeScope.Actions.ShowProblem("Unable to rename step, the step definition expression cannot be detected.");
                 return true;
             }
 
-            var viewModel = new RenameStepViewModel
-            {
-                StepText = selectedStepDefinition.Item2.Expression
-            };
+            var viewModel = PrepareViewModel(stepDefinitionBinding);
             var result = IdeScope.WindowManager.ShowDialog(viewModel);
             if (result != true)
                 return true;
 
-            PerformRenameStep(selectedStepDefinition.Item1, selectedStepDefinition.Item2, viewModel);
+            PerformRenameStep(selectedStepDefinition.Item1, stepDefinitionBinding, viewModel);
 
             return true;
+        }
+
+        private static RenameStepViewModel PrepareViewModel(ProjectStepDefinitionBinding stepDefinitionBinding)
+        {
+            var expression = stepDefinitionBinding.Expression.TrimStart('^').TrimEnd('$');
+
+            var viewModel = new RenameStepViewModel
+            {
+                StepText = expression
+            };
+            return viewModel;
         }
 
         private void PerformRenameStep(IProjectScope projectScope, ProjectStepDefinitionBinding projectStepDefinitionBinding, RenameStepViewModel viewModel)
