@@ -82,6 +82,9 @@ namespace SpecFlow.VisualStudio.UI
             if ((object)viewModel is AddNewSpecFlowProjectViewModel addNewSpecFlowProjectViewModel)
                 return new AddNewSpecFlowProjectDialog(addNewSpecFlowProjectViewModel, _vsUiShell);
 
+            if ((object)viewModel is RenameStepViewModel renameStepViewModel)
+                return new RenameStepDialog(renameStepViewModel, _vsUiShell);
+
             throw new NotSupportedException(typeof(TViewModel).ToString());
         }
     }

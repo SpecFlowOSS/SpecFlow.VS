@@ -14,5 +14,6 @@
         <Button Click="Test_WelcomeDialog">Test welcome dialog</Button>
         <Button Click="Test_UpgradeDialog">Test upgrade dialog</Button>
         <Button Click="Test_ProjectTemplateWizard">Test Project Template Wizard</Button>
+        <Button Click="Test_RenameStep">Test Rename Step</Button>
     </StackPanel>
 </Window>
