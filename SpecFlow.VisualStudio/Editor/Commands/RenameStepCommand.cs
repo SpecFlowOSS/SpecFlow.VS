@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text;
@@ -111,12 +113,25 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         private void PerformRenameStepInStepDefinitionClass(IProjectScope projectScope, ProjectStepDefinitionBinding projectStepDefinitionBinding, IWpfTextView textView, RenameStepViewModel viewModel)
         {
             var roslynDocument = textView.TextBuffer.GetRelatedDocuments().FirstOrDefault();
-            if (roslynDocument != null && roslynDocument.TryGetSyntaxTree(out var tree))
+            var code = textView.TextBuffer.CurrentSnapshot.GetText();
+            var tree = CSharpSyntaxTree.ParseText(code);
+
+            // if (roslynDocument != null && roslynDocument.TryGetSyntaxTree(out var tree))
             {
                 var rootNode = tree.GetRoot();
                 var methodLine = textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileLine - 1);
                 var node = rootNode.FindNode(new TextSpan(methodLine.Start + projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileColumn - 1, 1));
-                var method = GetMethodDeclaration(node);
+                var method = node.Parent as MethodDeclarationSyntax;// GetMethodDeclaration(node);
+
+                var stringTokens = method
+                    .AttributeLists
+                    .Select(al => al.Attributes.Single().ArgumentList.Arguments.Single().Expression.GetFirstToken());
+                    //.Where(tok=>tok.ValueText == viewModel.StepText);
+                foreach (var stringToken in stringTokens)
+                {
+                   // var newToken = new StringLiteralToken();
+                   // stringToken.Parent.ReplaceToken(stringToken, new )
+                }
 
                 //method.AttributeLists.SelectMany(al => al.Attributes)
                 //    .Select(a => a.ArgumentList)
