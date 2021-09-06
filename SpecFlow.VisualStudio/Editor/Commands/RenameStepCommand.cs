@@ -12,7 +12,7 @@ using SpecFlow.VisualStudio.UI.ViewModels;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
-    [Export(typeof(IDeveroomFeatureEditorCommand))]
+    [Export(typeof(IDeveroomCodeEditorCommand))]
     public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand
     {
         [ImportingConstructor]
