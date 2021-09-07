@@ -27,7 +27,7 @@ namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig
             var supportedTypes = new[] { typeof(bool), typeof(string), typeof(int) };
             if (!supportedTypes.Contains(typeof(TResult)))
                 throw new NotSupportedException($"Editor config setting type {typeof(TResult).Name} is not supported.");
-            var typeName = typeof(TResult).Name;
+            var typeName = typeof(TResult) == typeof(bool) ? "Bool" : typeof(TResult).Name;
             return
                 typeof(OptionSet).Assembly.GetType("Microsoft.CodeAnalysis.Options.EditorConfigStorageLocation", false)?
                         .GetMethod($"For{typeName}Option", BindingFlags.Public | BindingFlags.Static)?

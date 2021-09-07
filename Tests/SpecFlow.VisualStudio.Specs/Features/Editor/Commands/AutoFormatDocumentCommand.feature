@@ -105,15 +105,15 @@ Scenario: The formatting rules are customized from configuration file
 			"ide": {
 				"editor": {
 					"gherkinFormat": {
-						"indentFeatureChildren": true, // editorconfig: gherkin_indent_feature_children: true
-						"indentRuleChildren": true, // editorconfig: gherkin_indent_rule_children: true
-						"indentSteps": false, // editorconfig: gherkin_indent_steps: false
-						"indentAndSteps": true, // editorconfig: gherkin_indent_and_steps: true
-						"indentDataTable": false, // editorconfig: gherkin_indent_datatable: false
-						"indentDocString": false, // editorconfig: gherkin_indent_docstring: false
-						"indentExamples": true, // editorconfig: gherkin_indent_examples: true
-						"indentExamplesTable": false, // editorconfig: gherkin_indent_examples_table: false
-						"tableCellPaddingSize": 0 // editorconfig: gherkin_table_cell_padding_size: 0
+						"indentFeatureChildren": true, // editorconfig: gherkin_indent_feature_children = true
+						"indentRuleChildren": true, // editorconfig: gherkin_indent_rule_children = true
+						"indentSteps": false, // editorconfig: gherkin_indent_steps = false
+						"indentAndSteps": true, // editorconfig: gherkin_indent_and_steps = true
+						"indentDataTable": false, // editorconfig: gherkin_indent_datatable = false
+						"indentDocString": false, // editorconfig: gherkin_indent_docstring = false
+						"indentExamples": true, // editorconfig: gherkin_indent_examples = true
+						"indentExamplesTable": false, // editorconfig: gherkin_indent_examples_table = false
+						"tableCellPaddingSize": 0 // editorconfig: gherkin_table_cell_padding_size = 0
 					}
 				}
 			}
