@@ -93,7 +93,21 @@ Scenario: Misformatted feature file is cleaned up
 
 Rule: Formatting rules can be customized in the configuration file or from .editorconfig files
 
-The settings in .editorconfig file override the setting from the config file.
+The settings in .editorconfig file override the setting from the config file. 
+
+Used .editorconfig settings with the defaults:
+
+ * indent_style = (inherited from VS, suggested: space)
+ * indent_size = (inherited from VS, suggested: 2)
+ * gherkin_indent_feature_children = false
+ * gherkin_indent_rule_children = false
+ * gherkin_indent_steps = true
+ * gherkin_indent_and_steps = false
+ * gherkin_indent_datatable = true
+ * gherkin_indent_docstring = true
+ * gherkin_indent_examples = false
+ * gherkin_indent_examples_table = true
+ * gherkin_table_cell_padding_size = 1
 
 Scenario: The formatting rules are customized from configuration file
 	In this scenario all rules are specified and all of them is the opposite as the default.
