@@ -11,6 +11,7 @@ using Gherkin.Ast;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
+using SpecFlow.VisualStudio.Editor.Services.EditorConfig;
 using SpecFlow.VisualStudio.Editor.Services.Formatting;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
@@ -43,11 +44,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         }
 
         private readonly GherkinDocumentFormatter _gherkinDocumentFormatter;
+        private readonly EditorConfigOptionsProvider _editorConfigOptionsProvider;
 
         [ImportingConstructor]
-        public AutoFormatTableCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService, GherkinDocumentFormatter gherkinDocumentFormatter) : base(ideScope, aggregatorFactory, monitoringService)
+        public AutoFormatTableCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService, GherkinDocumentFormatter gherkinDocumentFormatter, EditorConfigOptionsProvider editorConfigOptionsProvider = null) : base(ideScope, aggregatorFactory, monitoringService)
         {
             _gherkinDocumentFormatter = gherkinDocumentFormatter;
+            _editorConfigOptionsProvider = editorConfigOptionsProvider;
         }
 
         protected internal override bool PostExec(IWpfTextView textView, char ch)
@@ -69,7 +72,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             var indent = GetIndent(textView.TextSnapshot, hasRows);
             var newLine = GetNewLine(textView);
-            var formatSettings = new GherkinFormatSettings();
+            var formatSettings = GherkinFormatSettings.Load(_editorConfigOptionsProvider, textView, GetConfiguration(textView));
 
             var caretPosition = GetCaretPosition(textView.Caret.Position, hasRows);
             var widths = _gherkinDocumentFormatter.GetTableWidths(hasRows);

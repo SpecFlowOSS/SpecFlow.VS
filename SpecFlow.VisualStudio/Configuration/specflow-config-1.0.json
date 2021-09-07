@@ -218,7 +218,59 @@
           "description": "TODO",
           "type": "boolean",
           "default": true
-        }
+        },
+        "gherkinFormat": {
+          "description": "TODO: Provides settings for formatting Gherkin feature files",
+          "type": "object",
+          "additionalItems": true,
+          "properties": {
+            "indentFeatureChildren": {
+              "description": "Specifies whether child elements of Feature (Background, Rule, Scenario, Scenario Outline) should be indented.",
+              "type": "boolean",
+              "default": false
+            },
+            "indentRuleChildren": {
+              "description": "Specifies whether child elements fo Rule (Background, Scenario, Scenario Outline) should be indented.",
+              "type": "boolean",
+              "default": false
+            },
+            "indentSteps": {
+              "description": "Specifies whether steps of scenarios should be indented.",
+              "type": "boolean",
+              "default": true
+            },
+            "indentAndSteps": {
+              "description": "Specifies whether the 'And' and 'But' steps of the scenarios should have an additional indentation.",
+              "type": "boolean",
+              "default": false
+            },
+            "indentDataTable": {
+              "description": "Specifies whether DataTable arguments should be indented within the step.",
+              "type": "boolean",
+              "default": true
+            },
+            "indentDocString": {
+              "description": "Specifies whether DocString arguments should be indented within the step.",
+              "type": "boolean",
+              "default": true
+            },
+            "indentExamples": {
+              "description": "Specifies whether the Examples block should be indented within the Scenario Outline.",
+              "type": "boolean",
+              "default": false
+            },
+            "indentExamplesTable": {
+              "description": "Specifies whether the Examples table should be indented within the Examples block.",
+              "type": "boolean",
+              "default": true
+            },
+            "tableCellPaddingSize": {
+              "description": "The number of space characters to be used on each sides as table cell padding.",
+              "type": "integer",
+              "default": 1
+            }
+          }
+        } 
       }
     } 
   }

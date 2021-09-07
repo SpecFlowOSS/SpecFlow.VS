@@ -12,7 +12,6 @@ Rules:
 Rule: Feature file can be formatted with useful defaults
 
 Scenario: Misformatted feature file is cleaned up
-
 	Given there is a SpecFlow project scope
 	And the following feature file in the editor
 		"""
@@ -91,6 +90,113 @@ Scenario: Misformatted feature file is cleaned up
 		    | number1 | number2 |
 		    | -101    | -59     |
 		"""
+
+Rule: Formatting rules can be customized in the configuration file or from .editorconfig files
+
+The settings in .editorconfig file override the setting from the config file.
+
+Scenario: The formatting rules are customized from configuration file
+	In this scenario all rules are specified and all of them is the opposite as the default.
+	The related editorconfig settings can be seen in the JSON comments.
+	Given there is a SpecFlow project scope
+	And the specflow.json configuration file contains
+		"""
+		{ 
+			"ide": {
+				"editor": {
+					"gherkinFormat": {
+						"indentFeatureChildren": true, // editorconfig: gherkin_indent_feature_children: true
+						"indentRuleChildren": true, // editorconfig: gherkin_indent_rule_children: true
+						"indentSteps": false, // editorconfig: gherkin_indent_steps: false
+						"indentAndSteps": true, // editorconfig: gherkin_indent_and_steps: true
+						"indentDataTable": false, // editorconfig: gherkin_indent_datatable: false
+						"indentDocString": false, // editorconfig: gherkin_indent_docstring: false
+						"indentExamples": true, // editorconfig: gherkin_indent_examples: true
+						"indentExamplesTable": false, // editorconfig: gherkin_indent_examples_table: false
+						"tableCellPaddingSize": 0 // editorconfig: gherkin_table_cell_padding_size: 0
+					}
+				}
+			}
+		}
+		"""
+	And the following feature file in the editor
+		"""
+					@featureTag    @US1
+		 Feature: Addition
+		     Rule: Calculator functions
+
+		  Background:
+		Given I have entered 50 into the calculator
+
+		  @focus
+		  @WIP              @US1.1
+		  Scenario: Add two numbers
+		Given the following numbers added
+				|  number| reason |
+				  |   1   | first number  |
+			   | 2  |second number |
+		And foo
+			When   bar
+		
+			Scenario Outline: Add multiple
+				 Given I have entered <number1> to the calculator
+				    And I have entered <number2> to the calculator
+					When I check the output
+					```
+					1+2
+					  3
+
+ close
+					```
+
+			  @optimal
+			Examples:
+				| number1 | number2 |
+				| 1 | 2|
+			Examples: negative numbers
+				| number1 | number2 |
+				| -101 | -59              |
+		"""
+	When I invoke the "Auto Format Document" command
+	Then the editor should be updated to
+		"""
+		@featureTag @US1
+		Feature: Addition
+		    Rule: Calculator functions
+		
+		        Background:
+		        Given I have entered 50 into the calculator
+		
+		        @focus
+		        @WIP @US1.1
+		        Scenario: Add two numbers
+		        Given the following numbers added
+		        |number|reason       |
+		        |1     |first number |
+		        |2     |second number|
+		            And foo
+		        When bar
+		
+		        Scenario Outline: Add multiple
+		        Given I have entered <number1> to the calculator
+		            And I have entered <number2> to the calculator
+		        When I check the output
+		        ```
+		        1+2
+		          3
+		        
+		        close
+		        ```
+		
+		            @optimal
+		            Examples:
+		            |number1|number2|
+		            |1      |2      |
+		            Examples: negative numbers
+		            |number1|number2|
+		            |-101   |-59    |
+		"""
+
 
 Rule: Caret should stay in the same line where it was
 

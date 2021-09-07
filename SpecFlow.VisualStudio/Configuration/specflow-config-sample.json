@@ -8,6 +8,20 @@
       "traits": [
         "DesignTimeFeatureFileGeneration"
       ]
+    },
+    "editor": {
+      "showStepCompletionAfterStepKeywords": true,
+      "gherkinFormat": {
+        "indentFeatureChildren": false,
+        "indentRuleChildren": false,
+        "indentSteps": true,
+        "indentAndSteps": false,
+        "indentDataTable": true,
+        "indentDocString": true,
+        "indentExamples": false,
+        "indentExamplesTable": true,
+        "tableCellPaddingSize": 1
+      }
     }
   }
 }

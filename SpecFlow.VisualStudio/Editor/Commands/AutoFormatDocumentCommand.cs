@@ -60,7 +60,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 endLine = selectionSpan.End.GetContainingLine().LineNumber;
             }
 
-            var formatSettings = LoadFormatSettings(textView);
+            var formatSettings = GherkinFormatSettings.Load(_editorConfigOptionsProvider, textView, GetConfiguration(textView));
 
             var lines = new DocumentLinesEditBuffer(textSnapshot, startLine, endLine);
             if (lines.IsEmpty)
@@ -85,23 +85,5 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return true;
         }
 
-        private GherkinFormatSettings LoadFormatSettings(IWpfTextView textView)
-        {
-            var formatSettings = new GherkinFormatSettings();
-
-            var editorOptions = textView.Options;
-            var convertTabsToSpaces = editorOptions.GetOptionValue(DefaultOptions.ConvertTabsToSpacesOptionId);
-            var indentSize = editorOptions.GetOptionValue(DefaultOptions.IndentSizeOptionId);
-            formatSettings.Indent = convertTabsToSpaces ? new string(' ', indentSize) : new string('\t', 1);
-
-            var editorConfigOptions = _editorConfigOptionsProvider?.GetEditorConfigOptions(textView);
-            if (editorConfigOptions != null)
-            {
-                formatSettings.FeatureChildrenIndentLevel =
-                    editorConfigOptions.GetOption("gherkin_indent_feature_children", false) ? 1 : 0;
-            }
-
-            return formatSettings;
-        }
     }
 }
