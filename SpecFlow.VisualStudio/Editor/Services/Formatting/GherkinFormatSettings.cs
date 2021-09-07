@@ -8,7 +8,7 @@ namespace SpecFlow.VisualStudio.Editor.Services.Formatting
 {
     public class GherkinFormatSettings
     {
-        public GherkinFormatConfiguration Configuration { get; set; }
+        public GherkinFormatConfiguration Configuration { get; set; } = new();
 
         public string Indent { get; set; } = "    ";
 
