@@ -74,6 +74,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             if (changeSpan.GetText().Equals(replacementText)) // no change
                 return false;
 
+            using (IdeScope.CreateUndoContext("Auto format document"))
             using (var textEdit = textSnapshot.TextBuffer.CreateEdit())
             {
                 textEdit.Replace(changeSpan, replacementText);

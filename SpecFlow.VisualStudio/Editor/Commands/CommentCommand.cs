@@ -35,6 +35,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             int indent = lines.Min(l => l.GetText().TakeWhile(char.IsWhiteSpace).Count());
 
+            using (IdeScope.CreateUndoContext("Comment lines"))
             using (var textEdit = selectionSpan.Snapshot.TextBuffer.CreateEdit())
             {
                 foreach (var line in lines)

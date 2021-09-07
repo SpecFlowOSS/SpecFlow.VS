@@ -6,6 +6,7 @@ using SpecFlow.VisualStudio.VsxStubs;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Moq;
+using SpecFlow.VisualStudio.ProjectSystem;
 using Xunit;
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands
@@ -13,10 +14,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
     public class CommentUncommentCommandTests
     {
         private IMonitoringService _monitoringService;
+        private IIdeScope _ideScope;
 
         public CommentUncommentCommandTests()
         {
             _monitoringService = new Mock<IMonitoringService>().Object;
+            _ideScope = new Mock<IIdeScope>().Object;
             VsxStubObjects.Initialize();
         }
 
@@ -36,7 +39,7 @@ Scenario: bar
         public void Can_comment_out_lines(string test, int selectionStartLine, int selectionStartColumn, int? selectionEndLine, int? selectionEndColumn, string expectedTextValue)
         {
             Console.WriteLine($"running: {test}");
-            var command = new CommentCommand(null, null, _monitoringService);
+            var command = new CommentCommand(_ideScope, null, _monitoringService);
             var inputText = new TestText(
                 "Feature: foo",
                 "Scenario: bar",
@@ -70,7 +73,7 @@ Scenario: bar
         public void Can_uncomment_lines(string test, int selectionStartLine, int selectionStartColumn, int? selectionEndLine, int? selectionEndColumn, string inputTextValue)
         {
             Console.WriteLine($"running: {test}");
-            var command = new UncommentCommand(null, null, _monitoringService);
+            var command = new UncommentCommand(_ideScope, null, _monitoringService);
             var inputText = new TestText(inputTextValue);
             var textView = CreateTextView(inputText, selectionStartLine, selectionStartColumn, selectionEndLine, selectionEndColumn);
 

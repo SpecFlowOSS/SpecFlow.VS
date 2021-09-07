@@ -24,5 +24,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
         IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation);
         IProjectScope[] GetProjectsWithFeatureFiles();
+
+        IDisposable CreateUndoContext(string undoLabel);
     }
 }

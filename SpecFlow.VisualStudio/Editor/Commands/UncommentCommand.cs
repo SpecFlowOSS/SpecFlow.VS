@@ -33,6 +33,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var lines = GetSpanFullLines(selectionSpan).ToArray();
             Debug.Assert(lines.Length > 0);
 
+            using (IdeScope.CreateUndoContext("Uncomment lines")) 
             using (var textEdit = selectionSpan.Snapshot.TextBuffer.CreateEdit())
             {
                 foreach (var line in lines)

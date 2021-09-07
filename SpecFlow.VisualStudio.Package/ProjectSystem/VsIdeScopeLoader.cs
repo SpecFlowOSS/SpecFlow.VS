@@ -129,6 +129,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return VsIdeScope.GetProjectsWithFeatureFiles();
         }
 
+        public IDisposable CreateUndoContext(string undoLabel)
+        {
+            return VsIdeScope.CreateUndoContext(undoLabel);
+        }
+
         public IServiceProvider ServiceProvider => VsIdeScope.ServiceProvider;
         public DTE Dte => VsIdeScope.Dte;
         public IDeveroomOutputPaneServices DeveroomOutputPaneServices => VsIdeScope.DeveroomOutputPaneServices;

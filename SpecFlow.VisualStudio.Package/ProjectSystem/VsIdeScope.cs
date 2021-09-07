@@ -133,6 +133,27 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             }
         }
 
+        class DeveroomUndoContext : IDisposable
+        {
+            private DTE _dte;
+
+            public DeveroomUndoContext(DTE dte, string undoLabel)
+            {
+                _dte = dte;
+                _dte.UndoContext.Open(undoLabel);
+            }
+
+            public void Dispose()
+            {
+                _dte.UndoContext.Close();
+            }
+        }
+
+        public IDisposable CreateUndoContext(string undoLabel)
+        {
+            return new DeveroomUndoContext(Dte, undoLabel);
+        }
+
         private void SolutionEventListenerOnLoaded(object sender, EventArgs e)
         {
             Logger.LogVerbose("Solution loaded");

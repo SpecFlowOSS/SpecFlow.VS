@@ -196,6 +196,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return new IProjectScope[0];
         }
 
+        public IDisposable CreateUndoContext(string undoLabel)
+        {
+            return null;
+        }
+
         public IProjectScope GetProject(ITextBuffer textBuffer)
         {
             return null;

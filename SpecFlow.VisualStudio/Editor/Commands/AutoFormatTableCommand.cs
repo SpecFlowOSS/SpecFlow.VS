@@ -86,6 +86,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             MonitoringService.MonitorCommandAutoFormatTable();
 
+            using (IdeScope.CreateUndoContext("Auto format table"))
             using (var textEdit = textView.TextBuffer.CreateEdit())
             {
                 textEdit.Replace(dataTableTag.Span, formattedTableText);

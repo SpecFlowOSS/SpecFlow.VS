@@ -51,6 +51,11 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             return ProjectScopes.ToArray();
         }
 
+        public IDisposable CreateUndoContext(string undoLabel)
+        {
+            return null;
+        }
+
         public StubIdeScope(ITestOutputHelper testOutputHelper)
         {
             MonitoringService = new Mock<IMonitoringService>().Object;
