@@ -22,6 +22,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public string TargetFrameworkMonikers { get; } = ".NETCoreApp,Version=v5.0;.NETFramework,Version=v4.5.2";
         public string PlatformTargetName { get; } = "Any CPU";
         public string ProjectName { get; } = "Test Project";
+        public string ProjectFullName { get; } = "Test Project.csproj";
         public string DefaultNamespace => ProjectName.Replace(" ", "");
 
         public List<NuGetPackageReference> PackageReferencesList = new List<NuGetPackageReference>();

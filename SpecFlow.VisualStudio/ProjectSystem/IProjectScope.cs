@@ -8,6 +8,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
     {
         IIdeScope IdeScope { get; }
         string ProjectName { get; }
+        string ProjectFullName { get; }
         string ProjectFolder { get; }
 
         IEnumerable<NuGetPackageReference> PackageReferences { get; }

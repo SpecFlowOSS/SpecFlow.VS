@@ -19,6 +19,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public string TargetFrameworkMonikers { get; } = null;
         public string PlatformTargetName { get; } = "Any CPU";
         public string ProjectName { get; set; } = "Test Project";
+        public string ProjectFullName { get; set; } = "Test Project.csproj";
         public string DefaultNamespace => ProjectName.Replace(" ", "");
 
         public StubProjectScope(string projectFolder, string outputAssemblyPath,

@@ -246,6 +246,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                     { "SpecFlowVersion", settings.GetSpecFlowVersionLabel() },
                     { "ProjectTargetFramework", settings.TargetFrameworkMonikers },
                     { "SingleFileGeneratorUsed", settings.DesignTimeFeatureFileGenerationEnabled },
+                    { "ProgrammingLanguage", settings.ProgrammingLanguage },
                 };
             }
             if (additionalSettings != null && additionalSettings.Any())

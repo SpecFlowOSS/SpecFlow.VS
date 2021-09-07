@@ -153,7 +153,8 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Settings
                 specFlowSettings?.Version, 
                 specFlowSettings?.GeneratorFolder,
                 specFlowSettings?.ConfigFilePath,
-                specFlowSettings?.Traits ?? SpecFlowProjectTraits.None);
+                specFlowSettings?.Traits ?? SpecFlowProjectTraits.None,
+                _projectScope.ProjectFullName);
 
             return settings;
         }

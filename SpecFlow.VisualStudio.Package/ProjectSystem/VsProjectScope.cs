@@ -23,6 +23,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         public string TargetFrameworkMonikers => VsUtils.GetTargetFrameworkMonikers(_project);
         public string PlatformTargetName => VsUtils.GetPlatformTargetName(_project) ?? VsUtils.GetPlatformName(_project);
         public string ProjectName { get; }
+        public string ProjectFullName { get; }
         public string DefaultNamespace => GetDefaultNamespace();
 
         public VsProjectScope(string id, Project project, IIdeScope ideScope, IVsPackageInstallerServices vsPackageInstallerServices)
@@ -32,6 +33,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             IdeScope = ideScope;
             ProjectFolder = VsUtils.GetProjectFolder(project);
             ProjectName = project.Name;
+            ProjectFullName = project.FullName;
             Debug.Assert(ProjectFolder != null, "VsxHelper.IsSolutionProject ensures a not-null ProjectFolder");
         }
 
