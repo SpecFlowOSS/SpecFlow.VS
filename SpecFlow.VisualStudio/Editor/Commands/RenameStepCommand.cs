@@ -138,9 +138,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
                 var modifiedCode = rootNode.ToFullString();
 
-                //method.AttributeLists.SelectMany(al => al.Attributes)
-                //    .Select(a => a.ArgumentList)
-                //    .Where(a => a.Arguments.Any(aa => aa.GetText() == ))
+                using (var textEdit = textView.TextBuffer.CreateEdit())
+                {
+                    textEdit.Replace(0, textView.TextBuffer.CurrentSnapshot.Length, modifiedCode);
+                    textEdit.Apply();
+                }
 
                 Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
             }
