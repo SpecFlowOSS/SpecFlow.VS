@@ -112,40 +112,35 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private void PerformRenameStepInStepDefinitionClass(IProjectScope projectScope, ProjectStepDefinitionBinding projectStepDefinitionBinding, IWpfTextView textView, RenameStepViewModel viewModel)
         {
-            var roslynDocument = textView.TextBuffer.GetRelatedDocuments().FirstOrDefault();
-            var code = textView.TextBuffer.CurrentSnapshot.GetText();
-            var tree = CSharpSyntaxTree.ParseText(code);
+            Document roslynDocument = textView.TextBuffer.GetRelatedDocuments().Single();
 
-            // if (roslynDocument != null && roslynDocument.TryGetSyntaxTree(out var tree))
+            var rootNode = roslynDocument.GetSyntaxRootAsync().Result;
+            var methodLine = textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileLine - 1);
+            var node = rootNode.FindNode(new TextSpan(methodLine.Start + projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileColumn - 1, 1));
+            var method = node.Parent as MethodDeclarationSyntax;// GetMethodDeclaration(node)                                         
+
+            var stepExpressions = method
+                .AttributeLists
+                .Select(al => al.Attributes.Single().ArgumentList.Arguments.Single().Expression);
+
+            foreach (var expression in stepExpressions)
             {
-                var rootNode = tree.GetRoot();
-                var methodLine = textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileLine - 1);
-                var node = rootNode.FindNode(new TextSpan(methodLine.Start + projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileColumn - 1, 1));
-                var method = node.Parent as MethodDeclarationSyntax;// GetMethodDeclaration(node)                                         
+                var oldTextToken = expression.GetFirstToken();
+                var newTextToken = SyntaxFactory.Literal(viewModel.StepText);
+                SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(viewModel.StepText));
 
-                var stepExpressions = method
-                    .AttributeLists
-                    .Select(al => al.Attributes.Single().ArgumentList.Arguments.Single().Expression);
-
-                foreach (var expression in stepExpressions)
-                {
-                    var oldTextToken = expression.GetFirstToken();
-                    var newTextToken = SyntaxFactory.Literal(viewModel.StepText);
-                    SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(viewModel.StepText));
-
-                    rootNode = rootNode.ReplaceToken(oldTextToken, newTextToken);
-                }
-
-                var modifiedCode = rootNode.ToFullString();
-
-                using (var textEdit = textView.TextBuffer.CreateEdit())
-                {
-                    textEdit.Replace(0, textView.TextBuffer.CurrentSnapshot.Length, modifiedCode);
-                    textEdit.Apply();
-                }
-
-                Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
+                rootNode = rootNode.ReplaceToken(oldTextToken, newTextToken);
             }
+
+            var modifiedCode = rootNode.ToFullString();
+
+            using (var textEdit = textView.TextBuffer.CreateEdit())
+            {
+                textEdit.Replace(0, textView.TextBuffer.CurrentSnapshot.Length, modifiedCode);
+                textEdit.Apply();
+            }
+
+            Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
         }
 
         private MethodDeclarationSyntax GetMethodDeclaration(SyntaxNode node)

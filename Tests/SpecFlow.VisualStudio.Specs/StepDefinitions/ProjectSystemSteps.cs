@@ -19,6 +19,7 @@ using SpecFlow.VisualStudio.UI.ViewModels;
 using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.Language.Intellisense;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
@@ -195,9 +196,8 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             _ideScope.Logger.LogInfo(stepDefinition.SourceLocation);
             RegisterStepDefinitions(stepDefinition);
             WhenTheProjectIsBuilt();
-            _wpfTextView = StubWpfTextView.CreateTextView(_ideScope, new TestText(stepDefinitionFile), projectScope: _projectScope, contentType: "text", filePath: fileName);
+            _wpfTextView = StubWpfTextView.CreateTextView(_ideScope, new TestText(stepDefinitionFile), projectScope: _projectScope, contentType: LanguageNames.CSharp, filePath: fileName);
         }
-
 
         [When(@"the project is built")]
         public void WhenTheProjectIsBuilt()
