@@ -121,17 +121,22 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 var rootNode = tree.GetRoot();
                 var methodLine = textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileLine - 1);
                 var node = rootNode.FindNode(new TextSpan(methodLine.Start + projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileColumn - 1, 1));
-                var method = node.Parent as MethodDeclarationSyntax;// GetMethodDeclaration(node);
+                var method = node.Parent as MethodDeclarationSyntax;// GetMethodDeclaration(node)                                         
 
-                var stringTokens = method
+                var stepExpressions = method
                     .AttributeLists
-                    .Select(al => al.Attributes.Single().ArgumentList.Arguments.Single().Expression.GetFirstToken());
-                    //.Where(tok=>tok.ValueText == viewModel.StepText);
-                foreach (var stringToken in stringTokens)
+                    .Select(al => al.Attributes.Single().ArgumentList.Arguments.Single().Expression);
+
+                foreach (var expression in stepExpressions)
                 {
-                   // var newToken = new StringLiteralToken();
-                   // stringToken.Parent.ReplaceToken(stringToken, new )
+                    var oldTextToken = expression.GetFirstToken();
+                    var newTextToken = SyntaxFactory.Literal(viewModel.StepText);
+                    SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(viewModel.StepText));
+
+                    rootNode = rootNode.ReplaceToken(oldTextToken, newTextToken);
                 }
+
+                var modifiedCode = rootNode.ToFullString();
 
                 //method.AttributeLists.SelectMany(al => al.Attributes)
                 //    .Select(a => a.ArgumentList)
