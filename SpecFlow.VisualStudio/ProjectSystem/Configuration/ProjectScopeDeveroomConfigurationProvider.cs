@@ -111,8 +111,14 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
                 var projectFolder = _projectScope.ProjectFolder;
                 var fileSystem = _projectScope.IdeScope.FileSystem;
                 var configFilePath = fileSystem.GetFilePathIfExists(Path.Combine(projectFolder, fileName));
+                
+                if (fileName.Equals(SpecFlowAppConfigFileName))
+                {
+                    configFilePath ??= GetAppConfigPathFromProject();
+                }
                 if (configFilePath == null)
                     return null;
+
                 return new ConfigSource(configFilePath, FileSystem.File.GetLastWriteTimeUtc(configFilePath));
             }
             catch (Exception ex)
@@ -120,6 +126,23 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
                 Logger.LogDebugException(ex);
                 return null;
             }
+        }
+
+        private string GetAppConfigPathFromProject()
+        {
+            var projectFilePath = _projectScope.ProjectFullName;
+            XElement csProjXElement = XElement.Load(projectFilePath);
+
+            string appConfigPath = csProjXElement
+                .Element("PropertyGroup")?
+                .Element("AppConfig")?
+                .Value;
+            if (!string.IsNullOrEmpty(appConfigPath) && !Path.IsPathRooted(appConfigPath))
+            {
+                appConfigPath = Path.Combine(Path.GetDirectoryName(projectFilePath), appConfigPath);
+            }
+
+            return appConfigPath;
         }
 
         private ConfigCache LoadConfiguration(ConfigSource[] configSources)
