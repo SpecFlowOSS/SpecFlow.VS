@@ -96,7 +96,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
                     _registryManager.UpdateStatus(status);
                     CheckFileAssociation(ideScope);
-
+#if !DEBUG
                     var selectedChangelog = GetSelectedChangelog(ideScope, installedVersion);
                     ScheduleWelcomeDialog(ideScope, new UpgradeDialogViewModel(currentVersion.ToString(), selectedChangelog),
                         (viewModel, elapsed) =>
@@ -119,6 +119,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                             //    newsPage.Text = UpgradeDialogViewModel.COMMUNITY_INFO_HEADER + _deveroomNews;
                             //}
                         });
+#endif
                 }
                 else
                 {
