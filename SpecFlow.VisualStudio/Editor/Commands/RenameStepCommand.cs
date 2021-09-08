@@ -86,7 +86,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             if (stepDefinitions.Count != 1)
             {
-                //TODO: support multiple step defs
+                //TODO: Let the customer select the stepDefinition when there are more than one
                 IdeScope.Actions.ShowProblem("TODO: multiple projects/stepdefs not supported");
                 return true;
             }
@@ -110,52 +110,12 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return true;
         }
 
-        private void PerformRenameStepInStepDefinitionClass(IProjectScope projectScope, ProjectStepDefinitionBinding projectStepDefinitionBinding, IWpfTextView textView, RenameStepViewModel viewModel)
-        {
-            Document roslynDocument = textView.TextBuffer.GetRelatedDocuments().Single();
-
-            var rootNode = roslynDocument.GetSyntaxRootAsync().Result;
-            var methodLine = textView.TextBuffer.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileLine - 1);
-            var node = rootNode.FindNode(new TextSpan(methodLine.Start + projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileColumn - 1, 1));
-            var method = node.Parent as MethodDeclarationSyntax;// GetMethodDeclaration(node)                                         
-
-            var stepExpressions = method
-                .AttributeLists
-                .Select(al => al.Attributes.Single().ArgumentList.Arguments.Single().Expression);
-
-            foreach (var expression in stepExpressions)
-            {
-                var oldTextToken = expression.GetFirstToken();
-                var newTextToken = SyntaxFactory.Literal(viewModel.StepText);
-                SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(viewModel.StepText));
-
-                rootNode = rootNode.ReplaceToken(oldTextToken, newTextToken);
-            }
-
-            var modifiedCode = rootNode.ToFullString();
-
-            using (var textEdit = textView.TextBuffer.CreateEdit())
-            {
-                textEdit.Replace(0, textView.TextBuffer.CurrentSnapshot.Length, modifiedCode);
-                textEdit.Apply();
-            }
-
-            Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
-        }
-
-        private MethodDeclarationSyntax GetMethodDeclaration(SyntaxNode node)
-        {
-            return node.AncestorsAndSelf().OfType<MethodDeclarationSyntax>().FirstOrDefault();
-        }
-
         private static RenameStepViewModel PrepareViewModel(ProjectStepDefinitionBinding stepDefinitionBinding)
         {
             var expression = stepDefinitionBinding.Expression.TrimStart('^').TrimEnd('$');
 
-            var viewModel = new RenameStepViewModel
-            {
-                StepText = expression
-            };
+            var viewModel = new RenameStepViewModel(expression);
+
             return viewModel;
         }
 
@@ -169,25 +129,86 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 var firstPosition = fileUsage.First().SourceLocation;
                 EnsureFeatureFileOpen(firstPosition);
                 var textBuffer = IdeScope.GetTextBuffer(firstPosition);
-
-                using (var textEdit = textBuffer.CreateEdit())
-                {
-                    foreach (var usage in fileUsage)
-                    {
-                        var line = textBuffer.CurrentSnapshot.GetLineFromLineNumber(usage.SourceLocation.SourceFileLine - 1);
-                        var indentPlusKeywordLength = (usage.SourceLocation.SourceFileColumn - 1) + usage.Step.Keyword.Length;
-                        var startPosition = line.Start.Position + indentPlusKeywordLength;
-                        var replaceSpan = new Span(startPosition, line.End.Position - startPosition);
-                        textEdit.Replace(replaceSpan, viewModel.StepText);
-                    }
-                    textEdit.Apply();
-                }
+                EditTextBuffer(textBuffer, fileUsage, 
+                    usage=>CalculateReplaceSpan((textBuffer, usage)), 
+                    viewModel.StepText);
             }
         }
 
-        private bool EnsureFeatureFileOpen(SourceLocation sourceLocation)
+        private void EnsureFeatureFileOpen(SourceLocation sourceLocation)
         {
-            return IdeScope.Actions.NavigateTo(sourceLocation);
+            IdeScope.Actions.NavigateTo(sourceLocation);
+        }
+
+        private static Span CalculateReplaceSpan((ITextBuffer textBuffer, StepDefinitionUsage usage) from)
+        {
+            var line = from.textBuffer.CurrentSnapshot.GetLineFromLineNumber(from.usage.SourceLocation.SourceFileLine - 1);
+            var indentPlusKeywordLength = (from.usage.SourceLocation.SourceFileColumn - 1) + from.usage.Step.Keyword.Length;
+            var startPosition = line.Start.Position + indentPlusKeywordLength;
+            var replaceSpan = new Span(startPosition, line.End.Position - startPosition);
+            return replaceSpan;
+        }
+
+        private void PerformRenameStepInStepDefinitionClass(IProjectScope projectScope, ProjectStepDefinitionBinding projectStepDefinitionBinding, IWpfTextView textView, RenameStepViewModel viewModel)
+        {
+            MethodDeclarationSyntax method = GetMethod(projectStepDefinitionBinding, textView.TextBuffer);
+
+            IOrderedEnumerable<SyntaxToken> expressionsToReplace = ExpressionsToReplace(viewModel, method);
+
+            EditTextBuffer(textView.TextBuffer, expressionsToReplace, CalculateReplaceSpan, viewModel.StepText);
+
+            Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
+        }
+
+        private static Span CalculateReplaceSpan(SyntaxToken token)
+        {
+            var offset = token.Text.IndexOf(token.ValueText, StringComparison.Ordinal);
+            var trimLength = token.Text.Length - token.ValueText.Length;
+
+            var replaceSpan = new Span(token.SpanStart + offset, token.Span.Length - trimLength);
+            return replaceSpan;
+        }
+
+        private static MethodDeclarationSyntax GetMethod(ProjectStepDefinitionBinding projectStepDefinitionBinding,
+            ITextBuffer textView)
+        {
+            Document roslynDocument = textView.GetRelatedDocuments().Single();
+            var rootNode = roslynDocument.GetSyntaxRootAsync().Result;
+            var methodLine =
+                textView.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation
+                    .SourceLocation.SourceFileLine - 1);
+            var methodColumn = projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileColumn - 1;
+            var methodPosition = methodLine.Start + methodColumn;
+            var node = rootNode.FindNode(new TextSpan(methodPosition, 1));
+            var method = node.Parent as MethodDeclarationSyntax;
+            return method;
+        }
+
+        private static IOrderedEnumerable<SyntaxToken> ExpressionsToReplace(RenameStepViewModel viewModel, MethodDeclarationSyntax method)
+        {
+            var stepDefinitionAttributeTextTokens = method
+                .AttributeLists
+                .Select(al => al.Attributes.Single().ArgumentList.Arguments.Single().Expression.GetFirstToken())
+                .Where(tok => tok.ValueText == viewModel.OriginalStepText)
+                .OrderByDescending(tok => tok.SpanStart);
+            return stepDefinitionAttributeTextTokens;
+        }
+
+        private static void EditTextBuffer<T>(
+            ITextBuffer textBuffer,
+            IEnumerable<T> expressionsToReplace,
+            Func<T, Span> calculateReplaceSpan,
+            string replacementText)
+        {
+            using var textEdit = textBuffer.CreateEdit();
+
+            foreach (var token in expressionsToReplace)
+            {
+                var replaceSpan = calculateReplaceSpan(token);
+                textEdit.Replace(replaceSpan, replacementText);
+            }
+
+            textEdit.Apply();
         }
 
         private ProjectStepDefinitionBinding[] GetStepDefinitions(IProjectScope project, string fileName, SnapshotPoint triggerPoint)
