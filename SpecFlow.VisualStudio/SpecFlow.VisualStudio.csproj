@@ -20,10 +20,10 @@
     <PackageReference Include="Microsoft.Composition" Version="1.0.31" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
 
-    <PackageReference Include="Microsoft.VisualStudio.Validation" Version="17.0.16-alpha" />
-    <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="17.0.191-preview-gdb4a0010f6" />
-    <PackageReference Include="Microsoft.VisualStudio.Editor" Version="17.0.191-preview-gdb4a0010f6" /> 
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.0.0-previews-2-31512-422" />
+    <PackageReference Include="Microsoft.VisualStudio.Validation" Version="17.0.21-alpha" />
+    <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="17.0.255-preview-ga4c683bf62" />
+    <PackageReference Include="Microsoft.VisualStudio.Editor" Version="17.0.255-preview-ga4c683bf62" /> 
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="17.0.0-previews-3-31605-261" />
   </ItemGroup>
 
   <ItemGroup>
