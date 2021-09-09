@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Threading;
+using Moq;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
-using Moq;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
-namespace SpecFlow.VisualStudio.Specs.StepDefinitions
+namespace SpecFlow.VisualStudio.VsxStubs.StepDefinitions
 {
     public class MockableDiscoveryService : DiscoveryService
     {
@@ -38,10 +39,32 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
 
         public static MockableDiscoveryService Setup(IProjectScope projectScope)
         {
-            var discoveryResultProviderMock = new Mock<IDiscoveryResultProvider>();
-            var discoveryService = new MockableDiscoveryService(projectScope, discoveryResultProviderMock);
+            return SetupWithInitialStepDefinitions(projectScope, Array.Empty<StepDefinition>());
+        }
+
+        public static MockableDiscoveryService SetupWithInitialStepDefinitions(IProjectScope projectScope, StepDefinition[] stepDefinitions)
+        {
+            var initialDiscoveryResult = new DiscoveryResult() { StepDefinitions = stepDefinitions };
+            var discoveryResultProviderMock = new Mock<IDiscoveryResultProvider>(MockBehavior.Strict);
+            discoveryResultProviderMock
+                .Setup(ds => ds.RunDiscovery(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ProjectSettings>()))
+                .Returns(() => initialDiscoveryResult);
+
+            var discoveryService = new MockableDiscoveryService(projectScope, discoveryResultProviderMock)
+            {
+                LastDiscoveryResult = initialDiscoveryResult
+            };
+
             projectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService);
             return discoveryService;
+        }
+
+        public void WaitUntilDiscoveryPerformed()
+        {
+            while (!IsDiscoveryPerformed)
+            {
+                Thread.Sleep(10);
+            }
         }
     }
 }

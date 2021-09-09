@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using FluentAssertions;
+using Microsoft.CodeAnalysis;
+using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.Diagnostics;
+using SpecFlow.VisualStudio.ProjectSystem.Settings;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
 using Xunit;
@@ -26,7 +31,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
         private StubWpfTextView CreateTextView(TestText inputText, string newLine = null)
         {
-            return StubWpfTextView.CreateTextView(_projectScope.IdeScope as StubIdeScope, inputText, newLine, _projectScope);
+            return StubWpfTextView.CreateTextView(_projectScope.IdeScope as StubIdeScope, inputText, newLine, _projectScope, LanguageNames.CSharp, "Steps.cs");
         }
 
         private StubLogger GetStubLogger()
@@ -55,6 +60,11 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         private static bool MissingStepDefinition(Tuple<TraceLevel, string> msg)
         {
             return msg.Item2 == "ShowProblem: User Notification: No step definition found that is related to this position";
+        }   
+        
+        private static bool MissingStepDefinitionExpression(Tuple<TraceLevel, string> msg)
+        {
+            return msg.Item2 == "ShowProblem: User Notification: Unable to rename step, the step definition expression cannot be detected.";
         }
 
         [Fact]
@@ -113,5 +123,36 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             stubLogger.Messages.Should().Contain(msg => MissingStepDefinition(msg));
         }
 
+        [Fact]
+        public void StepDefinition_must_have_expression()
+        {
+            var stepDefinitions = new[]
+            {
+                new StepDefinition
+                {
+                    Method = "WhenIPressAdd",
+                    Type = "When",
+                    //Regex = "^I press add$",
+                    SourceLocation = @"Steps.cs|1|10"
+                }
+            };
+
+            _projectScope.AddSpecFlowPackage();
+            _projectScope.AddFile("calculator.feature", string.Empty);
+
+            var discoveryService = MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, stepDefinitions);
+            discoveryService.WaitUntilDiscoveryPerformed();
+
+            var command = new RenameStepCommand(_projectScope.IdeScope, null, null);
+            var inputText = new TestText(string.Empty);
+
+            var textView = CreateTextView(inputText);
+            textView.TextBuffer.Insert(0, "[When(\"I press add\")]");
+            textView.Caret.MoveTo(new SnapshotPoint(textView.TextSnapshot, 10));
+            command.PreExec(textView, command.Targets.First());
+
+            var stubLogger = GetStubLogger();
+            stubLogger.Messages.Should().Contain(msg => MissingStepDefinitionExpression(msg));
+        }
     }
 }

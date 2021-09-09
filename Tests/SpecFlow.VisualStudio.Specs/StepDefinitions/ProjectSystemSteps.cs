@@ -26,6 +26,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using SpecFlow.VisualStudio.Editor.Services.Formatting;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
+using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using Xunit;
