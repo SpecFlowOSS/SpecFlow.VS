@@ -103,7 +103,7 @@ namespace SpecFlow.VisualStudio.VsEvents
             });
         }
 
-        public async Task<TestContainersChangedEventArgs> AwaitForBuildComplete(CancellationToken cancellationToken)
+        public async Task<TestContainersChangedEventArgs> AwaitForBuildCompleteAsync(CancellationToken cancellationToken)
         {
             bool testContainerUpdateCanceled = (uint)await Task.Run<int>(() => WaitForBuildComplete(cancellationToken)) > 0U;
             _buildResult = _buildResult == null ? new TestContainersChangedEventArgs(false, testContainerUpdateCanceled) : new TestContainersChangedEventArgs(_buildResult.Succeeded, _buildResult.Canceled | testContainerUpdateCanceled);

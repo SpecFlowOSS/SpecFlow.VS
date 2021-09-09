@@ -11,4 +11,8 @@
     <GitVersionBaseDirectory>$(MSBuildThisFileDirectory)</GitVersionBaseDirectory>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <NoWarn>VSTHRD010;VSTHRD110;NU1603</NoWarn>
+  </PropertyGroup>
+
 </Project>

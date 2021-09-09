@@ -6,7 +6,6 @@
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>TRACE;</DefineConstants>
     <LangVersion>latest</LangVersion>
-    <NoWarn>VSTHRD010</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

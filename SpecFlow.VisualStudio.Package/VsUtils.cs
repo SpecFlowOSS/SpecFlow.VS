@@ -287,6 +287,9 @@ namespace SpecFlow.VisualStudio
         public static string GetMefCatalogCacheFolder(IServiceProvider serviceProvider)
         {
             var componentModelHost = serviceProvider.GetService(typeof(SVsComponentModelHost)) as IVsComponentModelHost;
+            if (componentModelHost == null)
+                return null;
+
             componentModelHost.GetCatalogCacheFolder(out var folderPath);
             return folderPath;
         }
@@ -317,6 +320,8 @@ namespace SpecFlow.VisualStudio
             try
             {
                 var vsTextManager = (IVsTextManager) serviceProvider.GetService(typeof(SVsTextManager));
+                if (vsTextManager == null)
+                    return null;
 
                 ErrorHandler.ThrowOnFailure(vsTextManager.GetActiveView(Convert.ToInt32(true), null, out var activeView));
                 if (activeView == null)

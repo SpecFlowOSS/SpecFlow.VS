@@ -23,7 +23,9 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             }
             else
             {
+#pragma warning disable VSTHRD001 // Avoid legacy thread switching APIs
                 _dispatcher.BeginInvoke(action, DispatcherPriority.ContextIdle);
+#pragma warning restore VSTHRD001 // Avoid legacy thread switching APIs
             }
         }
     }
