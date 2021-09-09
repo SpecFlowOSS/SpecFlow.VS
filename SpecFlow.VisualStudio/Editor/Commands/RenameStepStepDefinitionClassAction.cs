@@ -10,7 +10,7 @@ using SpecFlow.VisualStudio.UI.ViewModels;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
-    internal class RenameStepPerformInStepDefinitionClass : RenameStepPerformBase
+    internal class RenameStepStepDefinitionClassAction : RenameStepAction
     {
         public override void PerformRenameStep(RenameStepViewModel viewModel, ITextBuffer textBufferOfStepDefinitionClass)
         {

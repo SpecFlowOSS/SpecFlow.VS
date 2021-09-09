@@ -2,14 +2,15 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Windows.Documents;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.Diagnostics;
+using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
-using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
 using Xunit;
@@ -126,33 +127,66 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Fact]
         public void StepDefinition_must_have_expression()
         {
-            var stepDefinitions = new[]
-            {
-                new StepDefinition
-                {
-                    Method = "WhenIPressAdd",
-                    Type = "When",
-                    //Regex = "^I press add$",
-                    SourceLocation = @"Steps.cs|1|10"
-                }
-            };
+            var stepDefinitions = ArrangeOneStepDefinition("I press add");
+            stepDefinitions[0].Regex = default;
+            var featureFiles = ArrangeOneFeatureFile(string.Empty);
+            var (textView, command) = ArrangeSut(stepDefinitions, featureFiles);
 
-            _projectScope.AddSpecFlowPackage();
-            _projectScope.AddFile("calculator.feature", string.Empty);
-
-            var discoveryService = MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, stepDefinitions);
-            discoveryService.WaitUntilDiscoveryPerformed();
-
-            var command = new RenameStepCommand(_projectScope.IdeScope, null, null);
-            var inputText = new TestText(string.Empty);
-
-            var textView = CreateTextView(inputText);
-            textView.TextBuffer.Insert(0, "[When(\"I press add\")]");
-            textView.Caret.MoveTo(new SnapshotPoint(textView.TextSnapshot, 10));
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger();
             stubLogger.Messages.Should().Contain(msg => MissingStepDefinitionExpression(msg));
+        }
+
+        private static TestFeatureFile[] ArrangeOneFeatureFile(string featureFileContent)
+        {
+            var featureFiles = new[]
+            {
+                new TestFeatureFile("calculator.feature", featureFileContent)
+            };
+            return featureFiles;
+        }
+
+        private static TestStepDefinition[] ArrangeOneStepDefinition(string textExpression)
+        {
+            var testSourceLocation = new SourceLocation("Steps.cs", 7, 10);
+            var stepDefinitions = new[]
+            {
+                new TestStepDefinition
+                {
+                    Method = "WhenIPressAdd",
+                    Type = "When",
+                    TestSourceLocation = testSourceLocation,
+                    TestExpression = textExpression
+                }
+            };
+            return stepDefinitions;
+        }
+
+        private (StubWpfTextView textView, RenameStepCommand command) ArrangeSut(TestStepDefinition[] stepDefinitions,
+            TestFeatureFile[] featureFiles)
+        {
+            var stepDefinitionClassFile = new StepDefinitionClassFile(stepDefinitions);
+
+            _projectScope.AddSpecFlowPackage();
+            foreach (var featureFile in featureFiles)
+            {
+                _projectScope.AddFile(featureFile.FileName, featureFile.Content);
+            }
+
+            var discoveryService =
+                MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope,
+                    stepDefinitionClassFile.StepDefinitions);
+            discoveryService.WaitUntilDiscoveryPerformed();
+
+            var inputText = stepDefinitionClassFile.GetText();
+            var textView = CreateTextView(inputText);
+            inputText.MoveCaretTo(textView,
+                stepDefinitionClassFile.StepDefinitions[0].TestSourceLocation.SourceFileLine,
+                stepDefinitionClassFile.StepDefinitions[0].TestSourceLocation.SourceFileColumn);
+
+            var command = new RenameStepCommand(_projectScope.IdeScope, null, null);
+            return (textView, command);
         }
     }
 }

@@ -20,15 +20,15 @@ namespace SpecFlow.VisualStudio.Editor.Commands
     [Export(typeof(IDeveroomFeatureEditorCommand))]
     public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand, IDeveroomFeatureEditorCommand
     {
-        private readonly ImmutableHashSet<IRenameStepPerform> _renameStepPerforms;
+        private readonly ImmutableHashSet<IRenameStepAction> _renameStepPerforms;
         
         [ImportingConstructor]
         public RenameStepCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService) :
             base(ideScope, aggregatorFactory, monitoringService)
         {
-            _renameStepPerforms = ImmutableHashSet.Create<IRenameStepPerform>(
-                new RenameStepPerformInFeatureFiles(),
-                new RenameStepPerformInStepDefinitionClass()
+            _renameStepPerforms = ImmutableHashSet.Create<IRenameStepAction>(
+                new RenameStepFeatureFileAction(),
+                new RenameStepStepDefinitionClassAction()
             );
         }
 
