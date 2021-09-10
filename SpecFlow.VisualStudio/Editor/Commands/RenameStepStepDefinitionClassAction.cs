@@ -45,19 +45,19 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var stepDefinitionAttributeTextTokens = method
                 .AttributeLists
                 .Select(al => al.Attributes.Single().ArgumentList.Arguments.Single().Expression.GetFirstToken())
-                .Where(tok => tok.ValueText == viewModel.OriginalStepText)
+                .Where(MatchesWithOriginalText)
                 .OrderByDescending(tok => tok.SpanStart);
             return stepDefinitionAttributeTextTokens;
+
+            bool MatchesWithOriginalText(SyntaxToken tok) => tok.Text == $"\"{viewModel.OriginalStepText}\"";
         }
 
         private static Span CalculateReplaceSpan(SyntaxToken token)
         {
-            var offset = token.Text.IndexOf(token.ValueText, StringComparison.Ordinal);
-            var trimLength = token.Text.Length - token.ValueText.Length;
+            var offset = token.Text.IndexOf(token.Text, StringComparison.Ordinal) +1;
 
-            var replaceSpan = new Span(token.SpanStart + offset, token.Span.Length - trimLength);
+            var replaceSpan = new Span(token.SpanStart + offset, token.Span.Length-2);
             return replaceSpan;
         }
-
     }
 }

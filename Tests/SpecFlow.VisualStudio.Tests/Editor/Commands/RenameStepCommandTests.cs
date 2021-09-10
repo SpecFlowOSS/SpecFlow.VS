@@ -215,18 +215,23 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             stubLogger.Messages.Should().Contain(msg => MissingStepDefinitionExpression(msg));
         }
 
-        [Fact]
-        public void Renames_a_simple_expression_in_stepdefinition_class()
+        [Theory]
+        [InlineData(@"I press add", @"I choose add", @"        [When(""I choose add"")]")]
+        [InlineData(@"I press add", @"I \""choose\"" add", @"        [When(""I \""choose\"" add"")]")]
+        [InlineData(@"I \""press\"" add", @"I choose add", @"        [When(""I choose add"")]")]
+        [InlineData(@"I \""press\"" add", @"I \""choose\"" add", @"        [When(""I \""choose\"" add"")]")]
+        [InlineData(@"\""I press add \""", @"\""I choose add\""", @"        [When(""\""I choose add\"""")]")]
+        public void Step_definition_class_has_one_matching_expression(string testExpression, string modelStepText, string expectedLine)
         {
-            var stepDefinitions = ArrangeOneStepDefinition("I press add");
+            var stepDefinitions = ArrangeOneStepDefinition(testExpression);
             var featureFiles = ArrangeOneFeatureFile(string.Empty);
-            ArrangePopup("I choose add");
+            ArrangePopup(modelStepText);
             var (textView, command) = ArrangeSut(stepDefinitions, featureFiles);
             
             command.PreExec(textView, command.Targets.First());
 
             var testText = Dump(textView, "Step definition class after rename");
-            testText.Lines[6].Should().Be(@"        [When(""I choose add"")]");
+            testText.Lines[6].Should().Be(expectedLine);
         }
     }
 }
