@@ -11,13 +11,14 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         public StepDefinitionClassFile(TestStepDefinition[] stepDefinitions)
         {
             StepDefinitions = stepDefinitions;
-            ContentTemplate = @"
-using System;
+            ContentTemplate = @"using System;
 using TechTalk.SpecFlow;
 namespace MyProject
 {
-}
-";
+    [Binding]
+    public class Steps {
+    }
+}";
         }
 
         public string ContentTemplate {  get;  }
@@ -26,7 +27,7 @@ namespace MyProject
 
         public TestText GetText()
         {
-            var insertLineNumber = 5;
+            var insertLineNumber = 6;
             var testText = new TestText(ContentTemplate);
             var stepDefinitionText = new StringBuilder();
 
