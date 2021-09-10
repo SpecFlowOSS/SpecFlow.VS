@@ -130,7 +130,7 @@
       }
     },
     "ide": {
-      "description": "TODO: description for ide",
+      "description": "This section contains all the extension configurations related to the IDE.",
       "type": "object",
       "additionalProperties": true,
       "properties": {
@@ -141,8 +141,8 @@
           "$ref": "#/definitions/Traceability"
         },
         "editor": {
-          "$ref":  "#/definitions/Editor"
-        } 
+          "$ref": "#/definitions/Editor"
+        }
       }
     },
     "$schema": {
@@ -209,18 +209,19 @@
         }
       }
     },
+
     "Editor": {
-      "description": "TODO",
+      "description": "This section contains all the Editor related configurations.",
       "type": "object",
       "additionalProperties": true,
       "properties": {
         "showStepCompletionAfterStepKeywords": {
-          "description": "TODO",
+          "description": "Determines whether the extension should suggest step completions.",
           "type": "boolean",
           "default": true
         },
         "gherkinFormat": {
-          "description": "TODO: Provides settings for formatting Gherkin feature files",
+          "description": "Provides settings for formatting Gherkin feature files",
           "type": "object",
           "additionalItems": true,
           "properties": {
@@ -270,7 +271,7 @@
               "default": 1
             }
           }
-        } 
+        }
       }
     } 
   }
