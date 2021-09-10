@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 using Microsoft.Win32;
 
 namespace SpecFlow.VisualStudio.Analytics
@@ -78,7 +79,7 @@ namespace SpecFlow.VisualStudio.Analytics
             }
             catch(Exception ex)
             {
-                //tracer.Trace("Registry read error: {0}", this, ex);
+                Debug.WriteLine(ex, $"Registry read error: {this}");
                 return default(T);
             }
         }
@@ -94,7 +95,7 @@ namespace SpecFlow.VisualStudio.Analytics
             }
             catch(Exception ex)
             {
-                //tracer.Trace("Registry read error: {0}", this, ex);
+                Debug.WriteLine(ex, $"Registry read error: {this}");
                 return default(T);
             }
         }
