@@ -224,6 +224,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData(4, @"""I \""press\"" add""", @"I \""choose\"" add", @"        [When(""I \""choose\"" add"")]")]
         [InlineData(5, @"""\""I press add \""""", @"\""I choose add\""", @"        [When(""\""I choose add\"""")]")]
         [InlineData(6, @"@""I press add""", @"I choose add", @"        [When(@""I choose add"")]")]
+        [InlineData(7, @"@""I """"press"""" add""", @"I ""choose"" add", @"        [When(@""I ""choose"" add"")]")]
         public void Step_definition_class_has_one_matching_expression(int _, string testExpression, string modelStepText, string expectedLine)
         {
             var stepDefinitions = ArrangeOneStepDefinition(testExpression);
