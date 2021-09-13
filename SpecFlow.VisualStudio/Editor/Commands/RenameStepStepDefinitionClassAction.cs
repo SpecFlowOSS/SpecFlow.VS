@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable enable
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -45,12 +45,20 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             var stepDefinitionAttributeTextTokens = method
                 .AttributeLists
-                .Select(al => al.Attributes.Single().ArgumentList.Arguments.Single().Expression.GetFirstToken())
-                .Where(MatchesWithOriginalText)
+                .Select(ArgumentTokens)
+                .Where(tok => !tok.IsMissing && MatchesWithOriginalText(tok))
                 .OrderByDescending(tok => tok.SpanStart);
             return stepDefinitionAttributeTextTokens;
 
             bool MatchesWithOriginalText(SyntaxToken tok) => tok.ValueText == viewModel.OriginalStepText;
+        }
+
+        private static SyntaxToken ArgumentTokens(AttributeListSyntax al)
+        {
+            AttributeArgumentListSyntax? attributeArgumentListSyntax = al.Attributes.Single().ArgumentList;
+            return attributeArgumentListSyntax == null || attributeArgumentListSyntax.Arguments.Count == 0
+                ? SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken) 
+                : attributeArgumentListSyntax.Arguments.Single().Expression.GetFirstToken();
         }
 
         private static Span CalculateReplaceSpan(SyntaxToken token)

@@ -74,7 +74,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             var selectedStepDefinition = stepDefinitions[0];
             var stepDefinitionBinding = selectedStepDefinition.Item2;
-            if (stepDefinitionBinding.Expression == null)
+            if (stepDefinitionBinding.Expression is null or "^$")
             {
                 IdeScope.Actions.ShowProblem("Unable to rename step, the step definition expression cannot be detected.");
                 return true;

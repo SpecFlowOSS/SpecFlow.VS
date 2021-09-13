@@ -34,26 +34,36 @@ namespace MyProject
             List<string> lines = testText.Lines.Take(insertLineNumber).ToList();
             foreach (var stepDefinition in StepDefinitions)
             {
-                var stepLines = Append(stepDefinitionText, stepDefinition);
-                lines.AddRange(stepLines);
+                Append(stepDefinitionText, stepDefinition);
             }
+            AppendMethod(stepDefinitionText, StepDefinitions.First().Method);
+
+            lines.AddRange(ToLines(stepDefinitionText));
 
             lines.AddRange(testText.Lines.Skip(insertLineNumber));
 
             return new TestText(lines.ToArray());
         }
 
-        private static string[] Append(StringBuilder stepDefinitionText, TestStepDefinition stepDefinition)
+        private static string[] ToLines(StringBuilder stepDefinitionText)
         {
-            stepDefinitionText.Append(' ', 8).Append('[').Append(stepDefinition.Type).Append("(")
-                .Append(stepDefinition.TestExpression.Text).AppendLine(")]");
+            return stepDefinitionText.ToString().Split(new[] {Environment.NewLine}, StringSplitOptions.None);
+        }
 
-            stepDefinitionText.Append(' ', 8).Append("public void ").Append(stepDefinition.Method).AppendLine("()");
+        private static void Append(StringBuilder stepDefinitionText, TestStepDefinition stepDefinition)
+        {
+            stepDefinitionText.Append(' ', 8).Append('[').Append(stepDefinition.Type);
+            if (!stepDefinition.TestExpression.IsMissing)
+                stepDefinitionText.Append("(").Append(stepDefinition.TestExpression.Text).Append(")");
+            stepDefinitionText.AppendLine("]");
+        }
+
+        private static void AppendMethod(StringBuilder stepDefinitionText, string method)
+        {
+            stepDefinitionText.Append(' ', 8).Append("public void ").Append(method).AppendLine("()");
 
             stepDefinitionText.Append(' ', 8).AppendLine("{");
             stepDefinitionText.Append(' ', 8).AppendLine("}");
-
-            return stepDefinitionText.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
         }
     }
 }

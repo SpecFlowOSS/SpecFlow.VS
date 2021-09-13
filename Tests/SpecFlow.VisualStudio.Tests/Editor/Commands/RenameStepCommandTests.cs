@@ -82,19 +82,26 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
         private static TestStepDefinition[] ArrangeOneStepDefinition(string textExpression)
         {
-            var testSourceLocation = new SourceLocation("Steps.cs", 9, 9);
-            var token = SyntaxFactory.ParseToken(textExpression);
+            var testStepDefinition = ArrangeStepDefinition(textExpression);
             var stepDefinitions = new[]
             {
-                new TestStepDefinition
-                {
-                    Method = "WhenIPressAdd",
-                    Type = "When",
-                    TestSourceLocation = testSourceLocation,
-                    TestExpression = token
-                }
+                testStepDefinition
             };
             return stepDefinitions;
+        }
+
+        private static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord = "When")
+        {
+            var testSourceLocation = new SourceLocation("Steps.cs", 9, 9);
+            var token = SyntaxFactory.ParseToken(textExpression);
+            var testStepDefinition = new TestStepDefinition
+            {
+                Method = keyWord + "IPressAdd",
+                Type = keyWord,
+                TestSourceLocation = testSourceLocation,
+                TestExpression = token
+            };
+            return testStepDefinition;
         }
 
         private void ArrangePopup(string modelStepText)
@@ -206,8 +213,23 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Fact]
         public void StepDefinition_must_have_expression()
         {
-            var stepDefinitions = ArrangeOneStepDefinition("I press add");
+            var stepDefinitions = ArrangeOneStepDefinition(string.Empty);
+            stepDefinitions[0].TestExpression = SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken);
             stepDefinitions[0].Regex = default;
+
+            StepDefinitionMustHaveExpression(stepDefinitions);
+        }
+
+        [Fact]
+        public void StepDefinition_expression_cannot_be_empty()
+        {
+            var stepDefinitions = ArrangeOneStepDefinition(string.Empty);
+
+            StepDefinitionMustHaveExpression(stepDefinitions);
+        }
+
+        private void StepDefinitionMustHaveExpression(TestStepDefinition[] stepDefinitions)
+        {
             var featureFiles = ArrangeOneFeatureFile(string.Empty);
             var (textView, command) = ArrangeSut(stepDefinitions, featureFiles);
 
