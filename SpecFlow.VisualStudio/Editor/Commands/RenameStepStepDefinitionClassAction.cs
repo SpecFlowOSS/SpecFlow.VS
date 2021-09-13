@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text;
@@ -49,15 +50,20 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 .OrderByDescending(tok => tok.SpanStart);
             return stepDefinitionAttributeTextTokens;
 
-            bool MatchesWithOriginalText(SyntaxToken tok) => tok.Text == $"\"{viewModel.OriginalStepText}\"";
+            bool MatchesWithOriginalText(SyntaxToken tok) => tok.ValueText == viewModel.OriginalStepText;
         }
 
         private static Span CalculateReplaceSpan(SyntaxToken token)
         {
-            var offset = token.Text.IndexOf(token.Text, StringComparison.Ordinal) +1;
+            var offset = IsVerbatim(token) ? 2 : 1;
 
-            var replaceSpan = new Span(token.SpanStart + offset, token.Span.Length-2);
+            var replaceSpan = new Span(token.SpanStart + offset, token.Span.Length - offset - 1);
             return replaceSpan;
+        }
+
+        private static bool IsVerbatim(SyntaxToken token)
+        {
+            return token.Text.StartsWith("@");
         }
     }
 }

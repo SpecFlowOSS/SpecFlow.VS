@@ -1,20 +1,19 @@
-﻿using SpecFlow.VisualStudio.Discovery;
+﻿using Microsoft.CodeAnalysis;
+using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
     public class TestStepDefinition : StepDefinition
     {
-        private string _testExpression;
         private SourceLocation _testSourceLocation;
+        private SyntaxToken _testExpression;
 
-        public string TestExpression
+        public SyntaxToken TestExpression
         {
             get => _testExpression;
-            set
-            {
-                _testExpression = value;
-                Regex = $"^{_testExpression}$";
+            set { _testExpression = value;
+                Regex = $"^{_testExpression.ValueText}$";
             }
         }
 

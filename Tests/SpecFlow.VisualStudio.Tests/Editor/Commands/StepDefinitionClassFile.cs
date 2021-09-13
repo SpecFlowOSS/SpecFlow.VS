@@ -45,8 +45,8 @@ namespace MyProject
 
         private static string[] Append(StringBuilder stepDefinitionText, TestStepDefinition stepDefinition)
         {
-            stepDefinitionText.Append(' ', 8).Append('[').Append(stepDefinition.Type).Append("(\"")
-                .Append(stepDefinition.TestExpression).AppendLine("\")]");
+            stepDefinitionText.Append(' ', 8).Append('[').Append(stepDefinition.Type).Append("(")
+                .Append(stepDefinition.TestExpression.Text).AppendLine(")]");
 
             stepDefinitionText.Append(' ', 8).Append("public void ").Append(stepDefinition.Method).AppendLine("()");
 

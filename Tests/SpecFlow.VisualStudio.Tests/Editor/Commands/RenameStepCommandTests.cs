@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows.Documents;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using SpecFlow.VisualStudio.Editor.Commands;
@@ -82,6 +83,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         private static TestStepDefinition[] ArrangeOneStepDefinition(string textExpression)
         {
             var testSourceLocation = new SourceLocation("Steps.cs", 9, 9);
+            var token = SyntaxFactory.ParseToken(textExpression);
             var stepDefinitions = new[]
             {
                 new TestStepDefinition
@@ -89,7 +91,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
                     Method = "WhenIPressAdd",
                     Type = "When",
                     TestSourceLocation = testSourceLocation,
-                    TestExpression = textExpression
+                    TestExpression = token
                 }
             };
             return stepDefinitions;
@@ -216,12 +218,13 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         }
 
         [Theory]
-        [InlineData(@"I press add", @"I choose add", @"        [When(""I choose add"")]")]
-        [InlineData(@"I press add", @"I \""choose\"" add", @"        [When(""I \""choose\"" add"")]")]
-        [InlineData(@"I \""press\"" add", @"I choose add", @"        [When(""I choose add"")]")]
-        [InlineData(@"I \""press\"" add", @"I \""choose\"" add", @"        [When(""I \""choose\"" add"")]")]
-        [InlineData(@"\""I press add \""", @"\""I choose add\""", @"        [When(""\""I choose add\"""")]")]
-        public void Step_definition_class_has_one_matching_expression(string testExpression, string modelStepText, string expectedLine)
+        [InlineData(1, @"""I press add""", @"I choose add", @"        [When(""I choose add"")]")]
+        [InlineData(2, @"""I press add""", @"I \""choose\"" add", @"        [When(""I \""choose\"" add"")]")]
+        [InlineData(3, @"""I \""press\"" add""", @"I choose add", @"        [When(""I choose add"")]")]
+        [InlineData(4, @"""I \""press\"" add""", @"I \""choose\"" add", @"        [When(""I \""choose\"" add"")]")]
+        [InlineData(5, @"""\""I press add \""""", @"\""I choose add\""", @"        [When(""\""I choose add\"""")]")]
+        [InlineData(6, @"@""I press add""", @"I choose add", @"        [When(@""I choose add"")]")]
+        public void Step_definition_class_has_one_matching_expression(int _, string testExpression, string modelStepText, string expectedLine)
         {
             var stepDefinitions = ArrangeOneStepDefinition(testExpression);
             var featureFiles = ArrangeOneFeatureFile(string.Empty);
