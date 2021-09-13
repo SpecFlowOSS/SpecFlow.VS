@@ -12,8 +12,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         public SyntaxToken TestExpression
         {
             get => _testExpression;
-            set { _testExpression = value;
-                Regex = $"^{_testExpression.ValueText}$";
+            set
+            {
+                _testExpression = value;
+                Regex = value.Text == string.Empty
+                    ? "^(?i)I[^\\w\\p{Sc}]*(?!(?<=-)\\d)Press[^\\w\\p{Sc}]*(?!(?<=-)\\d)Add[^\\w\\p{Sc}]*(?!(?<=-)\\d)$" 
+                    : $"^{_testExpression.ValueText}$";
             }
         }
 

@@ -1,13 +1,17 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.VsxStubs;
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
     public class StepDefinitionClassFile
     {
+        public string MethodName { get; private set; }
+
         public StepDefinitionClassFile(TestStepDefinition[] stepDefinitions)
         {
             StepDefinitions = stepDefinitions;
@@ -19,24 +23,32 @@ namespace MyProject
     public class Steps {
     }
 }";
+            MethodName = "WhenIPressAdd";
+            CaretPositionLine = 8;
+            CaretPositionColumn = 9;
         }
 
         public string ContentTemplate {  get;  }
     
         public TestStepDefinition[] StepDefinitions { get; }
 
+        public int CaretPositionLine { get; private set; }
+        public int CaretPositionColumn { get; private set; }
+
         public TestText GetText()
         {
             var insertLineNumber = 6;
             var testText = new TestText(ContentTemplate);
             var stepDefinitionText = new StringBuilder();
-
+           
             List<string> lines = testText.Lines.Take(insertLineNumber).ToList();
             foreach (var stepDefinition in StepDefinitions)
             {
+                MethodName = stepDefinition.Method;
+                stepDefinition.TestSourceLocation = new SourceLocation("Steps.cs", ++CaretPositionLine, CaretPositionColumn);
                 Append(stepDefinitionText, stepDefinition);
             }
-            AppendMethod(stepDefinitionText, StepDefinitions.First().Method);
+            AppendMethod(stepDefinitionText, MethodName);
 
             lines.AddRange(ToLines(stepDefinitionText));
 

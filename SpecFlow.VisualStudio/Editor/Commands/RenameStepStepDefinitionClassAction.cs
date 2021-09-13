@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -13,15 +14,19 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal class RenameStepStepDefinitionClassAction : RenameStepAction
     {
-        public override void PerformRenameStep(RenameStepViewModel viewModel, ITextBuffer textBufferOfStepDefinitionClass)
+        public override bool PerformRenameStep(RenameStepViewModel viewModel,
+            ITextBuffer textBufferOfStepDefinitionClass)
         {
             MethodDeclarationSyntax method = GetMethod(viewModel.SelectedStepDefinitionBinding, textBufferOfStepDefinitionClass);
 
-            IOrderedEnumerable<SyntaxToken> expressionsToReplace = ExpressionsToReplace(viewModel, method);
+            ImmutableSortedSet<SyntaxToken> expressionsToReplace = ExpressionsToReplace(viewModel, method);
+            if (expressionsToReplace.IsEmpty) return false;
 
             EditTextBuffer(textBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, viewModel.StepText);
 
             viewModel.SelectedStepDefinitionProject.IdeScope.Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
+
+            return true;
         }
 
         private static MethodDeclarationSyntax GetMethod(ProjectStepDefinitionBinding projectStepDefinitionBinding,
@@ -41,13 +46,15 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return method;
         }
 
-        private static IOrderedEnumerable<SyntaxToken> ExpressionsToReplace(RenameStepViewModel viewModel, MethodDeclarationSyntax method)
+        private static ImmutableSortedSet<SyntaxToken> ExpressionsToReplace(RenameStepViewModel viewModel, MethodDeclarationSyntax method)
         {
             var stepDefinitionAttributeTextTokens = method
                 .AttributeLists
                 .Select(ArgumentTokens)
                 .Where(tok => !tok.IsMissing && MatchesWithOriginalText(tok))
-                .OrderByDescending(tok => tok.SpanStart);
+                .OrderByDescending(tok => tok.SpanStart)
+                .ToImmutableSortedSet();
+
             return stepDefinitionAttributeTextTokens;
 
             bool MatchesWithOriginalText(SyntaxToken tok) => tok.ValueText == viewModel.OriginalStepText;

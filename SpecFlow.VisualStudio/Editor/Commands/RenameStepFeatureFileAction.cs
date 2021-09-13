@@ -10,7 +10,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal class RenameStepFeatureFileAction : RenameStepAction
     {
-        public override void PerformRenameStep(RenameStepViewModel viewModel, ITextBuffer textBufferOfStepDefinitionClass)
+        public override bool PerformRenameStep(RenameStepViewModel viewModel,
+            ITextBuffer textBufferOfStepDefinitionClass)
         {
             IIdeScope ideScope = viewModel.SelectedStepDefinitionProject.IdeScope;
             var stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope.FileSystem, ideScope.Logger, ideScope.MonitoringService);
@@ -26,6 +27,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                     usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
                     viewModel.StepText);
             }
+
+            return true;
         }
 
         protected void EnsureFeatureFileOpen(SourceLocation sourceLocation, IIdeScope ideScope)

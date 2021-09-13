@@ -33,7 +33,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public IDeveroomLogger Logger => CompositeLogger;
         public IIdeActions Actions { get; set; }
         public IDeveroomWindowManager WindowManager => StubWindowManager;
-        public IFileSystem FileSystem { get; } = new FileSystem();
+        public IFileSystem FileSystem { get; set; } = new FileSystem();
         public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; } = null;
         public IDeveroomErrorListServices DeveroomErrorListServices { get; } = null;
         public StubWindowManager StubWindowManager { get; } = new StubWindowManager();

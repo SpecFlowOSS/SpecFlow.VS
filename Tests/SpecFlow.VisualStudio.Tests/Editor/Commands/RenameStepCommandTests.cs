@@ -30,6 +30,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             _testOutputHelper = testOutputHelper;
             StubIdeScope ideScope = new StubIdeScope(testOutputHelper);
+            ideScope.FileSystem = new StubFileSystem();
             _projectScope = new InMemoryStubProjectScope(ideScope);
         }
 
@@ -61,15 +62,6 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             return msg.Item2 == "ShowProblem: User Notification: Unable to find step definition usages: could not find any SpecFlow project with feature files.";
         }  
-        private static bool MissingStepDefinition(Tuple<TraceLevel, string> msg)
-        {
-            return msg.Item2 == "ShowProblem: User Notification: No step definition found that is related to this position";
-        }   
-        
-        private static bool MissingStepDefinitionExpression(Tuple<TraceLevel, string> msg)
-        {
-            return msg.Item2 == "ShowProblem: User Notification: Unable to rename step, the step definition expression cannot be detected.";
-        }
         
         private static TestFeatureFile[] ArrangeOneFeatureFile(string featureFileContent)
         {
@@ -92,13 +84,13 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
         private static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord = "When")
         {
-            var testSourceLocation = new SourceLocation("Steps.cs", 9, 9);
-            var token = SyntaxFactory.ParseToken(textExpression);
+            var token =  textExpression==null
+                    ? SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken)
+                    : SyntaxFactory.ParseToken(textExpression);
             var testStepDefinition = new TestStepDefinition
             {
                 Method = keyWord + "IPressAdd",
                 Type = keyWord,
-                TestSourceLocation = testSourceLocation,
                 TestExpression = token
             };
             return testStepDefinition;
@@ -115,6 +107,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             TestFeatureFile[] featureFiles)
         {
             var stepDefinitionClassFile = new StepDefinitionClassFile(stepDefinitions);
+            var inputText = stepDefinitionClassFile.GetText();
+            Dump(inputText, "Generated step definition class");
 
             _projectScope.AddSpecFlowPackage();
             foreach (var featureFile in featureFiles)
@@ -127,13 +121,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
                     stepDefinitionClassFile.StepDefinitions);
             discoveryService.WaitUntilDiscoveryPerformed();
 
-            var inputText = stepDefinitionClassFile.GetText();
-            Dump(inputText, "Generated step definition class");
-
             var textView = CreateTextView(inputText);
-            inputText.MoveCaretTo(textView,
-                stepDefinitionClassFile.StepDefinitions[0].TestSourceLocation.SourceFileLine,
-                stepDefinitionClassFile.StepDefinitions[0].TestSourceLocation.SourceFileColumn);
+            inputText.MoveCaretTo(textView, stepDefinitionClassFile.CaretPositionLine, stepDefinitionClassFile.CaretPositionColumn);
 
             var command = new RenameStepCommand(_projectScope.IdeScope, null, null);
             return (textView, command);
@@ -198,45 +187,57 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Fact]
         public void There_must_be_at_lest_one_step_definition()
         {
-            _projectScope.AddSpecFlowPackage();
-            _projectScope.AddFile("calculator.feature", string.Empty);
-            var command = new RenameStepCommand(_projectScope.IdeScope, null, null);
-            var inputText = new TestText(string.Empty);
-
-            var textView = CreateTextView(inputText);
-            command.PreExec(textView, command.Targets.First());
-
-            var stubLogger = GetStubLogger();
-            stubLogger.Messages.Should().Contain(msg => MissingStepDefinition(msg));
+            StepDefinitionMustHaveValidExpression(Array.Empty<TestStepDefinition>(), "ShowProblem: User Notification: No step definition found that is related to this position");
         }
 
         [Fact]
-        public void StepDefinition_must_have_expression()
+        public void StepDefinition_regex_must_be_valid()
         {
             var stepDefinitions = ArrangeOneStepDefinition(string.Empty);
             stepDefinitions[0].TestExpression = SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken);
             stepDefinitions[0].Regex = default;
 
-            StepDefinitionMustHaveExpression(stepDefinitions);
+            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: Unable to rename step, the step definition expression cannot be detected.");
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void StepDefinition_expression_cannot_be_modified(string emptyExpression)
+        {
+            var stepDefinitions = ArrangeOneStepDefinition(emptyExpression);
+
+            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: There was an error during step definition class rename. Steps.cs not modified.");
+        }
+
+        [Theory]
+        [InlineData("\"\"")]
+        public void StepDefinition_expression_must_be_valid(string invalidExpression)
+        {
+            var stepDefinitions = ArrangeOneStepDefinition(invalidExpression);
+
+            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: Step definition expression is invalid");
         }
 
         [Fact]
-        public void StepDefinition_expression_cannot_be_empty()
+        public void Constant_is_not_supported_in_step_definition_expression()
         {
-            var stepDefinitions = ArrangeOneStepDefinition(string.Empty);
+            var stepDefinitions = ArrangeOneStepDefinition("ConstantValue");
+            stepDefinitions[0].Regex = "^I press add$";
 
-            StepDefinitionMustHaveExpression(stepDefinitions);
+            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: There was an error during step definition class rename. Steps.cs not modified.");
         }
 
-        private void StepDefinitionMustHaveExpression(TestStepDefinition[] stepDefinitions)
+        private void StepDefinitionMustHaveValidExpression(TestStepDefinition[] stepDefinitions, string errorMessage)
         {
             var featureFiles = ArrangeOneFeatureFile(string.Empty);
             var (textView, command) = ArrangeSut(stepDefinitions, featureFiles);
 
             command.PreExec(textView, command.Targets.First());
 
+            Dump(textView, "Step definition class after rename");
             var stubLogger = GetStubLogger();
-            stubLogger.Messages.Should().Contain(msg => MissingStepDefinitionExpression(msg));
+            stubLogger.Messages.Last().Item2.Should().Be(errorMessage);
         }
 
         [Theory]

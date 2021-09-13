@@ -7,7 +7,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal abstract class RenameStepAction : IRenameStepAction
     {
-        public abstract void PerformRenameStep(RenameStepViewModel viewModel,
+        public abstract bool PerformRenameStep(RenameStepViewModel viewModel,
             ITextBuffer textBufferOfStepDefinitionClass);
 
         protected static void EditTextBuffer<T>(
