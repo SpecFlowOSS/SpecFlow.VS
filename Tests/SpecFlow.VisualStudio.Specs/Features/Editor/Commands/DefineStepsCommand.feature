@@ -53,7 +53,7 @@ Scenario: Two undefined step has the same step definition skeleton
 Scenario: All steps are defined
 	Given there is a SpecFlow project scope
 	And the following step definitions in the project:
-		| type  | expression                     |
+		| type  | regex                     |
 		| Given | the operands have been entered |
 	And the following feature file in the editor
 		"""

@@ -133,7 +133,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 return false;
             }
 
-            if (stepDefinitionBinding.Expression == "^$")
+            if (stepDefinitionBinding.Expression == string.Empty)
             {
                 IdeScope.Actions.ShowProblem("Step definition expression is invalid");
                 return false;
