@@ -23,7 +23,7 @@ namespace SpecFlow.VisualStudio.UI
 
         public Image GetIcon(string iconName)
         {
-            return new Image {Source = new DrawingImage(GetIconDrawing(iconName))};
+            return new Image { Source = new DrawingImage(GetIconDrawing(iconName)) };
         }
     }
 }

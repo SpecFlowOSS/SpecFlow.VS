@@ -108,7 +108,7 @@ namespace SpecFlow.VisualStudio.UI
         {
             IsComplete = true;
             _cancellationTokenSource.Dispose();
-            RunOnUiThread(() => _contextMenuManager.SetMenuItemIcon(_headerMenuItem, "Deveroom"));
+            RunOnUiThread(() => _contextMenuManager.SetMenuItemIcon(_headerMenuItem, "SpecFlow"));
         }
     }
 }

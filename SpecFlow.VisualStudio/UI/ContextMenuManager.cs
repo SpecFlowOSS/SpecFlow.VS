@@ -26,7 +26,7 @@ namespace SpecFlow.VisualStudio.UI
                 FontWeight = FontWeights.Bold,
                 IsEnabled = false
             };
-            SetMenuItemIcon(headerMenuItem, "Deveroom");
+            SetMenuItemIcon(headerMenuItem, "SpecFlow");
             contextMenu.Items.Add(headerMenuItem);
             AddSeparator(contextMenu);
 
