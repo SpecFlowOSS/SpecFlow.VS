@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Abstractions;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
@@ -50,6 +51,9 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null, string contentType = "deveroom", string filePath = null)
         {
+            if (filePath != null && !Path.IsPathRooted(filePath) && projectScope != null)
+                filePath = Path.Combine(projectScope.ProjectFolder, filePath);
+
             var textView = StubWpfTextView.CreateTextView(this, inputText, newLine, projectScope, contentType, filePath);
             if (filePath != null)
                 OpenViews[filePath] = textView;

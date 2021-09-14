@@ -171,21 +171,47 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         public void GivenTheFollowingCStepDefinitionClassInTheEditor(string stepDefinitionClass)
         {
             var fileName = DomainDefaults.StepDefinitionFileName;
-            var stepDefinitionFile =
-                string.Join(Environment.NewLine, new[]
-                {
-                    "using System;",
-                    "using TechTalk.SpecFlow;",
-                    "",
-                    "namespace MyProject",
-                    "{",
-                    stepDefinitionClass,
-                    "}"
-                });
+            var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
+            var stepDefinitionFile = GetStepDefinitionFileContentFromClass(stepDefinitionClass);
 
+            var stepDefinitions = ParseStepDefinitions(stepDefinitionFile, filePath);
+
+            RegisterStepDefinitions(stepDefinitions.ToArray());
+            WhenTheProjectIsBuilt();
+            _wpfTextView = _ideScope.CreateTextView(new TestText(stepDefinitionFile), projectScope: _projectScope, contentType: LanguageNames.CSharp, filePath: fileName);
+        }
+
+        private static string GetStepDefinitionFileContentFromClass(string stepDefinitionClass)
+        {
+            return string.Join(Environment.NewLine, new[]
+            {
+                "using System;",
+                "using TechTalk.SpecFlow;",
+                "",
+                "namespace MyProject",
+                "{",
+                stepDefinitionClass,
+                "}"
+            });
+        }
+
+        private static string GetStepDefinitionClassFromMethod(string stepDefinitionMethod)
+        {
+            return string.Join(Environment.NewLine, new[]
+            {
+                "[Binding]",
+                "public class StepDefinitions1",
+                "{",
+                stepDefinitionMethod,
+                "}"
+            });
+        }
+
+        private List<StepDefinition> ParseStepDefinitions(string stepDefinitionFileContent, string filePath)
+        {
             var stepDefinitions = new List<StepDefinition>();
 
-            var tree = CSharpSyntaxTree.ParseText(stepDefinitionFile);
+            var tree = CSharpSyntaxTree.ParseText(stepDefinitionFileContent);
             var rootNode = tree.GetRoot();
             var nsDeclaration = rootNode.DescendantNodes().OfType<NamespaceDeclarationSyntax>().First();
             var methods = rootNode.DescendantNodes().OfType<MethodDeclarationSyntax>().ToArray();
@@ -195,8 +221,8 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                 Debug.Assert(method.Body != null);
                 var methodLineNumber = method.SyntaxTree.GetLineSpan(method.Body.Span).StartLinePosition.Line + 1;
 
-                var stepDefinitionAttributes = 
-                        RenameStepStepDefinitionClassAction.GetAttributesWithTokens(method)
+                var stepDefinitionAttributes =
+                    RenameStepStepDefinitionClassAction.GetAttributesWithTokens(method)
                         .Where(awt => !awt.Item2.IsMissing)
                         .ToArray();
 
@@ -208,7 +234,8 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                         Method = $"{nsDeclaration.Name}.{classDeclarationSyntax.Identifier.Text}.{method.Identifier.Text}",
                         ParamTypes = "",
                         Type = attributeSyntax?.Name.ToString(),
-                        SourceLocation = $"{fileName}|{methodLineNumber}|1"
+                        SourceLocation = $"{filePath}|{methodLineNumber}|1",
+                        Expression = stepDefinitionAttributeTextToken.ValueText
                     };
 
                     _ideScope.Logger.LogInfo($"{stepDefinition.SourceLocation}: {stepDefinition.Type}/{stepDefinition.Regex}");
@@ -216,9 +243,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                 }
             }
 
-            RegisterStepDefinitions(stepDefinitions.ToArray());
-            WhenTheProjectIsBuilt();
-            _wpfTextView = StubWpfTextView.CreateTextView(_ideScope, new TestText(stepDefinitionFile), projectScope: _projectScope, contentType: LanguageNames.CSharp, filePath: fileName);
+            return stepDefinitions;
         }
 
         [When(@"the project is built")]
@@ -247,7 +272,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
             _projectScope.FilesAdded.Add(filePath, featureFileContent);
 
-            _wpfTextView = StubWpfTextView.CreateTextView(_ideScope, new TestText(featureFileContent), projectScope: _projectScope);
+            _wpfTextView = _ideScope.CreateTextView(new TestText(featureFileContent), projectScope: _projectScope);
         }
         
         [Given(@"the initial binding discovery is performed")]
@@ -393,6 +418,13 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         {
             var expectedContent = new TestText(expectedContentValue);
             Assert.Equal(expectedContent.ToString(), _wpfTextView.TextSnapshot.GetText());
+        }
+
+        [Then("the editor should be updated to contain")]
+        public void ThenTheEditorShouldBeUpdatedToContain(string expectedContentValue)
+        {
+            var expectedContent = new TestText(expectedContentValue);
+            _wpfTextView.TextSnapshot.GetText().Should().Contain(expectedContent.ToString());
         }
 
         private IEnumerable<DeveroomTag> GetDeveroomTags(IWpfTextView textView)
@@ -559,18 +591,24 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         {
             public string Type { get; set; }
             public string Regex { get; set; }
+            public string Expression { get; set; }
         }
 
-        private StepDefinitionSnippetData[] ParseSnippets(string text)
+        private StepDefinitionSnippetData[] ParseSnippetsFromFile(string text, string filePath = DomainDefaults.StepDefinitionFileName)
         {
-            var regex = new Regex(@"\[(?<type>Given|When|Then)\(\@""(?<regex>[^\n]+)""\)\]");
-            var matches = regex.Matches(text);
-            return matches.Cast<Match>().Select(m =>
+            var stepDefinitions = ParseStepDefinitions(text, filePath);
+            return stepDefinitions.Select(sd =>
                 new StepDefinitionSnippetData()
                 {
-                    Type = m.Groups["type"].Value,
-                    Regex = m.Groups["regex"].Value
+                    Type = sd.Type,
+                    Regex = sd.Regex,
+                    Expression = sd.Expression
                 }).ToArray();
+        }
+
+        private StepDefinitionSnippetData[] ParseSnippets(string snippetText)
+        {
+            return ParseSnippetsFromFile(GetStepDefinitionFileContentFromClass(GetStepDefinitionClassFromMethod(snippetText)));
         }
 
         [Then(@"the define steps dialog should be opened with the following step definition skeletons")]
@@ -642,31 +680,19 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         [Then("invoking the first item from the jump list renames the {string} {string} step definition")]
         public void ThenInvokingTheFirstItemFromTheJumpListRenamesTheStepDefinition(string expression, string stepType)
         {
+            const string renamedExpression = "renamed step";
             _ideScope.StubWindowManager.RegisterWindowAction<RenameStepViewModel>(
                 viewModel =>
                 {
-                    viewModel.StepText = "renamed step";
+                    viewModel.StepText = renamedExpression;
+                    viewModel.OriginalStepText.Should().Be(expression);
                 });
 
             InvokeFirstContextMenuItem();
 
-            //TODO: remove hack
-            ThenTheEditorShouldBeUpdatedTo(@"using System;
-using TechTalk.SpecFlow;
-
-namespace MyProject
-{
-[Binding]
-public class CalculatorSteps
-{
-	[Given(""renamed step"")]
-	[When(""I press add"")]
-	[When(""I invoke add"")]
-	public void WhenIPressAdd()
-	{ 
-	}
-}
-}");
+            string fileContent = _wpfTextView.TextSnapshot.GetText();
+            var parsedSnippets = ParseSnippetsFromFile(fileContent);
+            parsedSnippets.Should().Contain(s => s.Type == stepType && s.Expression == renamedExpression);
         }
 
         [Then(@"the following step definition snippets should be copied to the clipboard")]
@@ -677,6 +703,7 @@ public class CalculatorSteps
             expectedSnippets.CompareToSet(parsedSnippets, false);
         }
 
+        [Then(@"the editor should be updated to contain the following step definitions")]
         [Then(@"the following step definition snippets should be in the step definition class")]
         public void ThenTheFollowingStepDefinitionSnippetsShouldBeInTheStepDefinitionClass(Table expectedSnippets)
         {
@@ -686,12 +713,9 @@ public class CalculatorSteps
         [Then(@"the following step definition snippets should be in file ""(.*)""")]
         public void ThenTheFollowingStepDefinitionSnippetsShouldBeInFile(string fileName, Table expectedSnippets)
         {
+            string fileContent = GetActualContent(fileName);
             var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
-            var fileAdded = _projectScope.FilesAdded.TryGetValue(filePath, out var fileContent);
-            fileAdded.Should().BeTrue($"file '{filePath}' should have been created");
-            //File.Exists(filePath).Should().BeTrue($"file '{filePath}' should have been created");
-            //var fileContent = File.ReadAllText(filePath);
-            var parsedSnippets = ParseSnippets(fileContent);
+            var parsedSnippets = ParseSnippetsFromFile(fileContent, filePath);
             expectedSnippets.CompareToSet(parsedSnippets, false);
         }
 
@@ -727,17 +751,26 @@ public class CalculatorSteps
         [Then("the file {string} should be updated to")]
         public void ThenTheFileShouldBeUpdatedTo(string fileName, string expectedFileContent)
         {
-            var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
-            var actualContent = GetActualContent(filePath);
+            var actualContent = GetActualContent(fileName);
             Assert.Equal(expectedFileContent, actualContent);
         }
 
-        private string GetActualContent(string filePath)
+        private string GetActualContent(string fileName)
         {
+            var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
             if (_ideScope.OpenViews.TryGetValue(filePath, out var textView))
+            {
                 return textView.TextBuffer.CurrentSnapshot.GetText();
-            var actualContent = File.ReadAllText(filePath);
-            return actualContent;
+            }
+
+            if (File.Exists(filePath))
+            {
+                return File.ReadAllText(filePath);
+            }
+
+            var fileAdded = _projectScope.FilesAdded.TryGetValue(filePath, out var fileContent);
+            fileAdded.Should().BeTrue($"file '{filePath}' should have been created");
+            return fileContent;
         }
     }
 }

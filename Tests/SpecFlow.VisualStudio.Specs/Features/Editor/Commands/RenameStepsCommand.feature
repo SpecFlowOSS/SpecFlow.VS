@@ -33,16 +33,8 @@ Scenario: A simple step with a sigle usage is renamed from step definition (code
 		Scenario: Add two numbers
 			When I choose add
 		"""
-	#And the following step definition snippets should be in the step definition class
-	#	| type | regex        |
-	#	| When | I choose add |
-    Then the editor should be updated to
+    And the editor should be updated to contain
 		"""
-		using System;
-		using TechTalk.SpecFlow;
-
-		namespace MyProject
-		{
 		[Binding]
 		public class CalculatorSteps
 		{
@@ -50,7 +42,6 @@ Scenario: A simple step with a sigle usage is renamed from step definition (code
 			public void WhenIPressAdd()
 			{ 
 			}
-		}
 		}
 		"""
 
