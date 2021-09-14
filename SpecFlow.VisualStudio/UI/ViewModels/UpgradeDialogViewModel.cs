@@ -22,17 +22,17 @@ Please have a look at the changes since the last installed version.
         public const string COMMUNITY_INFO_TEXT = COMMUNITY_INFO_HEADER + @"
 ## Find solutions, share ideas and engage in discussions.
 
-Join our community forum: https://support.specflow.org/hc/en-us/community/topics
+* Join our community forum: https://support.specflow.org/
 
-Join our Discord channel: https://discord.com/invite/xQMrjDXx7a
+* Join our Discord channel: https://discord.com/invite/xQMrjDXx7a
 
-Follow us on Twitter: https://twitter.com/specflow
+* Follow us on Twitter: https://twitter.com/specflow
 
-Follow us on LinkedIn: https://www.linkedin.com/company/specflow/
+* Follow us on LinkedIn: https://www.linkedin.com/company/specflow/
 
-Subscribe on YouTube: https://www.youtube.com/channel/UCD0cb6YaIC7Dpmi5RXCwdWQ
+* Subscribe on YouTube: https://www.youtube.com/c/SpecFlowBDD
 
-Join our next webinar: https://specflow.org/community/webinars/
+* Join our next webinar: https://specflow.org/community/webinars/
 
 In case you are missing an important feature, please leave us your feature request [here](https://support.specflow.org/hc/en-us/community/topics/360000519178-Feature-Requests).
 ";
