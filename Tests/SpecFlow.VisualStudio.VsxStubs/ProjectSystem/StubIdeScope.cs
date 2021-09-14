@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
@@ -34,7 +35,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public IDeveroomLogger Logger => CompositeLogger;
         public IIdeActions Actions { get; set; }
         public IDeveroomWindowManager WindowManager => StubWindowManager;
-        public IFileSystem FileSystem { get; set; } = new FileSystem();
+        public IFileSystem FileSystem { get; private set; } = new MockFileSystem();
         public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; } = null;
         public IDeveroomErrorListServices DeveroomErrorListServices { get; } = null;
         public StubWindowManager StubWindowManager { get; } = new StubWindowManager();
@@ -90,6 +91,11 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         {
             WeakProjectsBuilt?.Invoke(this, EventArgs.Empty);
             WeakProjectOutputsUpdated?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void UsePhysicalFileSystem()
+        {
+            FileSystem = new FileSystem();
         }
 
         class ActionsSetter : IDisposable

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using SpecFlow.SampleProjectGenerator;
 using SpecFlow.VisualStudio.Configuration;
@@ -47,6 +48,8 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         [Given(@"there is a simple SpecFlow project for (.*)")]
         public void GivenThereIsASimpleSpecFlowProjectForVersion(NuGetVersion specFlowVersion)
         {
+            _stubIdeScope.UsePhysicalFileSystem();
+
             _generatorOptions = new GeneratorOptions
             {
                 SpecFlowPackageVersion = specFlowVersion.ToString()
@@ -56,6 +59,8 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         [Given(@"there is a small SpecFlow project")]
         public void GivenThereIsASmallSpecFlowProject()
         {
+            _stubIdeScope.UsePhysicalFileSystem();
+
             _generatorOptions = new GeneratorOptions
             {
                 FeatureFileCount = 1,
@@ -67,6 +72,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         [Given(@"there is a simple SpecFlow project with test runner ""(.*)"" for (.*)")]
         public void GivenThereIsASimpleSpecFlowProjectWithTestRunnerForV_(string runner, NuGetVersion specFlowVersion)
         {
+            _stubIdeScope.UsePhysicalFileSystem();
             GivenThereIsASmallSpecFlowProject();
             _generatorOptions.UnitTestProvider = runner;
             _generatorOptions.SpecFlowPackageVersion = specFlowVersion.ToString();
@@ -90,6 +96,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         [Given(@"there is a simple SpecFlow project with plugin for (.*)")]
         public void GivenThereIsASimpleSpecFlowProjectWithPluginForVersion(NuGetVersion specFlowVersion)
         {
+            _stubIdeScope.UsePhysicalFileSystem();
             _generatorOptions = new GeneratorOptions
             {
                 SpecFlowPackageVersion = specFlowVersion.ToString(),
@@ -102,6 +109,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         [Given(@"there is a simple SpecFlow project with external bindings for (.*)")]
         public void GivenThereIsASimpleSpecFlowProjectWithExternalBindingsForVersion(NuGetVersion specFlowVersion)
         {
+            _stubIdeScope.UsePhysicalFileSystem();
             _generatorOptions = new GeneratorOptions
             {
                 SpecFlowPackageVersion = specFlowVersion.ToString(),
@@ -113,6 +121,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         [Given(@"there is a simple SpecFlow project with unicode bindings for (.*)")]
         public void GivenThereIsASimpleSpecFlowProjectWithUnicodeBindingsForVersion(NuGetVersion specFlowVersion)
         {
+            _stubIdeScope.UsePhysicalFileSystem();
             GivenThereIsASmallSpecFlowProject();
             _generatorOptions.SpecFlowPackageVersion = specFlowVersion.ToString();
             _generatorOptions.AddUnicodeBinding = true;
@@ -137,6 +146,8 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         [Given(@"the project is configured to use ""(.*)"" connector")]
         public void GivenTheProjectIsConfiguredToUseConnector(ProcessorArchitectureSetting platformTarget)
         {
+            _stubIdeScope.UsePhysicalFileSystem();
+
             _projectScopeConfigurationSteps.Add(scope =>
             {
                 scope.GetDeveroomConfiguration().ProcessorArchitecture = platformTarget;

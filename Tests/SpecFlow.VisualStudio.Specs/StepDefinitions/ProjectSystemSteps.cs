@@ -258,9 +258,9 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         public void GivenTheFollowingFeatureFile(string fileName, string fileContent)
         {
             var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
-            File.WriteAllText(filePath, fileContent);
+            _ideScope.FileSystem.Directory.CreateDirectory(_projectScope.ProjectFolder);
+            _ideScope.FileSystem.File.WriteAllText(filePath, fileContent);
             _projectScope.FilesAdded.Add(filePath, fileContent);
-            //TODO: use in-memory file system?
         }
 
 

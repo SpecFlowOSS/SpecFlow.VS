@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
-using System.Windows.Documents;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.UI.ViewModels;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
@@ -30,7 +25,6 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             _testOutputHelper = testOutputHelper;
             StubIdeScope ideScope = new StubIdeScope(testOutputHelper);
-            ideScope.FileSystem = new StubFileSystem();
             _projectScope = new InMemoryStubProjectScope(ideScope);
         }
 
