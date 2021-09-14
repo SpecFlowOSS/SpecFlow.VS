@@ -4,7 +4,7 @@
 
 SpecFlow bridges the communication gap between domain experts and developers by binding business readable behavior specifications and examples to the underlying implementation.
 
-Our mission is to provide a pragmatic and frictionless approach to [Specification-By-Example](https://www.specificationbyexample.com/) for .NET projects. SpecFlow is open source and provided under a [BSD license](https://go.specflow.org/license). 
+Our mission is to provide a pragmatic and frictionless approach to [Specification-By-Example](https://www.specificationbyexample.com/) for .NET projects. SpecFlow is open source and provided under a [BSD license](https://go.specflow.org/license).
 
 SpecFlow also supports the concepts of Acceptance Test Driven Development (ATDD) and Behavior Driven Development (BDD), which are often used synonymously with Specification-By-Example.
 
@@ -12,7 +12,7 @@ Read more on the [SpecFlow website](https://www.specflow.org).
 
 **Please help us and the other users by rating this package!**
 
-**Useful Links**   
+**Useful Links**
 
 * [Documentation](https://specflow.org/documentation/)
 * [Getting Started](https://specflow.org/getting-started/)

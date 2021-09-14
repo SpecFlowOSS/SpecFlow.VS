@@ -1,23 +1,27 @@
-# Deveroom - a Visual Studio extension for SpecFlow
+# SpecFlow.VS
 
-Many BDD teams working on formulating scenarios aim to produce a real living documentation, in this activity a feature file editor can be a great help as it saves typing, time and energy.
+Visual Studio extension of SpecFlow
 
-Deveroom is a feature file editing tool in Visual Studio, developed by the creator of SpecFlow.
+For documentation, please refer to the SpecFlow website:
+[https://www.specflow.org](https://www.specflow.org)
 
-[![Build Status](https://dev.azure.com/specsolutions/deveroom-visualstudio/_apis/build/status/specsolutions.deveroom-visualstudio?branchName=master)](https://dev.azure.com/specsolutions/deveroom-visualstudio/_build/latest?definitionId=4&branchName=master)
+[![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/TechTalkSpecFlowTeam.SpecFlowForVisualStudio2022?label=installs%20VS2022)](https://marketplace.visualstudio.com/items?itemName=TechTalkSpecFlowTeam.SpecFlowForVisualStudio2022)
 
-* Project site: https://www.specsolutions.eu/services/deveroom/
-* Twitter: [@SpecSol_BDD](https://twitter.com/SpecSol_BDD)
-* Issues: https://github.com/specsolutions/deveroom-visualstudio/issues
-* Blog: http://gasparnagy.com/tag/deveroom/
-* Documentation: http://speclink.me/deveroomdoc
+## Build status
+
+Continuous Integration: [![Build Status](https://specflow.visualstudio.com/SpecFlow/_apis/build/status/SpecFlow.VS.CI)](https://specflow.visualstudio.com/SpecFlow/_build?definitionId=52)
+
+## Deployment status
+
+Publish to MyGet: ![Publish to MyGet status](https://vsrm.dev.azure.com/specflow/_apis/public/Release/badge/4d755a95-f4b3-45f5-abb5-aeccc2b85d15/13/57)
+
+MyGet Feed: <https://www.myget.org/F/specflow-vsix/vsix/>
 
 ## Supported platforms
 
 ### Visual Studio
 
-* [Visual Studio 2017 (Community, Personal, Enterprise)](https://marketplace.visualstudio.com/items?itemName=SpecSolutions.DeveroomVisualStudio2017)
-* [Visual Studio 2019 (Community, Personal, Enterprise)](https://marketplace.visualstudio.com/items?itemName=SpecSolutions.DeveroomVisualStudio2019)
+* [Visual Studio 2022 (Community, Personal, Enterprise)](https://marketplace.visualstudio.com/items?itemName=TechTalkSpecFlowTeam.SpecFlowForVisualStudio2022)
 
 ### SpecFlow
 
@@ -28,28 +32,27 @@ Deveroom is a feature file editing tool in Visual Studio, developed by the creat
 * .NET Framework (for SpecFlow v1.9-v3)
 * .NET Core (for SpecFlow v3)
 
-## Installation 
+## Installation
 
-Deveroom can be installed directly from Visual Studio using the extension manager. See detailed instructions at the [Installation documentation page](http://speclink.me/deveroominstall).
+The extension can be installed directly from Visual Studio using the extension manager. See detailed instructions at the [Installation documentation page](https://docs.specflow.org/projects/specflow/en/latest/visualstudio/visual-studio-installation.html).
 
-Please also help other users by rating the extension at the Visual Studio Marketplace: [Deveroom for Visual Studio 2017](https://marketplace.visualstudio.com/items?itemName=SpecSolutions.DeveroomVisualStudio2017), [Deveroom for Visual Studio 2019](https://marketplace.visualstudio.com/items?itemName=SpecSolutions.DeveroomVisualStudio2019)
+Please also help other users by rating the extension at the Visual Studio Marketplace: [SpecFlow for Visual Studio 2022](https://marketplace.visualstudio.com/items?itemName=TechTalkSpecFlowTeam.SpecFlowForVisualStudio2022).
 
 ## Contributing
 
-All contributors are welcome! More information about development and testing guidelines are coming soon.
+All contributors are welcome! For more information see the [Contribution guidelines](CONTRIBUTION.md)
 
-## Important Blog Entries
+## Find solutions, share ideas and engage in discussions
 
-* [Deveroom – a new Visual Studio extension for SpecFlow](http://gasparnagy.com/2019/03/deveroom-a-new-visual-studio-extension-for-specflow/)
-* [Deveroom goes Open Source](http://gasparnagy.com/2019/04/deveroom-goes-open-source/)
-
-## See Also
-
-* [BDD & SpecFlow training services by Gaspar Nagy](https://www.specsolutions.eu/services/training/)
-* [SpecSync for Azure DevOps -- Synchronization tool for integrating BDD scenarios with Azure DevOps (TFS)](https://www.specsolutions.eu/services/specsync/)
+* Join our community forum: <https://support.specflow.org/>
+* Join our Discord channel: <https://discord.com/invite/xQMrjDXx7a>
+* Follow us on Twitter: <https://twitter.com/specflow>
+* Follow us on LinkedIn: <https://www.linkedin.com/company/specflow/>
+* Subscribe on YouTube: <https://www.youtube.com/c/SpecFlowBDD>
+* Join our next webinar: <https://specflow.org/community/webinars/>
 
 ## License
 
-Deveroom is licensed under the [MIT license](LICENSE).
+SpecFlow for VisualStudio is licensed under the [MIT license](LICENSE).
 
-Copyright (c) 2019 Spec Solutions and Gaspar Nagy, https://www.specsolutions.eu
+Copyright (c) 2019-2021 Gaspar Nagy (Spec Solutions), Tricentis GmbH

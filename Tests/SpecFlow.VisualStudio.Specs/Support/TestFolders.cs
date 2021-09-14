@@ -32,7 +32,7 @@ namespace SpecFlow.VisualStudio.Specs.Support
         {
             get
             {
-                var configuredFolder = Environment.GetEnvironmentVariable("DEVEROOM_TEST_TEMP");
+                var configuredFolder = Environment.GetEnvironmentVariable("SPECFLOW_TEST_TEMP");
                 return configuredFolder ?? Path.GetTempPath();
             }
         }
