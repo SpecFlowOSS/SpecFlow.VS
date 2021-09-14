@@ -60,7 +60,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             bool MatchesWithOriginalText(SyntaxToken tok) => tok.ValueText == viewModel.OriginalStepText;
         }
 
-        private static SyntaxToken ArgumentTokens(AttributeListSyntax al)
+        internal static SyntaxToken ArgumentTokens(AttributeListSyntax al)
         {
             AttributeArgumentListSyntax? attributeArgumentListSyntax = al.Attributes.Single().ArgumentList;
             return attributeArgumentListSyntax == null || attributeArgumentListSyntax.Arguments.Count == 0

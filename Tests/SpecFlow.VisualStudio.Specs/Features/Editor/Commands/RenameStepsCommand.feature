@@ -53,3 +53,38 @@ Scenario: A simple step with a sigle usage is renamed from step definition (code
 		}
 		}
 		"""
+
+Rule: User should choose the step definition to rename in case there are multiple step definitions on the method
+
+
+Scenario: Multiple step definitions declared for the method
+	Given there is a SpecFlow project scope
+	And the following feature file "Addition.feature"
+		"""
+		Feature: Addition
+
+		Scenario: Add two numbers
+			When I press add
+		"""
+	And the following C# step definition class in the editor
+		"""
+		[Binding]
+		public class CalculatorSteps
+		{
+			[Given("I press add")]
+			[When("I press add")]
+			[When("I invoke add")]
+			public void WhenIPressAdd()
+			{{caret} 
+			}
+		}
+		"""
+	And the initial binding discovery is performed
+	When I invoke the "Rename Step" command
+	Then a jump list "Choose step definition to rename" is opened with the following items
+		#TODO: assert for type
+		| step definition |
+		| I press add     |
+		| I press add     |
+		| I invoke add    |
+

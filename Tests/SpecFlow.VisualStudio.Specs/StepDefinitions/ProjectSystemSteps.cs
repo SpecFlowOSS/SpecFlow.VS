@@ -20,7 +20,10 @@ using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.Language.Intellisense;
+using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -179,23 +182,43 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                     stepDefinitionClass,
                     "}"
                 });
-            var namespaceValue = Regex.Match(stepDefinitionFile, @"namespace (?<value>\S+)").Groups["value"].Value;
-            var classValue = Regex.Match(stepDefinitionFile, @"public class (?<value>\S+)").Groups["value"].Value;
-            var methodValue = Regex.Match(stepDefinitionFile, @"public void (?<value>[^\(\s]+)").Groups["value"].Value;
-            var stepDefTypeValue = Regex.Match(stepDefinitionFile, @"\[(?<value>Given|When|Then)\(").Groups["value"].Value;
-            var regexValue = Regex.Match(stepDefinitionFile, @"\[(?:Given|When|Then)\(\@?""(?<value>.*?)""\)\]").Groups["value"].Value;
-            var locationMatch = Regex.Match(stepDefinitionFile, @"^(?<line>.*\r\n)*\s*\[(?:Given|When|Then)");
 
-            var stepDefinition = new StepDefinition()
+            var stepDefinitions = new List<StepDefinition>();
+
+            var tree = CSharpSyntaxTree.ParseText(stepDefinitionFile);
+            var rootNode = tree.GetRoot();
+            var nsDeclaration = rootNode.DescendantNodes().OfType<NamespaceDeclarationSyntax>().First();
+            var methods = rootNode.DescendantNodes().OfType<MethodDeclarationSyntax>().ToArray();
+            foreach (var method in methods)
             {
-                Regex = regexValue,
-                Method = $"{namespaceValue}.{classValue}.{methodValue}",
-                ParamTypes = "", 
-                Type = stepDefTypeValue,
-                SourceLocation = $"{fileName}|{locationMatch.Groups["line"].Captures.Count + 3}|1"
-            };
-            _ideScope.Logger.LogInfo(stepDefinition.SourceLocation);
-            RegisterStepDefinitions(stepDefinition);
+                Debug.Assert(method.Body != null);
+                var methodLineNumber = method.SyntaxTree.GetLineSpan(method.Body.Span).StartLinePosition.Line + 1;
+
+                var stepDefinitionAttributeTextTokens = method
+                    .AttributeLists
+                    .Select(RenameStepStepDefinitionClassAction.ArgumentTokens)
+                    .Where(tok => !tok.IsMissing)
+                    .ToArray();
+
+                foreach (var stepDefinitionAttributeTextToken in stepDefinitionAttributeTextTokens)
+                {
+                    var attributeSyntax = (AttributeSyntax)stepDefinitionAttributeTextToken.Parent?.Parent?.Parent?.Parent;
+
+                    var stepDefinition = new StepDefinition
+                    {
+                        Regex = "^" + stepDefinitionAttributeTextToken.ValueText + "$",
+                        Method = $"{nsDeclaration.Name}.{method.Ancestors().OfType<ClassDeclarationSyntax>().First().Identifier.Text}.{method.Identifier.Text}",
+                        ParamTypes = "",
+                        Type = attributeSyntax?.Name.ToString(),
+                        SourceLocation = $"{fileName}|{methodLineNumber}|1"
+                    };
+
+                    _ideScope.Logger.LogInfo($"{stepDefinition.SourceLocation}: {stepDefinition.Type}/{stepDefinition.Regex}");
+                    stepDefinitions.Add(stepDefinition);
+                }
+            }
+
+            RegisterStepDefinitions(stepDefinitions.ToArray());
             WhenTheProjectIsBuilt();
             _wpfTextView = StubWpfTextView.CreateTextView(_ideScope, new TestText(stepDefinitionFile), projectScope: _projectScope, contentType: LanguageNames.CSharp, filePath: fileName);
         }
