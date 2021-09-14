@@ -58,6 +58,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NuGet.VisualStudio" Version="6.0.0-preview.3" />
+    <PackageReference Include="NuGet.VisualStudio.Contracts" Version="6.0.0-preview.3" />
   </ItemGroup>
 
   <ItemGroup>

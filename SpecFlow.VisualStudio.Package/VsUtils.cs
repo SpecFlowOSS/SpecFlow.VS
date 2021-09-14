@@ -21,6 +21,9 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using IServiceProvider = System.IServiceProvider;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+using NuGet.VisualStudio.Contracts;
+using Microsoft.VisualStudio.Shell.ServiceBroker;
+using System.Threading;
 
 namespace SpecFlow.VisualStudio
 {
@@ -516,6 +519,39 @@ namespace SpecFlow.VisualStudio
                 Debug.WriteLine(ex);
                 return GetVsMainVersion(serviceProvider);
             }
+        }
+
+        public static IEnumerable<NuGetInstalledPackage> GetInstalledNuGetPackages(IServiceProvider serviceProvider, string projectFullName)
+        {
+            return ThreadHelper.JoinableTaskFactory.Run(async () =>
+            {
+                var solution = serviceProvider.GetService<SVsSolution, IVsSolution>();
+                int result = solution.GetProjectOfUniqueName(projectFullName, out IVsHierarchy project);
+                if (result != VSConstants.S_OK)
+                {
+                    throw new Exception($"Error calling {nameof(IVsSolution)}.{nameof(IVsSolution.GetProjectOfUniqueName)}: {result}");
+                }
+
+                result = solution.GetGuidOfProject(project, out Guid projectGuid);
+                if (result != VSConstants.S_OK)
+                {
+                    throw new Exception($"Error calling {nameof(IVsSolution)}.{nameof(IVsSolution.GetGuidOfProject)}: {result}");
+                }
+
+                var serviceBrokerContainer = serviceProvider.GetService<SVsBrokeredServiceContainer, IBrokeredServiceContainer>();
+                var serviceBroker = serviceBrokerContainer.GetFullAccessServiceBroker();
+
+                var projectService = await serviceBroker.GetProxyAsync<INuGetProjectService>(NuGetServices.NuGetProjectServiceV1);
+                using (projectService as IDisposable)
+                {
+                    var packagesResult = await projectService.GetInstalledPackagesAsync(projectGuid, CancellationToken.None);
+                    if (packagesResult.Status != InstalledPackageResultStatus.Successful)
+                    {
+                        throw new Exception("Unexpected result from GetInstalledPackagesAsync: " + packagesResult.Status);
+                    }
+                    return packagesResult.Packages;
+                }
+            });
         }
     }
 }

@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using SpecFlow.VisualStudio.Common;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Monitoring;
 using EnvDTE;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Utilities;
-using NuGet.VisualStudio;
+using NuGet.VisualStudio.Contracts;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
 {
     public class VsProjectScope : IProjectScope
     {
         private readonly Project _project;
-        private readonly IVsPackageInstallerServices _vsPackageInstallerServices;
         public PropertyCollection Properties { get; } = new PropertyCollection();
         public string ProjectFolder { get; }
         public string OutputAssemblyPath => VsUtils.GetOutputAssemblyPath(_project);
@@ -26,10 +25,9 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         public string ProjectFullName { get; }
         public string DefaultNamespace => GetDefaultNamespace();
 
-        public VsProjectScope(string id, Project project, IIdeScope ideScope, IVsPackageInstallerServices vsPackageInstallerServices)
+        public VsProjectScope(string id, Project project, IIdeScope ideScope)
         {
             _project = project;
-            _vsPackageInstallerServices = vsPackageInstallerServices;
             IdeScope = ideScope;
             ProjectFolder = VsUtils.GetProjectFolder(project);
             ProjectName = project.Name;
@@ -57,13 +55,10 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
         private NuGetPackageReference[] GetPackageReferences()
         {
-            if (_vsPackageInstallerServices == null)
-                return new NuGetPackageReference[0];
-
             try
             {
-                return _vsPackageInstallerServices.GetInstalledPackages(_project)
-                    .Select(pmd => new NuGetPackageReference(pmd.Id, new NuGetVersion(pmd.VersionString), pmd.InstallPath))
+                return VsUtils.GetInstalledNuGetPackages((IdeScope as VsIdeScope).ServiceProvider, _project.FullName)
+                    .Select(pmd => new NuGetPackageReference(pmd.Id, new NuGetVersion(pmd.Version), pmd.InstallPath))
                     .ToArray();
             }
             catch (Exception e)

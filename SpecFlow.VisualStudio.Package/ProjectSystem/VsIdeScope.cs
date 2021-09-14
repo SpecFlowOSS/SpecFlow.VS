@@ -9,14 +9,11 @@ using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
-using SpecFlow.VisualStudio.UI;
 using SpecFlow.VisualStudio.VsEvents;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Events;
 using Microsoft.VisualStudio.Text;
-using NuGet.VisualStudio;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
 {
@@ -25,8 +22,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
     {
         public IServiceProvider ServiceProvider { get; }
         public DTE Dte { get; }
-
-        private readonly IVsPackageInstallerServices _vsPackageInstallerServices;
+        
         private readonly IPersistentSpanFactory _persistentSpanFactory;
 
         private readonly IVsSolutionEventListener _solutionEventListener;
@@ -68,7 +64,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         }
 
         [ImportingConstructor]
-        public VsIdeScope([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IVsPackageInstallerServices vsPackageInstallerServices, IVsSolutionEventListener solutionEventListener, IMonitoringService monitoringService, IDeveroomWindowManager windowManager, IFileSystem fileSystem)
+        public VsIdeScope([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IVsSolutionEventListener solutionEventListener, IMonitoringService monitoringService, IDeveroomWindowManager windowManager, IFileSystem fileSystem)
         {
             ServiceProvider = serviceProvider;
             MonitoringService = monitoringService;
@@ -81,8 +77,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             CompositeLogger.Add(new OutputWindowPaneLogger(DeveroomOutputPaneServices));
             Logger.LogVerbose("Creating IDE Scope");
             Actions = new VsIdeActions(this);
-
-            _vsPackageInstallerServices = vsPackageInstallerServices;
+            
             _persistentSpanFactory = VsUtils.ResolveMefDependency<IPersistentSpanFactory>(serviceProvider);
 
             _solutionEventListener = solutionEventListener;
@@ -223,7 +218,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         {
             OnActivityStarted();
             Logger.LogInfo($"Initializing project: {project.Name}");
-            var projectScope = new VsProjectScope(id, project, this, _vsPackageInstallerServices);
+            var projectScope = new VsProjectScope(id, project, this);
             projectScope.InitializeServices();
             return projectScope;
         }
