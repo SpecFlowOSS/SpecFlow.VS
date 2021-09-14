@@ -57,7 +57,7 @@
           If you do not want an image next to your command, remove the Icon node /> -->
       <Button guid="guidDeveroomPackageCmdSet" id="DefineStepsCommandId" priority="0x0100" type="Button">
         <Parent guid="guidDeveroomPackageCmdSet" id="EditorContextMenuGroup" />
-        <Icon guid="guidImages" id="bmpDeveroom" />
+        <Icon guid="guidImages" id="bmpSpecFlow" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
@@ -70,7 +70,7 @@
       </Button>
       <Button guid="guidDeveroomPackageCmdSet" id="FindStepDefinitionUsagesCommandId" priority="0x0101" type="Button">
         <Parent guid="guidDeveroomPackageCmdSet" id="EditorContextMenuGroup" />
-        <Icon guid="guidImages" id="bmpDeveroom" />
+        <Icon guid="guidImages" id="bmpSpecFlow" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
@@ -83,7 +83,7 @@
       </Button>
       <Button guid="guidDeveroomPackageCmdSet" id="RegenerateAllFeatureFileCodeBehindCommandId" priority="0x0101" type="Button">
         <Parent guid="guidDeveroomPackageCmdSet" id="ProjectContextMenuGroup" />
-        <Icon guid="guidImages" id="bmpDeveroom" />
+        <Icon guid="guidImages" id="bmpSpecFlow" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
@@ -103,7 +103,7 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpDeveroom, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
+      <Bitmap guid="guidImages" href="Resources\CommandIcons.png" usedList="bmpSpecFlow, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
     </Bitmaps>
   </Commands>
 
@@ -127,7 +127,7 @@
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{ca66370a-5382-4dd1-bb96-f4e09d54aa29}" >
-      <IDSymbol name="bmpDeveroom" value="1" />
+      <IDSymbol name="bmpSpecFlow" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
       <IDSymbol name="bmpPicX" value="4" />
