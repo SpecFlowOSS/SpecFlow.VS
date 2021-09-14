@@ -19,8 +19,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             MethodDeclarationSyntax method = GetMethod(viewModel.SelectedStepDefinitionBinding, textBufferOfStepDefinitionClass);
 
-            ImmutableSortedSet<SyntaxToken> expressionsToReplace = ExpressionsToReplace(viewModel, method);
-            if (expressionsToReplace.IsEmpty) return false;
+            var expressionsToReplace = ExpressionsToReplace(viewModel, method);
+            if (expressionsToReplace.Length == 0) return false;
 
             EditTextBuffer(textBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, viewModel.StepText);
 
@@ -46,14 +46,14 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return method;
         }
 
-        private static ImmutableSortedSet<SyntaxToken> ExpressionsToReplace(RenameStepViewModel viewModel, MethodDeclarationSyntax method)
+        private static SyntaxToken[] ExpressionsToReplace(RenameStepViewModel viewModel, MethodDeclarationSyntax method)
         {
             var stepDefinitionAttributeTextTokens = method
                 .AttributeLists
                 .Select(ArgumentTokens)
                 .Where(tok => !tok.IsMissing && MatchesWithOriginalText(tok))
                 .OrderByDescending(tok => tok.SpanStart)
-                .ToImmutableSortedSet();
+                .ToArray();
 
             return stepDefinitionAttributeTextTokens;
 
