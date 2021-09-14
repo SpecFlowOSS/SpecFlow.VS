@@ -202,7 +202,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             var stepDefinitions = ArrangeOneStepDefinition(emptyExpression);
 
-            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: There was an error during step definition class rename. Steps.cs not modified.");
+            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: There was an error during step definition class rename.");
         }
 
         [Theory]
@@ -220,7 +220,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinitions = ArrangeOneStepDefinition("ConstantValue");
             stepDefinitions[0].Regex = "^I press add$";
 
-            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: There was an error during step definition class rename. Steps.cs not modified.");
+            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: There was an error during step definition class rename.");
         }
 
         private void StepDefinitionMustHaveValidExpression(TestStepDefinition[] stepDefinitions, string errorMessage)

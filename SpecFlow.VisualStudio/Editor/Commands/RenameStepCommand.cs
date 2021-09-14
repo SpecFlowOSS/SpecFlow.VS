@@ -92,7 +92,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             _renameStepFeatureFileAction.PerformRenameStep(viewModel, textBuffer);
             if (!_renameStepStepDefinitionClassAction.PerformRenameStep(viewModel, textBuffer))
             {
-                IdeScope.Actions.ShowProblem($"There was an error during step definition class rename. {viewModel.SelectedStepDefinitionBinding.Implementation.SourceLocation.SourceFile} not modified.");
+                IdeScope.Actions.ShowProblem("There was an error during step definition class rename.");
             }
         }
 
