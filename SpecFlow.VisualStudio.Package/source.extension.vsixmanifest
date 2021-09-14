@@ -9,7 +9,7 @@
         <GettingStartedGuide>http://go.specflow.org/getting-started</GettingStartedGuide>
         <ReleaseNotes>Changelog.txt</ReleaseNotes>
         <Icon>Package\Resources\SpecFlowIcon.ico</Icon>
-        <Tags>SpecFlow, BDD, Gherkin, Feature File</Tags>
+        <Tags>SpecFlow, BDD, Gherkin, Feature File, Formulation</Tags>
     </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
