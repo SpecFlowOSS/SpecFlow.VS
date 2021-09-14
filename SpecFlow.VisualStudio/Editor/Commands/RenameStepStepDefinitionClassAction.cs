@@ -1,5 +1,6 @@
 ﻿#nullable enable
-using System.Collections.Immutable;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.CodeAnalysis;
@@ -17,7 +18,9 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public override bool PerformRenameStep(RenameStepViewModel viewModel,
             ITextBuffer textBufferOfStepDefinitionClass)
         {
-            MethodDeclarationSyntax method = GetMethod(viewModel.SelectedStepDefinitionBinding, textBufferOfStepDefinitionClass);
+            MethodDeclarationSyntax? method = GetMethod(viewModel.SelectedStepDefinitionBinding, textBufferOfStepDefinitionClass);
+            if (method == null)
+                return false;
 
             var expressionsToReplace = ExpressionsToReplace(viewModel, method);
             if (expressionsToReplace.Length == 0) return false;
@@ -29,12 +32,14 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return true;
         }
 
-        private static MethodDeclarationSyntax GetMethod(ProjectStepDefinitionBinding projectStepDefinitionBinding,
+        private static MethodDeclarationSyntax? GetMethod(ProjectStepDefinitionBinding projectStepDefinitionBinding, 
             ITextBuffer textBuffer)
         {
             Document roslynDocument = textBuffer.GetRelatedDocuments().Single();
             
             var rootNode = roslynDocument.GetSyntaxRootAsync().Result;
+            if (rootNode == null)
+                return null;
             var methodLine =
                 textBuffer.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation
                     .SourceLocation.SourceFileLine - 1);
@@ -48,23 +53,40 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private static SyntaxToken[] ExpressionsToReplace(RenameStepViewModel viewModel, MethodDeclarationSyntax method)
         {
-            var stepDefinitionAttributeTextTokens = method
-                .AttributeLists
-                .Select(ArgumentTokens)
-                .Where(tok => !tok.IsMissing && MatchesWithOriginalText(tok))
-                .OrderByDescending(tok => tok.SpanStart)
+            var attributesWithMatchingExpression = GetAttributesWithTokens(method)
+                .Where(awt => !awt.Item2.IsMissing && MatchesWithOriginalText(awt.Item2))
                 .ToArray();
+
+            if (attributesWithMatchingExpression.Length > 1)
+                attributesWithMatchingExpression =
+                    attributesWithMatchingExpression
+                        .Where(awt => MatchesAttributeNameWithStepType(awt.Item1))
+                        .ToArray();
+
+            var stepDefinitionAttributeTextTokens =
+                attributesWithMatchingExpression
+                    .Select(awt => awt.Item2)
+                    .OrderByDescending(tok => tok.SpanStart)
+                    .ToArray();
 
             return stepDefinitionAttributeTextTokens;
 
             bool MatchesWithOriginalText(SyntaxToken tok) => tok.ValueText == viewModel.OriginalStepText;
+            bool MatchesAttributeNameWithStepType(AttributeSyntax a) => viewModel.SelectedStepDefinitionBinding.StepDefinitionType.ToString().Equals(a.Name.ToString());
         }
 
-        internal static SyntaxToken ArgumentTokens(AttributeListSyntax al)
+        internal static IEnumerable<Tuple<AttributeSyntax, SyntaxToken>> GetAttributesWithTokens(MethodDeclarationSyntax method)
         {
-            AttributeArgumentListSyntax? attributeArgumentListSyntax = al.Attributes.Single().ArgumentList;
+            return method.AttributeLists
+                .SelectMany(al => al.Attributes)
+                .Select(a => new Tuple<AttributeSyntax, SyntaxToken>(a, GetAttributeToken(a)));
+        }
+
+        private static SyntaxToken GetAttributeToken(AttributeSyntax attributeSyntax)
+        {
+            AttributeArgumentListSyntax? attributeArgumentListSyntax = attributeSyntax.ArgumentList;
             return attributeArgumentListSyntax == null || attributeArgumentListSyntax.Arguments.Count == 0
-                ? SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken) 
+                ? SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken)
                 : attributeArgumentListSyntax.Arguments.Single().Expression.GetFirstToken();
         }
 

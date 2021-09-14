@@ -15,7 +15,7 @@ namespace SpecFlow.VisualStudio.Discovery
         public Scope Scope { get; }
         public ProjectStepDefinitionImplementation Implementation { get; }
 
-        public string Expression => SpecifiedExpression ?? Regex?.ToString();
+        public string Expression => SpecifiedExpression ?? GetSpecifiedExpressionFromRegex();
 
         public ProjectStepDefinitionBinding(ScenarioBlock stepDefinitionType, Regex regex, Scope scope, ProjectStepDefinitionImplementation implementation, string specifiedExpression = null, string error = null)
         {
@@ -25,6 +25,20 @@ namespace SpecFlow.VisualStudio.Discovery
             Implementation = implementation;
             SpecifiedExpression = specifiedExpression;
             Error = error;
+        }
+
+        private string GetSpecifiedExpressionFromRegex()
+        {
+            var result = Regex?.ToString();
+            if (result == null)
+                return null;
+
+            // remove only ONE ^/$ from around the regex
+            if (result.StartsWith("^"))
+                result = result.Substring(1);
+            if (result.EndsWith("$"))
+                result = result.Substring(0, result.Length - 1);
+            return result;
         }
 
         public MatchResultItem Match(Step step, IGherkinDocumentContext context, string stepText = null)

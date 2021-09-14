@@ -9,6 +9,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         private SourceLocation _testSourceLocation;
         private SyntaxToken _testExpression;
 
+        public string AttributeName { get; set; }
+
         public SyntaxToken TestExpression
         {
             get => _testExpression;

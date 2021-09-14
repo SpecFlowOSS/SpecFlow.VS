@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.ComponentModel.Composition;
 using System.Linq;
 using Microsoft.VisualStudio.Text;
@@ -11,6 +10,7 @@ using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.UI.ViewModels;
 
@@ -20,6 +20,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
     [Export(typeof(IDeveroomFeatureEditorCommand))]
     public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand, IDeveroomFeatureEditorCommand
     {
+        const string ChooseStepDefinitionPopupHeader = "Choose step definition to rename";
+
         private RenameStepFeatureFileAction _renameStepFeatureFileAction;
         private RenameStepStepDefinitionClassAction _renameStepStepDefinitionClassAction;
 
@@ -66,26 +68,32 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             if (stepDefinitions.Count != 1)
             {
-                //TODO: 13793 Let the customer select the stepDefinition when there are more than one
-                IdeScope.Actions.ShowProblem("TODO: multiple projects/stepdefs not supported");
+                Logger.LogVerbose($"Choose step definitions from: {string.Join(", ", stepDefinitions.Select(sd => sd.Item2.ToString()))}");
+                IdeScope.Actions.ShowSyncContextMenu(ChooseStepDefinitionPopupHeader, stepDefinitions.Select(sd =>
+                    new ContextMenuItem(sd.Item2.ToString(), _ => { PerformRenameStepForStepDefinition(sd, textBuffer); }, "StepDefinitionsDefined")
+                ).ToArray());
                 return true;
             }
 
-            var selectedStepDefinition = stepDefinitions[0];
+            PerformRenameStepForStepDefinition(stepDefinitions[0], textBuffer);
+            return true;
+        }
+
+        private void PerformRenameStepForStepDefinition(Tuple<IProjectScope, ProjectStepDefinitionBinding> selectedStepDefinition, ITextBuffer textBuffer)
+        {
             var stepDefinitionBinding = selectedStepDefinition.Item2;
-            if (!ExpressionIsValidAndSupported(stepDefinitionBinding)) return true;
+            if (!ExpressionIsValidAndSupported(stepDefinitionBinding)) return;
 
             RenameStepViewModel viewModel = PrepareViewModel(selectedStepDefinition.Item1, stepDefinitionBinding);
             var result = IdeScope.WindowManager.ShowDialog(viewModel);
             if (result != true)
-                return true;
+                return;
 
             _renameStepFeatureFileAction.PerformRenameStep(viewModel, textBuffer);
             if (!_renameStepStepDefinitionClassAction.PerformRenameStep(viewModel, textBuffer))
             {
                 IdeScope.Actions.ShowProblem($"There was an error during step definition class rename. {viewModel.SelectedStepDefinitionBinding.Implementation.SourceLocation.SourceFile} not modified.");
             }
-            return true;
         }
 
         private bool ValidateProjectsWithFeatureFiles(out IProjectScope[] specFlowTestProjects)

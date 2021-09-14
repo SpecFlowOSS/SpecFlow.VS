@@ -64,7 +64,7 @@ namespace MyProject
 
         private static void Append(StringBuilder stepDefinitionText, TestStepDefinition stepDefinition)
         {
-            stepDefinitionText.Append(' ', 8).Append('[').Append(stepDefinition.Type);
+            stepDefinitionText.Append(' ', 8).Append('[').Append(stepDefinition.AttributeName);
             if (!stepDefinition.TestExpression.IsMissing)
                 stepDefinitionText.Append("(").Append(stepDefinition.TestExpression.Text).Append(")");
             stepDefinitionText.AppendLine("]");

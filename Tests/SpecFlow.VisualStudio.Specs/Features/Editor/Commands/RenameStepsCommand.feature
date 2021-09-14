@@ -82,9 +82,9 @@ Scenario: Multiple step definitions declared for the method
 	And the initial binding discovery is performed
 	When I invoke the "Rename Step" command
 	Then a jump list "Choose step definition to rename" is opened with the following items
-		#TODO: assert for type
-		| step definition |
-		| I press add     |
-		| I press add     |
-		| I invoke add    |
+		| step type | step definition |
+		| Given     | I press add     |
+		| When      | I press add     |
+		| When      | I invoke add    |
+	And invoking the first item from the jump list renames the "I press add" "Given" step definition
 

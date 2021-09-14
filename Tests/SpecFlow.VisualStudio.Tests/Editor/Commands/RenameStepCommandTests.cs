@@ -82,7 +82,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             return stepDefinitions;
         }
 
-        private static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord = "When")
+        private static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord = "When", string attributeName = null)
         {
             var token =  textExpression==null
                     ? SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken)
@@ -91,7 +91,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             {
                 Method = keyWord + "IPressAdd",
                 Type = keyWord,
-                TestExpression = token
+                TestExpression = token,
+                AttributeName = attributeName ?? keyWord
             };
             return testStepDefinition;
         }
@@ -259,6 +260,20 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             var testText = Dump(textView, "Step definition class after rename");
             testText.Lines[6].Should().Be(expectedLine);
+        }
+
+        [Fact]
+        public void Step_definition_is_declared_with_a_derived_attribute()
+        {
+            var stepDefinition = ArrangeStepDefinition(@"""I press add""", attributeName: "WhenDerived");
+            var featureFiles = ArrangeOneFeatureFile(string.Empty);
+            ArrangePopup(@"I choose add");
+            var (textView, command) = ArrangeSut(new[] { stepDefinition}, featureFiles);
+            
+            command.PreExec(textView, command.Targets.First());
+
+            var testText = Dump(textView, "Step definition class after rename");
+            testText.Lines[6].Should().Be(@"        [WhenDerived(""I choose add"")]");
         }
     }
 }

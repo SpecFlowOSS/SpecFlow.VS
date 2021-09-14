@@ -191,23 +191,21 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             var methods = rootNode.DescendantNodes().OfType<MethodDeclarationSyntax>().ToArray();
             foreach (var method in methods)
             {
+                var classDeclarationSyntax = method.Ancestors().OfType<ClassDeclarationSyntax>().First();
                 Debug.Assert(method.Body != null);
                 var methodLineNumber = method.SyntaxTree.GetLineSpan(method.Body.Span).StartLinePosition.Line + 1;
 
-                var stepDefinitionAttributeTextTokens = method
-                    .AttributeLists
-                    .Select(RenameStepStepDefinitionClassAction.ArgumentTokens)
-                    .Where(tok => !tok.IsMissing)
-                    .ToArray();
+                var stepDefinitionAttributes = 
+                        RenameStepStepDefinitionClassAction.GetAttributesWithTokens(method)
+                        .Where(awt => !awt.Item2.IsMissing)
+                        .ToArray();
 
-                foreach (var stepDefinitionAttributeTextToken in stepDefinitionAttributeTextTokens)
+                foreach (var (attributeSyntax, stepDefinitionAttributeTextToken) in stepDefinitionAttributes)
                 {
-                    var attributeSyntax = (AttributeSyntax)stepDefinitionAttributeTextToken.Parent?.Parent?.Parent?.Parent;
-
                     var stepDefinition = new StepDefinition
                     {
                         Regex = "^" + stepDefinitionAttributeTextToken.ValueText + "$",
-                        Method = $"{nsDeclaration.Name}.{method.Ancestors().OfType<ClassDeclarationSyntax>().First().Identifier.Text}.{method.Identifier.Text}",
+                        Method = $"{nsDeclaration.Name}.{classDeclarationSyntax.Identifier.Text}.{method.Identifier.Text}",
                         ParamTypes = "",
                         Type = attributeSyntax?.Name.ToString(),
                         SourceLocation = $"{fileName}|{methodLineNumber}|1"
@@ -480,14 +478,25 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             ActionsMock.LastNavigateToSourceLocation.Should().Be(_stepDefinitionBinding.Implementation.SourceLocation);
         }
 
+        class StepDefinitionJumpListData
+        {
+            public string StepDefinition { get; set; }
+            public string StepType { get; set; }
+        }
+
         [Then(@"a jump list ""(.*)"" is opened with the following items")]
         public void ThenAJumpListIsOpenedWithTheFollowingItems(string expectedHeader, Table expectedJumpListItemsTable)
         {
-            var expectedStepDefinitions = expectedJumpListItemsTable.Rows.Select(r => r[0]).ToArray();
             ActionsMock.LastShowContextMenuHeader.Should().Be(expectedHeader);
             ActionsMock.LastShowContextMenuItems.Should().NotBeNull();
-            var actualStepDefs = ActionsMock.LastShowContextMenuItems.Select(i => Regex.Match(i.Label, @"\((?<stepdef>.*?)\)").Groups["stepdef"].Value).ToArray();
-            actualStepDefs.Should().Equal(expectedStepDefinitions);
+            var actualStepDefs = ActionsMock.LastShowContextMenuItems.Select(
+                i => 
+                    new StepDefinitionJumpListData
+                    {
+                        StepDefinition = Regex.Match(i.Label, @"\((?<stepdef>.*?)\)").Groups["stepdef"].Value,
+                        StepType = Regex.Match(i.Label, @"\[(?<stepdeftype>.*?)\(").Groups["stepdeftype"].Value
+                    }).ToArray();
+            expectedJumpListItemsTable.CompareToSet(actualStepDefs);
         }
 
         [Then(@"a jump list ""(.*)"" is opened with the following steps")]
@@ -628,6 +637,36 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                     viewModel.StepText = renamedStep;
                 });
             WhenIInvokeTheCommand(_commandToInvokeDeferred);
+        }
+
+        [Then("invoking the first item from the jump list renames the {string} {string} step definition")]
+        public void ThenInvokingTheFirstItemFromTheJumpListRenamesTheStepDefinition(string expression, string stepType)
+        {
+            _ideScope.StubWindowManager.RegisterWindowAction<RenameStepViewModel>(
+                viewModel =>
+                {
+                    viewModel.StepText = "renamed step";
+                });
+
+            InvokeFirstContextMenuItem();
+
+            //TODO: remove hack
+            ThenTheEditorShouldBeUpdatedTo(@"using System;
+using TechTalk.SpecFlow;
+
+namespace MyProject
+{
+[Binding]
+public class CalculatorSteps
+{
+	[Given(""renamed step"")]
+	[When(""I press add"")]
+	[When(""I invoke add"")]
+	public void WhenIPressAdd()
+	{ 
+	}
+}
+}");
         }
 
         [Then(@"the following step definition snippets should be copied to the clipboard")]
