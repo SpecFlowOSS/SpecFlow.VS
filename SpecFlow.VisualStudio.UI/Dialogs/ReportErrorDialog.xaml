@@ -8,7 +8,7 @@
       xmlns:controls="clr-namespace:SpecFlow.VisualStudio.UI.Controls"
       mc:Ignorable="d" d:DataContext="{Binding Source={x:Static vm:ReportErrorDialogViewModel.DesignData}}"
       DataContext="{Binding ViewModel, RelativeSource={RelativeSource Self}}"                  
-      Title="Error Reporting - Deveroom" Height="400" Width="600">
+      Title="Error Reporting - SpecFlow" Height="400" Width="600">
     <local:DialogWindow.Resources>
         <ResourceDictionary Source="..\DeveroomResources.xaml" />
     </local:DialogWindow.Resources>

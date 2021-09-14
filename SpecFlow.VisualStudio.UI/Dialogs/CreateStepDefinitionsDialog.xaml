@@ -7,7 +7,7 @@
         xmlns:vm="clr-namespace:SpecFlow.VisualStudio.UI.ViewModels;assembly=SpecFlow.VisualStudio"
         mc:Ignorable="d" d:DataContext="{Binding Source={x:Static vm:CreateStepDefinitionsDialogViewModel.DesignData}}"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Self}}"                  
-        Title="Define Steps - Deveroom" Height="450" Width="800">
+        Title="Define Steps - SpecFlow" Height="450" Width="800">
     <local:DialogWindow.Resources>
         <ResourceDictionary Source="..\DeveroomResources.xaml" />
     </local:DialogWindow.Resources>
