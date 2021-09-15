@@ -123,6 +123,7 @@ namespace SpecFlow.VisualStudio.UI
 
         protected override void OnSourceInitialized(EventArgs e)
         {
+            base.OnSourceInitialized(e);
             _hwndSource = (HwndSource)PresentationSource.FromVisual(this);
             if (_hwndSource != null)
             {

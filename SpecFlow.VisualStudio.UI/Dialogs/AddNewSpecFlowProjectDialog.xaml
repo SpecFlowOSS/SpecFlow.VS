@@ -18,6 +18,11 @@
         AllowDrop="True"
         TextOptions.TextFormattingMode="Display"
         HasDialogFrame="False" WindowStyle="None">
+    <WindowChrome.WindowChrome>
+        <WindowChrome 
+            CaptionHeight="0"
+            ResizeBorderThickness="5" />
+    </WindowChrome.WindowChrome>
     <local:DialogWindow.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

@@ -62,7 +62,7 @@
         </Style.Setters>
     </Style>
 
-    <SolidColorBrush x:Key="ThemedWindowBackgroundBrush" Color="Yellow"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedWindowBackgroundBrush" Color="#FFFBFBFB"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemedWindowButtonBrushKey" Color="#FFFBFBFB"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemedWindowPanelTextBrushKey" Color="Black"></SolidColorBrush>
     <SolidColorBrush x:Key="ThemedWindowButtonGlyphBrushKey" Color="Black"></SolidColorBrush>
