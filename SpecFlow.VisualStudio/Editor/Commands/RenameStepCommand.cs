@@ -19,6 +19,11 @@ using SpecFlow.VisualStudio.UI.ViewModels;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
+    public class RenameStepCommandContext
+    {
+
+    }
+
     [Export(typeof(IDeveroomCodeEditorCommand))]
     [Export(typeof(IDeveroomFeatureEditorCommand))]
     public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand, IDeveroomFeatureEditorCommand
@@ -44,6 +49,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public override bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs = default(IntPtr))
         {
             Logger.LogVerbose("Rename Step");
+
+            var ctx = new RenameStepCommandContext();
 
             var textBuffer = textView.TextBuffer;
             
