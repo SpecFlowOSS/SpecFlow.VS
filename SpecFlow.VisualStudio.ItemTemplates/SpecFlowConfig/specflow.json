@@ -1,5 +1,5 @@
 {
-  "$schema": "http://schemas.specsolutions.eu/specflow-config-latest.json"
+  "$schema": "https://specflow.org/specflow-config.json"
 
 
 }
