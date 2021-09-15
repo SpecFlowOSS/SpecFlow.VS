@@ -1,8 +1,12 @@
 ﻿using System.Linq;
+using System.Text;
 using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services;
+using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
 using SpecFlow.VisualStudio.ProjectSystem;
+using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 using SpecFlow.VisualStudio.UI.ViewModels;
 
@@ -17,7 +21,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope.FileSystem, ideScope.Logger, ideScope.MonitoringService);
             var featureFiles = viewModel.SelectedStepDefinitionProject.GetProjectFiles(".feature");
             var configuration = viewModel.SelectedStepDefinitionProject.GetDeveroomConfiguration();
-            var projectUsages = stepDefinitionUsageFinder.FindUsages(new[] { viewModel.SelectedStepDefinitionBinding }, featureFiles, configuration);
+            var projectUsages = stepDefinitionUsageFinder.FindUsages(new[] { viewModel.SelectedStepDefinitionBinding }, featureFiles, configuration).ToArray();
             foreach (var fileUsage in projectUsages.GroupBy(u => u.SourceLocation.SourceFile))
             {
                 var firstPosition = fileUsage.First().SourceLocation;
@@ -25,10 +29,43 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 var textBufferOfFeatureFile = ideScope.GetTextBuffer(firstPosition);
                 EditTextBuffer(textBufferOfFeatureFile, fileUsage,
                     usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
-                    viewModel.StepText);
+                    usage => CalculateReplacementText((textBufferOfFeatureFile, usage), viewModel.ParsedUpdatedExpression));
             }
 
             return true;
+        }
+
+        private string CalculateReplacementText((ITextBuffer textBufferOfFeatureFile, StepDefinitionUsage usage) from, AnalyzedStepDefinitionExpression updatedExpression)
+        {
+            //TODO: make a shortcut for simple expressions (no params), in that case we just need to return viewModel.StepText
+
+            var snapshotSpan = new SnapshotSpan(from.textBufferOfFeatureFile.CurrentSnapshot, CalculateReplaceSpan(from));
+            var matchedStepTag =
+                DeveroomEditorCommandBase.GetDeveroomTagsForSpan(from.textBufferOfFeatureFile, snapshotSpan)
+                    .FirstOrDefault(t => t.Type == DeveroomTagTypes.DefinedStep);
+
+            var matchResult = matchedStepTag?.Data as MatchResult;
+            var parameterMatch = matchResult?.Items
+                .FirstOrDefault(m => m.ParameterMatch != null)
+                ?.ParameterMatch;
+
+            if (parameterMatch == null || parameterMatch.StepTextParameters.Length != updatedExpression.ParameterParts.Count())
+            {
+                //TODO: show warning???
+                //TODO: change return type to something that can handle error result (and do not replace the feature file text in this case)
+                return "TODO: do not replace to this";
+            }
+
+            var resultText = new StringBuilder();
+            var text = from.usage.Step.Text;
+            for (int i = 0; i < parameterMatch.StepTextParameters.Length; i++)
+            {
+                resultText.Append(updatedExpression.Parts[i * 2].ExpressionText);
+                resultText.Append(text.Substring(parameterMatch.StepTextParameters[i].Index, parameterMatch.StepTextParameters[i].Length));
+            }
+            resultText.Append(updatedExpression.Parts.Last().ExpressionText);
+
+            return resultText.ToString();
         }
 
         protected void EnsureFeatureFileOpen(SourceLocation sourceLocation, IIdeScope ideScope)

@@ -763,9 +763,9 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                 return textView.TextBuffer.CurrentSnapshot.GetText();
             }
 
-            if (File.Exists(filePath))
+            if (_ideScope.FileSystem.File.Exists(filePath))
             {
-                return File.ReadAllText(filePath);
+                return _ideScope.FileSystem.File.ReadAllText(filePath);
             }
 
             var fileAdded = _projectScope.FilesAdded.TryGetValue(filePath, out var fileContent);

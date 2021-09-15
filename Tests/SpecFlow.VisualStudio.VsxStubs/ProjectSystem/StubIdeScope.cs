@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
+using System.Linq;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
@@ -54,6 +55,12 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         {
             if (filePath != null && !Path.IsPathRooted(filePath) && projectScope != null)
                 filePath = Path.Combine(projectScope.ProjectFolder, filePath);
+
+            if (projectScope == null && filePath != null)
+            {
+                projectScope = ProjectScopes.FirstOrDefault(p =>
+                    (p as InMemoryStubProjectScope)?.FilesAdded.Any(f => f.Key == filePath) ?? false);
+            }
 
             var textView = StubWpfTextView.CreateTextView(this, inputText, newLine, projectScope, contentType, filePath);
             if (filePath != null)

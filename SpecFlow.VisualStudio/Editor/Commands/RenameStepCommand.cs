@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Windows.Documents;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
+using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
@@ -85,9 +87,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             if (!ExpressionIsValidAndSupported(stepDefinitionBinding)) return;
 
             RenameStepViewModel viewModel = PrepareViewModel(selectedStepDefinition.Item1, stepDefinitionBinding);
+            //TODO: validate modified expression in the UI: the parameter expressions and order cannot be changed
             var result = IdeScope.WindowManager.ShowDialog(viewModel);
             if (result != true)
                 return;
+
+            viewModel.ParsedUpdatedExpression = viewModel.StepDefinitionExpressionAnalyzer.Parse(viewModel.StepText);
+            //TODO: validate, although the form should have validated it anyway...
 
             _renameStepFeatureFileAction.PerformRenameStep(viewModel, textBuffer);
             if (!_renameStepStepDefinitionClassAction.PerformRenameStep(viewModel, textBuffer))
@@ -147,7 +153,14 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             var expression = stepDefinitionBinding.Expression.TrimStart('^').TrimEnd('$');
 
-            var viewModel = new RenameStepViewModel(expression, selectedStepDefinitionProject, stepDefinitionBinding);
+            var analyzer = new RegexStepDefinitionExpressionAnalyzer();
+            var analyzedExpression = analyzer.Parse(stepDefinitionBinding.Expression);
+
+            //TODO: move this to ExpressionIsValidAndSupported
+            if (!analyzedExpression.ContainsOnlySimpleText)
+                throw new NotSupportedException("The non-parameter parts cannot contain expression operators");
+
+            var viewModel = new RenameStepViewModel(expression, selectedStepDefinitionProject, stepDefinitionBinding, analyzedExpression, analyzer);
 
             return viewModel;
         }

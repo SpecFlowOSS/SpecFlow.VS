@@ -121,6 +121,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
             TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(fileSnapshot, 0, fileSnapshot.Length)));
         }
 
+        //TODO: why forceUpToDate is not used???
         public IEnumerable<ITagSpan<DeveroomTag>> GetTags(NormalizedSnapshotSpanCollection spans, bool forceUpToDate)
         {
             _tagsCache.Invalidate();

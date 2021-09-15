@@ -18,12 +18,17 @@
         </Grid.RowDefinitions>
         <Border Grid.Row="0" Style="{StaticResource VsDialogUpperPart}">
             <Grid Margin="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" VerticalAlignment="Center">Step expression:</Label>
-                <TextBox Grid.Column="1" VerticalAlignment="Center" Text="{Binding StepText}"/>
+                <TextBox Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Text="{Binding StepText, UpdateSourceTrigger=PropertyChanged}"/>
+                <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Center" Foreground="Red" Content="{Binding ValidationError}" />
             </Grid>
         </Border>
         <Border Grid.Row="1" Style="{StaticResource VsDialogLowerPart}">
