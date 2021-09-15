@@ -25,7 +25,7 @@
                     <ColumnDefinition Width="69" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Image Grid.Column="0" Source="pack://application:,,,/SpecFlow.VisualStudio.UI;component/Resources/Deveroom-Icon-64.png" 
+                <Image Grid.Column="0" Source="pack://application:,,,/SpecFlow.VisualStudio.UI;component/Resources/specflow-icon.png" 
                        Width="64" VerticalAlignment="Top" Margin="5,5,0,5" />
                 <ItemsControl Grid.Column="1" ItemsSource="{Binding Pages}">
                     <ItemsControl.Resources>

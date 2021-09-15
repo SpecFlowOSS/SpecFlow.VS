@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\specflow-icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SpecFlow.VisualStudio\SpecFlow.VisualStudio.csproj" />
   </ItemGroup>
 
