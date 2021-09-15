@@ -13,6 +13,7 @@
 
   <PropertyGroup>
     <NoWarn>VSTHRD010;VSTHRD110;NU1603</NoWarn>
+	<LangVersion>latest</LangVersion>
   </PropertyGroup>
 
 </Project>

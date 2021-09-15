@@ -69,6 +69,16 @@ namespace SpecFlow.VisualStudio.UI
             this.DragMove();
         }
 
+        protected void MinimizeButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        protected void MaximizeButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+        }
+
         #region VsDialogWindow
 
         public static readonly DependencyProperty HasMaximizeButtonProperty = DependencyProperty.Register(nameof(HasMaximizeButton), typeof(bool), typeof(DialogWindow), new FrameworkPropertyMetadata(Boxes.BooleanFalse, OnWindowStyleChanged));

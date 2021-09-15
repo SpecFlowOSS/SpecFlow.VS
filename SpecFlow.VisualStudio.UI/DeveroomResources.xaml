@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:SpecFlow.VisualStudio.UI">
+                    xmlns:local="clr-namespace:SpecFlow.VisualStudio.UI"
+                    x:Class="SpecFlow.VisualStudio.UI.DeveroomResources">
     <Style x:Key="VsDialogButton" TargetType="{x:Type Button}">
         <Style.Setters>
             <Setter Property="Padding" Value="8,0,8,2" />
@@ -58,6 +59,43 @@
     <Style x:Key="VsDialogLowerPart" TargetType="{x:Type Border}">
         <Style.Setters>
             <Setter Property="Background" Value="#F5F5F5" />
+        </Style.Setters>
+    </Style>
+
+    <SolidColorBrush x:Key="ThemedWindowBackgroundBrush" Color="Yellow"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedWindowButtonBrushKey" Color="#FFFBFBFB"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedWindowPanelTextBrushKey" Color="Black"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedWindowButtonGlyphBrushKey" Color="Black"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedHeaderTextBrushKey" Color="Black"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedWindowButtonHoverBrushKey" Color="LightGray"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedWindowButtonHoverForegroundBrushKey" Color="Black"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedWindowButtonHoverBorderBrushKey" Color="Black"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedCloseWindowButtonHoverBrushKey" Color="LightCoral"></SolidColorBrush>
+    <SolidColorBrush x:Key="ThemedCloseWindowButtonHoverTextBrushKey" Color="White"></SolidColorBrush>
+    <Style x:Key="ThemedHeader" TargetType="{x:Type TextBlock}">
+        <Style.Setters>
+            <Setter Property="FontSize" Value="33.98" />
+            <Setter Property="Margin" Value="0,0,0,4" />
+        </Style.Setters>
+    </Style>
+    <Style x:Key="ThemedDialogLabel" TargetType="{x:Type Label}">
+        <Style.Setters>
+            <Setter Property="Foreground" Value="Black" />
+        </Style.Setters>
+    </Style>
+    <Style x:Key="ThemedDialogCheckBox" TargetType="{x:Type CheckBox}">
+        <Style.Setters>
+            <Setter Property="Foreground" Value="Black" />
+        </Style.Setters>
+    </Style>
+    <Style x:Key="ThemedDialogComboBox" TargetType="{x:Type ComboBox}">
+        <Style.Setters>
+            <Setter Property="Foreground" Value="Black" />
+        </Style.Setters>
+    </Style>
+    <Style x:Key="ThemedDialogButton" TargetType="{x:Type Button}" BasedOn="{StaticResource VsWizardButton}">
+        <Style.Setters>
+            <Setter Property="MinWidth" Value="95" />
         </Style.Setters>
     </Style>
 </ResourceDictionary>
