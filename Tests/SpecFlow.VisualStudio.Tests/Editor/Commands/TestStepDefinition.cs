@@ -6,8 +6,11 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
     public class TestStepDefinition : StepDefinition
     {
+        public static TestStepDefinition Void = new TestStepDefinition{IsVoid = true};
         private SourceLocation _testSourceLocation;
         private SyntaxToken _testExpression;
+
+        public bool IsVoid {  get; private set; }
 
         public string AttributeName { get; set; }
 
@@ -33,5 +36,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
                     $"{_testSourceLocation.SourceFile}|{_testSourceLocation.SourceFileLine}|{_testSourceLocation.SourceFileColumn}";
             }
         }
+
+        public string PopupLabel => $"[{Type}({TestExpression.ValueText})]: {Method}";
     }
 }

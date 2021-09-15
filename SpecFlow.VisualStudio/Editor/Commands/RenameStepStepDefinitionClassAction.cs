@@ -15,8 +15,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal class RenameStepStepDefinitionClassAction : RenameStepAction
     {
-        public override bool PerformRenameStep(RenameStepViewModel viewModel,
-            ITextBuffer textBufferOfStepDefinitionClass)
+        public override bool PerformRenameStep(RenameStepViewModel viewModel, ITextBuffer textBufferOfStepDefinitionClass)
         {
             MethodDeclarationSyntax? method = GetMethod(viewModel.SelectedStepDefinitionBinding, textBufferOfStepDefinitionClass);
             if (method == null)

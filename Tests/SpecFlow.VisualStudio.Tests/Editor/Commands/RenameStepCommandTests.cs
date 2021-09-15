@@ -57,21 +57,19 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             return msg.Item2 == "ShowProblem: User Notification: Unable to find step definition usages: could not find any SpecFlow project with feature files.";
         }  
         
-        private static TestFeatureFile[] ArrangeOneFeatureFile(string featureFileContent)
+        private static TestFeatureFile ArrangeOneFeatureFile(string featureFileContent)
         {
-            var featureFiles = new[]
-            {
-                new TestFeatureFile("calculator.feature", featureFileContent)
-            };
-            return featureFiles;
+            return new TestFeatureFile("calculator.feature", featureFileContent);
         }
 
-        private static TestStepDefinition[] ArrangeOneStepDefinition(string textExpression)
+
+        private static TestStepDefinition[] ArrangeMultipleStepDefinitions()
         {
-            var testStepDefinition = ArrangeStepDefinition(textExpression);
             var stepDefinitions = new[]
             {
-                testStepDefinition
+                ArrangeStepDefinition(@"""I press add""", "When"),
+                ArrangeStepDefinition(@"""I press add""", "Given"),
+                ArrangeStepDefinition(@"""I select add""", "When")
             };
             return stepDefinitions;
         }
@@ -95,6 +93,20 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             (_projectScope.IdeScope.WindowManager as StubWindowManager)
                 .RegisterWindowAction<RenameStepViewModel>(model => model.StepText = modelStepText);
+        }
+
+        private (StubWpfTextView textView, RenameStepCommand command) ArrangeSut(
+            TestStepDefinition stepDefinition, TestFeatureFile featureFile)
+        {
+            var stepDefinitions = stepDefinition.IsVoid
+                ? Array.Empty<TestStepDefinition>() 
+                : new[] {stepDefinition};
+
+            var featureFiles = featureFile.IsVoid
+                ? Array.Empty<TestFeatureFile>()
+                : new[] { featureFile };
+
+            return ArrangeSut(stepDefinitions, featureFiles);
         }
 
         private (StubWpfTextView textView, RenameStepCommand command) ArrangeSut(
@@ -182,17 +194,17 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Fact]
         public void There_must_be_at_lest_one_step_definition()
         {
-            StepDefinitionMustHaveValidExpression(Array.Empty<TestStepDefinition>(), "ShowProblem: User Notification: No step definition found that is related to this position");
+            StepDefinitionMustHaveValidExpression(TestStepDefinition.Void, "ShowProblem: User Notification: No step definition found that is related to this position");
         }
 
         [Fact]
         public void StepDefinition_regex_must_be_valid()
         {
-            var stepDefinitions = ArrangeOneStepDefinition(string.Empty);
-            stepDefinitions[0].TestExpression = SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken);
-            stepDefinitions[0].Regex = default;
+            var stepDefinition = ArrangeStepDefinition(string.Empty);
+            stepDefinition.TestExpression = SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken);
+            stepDefinition.Regex = default;
 
-            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: Unable to rename step, the step definition expression cannot be detected.");
+            StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: Unable to rename step, the step definition expression cannot be detected.");
         }
 
         [Theory]
@@ -200,33 +212,33 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData("")]
         public void StepDefinition_expression_cannot_be_modified(string emptyExpression)
         {
-            var stepDefinitions = ArrangeOneStepDefinition(emptyExpression);
+            var stepDefinition = ArrangeStepDefinition(emptyExpression);
 
-            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: There was an error during step definition class rename.");
+            StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: There was an error during step definition class rename.");
         }
 
         [Theory]
         [InlineData("\"\"")]
         public void StepDefinition_expression_must_be_valid(string invalidExpression)
         {
-            var stepDefinitions = ArrangeOneStepDefinition(invalidExpression);
+            var stepDefinition = ArrangeStepDefinition(invalidExpression);
 
-            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: Step definition expression is invalid");
+            StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: Step definition expression is invalid");
         }
 
         [Fact]
         public void Constant_is_not_supported_in_step_definition_expression()
         {
-            var stepDefinitions = ArrangeOneStepDefinition("ConstantValue");
-            stepDefinitions[0].Regex = "^I press add$";
+            var stepDefinition = ArrangeStepDefinition("ConstantValue");
+            stepDefinition.Regex = "^I press add$";
 
-            StepDefinitionMustHaveValidExpression(stepDefinitions, "ShowProblem: User Notification: There was an error during step definition class rename.");
+            StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: There was an error during step definition class rename.");
         }
 
-        private void StepDefinitionMustHaveValidExpression(TestStepDefinition[] stepDefinitions, string errorMessage)
+        private void StepDefinitionMustHaveValidExpression(TestStepDefinition stepDefinition, string errorMessage)
         {
-            var featureFiles = ArrangeOneFeatureFile(string.Empty);
-            var (textView, command) = ArrangeSut(stepDefinitions, featureFiles);
+            var featureFile = ArrangeOneFeatureFile(string.Empty);
+            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
 
             command.PreExec(textView, command.Targets.First());
 
@@ -245,10 +257,10 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData(7, @"@""I """"press"""" add""", @"I ""choose"" add", @"        [When(@""I ""choose"" add"")]")]
         public void Step_definition_class_has_one_matching_expression(int _, string testExpression, string modelStepText, string expectedLine)
         {
-            var stepDefinitions = ArrangeOneStepDefinition(testExpression);
-            var featureFiles = ArrangeOneFeatureFile(string.Empty);
+            var stepDefinitions = ArrangeStepDefinition(testExpression);
+            var featureFile = ArrangeOneFeatureFile(string.Empty);
             ArrangePopup(modelStepText);
-            var (textView, command) = ArrangeSut(stepDefinitions, featureFiles);
+            var (textView, command) = ArrangeSut(stepDefinitions, featureFile);
             
             command.PreExec(textView, command.Targets.First());
 
@@ -260,14 +272,60 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         public void Step_definition_is_declared_with_a_derived_attribute()
         {
             var stepDefinition = ArrangeStepDefinition(@"""I press add""", attributeName: "WhenDerived");
-            var featureFiles = ArrangeOneFeatureFile(string.Empty);
+            var featureFile = ArrangeOneFeatureFile(string.Empty);
             ArrangePopup(@"I choose add");
-            var (textView, command) = ArrangeSut(new[] { stepDefinition}, featureFiles);
+            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
             
             command.PreExec(textView, command.Targets.First());
 
             var testText = Dump(textView, "Step definition class after rename");
             testText.Lines[6].Should().Be(@"        [WhenDerived(""I choose add"")]");
+        }
+        
+        [Fact]
+        public void Popup_appears_when_there_are_multiple_step_definitions()
+        {
+            var stepDefinitions = ArrangeMultipleStepDefinitions();
+            var featureFiles = new[] {ArrangeOneFeatureFile(string.Empty)};
+            var (textView, command) = ArrangeSut( stepDefinitions, featureFiles);
+
+            command.PreExec(textView, command.Targets.First());
+
+            var ideActions = _projectScope.IdeScope.Actions as StubIdeActions;
+            ideActions.LastShowContextMenuHeader.Should().Be("Choose step definition to rename");
+            ideActions.LastShowContextMenuItems.Select(item => item.Label)
+                .Should().BeEquivalentTo(stepDefinitions.Select(sd=>sd.PopupLabel));
+        }
+
+        [Theory]
+        [InlineData(0, new [] {
+            @"        [When(""I choose add"")]",
+            @"        [Given(""I press add"")]",
+            @"        [When(""I select add"")]" })]
+        [InlineData(1, new [] {
+            @"        [When(""I press add"")]",
+            @"        [Given(""I choose add"")]",
+            @"        [When(""I select add"")]" })]
+        [InlineData(2, new [] {
+            @"        [When(""I press add"")]",
+            @"        [Given(""I press add"")]",
+            @"        [When(""I choose add"")]" })]
+        public void Selected_step_definition_is_renamed(int chosenOption, string[] expectedLines)
+        {
+            var stepDefinitions = ArrangeMultipleStepDefinitions();
+            var featureFiles = new[] { ArrangeOneFeatureFile(string.Empty) };
+            ArrangePopup(@"I choose add");
+            var (textView, command) = ArrangeSut(stepDefinitions, featureFiles);
+
+            command.PreExec(textView, command.Targets.First());
+            var ideActions = _projectScope.IdeScope.Actions as StubIdeActions;
+            var chosenItem = ideActions.LastShowContextMenuItems[chosenOption];
+            chosenItem.Command(chosenItem);
+
+            var testText = Dump(textView, "Step definition class after rename");
+            testText.Lines[6].Should().Be(expectedLines[0]);
+            testText.Lines[7].Should().Be(expectedLines[1]);
+            testText.Lines[8].Should().Be(expectedLines[2]);
         }
     }
 }

@@ -42,10 +42,11 @@ namespace MyProject
             var stepDefinitionText = new StringBuilder();
            
             List<string> lines = testText.Lines.Take(insertLineNumber).ToList();
+            CaretPositionLine += StepDefinitions.Length;
             foreach (var stepDefinition in StepDefinitions)
             {
                 MethodName = stepDefinition.Method;
-                stepDefinition.TestSourceLocation = new SourceLocation("Steps.cs", ++CaretPositionLine, CaretPositionColumn);
+                stepDefinition.TestSourceLocation = new SourceLocation("Steps.cs", CaretPositionLine, CaretPositionColumn);
                 Append(stepDefinitionText, stepDefinition);
             }
             AppendMethod(stepDefinitionText, MethodName);
