@@ -10,6 +10,7 @@ using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
+using SpecFlow.VisualStudio.Editor.Services;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
@@ -45,7 +46,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             Logger.LogVerbose("Rename Step");
 
             var textBuffer = textView.TextBuffer;
-            var fileName = GetEditorDocumentPath(textView);
+            
+            var fileName = GetEditorDocumentPath(textBuffer);
             var triggerPoint = textView.Caret.Position.BufferPosition;
 
             if (ValidateCallerProject(textBuffer, out var project)) return true;

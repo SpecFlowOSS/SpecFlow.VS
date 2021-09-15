@@ -77,9 +77,9 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
             //}
         }
 
-        protected string GetEditorDocumentPath(IWpfTextView textView)
+        protected string GetEditorDocumentPath(ITextBuffer textBuffer)
         {
-            if (!textView.TextBuffer.Properties.TryGetProperty(typeof(IVsTextBuffer), out IVsTextBuffer bufferAdapter))
+            if (!textBuffer.Properties.TryGetProperty(typeof(IVsTextBuffer), out IVsTextBuffer bufferAdapter))
                 return null;
 
             if (!(bufferAdapter is IPersistFileFormat persistFileFormat))

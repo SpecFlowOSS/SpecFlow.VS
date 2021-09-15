@@ -57,7 +57,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             Logger.LogVerbose("Find Step Definition Usages");
 
             var textBuffer = textView.TextBuffer;
-            var fileName = GetEditorDocumentPath(textView);
+            var fileName = GetEditorDocumentPath(textBuffer);
             var triggerPoint = textView.Caret.Position.BufferPosition;
 
             var project = IdeScope.GetProject(textBuffer);

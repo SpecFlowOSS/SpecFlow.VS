@@ -310,7 +310,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             @"        [When(""I press add"")]",
             @"        [Given(""I press add"")]",
             @"        [When(""I choose add"")]" })]
-        public void Selected_step_definition_is_renamed(int chosenOption, string[] expectedLines)
+        public void Selected_step_definition_is_renamed_when_there_are_multiple(int chosenOption, string[] expectedLines)
         {
             var stepDefinitions = ArrangeMultipleStepDefinitions();
             var featureFiles = new[] { ArrangeOneFeatureFile(string.Empty) };
