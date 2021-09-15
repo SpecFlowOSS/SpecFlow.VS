@@ -49,6 +49,15 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public override bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs = default(IntPtr))
         {
             Logger.LogVerbose("Rename Step");
+            var stepTag = GetDeveroomTagForCaret(textView, DeveroomTagTypes.StepBlock);
+            if (stepTag != null)
+            {
+                var goToStepDefinitionCommand = new GoToStepDefinitionCommand(IdeScope, AggregatorFactory, MonitoringService);
+                goToStepDefinitionCommand.PreExec(textView, commandKey, inArgs);
+                var tb = IdeScope.GetTextBuffer(new SourceLocation(String.Empty, 1, 1));
+  
+            }
+            
 
             var ctx = new RenameStepCommandContext();
 
