@@ -16,6 +16,7 @@ namespace SpecFlow.VisualStudio.Diagnostics
             LogFilePath = logFilePath ?? GetLogFile();
             Level = level;
             CheckLogFolder();
+            DeleteOldLogFiles();
         }
 
         public void Log(TraceLevel messageLevel, string message)
@@ -76,6 +77,35 @@ namespace SpecFlow.VisualStudio.Diagnostics
             }
         }
 
+        private void DeleteOldLogFiles()
+        {
+            if (LogFilePath != null)
+            {
+                try
+                {
+                    var logFolder = Path.GetDirectoryName(LogFilePath);
+                    if (!Directory.Exists(logFolder))
+                        return;
+
+                    var logFiles = Directory.GetFiles(logFolder, "specflow-vs-*.log");
+                    
+                    foreach (string logFile in logFiles)
+                    {
+                        lock (LockObject)
+                        {
+                            FileInfo fi = new FileInfo(logFile);
+                            if (fi.LastWriteTime < DateTime.Now.AddDays(-10))
+                                fi.Delete();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex, "Error deleting log files");
+                }
+            }
+        }
+
         internal static string GetLogFile()
         {
             return Path.Combine(Environment.GetFolderPath(
@@ -83,6 +113,6 @@ namespace SpecFlow.VisualStudio.Diagnostics
                 "SpecFlow",
                 $"specflow-vs-{DateTime.Now:yyyyMMdd}.log");
         }
-
+        
     }
 }
