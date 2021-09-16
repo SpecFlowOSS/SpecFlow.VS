@@ -16,7 +16,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
     {
         public override void PerformRenameStep(RenameStepCommandContext ctx)
         {
-            MethodDeclarationSyntax? method = GetMethod(ctx.StepDefinitionBinding, ctx.TextBufferOfStepDefinitionClass);
+            MethodDeclarationSyntax? method = GetMethod(ctx.StepDefinitionBinding, ctx.TextBufferOfStepDefinitionClass, ctx);
             if (method == null)
             {
                 ctx.AddProblem($"Method not found for {ctx.StepDefinitionBinding}");
@@ -35,14 +35,14 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
         }
 
-        private static MethodDeclarationSyntax? GetMethod(ProjectStepDefinitionBinding projectStepDefinitionBinding, 
-            ITextBuffer textBuffer)
+        private MethodDeclarationSyntax? GetMethod(ProjectStepDefinitionBinding projectStepDefinitionBinding,
+            ITextBuffer textBuffer, RenameStepCommandContext ctx)
         {
-            Document roslynDocument = textBuffer.GetRelatedDocuments().Single();
-            
-            var rootNode = roslynDocument.GetSyntaxRootAsync().Result;
+            var syntaxTree = ctx.IdeScope.GetSyntaxTree(textBuffer);
+            var rootNode = syntaxTree?.GetRoot();
             if (rootNode == null)
                 return null;
+
             var methodLine =
                 textBuffer.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation
                     .SourceLocation.SourceFileLine - 1);

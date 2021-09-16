@@ -11,9 +11,13 @@ using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using SpecFlow.VisualStudio.VsEvents;
 using EnvDTE;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Events;
 using Microsoft.VisualStudio.Text;
+using Document = Microsoft.CodeAnalysis.Document;
+using Project = EnvDTE.Project;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
 {
@@ -156,6 +160,14 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
             var wpfTextView = VsUtils.GetWpfTextViewFromFilePath(sourceLocation.SourceFile, ServiceProvider, true);
             return wpfTextView?.TextBuffer;
+        }
+
+        public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
+        {
+            Document roslynDocument = textBuffer.GetRelatedDocuments().FirstOrDefault();
+            if (roslynDocument != null && roslynDocument.TryGetSyntaxTree(out var syntaxTree))
+                return syntaxTree;
+            return null;
         }
 
         private void SolutionEventListenerOnLoaded(object sender, EventArgs e)

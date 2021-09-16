@@ -10,8 +10,10 @@ using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.UI;
 using SpecFlow.VisualStudio.UI.ViewModels;
 using EnvDTE;
+using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.Notifications;
+using Project = EnvDTE.Project;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
 {
@@ -201,6 +203,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         }
 
         public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        {
+            return null;
+        }
+
+        public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
         {
             return null;
         }

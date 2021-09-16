@@ -5,6 +5,8 @@ using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
@@ -73,6 +75,12 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             var lines = FileSystem.File.ReadAllLines(sourceLocation.SourceFile);
             var textView = CreateTextView(new TestText(lines), filePath: sourceLocation.SourceFile);
             return textView.TextBuffer;
+        }
+
+        public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
+        {
+            var fileContent = textBuffer.CurrentSnapshot.GetText();
+            return CSharpSyntaxTree.ParseText(fileContent);
         }
 
         public IProjectScope[] GetProjectsWithFeatureFiles()

@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Host;
-using Microsoft.CodeAnalysis.Text;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services;
 using SpecFlow.VisualStudio.ProjectSystem;
@@ -234,8 +231,6 @@ namespace SpecFlow.VisualStudio.VsxStubs
             if (filePath != null)
                 textBuffer.Properties.AddProperty(typeof(IVsTextBuffer), new FilePathProvider(filePath));
 
-            AddRoslynSupport(textBuffer, projectScope, contentType, filePath);
-
             var textView = new StubWpfTextView(textBuffer);
             if (contentType == "deveroom")
             {
@@ -247,44 +242,6 @@ namespace SpecFlow.VisualStudio.VsxStubs
             inputText.SetCaret(textView);
 
             return textView;
-        }
-
-        private static void AddRoslynSupport(ITextBuffer textBuffer, IProjectScope projectScope, string contentType, string filePath)
-        {
-            if (contentType != LanguageNames.CSharp)
-            {
-                return;
-            }
-
-            var adhocWorkspace = new AdhocWorkspace();
-            var project = AddProject(adhocWorkspace, projectScope, contentType);
-            var document = AddDocument(adhocWorkspace, project, filePath, textBuffer);
-            EnsureRoslynBindings(adhocWorkspace, document);
-        }
-
-        private static Project AddProject(AdhocWorkspace adhocWorkspace, IProjectScope projectScope, string contentType)
-        {
-            var _ = typeof(Microsoft.CodeAnalysis.CSharp.Formatting.CSharpFormattingOptions);
-            var project =
-                adhocWorkspace.AddProject(projectScope?.ProjectName ?? Guid.NewGuid().ToString(), contentType);
-            return project;
-        }
-
-        private static Document AddDocument(AdhocWorkspace adhocWorkspace, Project project, string filePath, ITextBuffer textBuffer)
-        {
-            var sourceTextContainer = textBuffer.AsTextContainer();
-            filePath = filePath ?? Guid.NewGuid() + ".cs";
-
-            var document = adhocWorkspace
-                .AddDocument(project.Id, filePath, sourceTextContainer.CurrentText)
-                .WithFilePath(filePath);
-            return document;
-        }
-
-        private static void EnsureRoslynBindings(AdhocWorkspace adhocWorkspace, Document document)
-        {
-            adhocWorkspace.OpenDocument(document.Id);
-            //TODO: Subscribe to textBuffer change event and modify Document's text
         }
 
         private readonly ITextBuffer _textBuffer;
