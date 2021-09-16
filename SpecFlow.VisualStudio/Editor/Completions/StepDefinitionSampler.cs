@@ -16,6 +16,7 @@ namespace SpecFlow.VisualStudio.Editor.Completions
 
             IStepDefinitionExpressionAnalyzer analyzer = new RegexStepDefinitionExpressionAnalyzer();
             var analyzedStepDefinitionExpression = analyzer.Parse(regexTextCore);
+
             if (analyzedStepDefinitionExpression.Parts.Length == 1)
             {
                 return analyzedStepDefinitionExpression.Parts[0].ExpressionText;

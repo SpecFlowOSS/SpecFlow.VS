@@ -13,7 +13,7 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
 
         public ImmutableArray<AnalyzedStepDefinitionExpressionPart> Parts { get; }
 
-        public bool ContainsOnlySimpleText => Parts.OfType<AnalyzedStepDefinitionExpressionTextPart>().All(p => p.IsSimpleText);
+        public bool ContainsOnlySimpleText => Parts.OfType<AnalyzedStepDefinitionExpressionSimpleTextPart>().Count() == Parts.Length/2 + 1;
         public IEnumerable<AnalyzedStepDefinitionExpressionParameterPart> ParameterParts => Parts.OfType<AnalyzedStepDefinitionExpressionParameterPart>();
     }
 }

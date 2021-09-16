@@ -57,9 +57,7 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
                 }
                 else
                 {
-                    return ImmutableArray.Create<AnalyzedStepDefinitionExpressionPart>(
-                        CreateTextPart(regexString)
-                    );
+                    return ImmutableArray.Create(CreateTextPart(regexString));
                 }
             }
 
@@ -68,10 +66,11 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
             return parts.ToImmutableArray();
         }
 
-        private AnalyzedStepDefinitionExpressionTextPart CreateTextPart(string text)
+        private AnalyzedStepDefinitionExpressionPart CreateTextPart(string text)
         {
-            var isSimpleText = IsSimpleText(text);
-            return new AnalyzedStepDefinitionExpressionTextPart(text, isSimpleText);
+            return IsSimpleText(text)
+                ? new AnalyzedStepDefinitionExpressionSimpleTextPart(text)
+                : new AnalyzedStepDefinitionExpressionComplexTextPart(text);
         }
 
         private static bool IsSimpleText(string text)

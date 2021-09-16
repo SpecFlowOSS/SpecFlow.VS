@@ -204,6 +204,17 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Theory]
         [InlineData(null)]
         [InlineData("")]
+        [InlineData(@"""foo? (\d+) bar""")]
+        [InlineData(@"""foo (?:\d+) bar""")]
+        [InlineData(@"""foo [a-z] bar""")]
+        [InlineData(@"""foo. (\d+) bar""")]
+        [InlineData(@"""foo* (\d+) bar""")]
+        [InlineData(@"""foo+ (\d+) bar""")]
+        [InlineData(@"""some \\(context\\)""")]
+        [InlineData(@"""some \{context\}""")]
+        [InlineData(@"""some \[context\]""")]
+        [InlineData(@"""some \[context]""")]
+        [InlineData(@"""chars \\\\\\*\\+\\?\\|\\{\\}\\[\\]\\(\\)\\^\\$\\#""")]
         public void StepDefinition_expression_cannot_be_modified(string emptyExpression)
         {
             var stepDefinition = ArrangeStepDefinition(emptyExpression);
