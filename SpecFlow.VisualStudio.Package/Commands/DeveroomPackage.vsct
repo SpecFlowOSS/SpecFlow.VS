@@ -83,7 +83,7 @@
       </Button>
       <Button guid="guidDeveroomPackageCmdSet" id="RenameStepCommandId" priority="0x0101" type="Button">
 	      <Parent guid="guidDeveroomPackageCmdSet" id="EditorContextMenuGroup" />
-	      <Icon guid="guidImages" id="bmpDeveroom" />
+	      <Icon guid="guidImages" id="bmpSpecFlow" />
 	      <CommandFlag>DynamicVisibility</CommandFlag>
 	      <CommandFlag>DefaultInvisible</CommandFlag>
 	      <Strings>
