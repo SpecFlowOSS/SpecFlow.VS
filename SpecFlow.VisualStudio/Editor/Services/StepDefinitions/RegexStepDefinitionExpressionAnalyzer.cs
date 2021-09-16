@@ -13,31 +13,19 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
             if (!SplitRegexByGroups(expression, out var regexParts))
                 return new AnalyzedStepDefinitionExpression(
                     ImmutableArray.Create<AnalyzedStepDefinitionExpressionPart>(
-                        new AnalyzedStepDefinitionExpressionTextPart(expression, true)
+                        CreateTextPart(expression)
                         )
                     );
 
-            if (regexParts.Length == 1)
-            {
-                return new AnalyzedStepDefinitionExpression(
-                    ImmutableArray.Create<AnalyzedStepDefinitionExpressionPart>(
-                        new AnalyzedStepDefinitionExpressionTextPart(regexParts[0], true)
-                    )
-                );
-            }
-
-
-            var matches = Regex.Matches(expression, @"\([^\)]+\)"); //TODO: make proper split, see StepDefinitionSampler
             var parts = new List<AnalyzedStepDefinitionExpressionPart>();
-            int processedUntil = 0;
-            foreach (Match match in matches)
+            int i = 0;
+            for (; i < regexParts.Length-1; i++)
             {
-                parts.Add(CreateTextPart(expression.Substring(processedUntil, match.Index - processedUntil)));
-                parts.Add(new AnalyzedStepDefinitionExpressionParameterPart(match.Value));
-                processedUntil = match.Index + match.Length;
+                var regexPart = regexParts[i];
+                parts.Add(CreateTextPart(regexPart));
+                parts.Add(new AnalyzedStepDefinitionExpressionParameterPart("??"));
             }
-            parts.Add(CreateTextPart(expression.Substring(processedUntil)));
-
+            parts.Add(CreateTextPart(regexParts[i]));
             return new AnalyzedStepDefinitionExpression(parts.ToImmutableArray());
         }
 
