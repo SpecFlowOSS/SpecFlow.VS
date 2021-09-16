@@ -685,7 +685,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                 viewModel =>
                 {
                     viewModel.StepText = renamedExpression;
-                    viewModel.OriginalStepText.Should().Be(expression);
+                    viewModel.OriginalStepText.Should().Be($"[{stepType}({expression})]: MyProject.CalculatorSteps.WhenIPressAdd");
                 });
 
             InvokeFirstContextMenuItem();

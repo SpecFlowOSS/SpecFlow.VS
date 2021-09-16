@@ -28,7 +28,7 @@ namespace SpecFlow.VisualStudio.Editor.Completions
                 if (i < analyzedStepDefinitionExpression.Parts.Length - 1)
                 {
                     completionTextBuilder.Append("[");
-                    completionTextBuilder.Append(GetPlaceHolderText(stepDefinitionBinding, i));
+                    completionTextBuilder.Append(GetPlaceHolderText(stepDefinitionBinding, i/2));
                     completionTextBuilder.Append("]");
                 }
             }
