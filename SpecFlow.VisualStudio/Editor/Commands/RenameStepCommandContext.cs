@@ -20,6 +20,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public IStepDefinitionExpressionAnalyzer Analyzer { get; set; }
         public AnalyzedStepDefinitionExpression AnalyzedExpression { get; set; }
 
+        public IProjectScope[] SpecFlowTestProjectsWithFeatureFiles { get; set; }
+
         public void AddProblem(string description)
         {
             AddIssue(Issue.IssueKind.Problem, description);

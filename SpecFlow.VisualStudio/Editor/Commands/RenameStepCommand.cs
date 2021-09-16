@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Windows.Documents;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -19,29 +18,6 @@ using SpecFlow.VisualStudio.UI.ViewModels;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
-
-    public record Issue
-    {
-        public enum IssueKind
-        {
-            Problem
-        }
-
-        public Issue(IssueKind kind, string description)
-        {
-            Kind = kind;
-            Description = description;
-        }
-
-        public IssueKind Kind { get; }
-        public string Description { get; }
-
-        public override string ToString()
-        {
-            return $"{Kind,10} {Description}";
-        }
-    }
-
     [Export(typeof(IDeveroomCodeEditorCommand))]
     [Export(typeof(IDeveroomFeatureEditorCommand))]
     public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand, IDeveroomFeatureEditorCommand
@@ -79,52 +55,55 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }            
 
             ctx.TextBufferOfStepDefinitionClass = textView.TextBuffer;
-            
-            var fileName = GetEditorDocumentPath(ctx.TextBufferOfStepDefinitionClass);
             var triggerPoint = textView.Caret.Position.BufferPosition;
 
             ValidateCallerProject(ctx);
             if (Erroneous(ctx)) return true;
 
-            if (ValidateProjectsWithFeatureFiles(out var specFlowTestProjects)) return true;
+            ValidateProjectsWithFeatureFiles(ctx);
+            if (Erroneous(ctx)) return true;
 
-            var stepDefinitions = new List<Tuple<IProjectScope, ProjectStepDefinitionBinding>>();
-            foreach (var specFlowTestProject in specFlowTestProjects)
+            var stepDefinitions = new List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)>();
+            foreach (IProjectScope specFlowTestProject in ctx.SpecFlowTestProjectsWithFeatureFiles)
             {
-                var projectStepDefinitions = GetStepDefinitions(ctx.ProjectOfStepDefinitionClass, fileName, triggerPoint);
+                ProjectStepDefinitionBinding[] projectStepDefinitions = GetStepDefinitions(ctx, triggerPoint);
                 foreach (var projectStepDefinitionBinding in projectStepDefinitions)
                 {
-                    stepDefinitions.Add(new Tuple<IProjectScope, ProjectStepDefinitionBinding>(specFlowTestProject, projectStepDefinitionBinding));
+                    stepDefinitions.Add((specFlowTestProject, projectStepDefinitionBinding));
                 }
             }
 
-            if (stepDefinitions.Count == 0)
+            switch (stepDefinitions.Count)
             {
-                IdeScope.Actions.ShowProblem("No step definition found that is related to this position");
-                return true;
+                case 0:
+                    IdeScope.Actions.ShowProblem("No step definition found that is related to this position");
+                    return true;
+                case 1:
+                {
+                    var selectedStepDefinition = stepDefinitions[0];
+                    PerformRenameStepForStepDefinition(selectedStepDefinition.specFlowTestProject,
+                        selectedStepDefinition.projectStepDefinitionBinding, ctx);
+                    return true;
+                }
+                default:
+                {
+                    Logger.LogVerbose($"Choose step definitions from: {string.Join(", ", stepDefinitions.Select(sd => sd.projectStepDefinitionBinding.ToString()))}");
+                    IdeScope.Actions.ShowSyncContextMenu(ChooseStepDefinitionPopupHeader, stepDefinitions.Select(sd =>
+                        new ContextMenuItem(sd.projectStepDefinitionBinding.ToString(),
+                            _ => { PerformRenameStepForStepDefinition(sd.specFlowTestProject, sd.projectStepDefinitionBinding, ctx); },
+                            "StepDefinitionsDefined")
+                    ).ToArray());
+                    return true;
+                }
             }
-
-            if (stepDefinitions.Count != 1)
-            {
-                Logger.LogVerbose($"Choose step definitions from: {string.Join(", ", stepDefinitions.Select(sd => sd.Item2.ToString()))}");
-                IdeScope.Actions.ShowSyncContextMenu(ChooseStepDefinitionPopupHeader, stepDefinitions.Select(sd =>
-                    new ContextMenuItem(sd.Item2.ToString(), _ => { PerformRenameStepForStepDefinition(sd, ctx); }, "StepDefinitionsDefined")
-                ).ToArray());
-                return true;
-            }
-
-            PerformRenameStepForStepDefinition(stepDefinitions[0], ctx);
-
-            return true;
         }
 
-        private void PerformRenameStepForStepDefinition(Tuple<IProjectScope, ProjectStepDefinitionBinding> selectedStepDefinition, RenameStepCommandContext ctx)
+        private void PerformRenameStepForStepDefinition(IProjectScope stepDefinitionProjectScope, ProjectStepDefinitionBinding stepDefinitionBinding, RenameStepCommandContext ctx)
         {
-            var stepDefinitionBinding = selectedStepDefinition.Item2;
             ExpressionIsValidAndSupported(stepDefinitionBinding, ctx);
             if (Erroneous(ctx)) return;
 
-            RenameStepViewModel viewModel = PrepareViewModel(selectedStepDefinition.Item1, stepDefinitionBinding, ctx);
+            RenameStepViewModel viewModel = PrepareViewModel(stepDefinitionProjectScope, stepDefinitionBinding, ctx);
             //TODO: validate modified expression in the UI: the parameter expressions and order cannot be changed
             var result = IdeScope.WindowManager.ShowDialog(viewModel);
             if (result != true)
@@ -153,20 +132,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         }
 
-        private bool ValidateProjectsWithFeatureFiles(out IProjectScope[] specFlowTestProjects)
+        private void ValidateProjectsWithFeatureFiles(RenameStepCommandContext ctx)
         {
-            specFlowTestProjects = IdeScope.GetProjectsWithFeatureFiles()
+            ctx.SpecFlowTestProjectsWithFeatureFiles = IdeScope.GetProjectsWithFeatureFiles()
                 .Where(p => p.GetProjectSettings().IsSpecFlowTestProject)
                 .ToArray();
 
-            if (specFlowTestProjects.Length == 0)
+            if (ctx.SpecFlowTestProjectsWithFeatureFiles.Length == 0)
             {
-                IdeScope.Actions.ShowProblem(
-                    "Unable to find step definition usages: could not find any SpecFlow project with feature files.");
-                return true;
+                ctx.AddProblem("Unable to find step definition usages: could not find any SpecFlow project with feature files.");
             }
-
-            return false;
         }
 
         private void ValidateCallerProject(RenameStepCommandContext ctx)
@@ -211,12 +186,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return viewModel;
         }
 
-        private ProjectStepDefinitionBinding[] GetStepDefinitions(IProjectScope project, string fileName, SnapshotPoint triggerPoint)
+        private ProjectStepDefinitionBinding[] GetStepDefinitions(RenameStepCommandContext ctx, SnapshotPoint triggerPoint)
         {
-            var discoveryService = project.GetDiscoveryService();
+            var fileName = GetEditorDocumentPath(ctx.TextBufferOfStepDefinitionClass);
+            var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
             var bindingRegistry = discoveryService.GetBindingRegistry();
             if (bindingRegistry == null)
-                Logger.LogWarning($"Unable to get step definitions from project '{project.ProjectName}', usages will not be found for this project.");
+                Logger.LogWarning($"Unable to get step definitions from project '{ctx.ProjectOfStepDefinitionClass.ProjectName}', usages will not be found for this project.");
             return FindStepDefinitionCommand.GetStepDefinitions(fileName, triggerPoint, bindingRegistry);
         }
     }
