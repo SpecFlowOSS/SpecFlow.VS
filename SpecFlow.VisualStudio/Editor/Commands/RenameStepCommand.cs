@@ -145,7 +145,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private bool Erroneous(RenameStepCommandContext ctx)
         {
-            if (ctx.Issues.Count <= 0) return false;
+            if (!ctx.IsErroneous) return false;
 
             foreach (var issue in ctx.Issues)
             {
@@ -182,21 +182,21 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private void ExpressionIsValidAndSupported(RenameStepCommandContext ctx)
         {
+            switch (ctx.StepDefinitionBinding.Expression)
+            {
+                case null:
+                    ctx.AddProblem( "Unable to rename step, the step definition expression cannot be detected.");
+                    return;
+                case "":
+                    ctx.AddProblem("Step definition expression is invalid");
+                    return;
+            }
+
             ctx.StepDefinitionExpressionAnalyzer = new RegexStepDefinitionExpressionAnalyzer();
             ctx.AnalyzedOriginalExpression = ctx.StepDefinitionExpressionAnalyzer.Parse(ctx.StepDefinitionBinding.Expression);
 
             if (!ctx.AnalyzedOriginalExpression.ContainsOnlySimpleText)
                 ctx.AddProblem("The non-parameter parts cannot contain expression operators");
-
-            switch (ctx.StepDefinitionBinding.Expression)
-            {
-                case null:
-                    ctx.AddProblem( "Unable to rename step, the step definition expression cannot be detected.");
-                    break;
-                case "":
-                    ctx.AddProblem("Step definition expression is invalid");
-                    break;
-            }
         }
 
         private static RenameStepViewModel PrepareViewModel(RenameStepCommandContext ctx)

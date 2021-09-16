@@ -8,7 +8,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text;
-using SpecFlow.VisualStudio.Discovery;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
@@ -16,47 +15,42 @@ namespace SpecFlow.VisualStudio.Editor.Commands
     {
         public override void PerformRenameStep(RenameStepCommandContext ctx)
         {
-            MethodDeclarationSyntax? method = GetMethod(ctx.StepDefinitionBinding, ctx.TextBufferOfStepDefinitionClass, ctx);
-            if (method == null)
-            {
-                ctx.AddProblem($"Method not found for {ctx.StepDefinitionBinding}");
-                return;
-            }
+            GetMethod(ctx);
+            if (ctx.IsErroneous) return;
 
-            var expressionsToReplace = ExpressionsToReplace(ctx, method);
-            if (expressionsToReplace.Length == 0)
-            {
-                ctx.AddProblem($"No expressions found to replace for {ctx.StepDefinitionBinding}");
-                return;
-            }
+            var expressionsToReplace = ExpressionsToReplace(ctx);
+            if (ctx.IsErroneous) return;
 
             EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, ctx.UpdatedExpression);
 
-            ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
+            ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.Log(TraceLevel.Info, ctx.Method.AttributeLists.Count.ToString());
         }
 
-        private MethodDeclarationSyntax? GetMethod(ProjectStepDefinitionBinding projectStepDefinitionBinding,
-            ITextBuffer textBuffer, RenameStepCommandContext ctx)
+        private void GetMethod(RenameStepCommandContext ctx)
         {
-            var syntaxTree = ctx.IdeScope.GetSyntaxTree(textBuffer);
-            var rootNode = syntaxTree?.GetRoot();
-            if (rootNode == null)
-                return null;
+            var syntaxTree = ctx.IdeScope.GetSyntaxTree(ctx.TextBufferOfStepDefinitionClass);
+            if (!syntaxTree.TryGetRoot(out SyntaxNode? rootNode)){
+                ctx.AddProblem("Couldn't find syntax root");
+                return;
+            }
 
             var methodLine =
-                textBuffer.CurrentSnapshot.GetLineFromLineNumber(projectStepDefinitionBinding.Implementation
+                ctx.TextBufferOfStepDefinitionClass.CurrentSnapshot.GetLineFromLineNumber(ctx.StepDefinitionBinding.Implementation
                     .SourceLocation.SourceFileLine - 1);
-            var methodColumn = projectStepDefinitionBinding.Implementation.SourceLocation.SourceFileColumn - 1;
+            var methodColumn = ctx.StepDefinitionBinding.Implementation.SourceLocation.SourceFileColumn - 1;
             var methodPosition = methodLine.Start + methodColumn;
             var node = rootNode.FindNode(new TextSpan(methodPosition, 1));
-            var method = node.Parent as MethodDeclarationSyntax;
 
-            return method;
+            ctx.Method = node.Parent as MethodDeclarationSyntax;
+            if (ctx.Method == null)
+            {
+                ctx.AddProblem($"Method not found for {ctx.StepDefinitionBinding}.");
+            }
         }
 
-        private static SyntaxToken[] ExpressionsToReplace(RenameStepCommandContext ctx, MethodDeclarationSyntax method)
+        private static SyntaxToken[] ExpressionsToReplace(RenameStepCommandContext ctx)
         {
-            var attributesWithMatchingExpression = GetAttributesWithTokens(method)
+            var attributesWithMatchingExpression = GetAttributesWithTokens(ctx.Method)
                 .Where(awt => !awt.Item2.IsMissing && MatchesWithOriginalText(awt.Item2))
                 .ToArray();
 
@@ -71,6 +65,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                     .Select(awt => awt.Item2)
                     .OrderByDescending(tok => tok.SpanStart)
                     .ToArray();
+
+            if (stepDefinitionAttributeTextTokens.Length == 0)
+            {
+                ctx.AddProblem($"No expressions found to replace for {ctx.StepDefinitionBinding}");
+            }
 
             return stepDefinitionAttributeTextTokens;
 

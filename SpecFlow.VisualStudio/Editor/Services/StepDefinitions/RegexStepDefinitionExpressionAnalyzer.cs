@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿#nullable enable
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using SpecFlow.VisualStudio.Discovery;
 
 namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
 {
