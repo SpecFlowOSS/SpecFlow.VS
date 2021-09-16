@@ -10,54 +10,27 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
     {
         public AnalyzedStepDefinitionExpression Parse(string expression)
         {
-            if (!SplitRegexByGroups(expression, out var regexParts))
-                return new AnalyzedStepDefinitionExpression(
-                    ImmutableArray.Create<AnalyzedStepDefinitionExpressionPart>(
-                        CreateTextPart(expression)
-                        )
-                    );
+            var parts = SplitExpressionByGroups(expression);
+            return new AnalyzedStepDefinitionExpression(parts);
+        }
 
+        private ImmutableArray<AnalyzedStepDefinitionExpressionPart> SplitExpressionByGroups(string regexString)
+        {
             var parts = new List<AnalyzedStepDefinitionExpressionPart>();
-            int i = 0;
-            for (; i < regexParts.Length-1; i++)
-            {
-                var regexPart = regexParts[i];
-                parts.Add(CreateTextPart(regexPart));
-                parts.Add(new AnalyzedStepDefinitionExpressionParameterPart("??"));
-            }
-            parts.Add(CreateTextPart(regexParts[i]));
-            return new AnalyzedStepDefinitionExpression(parts.ToImmutableArray());
-        }
-
-        private AnalyzedStepDefinitionExpressionTextPart CreateTextPart(string text)
-        {
-            var isSimpleText = IsSimpleText(text);
-            return new AnalyzedStepDefinitionExpressionTextPart(text, isSimpleText);
-        }
-
-        private static bool IsSimpleText(string text)
-        {
-            //TODO: maybe there is a smarter/more proper way
-            text = text.Replace(' ', '_');
-            return Regex.Escape(text) == text;
-        }
-
-        private bool SplitRegexByGroups(string regexString, out string[] unescapedStrings)
-        {
-            unescapedStrings = null;
-            List<string> unescapedStringsList = null;
             var unescapedStringBuilder = new StringBuilder();
 
             var maskChar = '\\';
             var groupOpenChar = '(';
             var maskedRegexChars = new[] { maskChar, '+', '.', '*', '?', '|', '{', '[', groupOpenChar, '^', '$', '#' };
             int position = 0;
+            string unescapedString;
             while (position < regexString.Length)
             {
                 int index = regexString.IndexOfAny(maskedRegexChars, position);
                 if (index < 0)
                 {
-                    unescapedStringBuilder.Append(regexString.Substring(position));
+                    unescapedString = regexString.Substring(position);
+                    unescapedStringBuilder.Append(unescapedString);
                     break;
                 }
 
@@ -74,21 +47,38 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
                     if (index > position)
                         unescapedStringBuilder.Append(regexString.Substring(position, index - position));
 
-                    unescapedStringsList = unescapedStringsList ?? new List<string>();
-                    unescapedStringsList.Add(unescapedStringBuilder.ToString());
+                    unescapedString = unescapedStringBuilder.ToString();
+                    parts.Add(CreateTextPart(unescapedString));
                     unescapedStringBuilder = new StringBuilder();
-                    position = FindGroupCloseIndex(regexString, index) + 1;
+                    var groupCloseIndex = FindGroupCloseIndex(regexString, index) + 1;
+                    var parameter = regexString.Substring(index, groupCloseIndex - index);
+                    parts.Add(new AnalyzedStepDefinitionExpressionParameterPart(parameter));
+                    position = groupCloseIndex;
                 }
                 else
                 {
-                    return false;
+                    return ImmutableArray.Create<AnalyzedStepDefinitionExpressionPart>(
+                        CreateTextPart(regexString)
+                    );
                 }
             }
 
-            unescapedStringsList = unescapedStringsList ?? new List<string>();
-            unescapedStringsList.Add(unescapedStringBuilder.ToString());
-            unescapedStrings = unescapedStringsList.ToArray();
-            return true;
+            unescapedString = unescapedStringBuilder.ToString();
+            parts.Add(CreateTextPart(unescapedString));
+            return parts.ToImmutableArray();
+        }
+
+        private AnalyzedStepDefinitionExpressionTextPart CreateTextPart(string text)
+        {
+            var isSimpleText = IsSimpleText(text);
+            return new AnalyzedStepDefinitionExpressionTextPart(text, isSimpleText);
+        }
+
+        private static bool IsSimpleText(string text)
+        {
+            //TODO: maybe there is a smarter/more proper way
+            text = text.Replace(' ', '_');
+            return Regex.Escape(text) == text;
         }
 
         private int FindGroupCloseIndex(string regexString, int openPosition)
