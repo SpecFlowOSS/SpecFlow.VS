@@ -9,26 +9,30 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.UI.ViewModels;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal class RenameStepStepDefinitionClassAction : RenameStepAction
     {
-        public override bool PerformRenameStep(RenameStepViewModel viewModel, ITextBuffer textBufferOfStepDefinitionClass)
+        public override void PerformRenameStep(RenameStepCommandContext ctx)
         {
-            MethodDeclarationSyntax? method = GetMethod(viewModel.SelectedStepDefinitionBinding, textBufferOfStepDefinitionClass);
+            MethodDeclarationSyntax? method = GetMethod(ctx.StepDefinitionBinding, ctx.TextBufferOfStepDefinitionClass);
             if (method == null)
-                return false;
+            {
+                ctx.AddProblem($"Method not found for {ctx.StepDefinitionBinding}");
+                return;
+            }
 
-            var expressionsToReplace = ExpressionsToReplace(viewModel, method);
-            if (expressionsToReplace.Length == 0) return false;
+            var expressionsToReplace = ExpressionsToReplace(ctx, method);
+            if (expressionsToReplace.Length == 0)
+            {
+                ctx.AddProblem($"No expressions found to replace for {ctx.StepDefinitionBinding}");
+                return;
+            }
 
-            EditTextBuffer(textBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, viewModel.StepText);
+            EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, ctx.UpdatedExpression);
 
-            viewModel.SelectedStepDefinitionProject.IdeScope.Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
-
-            return true;
+            ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.Log(TraceLevel.Info, method.AttributeLists.Count.ToString());
         }
 
         private static MethodDeclarationSyntax? GetMethod(ProjectStepDefinitionBinding projectStepDefinitionBinding, 
@@ -50,7 +54,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return method;
         }
 
-        private static SyntaxToken[] ExpressionsToReplace(RenameStepViewModel viewModel, MethodDeclarationSyntax method)
+        private static SyntaxToken[] ExpressionsToReplace(RenameStepCommandContext ctx, MethodDeclarationSyntax method)
         {
             var attributesWithMatchingExpression = GetAttributesWithTokens(method)
                 .Where(awt => !awt.Item2.IsMissing && MatchesWithOriginalText(awt.Item2))
@@ -70,8 +74,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             return stepDefinitionAttributeTextTokens;
 
-            bool MatchesWithOriginalText(SyntaxToken tok) => tok.ValueText == viewModel.OriginalStepText;
-            bool MatchesAttributeNameWithStepType(AttributeSyntax a) => viewModel.SelectedStepDefinitionBinding.StepDefinitionType.ToString().Equals(a.Name.ToString());
+            bool MatchesWithOriginalText(SyntaxToken tok) => tok.ValueText == ctx.OriginalExpression;
+            bool MatchesAttributeNameWithStepType(AttributeSyntax a) => ctx.StepDefinitionBinding.StepDefinitionType.ToString().Equals(a.Name.ToString());
         }
 
         internal static IEnumerable<Tuple<AttributeSyntax, SyntaxToken>> GetAttributesWithTokens(MethodDeclarationSyntax method)

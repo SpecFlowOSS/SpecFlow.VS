@@ -5,6 +5,6 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal interface IRenameStepAction
     {
-        bool PerformRenameStep(RenameStepViewModel viewModel, ITextBuffer textBufferOfStepDefinitionClass);
+        void PerformRenameStep(RenameStepCommandContext ctx);
     }
 }

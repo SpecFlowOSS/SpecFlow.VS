@@ -1,16 +1,30 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using SpecFlow.VisualStudio.Discovery;
+using System.Text.RegularExpressions;
 using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
-using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.Annotations;
+using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Editor.Services.Parser;
 
 namespace SpecFlow.VisualStudio.UI.ViewModels
 {
     public class RenameStepViewModel : INotifyPropertyChanged
     {
-        public bool IsValid => ValidationError != null;
+        public RenameStepViewModel(ProjectStepDefinitionBinding binding, Func<string, ImmutableHashSet<string>> validateFunc)
+        {
+            _validateFunc = validateFunc;
+            StepText = binding.Expression;
+            OriginalStepText = binding.ToString();
+        }
 
+        private readonly Func<string, ImmutableHashSet<string>> _validateFunc;
+        
+        public bool IsValid => string.IsNullOrEmpty(ValidationError);
+
+        private string _validationError = string.Empty;
         public string ValidationError
         {
             get => _validationError;
@@ -23,6 +37,7 @@ namespace SpecFlow.VisualStudio.UI.ViewModels
             }
         }
 
+        private string _stepText;
         public string StepText
         {
             get => _stepText;
@@ -35,43 +50,14 @@ namespace SpecFlow.VisualStudio.UI.ViewModels
 
         public string OriginalStepText { get; }
 
-        public IProjectScope SelectedStepDefinitionProject { get; }
-
-        public ProjectStepDefinitionBinding SelectedStepDefinitionBinding { get; }
-        public AnalyzedStepDefinitionExpression AnalyzedOriginalExpression { get; }
-        public IStepDefinitionExpressionAnalyzer StepDefinitionExpressionAnalyzer { get; }
         public AnalyzedStepDefinitionExpression ParsedUpdatedExpression { get; set; }
 
         private void Validate()
         {
-            ValidationError = null;
-            if (StepText == "invalid")
-            {
-                ValidationError = "bla bla";
-            }
+            var errors = _validateFunc(StepText);
+            ValidationError = string.Join(Environment.NewLine, errors);
         }
 
-        public RenameStepViewModel(string stepText, IProjectScope selectedStepDefinitionProject,
-            ProjectStepDefinitionBinding selectedStepDefinitionBinding,
-            AnalyzedStepDefinitionExpression analyzedOriginalExpression,
-            IStepDefinitionExpressionAnalyzer stepDefinitionExpressionAnalyzer)
-        {
-            StepText = stepText;
-            SelectedStepDefinitionProject = selectedStepDefinitionProject;
-            SelectedStepDefinitionBinding = selectedStepDefinitionBinding;
-            AnalyzedOriginalExpression = analyzedOriginalExpression;
-            StepDefinitionExpressionAnalyzer = stepDefinitionExpressionAnalyzer;
-            OriginalStepText = stepText;
-        }
-
-#if DEBUG
-        public static RenameStepViewModel DesignData = new("I press add", null, null, null, null)
-        {
-            ValidationError = "This is wrong"
-        };
-        private string _stepText;
-        private string _validationError = null;
-#endif
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -79,5 +65,25 @@ namespace SpecFlow.VisualStudio.UI.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+#if DEBUG
+        public static RenameStepViewModel DesignData = new(
+            new ProjectStepDefinitionBinding(
+                ScenarioBlock.Given, 
+                new Regex("^invalid$"), 
+                new Scope(), 
+                new ProjectStepDefinitionImplementation(
+                    "WhenIPressAdd", 
+                    Array.Empty<string>(), 
+                    new SourceLocation("Steps.cs", 10, 9)) 
+                ), StubValidation);
+
+        public static ImmutableHashSet<string> StubValidation(string updatedExpression)
+        {
+            return updatedExpression == "invalid" 
+                ? ImmutableHashSet.Create("This is wrong") 
+                : ImmutableHashSet<string>.Empty;
+        }
+#endif
     }
 }

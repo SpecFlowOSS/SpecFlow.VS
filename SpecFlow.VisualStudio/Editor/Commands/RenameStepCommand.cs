@@ -1,5 +1,7 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel.Composition;
 using System.Linq;
 using Microsoft.VisualStudio.Text;
@@ -50,7 +52,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             {
                 var goToStepDefinitionCommand = new GoToStepDefinitionCommand(IdeScope, AggregatorFactory, MonitoringService);
                 goToStepDefinitionCommand.PreExec(textView, commandKey, inArgs);
-                var tb = IdeScope.GetTextBuffer(new SourceLocation(String.Empty, 1, 1));
+                var tb = IdeScope.GetTextBuffer(new SourceLocation(string.Empty, 1, 1));
   
             }            
 
@@ -63,7 +65,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ValidateProjectsWithFeatureFiles(ctx);
             if (Erroneous(ctx)) return true;
 
-            var stepDefinitions = new List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)>();
+            var stepDefinitions = CollectStepDefinitions(ctx, triggerPoint);
+
+            PerformActions(stepDefinitions, ctx);
+            return true;
+        }
+
+        private List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)> CollectStepDefinitions(RenameStepCommandContext ctx, SnapshotPoint triggerPoint)
+        {
+            var stepDefinitions =
+                new List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)>();
             foreach (IProjectScope specFlowTestProject in ctx.SpecFlowTestProjectsWithFeatureFiles)
             {
                 ProjectStepDefinitionBinding[] projectStepDefinitions = GetStepDefinitions(ctx, triggerPoint);
@@ -73,50 +84,63 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 }
             }
 
+            return stepDefinitions;
+        }
+
+        private void PerformActions(IReadOnlyList<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)> stepDefinitions, RenameStepCommandContext ctx)
+        {
             switch (stepDefinitions.Count)
             {
                 case 0:
                     IdeScope.Actions.ShowProblem("No step definition found that is related to this position");
-                    return true;
+                    break;
                 case 1:
                 {
                     var selectedStepDefinition = stepDefinitions[0];
-                    PerformRenameStepForStepDefinition(selectedStepDefinition.specFlowTestProject,
+                    PerformActionsOnSelectedStepDefinition(selectedStepDefinition.specFlowTestProject,
                         selectedStepDefinition.projectStepDefinitionBinding, ctx);
-                    return true;
+                    break;
                 }
                 default:
                 {
-                    Logger.LogVerbose($"Choose step definitions from: {string.Join(", ", stepDefinitions.Select(sd => sd.projectStepDefinitionBinding.ToString()))}");
+                    Logger.LogVerbose(
+                        $"Choose step definitions from: {string.Join(", ", stepDefinitions.Select(sd => sd.projectStepDefinitionBinding.ToString()))}");
                     IdeScope.Actions.ShowSyncContextMenu(ChooseStepDefinitionPopupHeader, stepDefinitions.Select(sd =>
                         new ContextMenuItem(sd.projectStepDefinitionBinding.ToString(),
-                            _ => { PerformRenameStepForStepDefinition(sd.specFlowTestProject, sd.projectStepDefinitionBinding, ctx); },
+                            _ =>
+                            {
+                                PerformActionsOnSelectedStepDefinition(sd.specFlowTestProject, sd.projectStepDefinitionBinding,
+                                    ctx);
+                            },
                             "StepDefinitionsDefined")
                     ).ToArray());
-                    return true;
+                    break;
                 }
             }
         }
 
-        private void PerformRenameStepForStepDefinition(IProjectScope stepDefinitionProjectScope, ProjectStepDefinitionBinding stepDefinitionBinding, RenameStepCommandContext ctx)
+        private void PerformActionsOnSelectedStepDefinition(IProjectScope stepDefinitionProjectScope, ProjectStepDefinitionBinding stepDefinitionBinding, RenameStepCommandContext ctx)
         {
-            ExpressionIsValidAndSupported(stepDefinitionBinding, ctx);
+            ctx.StepDefinitionBinding = stepDefinitionBinding;
+            ctx.StepDefinitionProjectScope = stepDefinitionProjectScope;
+            ExpressionIsValidAndSupported(ctx);
             if (Erroneous(ctx)) return;
 
-            RenameStepViewModel viewModel = PrepareViewModel(stepDefinitionProjectScope, stepDefinitionBinding, ctx);
+            RenameStepViewModel viewModel = PrepareViewModel(ctx);
             //TODO: validate modified expression in the UI: the parameter expressions and order cannot be changed
             var result = IdeScope.WindowManager.ShowDialog(viewModel);
             if (result != true)
                 return;
 
-            viewModel.ParsedUpdatedExpression = viewModel.StepDefinitionExpressionAnalyzer.Parse(viewModel.StepText);
+            viewModel.ParsedUpdatedExpression = ctx.StepDefinitionExpressionAnalyzer.Parse(viewModel.StepText);
+            
+            ctx.UpdatedExpression = viewModel.StepText;
+            ctx.AnalyzedUpdatedExpression = viewModel.ParsedUpdatedExpression;
             //TODO: validate, although the form should have validated it anyway...
 
-            _renameStepFeatureFileAction.PerformRenameStep(viewModel, ctx.TextBufferOfStepDefinitionClass);
-            if (!_renameStepStepDefinitionClassAction.PerformRenameStep(viewModel, ctx.TextBufferOfStepDefinitionClass))
-            {
-                IdeScope.Actions.ShowProblem("There was an error during step definition class rename.");
-            }
+            _renameStepFeatureFileAction.PerformRenameStep(ctx);
+            _renameStepStepDefinitionClassAction.PerformRenameStep(ctx);
+            if (Erroneous(ctx)) return;
         }
 
         private bool Erroneous(RenameStepCommandContext ctx)
@@ -129,7 +153,6 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }
 
             return true;
-
         }
 
         private void ValidateProjectsWithFeatureFiles(RenameStepCommandContext ctx)
@@ -157,15 +180,15 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }
         }
 
-        private void ExpressionIsValidAndSupported(ProjectStepDefinitionBinding stepDefinitionBinding, RenameStepCommandContext ctx)
+        private void ExpressionIsValidAndSupported(RenameStepCommandContext ctx)
         {
-            ctx.Analyzer = new RegexStepDefinitionExpressionAnalyzer();
-            ctx.AnalyzedExpression = ctx.Analyzer.Parse(stepDefinitionBinding.Expression);
+            ctx.StepDefinitionExpressionAnalyzer = new RegexStepDefinitionExpressionAnalyzer();
+            ctx.AnalyzedOriginalExpression = ctx.StepDefinitionExpressionAnalyzer.Parse(ctx.StepDefinitionBinding.Expression);
 
-            if (!ctx.AnalyzedExpression.ContainsOnlySimpleText)
+            if (!ctx.AnalyzedOriginalExpression.ContainsOnlySimpleText)
                 ctx.AddProblem("The non-parameter parts cannot contain expression operators");
 
-            switch (stepDefinitionBinding.Expression)
+            switch (ctx.StepDefinitionBinding.Expression)
             {
                 case null:
                     ctx.AddProblem( "Unable to rename step, the step definition expression cannot be detected.");
@@ -176,14 +199,18 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }
         }
 
-        private static RenameStepViewModel PrepareViewModel(IProjectScope selectedStepDefinitionProject,
-            ProjectStepDefinitionBinding stepDefinitionBinding, RenameStepCommandContext ctx)
+        private static RenameStepViewModel PrepareViewModel(RenameStepCommandContext ctx)
         {
-            var expression = stepDefinitionBinding.Expression.TrimStart('^').TrimEnd('$');
-
-            var viewModel = new RenameStepViewModel(expression, selectedStepDefinitionProject, stepDefinitionBinding, ctx.AnalyzedExpression, ctx.Analyzer);
+            var viewModel = new RenameStepViewModel(ctx.StepDefinitionBinding, updatedExpression => Validate(ctx,updatedExpression));
 
             return viewModel;
+        }
+
+        public static ImmutableHashSet<string> Validate(RenameStepCommandContext ctx, string updatedExpression)
+        {
+            return updatedExpression == "invalid"
+                ? ImmutableHashSet.Create("This is wrong")
+                : ImmutableHashSet<string>.Empty;
         }
 
         private ProjectStepDefinitionBinding[] GetStepDefinitions(RenameStepCommandContext ctx, SnapshotPoint triggerPoint)

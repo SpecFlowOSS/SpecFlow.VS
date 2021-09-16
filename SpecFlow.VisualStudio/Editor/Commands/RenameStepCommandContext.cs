@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.Text;
+using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
 using SpecFlow.VisualStudio.ProjectSystem;
 
@@ -17,10 +18,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public List<Issue> Issues { get; }
         public ITextBuffer TextBufferOfStepDefinitionClass { get; set; }
         public IProjectScope ProjectOfStepDefinitionClass { get; set; }
-        public IStepDefinitionExpressionAnalyzer Analyzer { get; set; }
-        public AnalyzedStepDefinitionExpression AnalyzedExpression { get; set; }
-
+        public IStepDefinitionExpressionAnalyzer StepDefinitionExpressionAnalyzer { get; set; }
+        
         public IProjectScope[] SpecFlowTestProjectsWithFeatureFiles { get; set; }
+        public ProjectStepDefinitionBinding StepDefinitionBinding { get; set; }
+        public IProjectScope StepDefinitionProjectScope { get; set; }
+
+        public string OriginalExpression => StepDefinitionBinding.Expression;
+        public AnalyzedStepDefinitionExpression AnalyzedOriginalExpression { get; set; }
+        public string UpdatedExpression { get; set; }
+        public AnalyzedStepDefinitionExpression AnalyzedUpdatedExpression { get; set; }
 
         public void AddProblem(string description)
         {

@@ -226,7 +226,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinition = ArrangeStepDefinition("ConstantValue");
             stepDefinition.Regex = "^I press add$";
 
-            StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: There was an error during step definition class rename.");
+            StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: No expressions found to replace for [When(I press add)]: WhenIPressAdd");
         }
 
         private void StepDefinitionMustHaveValidExpression(TestStepDefinition stepDefinition, string errorMessage)

@@ -14,14 +14,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal class RenameStepFeatureFileAction : RenameStepAction
     {
-        public override bool PerformRenameStep(RenameStepViewModel viewModel,
-            ITextBuffer textBufferOfStepDefinitionClass)
+        public override void PerformRenameStep(RenameStepCommandContext ctx)
         {
-            IIdeScope ideScope = viewModel.SelectedStepDefinitionProject.IdeScope;
+            IIdeScope ideScope = ctx.ProjectOfStepDefinitionClass.IdeScope;
             var stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope.FileSystem, ideScope.Logger, ideScope.MonitoringService);
-            var featureFiles = viewModel.SelectedStepDefinitionProject.GetProjectFiles(".feature");
-            var configuration = viewModel.SelectedStepDefinitionProject.GetDeveroomConfiguration();
-            var projectUsages = stepDefinitionUsageFinder.FindUsages(new[] { viewModel.SelectedStepDefinitionBinding }, featureFiles, configuration).ToArray();
+            var featureFiles = ctx.ProjectOfStepDefinitionClass.GetProjectFiles(".feature");
+            var configuration = ctx.ProjectOfStepDefinitionClass.GetDeveroomConfiguration();
+            var projectUsages = stepDefinitionUsageFinder.FindUsages(new[] { ctx.StepDefinitionBinding }, featureFiles, configuration).ToArray();
             foreach (var fileUsage in projectUsages.GroupBy(u => u.SourceLocation.SourceFile))
             {
                 var firstPosition = fileUsage.First().SourceLocation;
@@ -29,10 +28,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 var textBufferOfFeatureFile = ideScope.GetTextBuffer(firstPosition);
                 EditTextBuffer(textBufferOfFeatureFile, fileUsage,
                     usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
-                    usage => CalculateReplacementText((textBufferOfFeatureFile, usage), viewModel.ParsedUpdatedExpression));
+                    usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression));
             }
-
-            return true;
         }
 
         private string CalculateReplacementText((ITextBuffer textBufferOfFeatureFile, StepDefinitionUsage usage) from, AnalyzedStepDefinitionExpression updatedExpression)
