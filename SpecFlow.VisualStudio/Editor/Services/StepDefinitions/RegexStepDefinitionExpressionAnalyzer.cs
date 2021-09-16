@@ -24,6 +24,7 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
             var maskedRegexChars = new[] { maskChar, '+', '.', '*', '?', '|', '{', '[', groupOpenChar, '^', '$', '#' };
             int position = 0;
             string unescapedString;
+            bool isSimpleText = true;
             while (position < regexString.Length)
             {
                 int index = regexString.IndexOfAny(maskedRegexChars, position);
@@ -36,10 +37,7 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
 
                 if (regexString[index] == maskChar && index < regexString.Length - 1)
                 {
-                    if (index > position)
-                        unescapedStringBuilder.Append(regexString.Substring(position, index - position));
-
-                    unescapedStringBuilder.Append(regexString[index + 1]);
+                    unescapedStringBuilder.Append(regexString.Substring(position, index - position + 2));
                     position = index + 2;
                 }
                 else if (regexString[index] == groupOpenChar && !IsNonCapturingGroup(regexString, index))
@@ -48,7 +46,8 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
                         unescapedStringBuilder.Append(regexString.Substring(position, index - position));
 
                     unescapedString = unescapedStringBuilder.ToString();
-                    parts.Add(CreateTextPart(unescapedString));
+                    parts.Add(CreateTextPart(unescapedString, isSimpleText));
+                    isSimpleText = true;
                     unescapedStringBuilder = new StringBuilder();
                     var groupCloseIndex = FindGroupCloseIndex(regexString, index) + 1;
                     var parameter = regexString.Substring(index, groupCloseIndex - index);
@@ -57,18 +56,20 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
                 }
                 else
                 {
-                    return ImmutableArray.Create(CreateTextPart(regexString));
+                    unescapedStringBuilder.Append(regexString.Substring(position, index - position + 1));
+                    position = index + 1;
+                    isSimpleText = false;
                 }
             }
 
             unescapedString = unescapedStringBuilder.ToString();
-            parts.Add(CreateTextPart(unescapedString));
+            parts.Add(CreateTextPart(unescapedString, isSimpleText));
             return parts.ToImmutableArray();
         }
 
-        private AnalyzedStepDefinitionExpressionPart CreateTextPart(string text)
+        private AnalyzedStepDefinitionExpressionPart CreateTextPart(string text, bool isSimpleText)
         {
-            return IsSimpleText(text)
+            return isSimpleText
                 ? new AnalyzedStepDefinitionExpressionSimpleTextPart(text)
                 : new AnalyzedStepDefinitionExpressionComplexTextPart(text);
         }
@@ -77,7 +78,9 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
         {
             //TODO: maybe there is a smarter/more proper way
             text = text.Replace(' ', '_');
-            return Regex.Escape(text) == text;
+            var escaped = Regex.Escape(text);
+            text = text.Replace("\\", "\\\\");
+            return escaped == text;
         }
 
         private int FindGroupCloseIndex(string regexString, int openPosition)
@@ -97,7 +100,7 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
                 }
             }
 
-            return regexString.Length;
+            return regexString.Length - 1;
         }
 
         private bool IsNonCapturingGroup(string regexString, int index)

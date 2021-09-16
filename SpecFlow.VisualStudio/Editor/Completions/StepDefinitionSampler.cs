@@ -19,13 +19,18 @@ namespace SpecFlow.VisualStudio.Editor.Completions
 
             if (analyzedStepDefinitionExpression.Parts.Length == 1)
             {
-                return analyzedStepDefinitionExpression.Parts[0].ExpressionText;
+                return regexTextCore.Replace("\\", "");
+            }   
+            
+            if (!analyzedStepDefinitionExpression.ContainsOnlySimpleText)
+            {
+                return regexTextCore;//.Replace("\\", "");
             }
 
             var completionTextBuilder = new StringBuilder();
             for (int i = 0; i < analyzedStepDefinitionExpression.Parts.Length; i+=2)
             {
-                completionTextBuilder.Append(analyzedStepDefinitionExpression.Parts[i].ExpressionText);
+                completionTextBuilder.Append(analyzedStepDefinitionExpression.Parts[i].ExpressionText.Replace("\\",""));
                 if (i < analyzedStepDefinitionExpression.Parts.Length - 1)
                 {
                     completionTextBuilder.Append("[");

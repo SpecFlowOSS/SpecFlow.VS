@@ -25,6 +25,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
     public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand, IDeveroomFeatureEditorCommand
     {
         const string ChooseStepDefinitionPopupHeader = "Choose step definition to rename";
+        private const string NonParameterPartsCannotContainExpressionOperators = "The non-parameter parts cannot contain expression operators";
 
         private readonly RenameStepFeatureFileAction _renameStepFeatureFileAction;
         private readonly RenameStepStepDefinitionClassAction _renameStepStepDefinitionClassAction;
@@ -200,7 +201,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ctx.AnalyzedOriginalExpression = ctx.StepDefinitionExpressionAnalyzer.Parse(ctx.StepDefinitionBinding.Expression);
 
             if (!ctx.AnalyzedOriginalExpression.ContainsOnlySimpleText)
-                ctx.AddProblem("The non-parameter parts cannot contain expression operators");
+                ctx.AddProblem(NonParameterPartsCannotContainExpressionOperators);
         }
 
         private static RenameStepViewModel PrepareViewModel(RenameStepCommandContext ctx)
@@ -215,6 +216,19 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var errors = new HashSet<string>();
             var parsedUpdatedExpression = ctx.StepDefinitionExpressionAnalyzer.Parse(updatedExpression);
             if (parsedUpdatedExpression.Parts.Length != ctx.AnalyzedOriginalExpression.Parts.Length) errors.Add("Parameter count mismatch");
+
+            if (ctx.AnalyzedOriginalExpression.ParameterParts
+                .Zip(parsedUpdatedExpression.ParameterParts, (original, updated) => original == updated)
+                .Any(eq => !eq))
+            {
+                errors.Add("Parameter expression mismatch");
+            }
+
+            if (!parsedUpdatedExpression.ContainsOnlySimpleText)
+            {
+                errors.Add(NonParameterPartsCannotContainExpressionOperators);
+            }
+
 
             return errors.ToImmutableHashSet();
         }

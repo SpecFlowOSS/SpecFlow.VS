@@ -1,6 +1,6 @@
 ﻿namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
 {
-    public class AnalyzedStepDefinitionExpressionComplexTextPart : AnalyzedStepDefinitionExpressionPart
+    public record AnalyzedStepDefinitionExpressionComplexTextPart : AnalyzedStepDefinitionExpressionPart
     {
         public string Text { get; }
         public override string ExpressionText => Text;

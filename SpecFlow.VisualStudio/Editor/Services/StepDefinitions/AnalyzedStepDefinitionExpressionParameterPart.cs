@@ -1,6 +1,6 @@
 ﻿namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
 {
-    public class AnalyzedStepDefinitionExpressionParameterPart : AnalyzedStepDefinitionExpressionPart
+    public record AnalyzedStepDefinitionExpressionParameterPart : AnalyzedStepDefinitionExpressionPart
     {
         public string ParameterExpression { get; }
 

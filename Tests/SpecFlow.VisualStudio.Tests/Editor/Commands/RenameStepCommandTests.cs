@@ -260,7 +260,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData(5, @"""\""I press add \""""", @"\""I choose add\""", @"        [When(""\""I choose add\"""")]")]
         [InlineData(6, @"@""I press add""", @"I choose add", @"        [When(@""I choose add"")]")]
         [InlineData(7, @"@""I """"press"""" add""", @"I ""choose"" add", @"        [When(@""I ""choose"" add"")]")]
-        [InlineData(8, @"""I press (.*)""", @"I choose (.*)", @"        [When(""I choose (.*)"")]")]
+        [InlineData(8, @"""I press (/d)""", @"I choose (/d)", @"        [When(""I choose (/d)"")]")]
         [InlineData(9, @"""I press (.*)""", @"I press (.*) button", @"        [When(""I press (.*) button"")]")]
         [InlineData(10, @"""(.*) press add""", @"(.*) press add button", @"        [When(""(.*) press add button"")]")]
         [InlineData(11, @"""(.*) press add""", @"On main screen (.*) press add", @"        [When(""On main screen (.*) press add"")]")]
@@ -289,6 +289,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData(7, @"""(.*) press add""", @"(.*) press (.*)", "Parameter count mismatch")]
         [InlineData(8, @"""(.*) press (.*)""", @"(.*) press add", "Parameter count mismatch")]
         [InlineData(9, @"""I press (.*)""", @"I press (.*)(.*)", "Parameter count mismatch")]
+        [InlineData(10, @"""I press (.*)""", @"I press (/d)", "Parameter expression mismatch")]
+        [InlineData(11, @"""I press (.*)""", @"I press (/d)(.*)", "Parameter count mismatch", "Parameter expression mismatch")]
+        [InlineData(13, @"""I press add""", @"I ( add (.*)", "Parameter count mismatch")]
+        [InlineData(14, @"""I press (.*)""", @"I press add .*)", "Parameter count mismatch")]
+        [InlineData(15, @"""I press add""", @"I pr?ess add", "The non-parameter parts cannot contain expression operators")]
+        [InlineData(16, @"""I press (.*)""", @"I pr?ess (.*)", "The non-parameter parts cannot contain expression operators")]
         public void User_cannot_type_invalid_expression(int _, string testExpression, string modelStepText, params string[] errorMessages)
         {
             var stepDefinitions = ArrangeStepDefinition(testExpression);
