@@ -47,11 +47,6 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             return stubLogger;
         }
 
-        private static bool NotSpecflowProject(Tuple<TraceLevel, string> msg)
-        {
-            return msg.Item2 == "ShowProblem: User Notification: Unable to find step definition usages: the project is not detected to be a SpecFlow project or it is not initialized yet.";
-        }
-
         private static bool SpecflowProjectMustHaveFeatureFiles(Tuple<TraceLevel, string> msg)
         {
             return msg.Item2 == "ShowProblem: User Notification: Unable to find step definition usages: could not find any SpecFlow project with feature files.";
@@ -61,7 +56,6 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             return new TestFeatureFile("calculator.feature", featureFileContent);
         }
-
 
         private static TestStepDefinition[] ArrangeMultipleStepDefinitions()
         {
@@ -161,7 +155,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger(emptyIde);
-            stubLogger.Messages.Should().Contain(msg => NotSpecflowProject(msg));
+            stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: Unable to find step definition usages: the project is not initialized yet.");
         }
 
         [Fact]
@@ -174,7 +168,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger();
-            stubLogger.Messages.Should().Contain(msg => NotSpecflowProject(msg));
+            stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
         }
 
         [Fact]
@@ -214,7 +208,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             var stepDefinition = ArrangeStepDefinition(emptyExpression);
 
-            StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: There was an error during step definition class rename.");
+            StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: The non-parameter parts cannot contain expression operators");
         }
 
         [Theory]
