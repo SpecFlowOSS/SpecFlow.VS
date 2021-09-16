@@ -133,7 +133,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 return;
 
             viewModel.ParsedUpdatedExpression = ctx.StepDefinitionExpressionAnalyzer.Parse(viewModel.StepText);
-            
+
+            var validationErrors = Validate(ctx, viewModel.StepText);
+            ctx.Issues.AddRange(validationErrors.Select(error=>new Issue(Issue.IssueKind.Problem, error)));
+            if (Erroneous(ctx)) return;
+
             ctx.UpdatedExpression = viewModel.StepText;
             ctx.AnalyzedUpdatedExpression = viewModel.ParsedUpdatedExpression;
             //TODO: validate, although the form should have validated it anyway...
@@ -208,9 +212,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         public static ImmutableHashSet<string> Validate(RenameStepCommandContext ctx, string updatedExpression)
         {
-            return updatedExpression == "invalid"
-                ? ImmutableHashSet.Create("This is wrong")
-                : ImmutableHashSet<string>.Empty;
+            var errors = new HashSet<string>();
+            var parsedUpdatedExpression = ctx.StepDefinitionExpressionAnalyzer.Parse(updatedExpression);
+            if (parsedUpdatedExpression.Parts.Length != ctx.AnalyzedOriginalExpression.Parts.Length) errors.Add("Parameter count mismatch");
+
+            return errors.ToImmutableHashSet();
         }
 
         private ProjectStepDefinitionBinding[] GetStepDefinitions(RenameStepCommandContext ctx, SnapshotPoint triggerPoint)

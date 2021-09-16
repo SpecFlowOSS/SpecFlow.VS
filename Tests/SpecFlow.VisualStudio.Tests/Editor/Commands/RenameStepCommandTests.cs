@@ -260,6 +260,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData(5, @"""\""I press add \""""", @"\""I choose add\""", @"        [When(""\""I choose add\"""")]")]
         [InlineData(6, @"@""I press add""", @"I choose add", @"        [When(@""I choose add"")]")]
         [InlineData(7, @"@""I """"press"""" add""", @"I ""choose"" add", @"        [When(@""I ""choose"" add"")]")]
+        [InlineData(8, @"""I press (.*)""", @"I choose (.*)", @"        [When(""I choose (.*)"")]")]
+        [InlineData(9, @"""I press (.*)""", @"I press (.*) button", @"        [When(""I press (.*) button"")]")]
+        [InlineData(10, @"""(.*) press add""", @"(.*) press add button", @"        [When(""(.*) press add button"")]")]
+        [InlineData(11, @"""(.*) press add""", @"On main screen (.*) press add", @"        [When(""On main screen (.*) press add"")]")]
+        [InlineData(12, @"""(.*) press (.*)""", @"(.*) choose (.*)", @"        [When(""(.*) choose (.*)"")]")]
+        [InlineData(13, @"""I press (.*)(.*)""", @"I press (.*) and (.*)", @"        [When(""I press (.*) and (.*)"")]")]
         public void Step_definition_class_has_one_matching_expression(int _, string testExpression, string modelStepText, string expectedLine)
         {
             var stepDefinitions = ArrangeStepDefinition(testExpression);
@@ -271,6 +277,31 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             var testText = Dump(textView, "Step definition class after rename");
             testText.Lines[6].Should().Be(expectedLine);
+        }
+        
+        [Theory]
+        [InlineData(1, @"""I press add""", @"I press (.*)", "Parameter count mismatch")]
+        [InlineData(2, @"""I press (.*)""", @"I press add", "Parameter count mismatch")]
+        [InlineData(3, @"""I press add button""", @"I press (.*) button", "Parameter count mismatch")]
+        [InlineData(4, @"""I press (.*) button""", @"I press add button", "Parameter count mismatch")]
+        [InlineData(5, @"""I press add button""", @"(.*) press add button", "Parameter count mismatch")]
+        [InlineData(6, @"""(.*) press add button""", @"I press add button", "Parameter count mismatch")]
+        [InlineData(7, @"""(.*) press add""", @"(.*) press (.*)", "Parameter count mismatch")]
+        [InlineData(8, @"""(.*) press (.*)""", @"(.*) press add", "Parameter count mismatch")]
+        [InlineData(9, @"""I press (.*)""", @"I press (.*)(.*)", "Parameter count mismatch")]
+        public void User_cannot_type_invalid_expression(int _, string testExpression, string modelStepText, params string[] errorMessages)
+        {
+            var stepDefinitions = ArrangeStepDefinition(testExpression);
+            var featureFile = ArrangeOneFeatureFile(string.Empty);
+            ArrangePopup(modelStepText);
+            var (textView, command) = ArrangeSut(stepDefinitions, featureFile);
+
+            command.PreExec(textView, command.Targets.First());
+
+            var stubLogger = GetStubLogger();
+            stubLogger.Messages
+                .Select(m => m.Item2.Replace("ShowProblem: User Notification: ", String.Empty))
+                .Should().Contain(errorMessages);
         }
 
         [Fact]
