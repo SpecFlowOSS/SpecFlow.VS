@@ -10,5 +10,10 @@
         }
 
         public override string ExpressionText => ParameterExpression;
+
+        public override string ToString()
+        {
+            return $"Parameter:`{ExpressionText}`";
+        }
     }
 }

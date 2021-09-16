@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 namespace SpecFlow.VisualStudio.Editor.Completions
@@ -11,7 +12,14 @@ namespace SpecFlow.VisualStudio.Editor.Completions
     {
         public string GetStepDefinitionSample(ProjectStepDefinitionBinding stepDefinitionBinding)
         {
-            var regexTextCore = stepDefinitionBinding.Regex.ToString().TrimStart('^').TrimEnd('$');
+            var regexTextCore = stepDefinitionBinding.Expression;
+
+            IStepDefinitionExpressionAnalyzer analyzer = new RegexStepDefinitionExpressionAnalyzer();
+            var analyzedStepDefinitionExpression = analyzer.Parse(regexTextCore);
+            if (analyzedStepDefinitionExpression.Parts.Length == 1)
+            {
+                return analyzedStepDefinitionExpression.Parts[0].ExpressionText;
+            }
 
             if (!SplitRegexByGroups(regexTextCore, out var regexParts))
                 return regexTextCore;

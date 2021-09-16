@@ -11,5 +11,10 @@
             Text = text;
             IsSimpleText = isSimpleText;
         }
+
+        public override string ToString()
+        {
+            return $"{(IsSimpleText?"simple text":"escaped text")}:`{ExpressionText}`";
+        }
     }
 }
