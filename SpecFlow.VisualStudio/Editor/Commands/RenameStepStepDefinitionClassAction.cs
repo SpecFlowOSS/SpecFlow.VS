@@ -21,6 +21,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var expressionsToReplace = ExpressionsToReplace(ctx);
             if (ctx.IsErroneous) return;
 
+            //TODO: The replacement text should be `@"expression"` if expression contains \ or " (" must be doubled) OR `"expression"` otherwise
             EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, ctx.UpdatedExpression);
 
             ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.Log(TraceLevel.Info, ctx.Method.AttributeLists.Count.ToString());
