@@ -153,6 +153,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             _renameStepFeatureFileAction.PerformRenameStep(ctx);
             _renameStepStepDefinitionClassAction.PerformRenameStep(ctx);
+            IdeScope.Actions.NavigateTo(ctx.StepDefinitionBinding.Implementation.SourceLocation);
             if (Erroneous(ctx)) return;
         }
 

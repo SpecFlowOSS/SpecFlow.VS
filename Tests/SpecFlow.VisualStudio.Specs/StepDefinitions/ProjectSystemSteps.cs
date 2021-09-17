@@ -434,7 +434,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         public void ThenTheEditorShouldBeUpdatedToContain(string expectedContentValue)
         {
             var expectedContent = new TestText(expectedContentValue);
-            _wpfTextView.TextSnapshot.GetText().Should().Contain(expectedContent.ToString());
+            _ideScope.CurrentTextView.TextSnapshot.GetText().Should().Contain(expectedContent.ToString());
         }
 
         private IEnumerable<DeveroomTag> GetDeveroomTags(IWpfTextView textView)

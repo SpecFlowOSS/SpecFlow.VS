@@ -40,7 +40,7 @@ Scenario: A simple step with a sigle usage is renamed from step definition (code
 		{
 			[When("I choose add")]
 			public void WhenIPressAdd()
-			{ 
+			{
 			}
 		}
 		"""

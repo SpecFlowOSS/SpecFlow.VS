@@ -13,6 +13,7 @@ using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Moq;
 using SpecFlow.VisualStudio.Editor.Services;
@@ -45,6 +46,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public StubWindowManager StubWindowManager { get; } = new StubWindowManager();
         public List<IProjectScope> ProjectScopes { get; } = new List<IProjectScope>();
         public IMonitoringService MonitoringService { get; }
+        public IWpfTextView CurrentTextView { get; internal set; }
 
         public event EventHandler<EventArgs> WeakProjectsBuilt;
         public event EventHandler<EventArgs> WeakProjectOutputsUpdated;
@@ -68,17 +70,25 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             var textView = StubWpfTextView.CreateTextView(this, inputText, newLine, projectScope, contentType, filePath);
             if (filePath != null)
                 OpenViews[filePath] = textView;
+
+            CurrentTextView = textView;
+
             return textView;
         }
 
         public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
         {
+            return EnsureOpenTextView(sourceLocation).TextBuffer;
+        }
+
+        public IWpfTextView EnsureOpenTextView(SourceLocation sourceLocation)
+        {
             if (OpenViews.TryGetValue(sourceLocation.SourceFile, out var view))
-                return view.TextBuffer;
+                return view;
 
             var lines = FileSystem.File.ReadAllLines(sourceLocation.SourceFile);
             var textView = CreateTextView(new TestText(lines), filePath: sourceLocation.SourceFile);
-            return textView.TextBuffer;
+            return textView;
         }
 
         public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)

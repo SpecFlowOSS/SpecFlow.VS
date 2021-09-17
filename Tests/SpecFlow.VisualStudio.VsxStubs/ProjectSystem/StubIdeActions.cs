@@ -11,7 +11,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 {
     public class StubIdeActions : IIdeActions, IAsyncContextMenu
     {
-        private readonly IIdeScope _ideScope;
+        private readonly StubIdeScope _ideScope;
 
         public SourceLocation LastNavigateToSourceLocation;
         public string LastShowContextMenuHeader;
@@ -21,13 +21,16 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public StubIdeActions(IIdeScope ideScope)
         {
-            _ideScope = ideScope;
+            _ideScope = (StubIdeScope)ideScope;
         }
 
         public bool NavigateTo(SourceLocation sourceLocation)
         {
             _ideScope.Logger.LogInfo("IDE Action performed");
             LastNavigateToSourceLocation = sourceLocation;
+
+            var view = _ideScope.EnsureOpenTextView(sourceLocation);
+            _ideScope.CurrentTextView = view;
             return true;
         }
 
