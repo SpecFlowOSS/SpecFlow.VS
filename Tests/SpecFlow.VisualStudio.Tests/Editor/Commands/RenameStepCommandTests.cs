@@ -276,6 +276,10 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData(11, @"""(.*) press add""", @"On main screen (.*) press add", @"        [When(""On main screen (.*) press add"")]")]
         [InlineData(12, @"""(.*) press (.*)""", @"(.*) choose (.*)", @"        [When(""(.*) choose (.*)"")]")]
         [InlineData(13, @"""I press (.*)(.*)""", @"I press (.*) and (.*)", @"        [When(""I press (.*) and (.*)"")]")]
+        [InlineData(14, @"""I press add""", @"I choose \(add\)", @"        [When(@""I choose \(add\)"")]")]
+        [InlineData(15, @"@""I press add""", @"I choose \(add\)", @"        [When(@""I choose \(add\)"")]")]
+        [InlineData(16, @"@""I press add""", @"I choose ""add""", @"        [When(@""I choose """"add"""""")]")]
+        [InlineData(17, @"""I press add""", @"I choose ""add""", @"        [When(@""I choose """"add"""""")]")]
         public void Step_definition_class_has_one_matching_expression(int _, string testExpression, string modelStepText, string expectedLine)
         {
             var stepDefinitions = ArrangeStepDefinition(testExpression);
@@ -415,6 +419,25 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
             var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
             featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
+        }
+
+        [Theory]
+        [InlineData(1, @"""I press add""", @"I press add")]
+        [InlineData(2, @"@""I press add""", @"I press add")]
+        [InlineData(3, @"""I press \\(add\\)""", @"I press \(add\)")]
+        [InlineData(4, @"@""I press \(add\)""", @"I press \(add\)")]
+        public void The_right_expression_is_loaded_to_the_dialog(int _, string originalCSharpExpression, string expectedExpression)
+        {
+            var stepDefinition = ArrangeStepDefinition(originalCSharpExpression);
+            var featureFile = ArrangeOneFeatureFile(string.Empty);
+            RenameStepViewModel viewModel = null;
+            (_projectScope.IdeScope.WindowManager as StubWindowManager)?
+                .RegisterWindowAction<RenameStepViewModel>(model => viewModel = model);
+            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+
+            command.PreExec(textView, command.Targets.First());
+
+            viewModel?.StepText.Should().Be(expectedExpression);
         }
     }
 }
