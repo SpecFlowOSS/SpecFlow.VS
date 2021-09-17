@@ -14,6 +14,8 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
             return new AnalyzedStepDefinitionExpression(parts);
         }
 
+        //TODO: rename Complex part to ...WithOperators
+
         private ImmutableArray<AnalyzedStepDefinitionExpressionPart> SplitExpressionByGroups(string regexString)
         {
             var parts = new List<AnalyzedStepDefinitionExpressionPart>();

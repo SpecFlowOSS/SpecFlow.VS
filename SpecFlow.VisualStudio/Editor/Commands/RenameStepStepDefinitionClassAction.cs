@@ -21,6 +21,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var expressionsToReplace = ExpressionsToReplace(ctx);
             if (ctx.IsErroneous) return;
 
+            //TODO: rename Complex part to ...WithOperators
             Func<SyntaxToken, string> replacementTextCalculation = UpdatedExpressionIsEscaped() 
                 ? FromEscapedExpression 
                 : FromSimpleExpression;
