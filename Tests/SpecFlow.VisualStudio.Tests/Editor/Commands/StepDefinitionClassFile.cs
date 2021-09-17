@@ -35,7 +35,7 @@ namespace MyProject
         public int CaretPositionLine { get; private set; }
         public int CaretPositionColumn { get; private set; }
 
-        public TestText GetText()
+        public TestText GetText(string filePath)
         {
             var insertLineNumber = 6;
             var testText = new TestText(ContentTemplate);
@@ -46,7 +46,7 @@ namespace MyProject
             foreach (var stepDefinition in StepDefinitions)
             {
                 MethodName = stepDefinition.Method;
-                stepDefinition.TestSourceLocation = new SourceLocation("Steps.cs", CaretPositionLine, CaretPositionColumn);
+                stepDefinition.TestSourceLocation = new SourceLocation(filePath, CaretPositionLine, CaretPositionColumn);
                 Append(stepDefinitionText, stepDefinition);
             }
             AppendMethod(stepDefinitionText, MethodName);

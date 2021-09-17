@@ -174,7 +174,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         internal static ProjectStepDefinitionBinding[] GetStepDefinitions(string fileName, SnapshotPoint triggerPoint, ProjectBindingRegistry bindingRegistry)
         {
             if (bindingRegistry == null)
-                return new ProjectStepDefinitionBinding[0];
+                return Array.Empty<ProjectStepDefinitionBinding>();
 
             return bindingRegistry.StepDefinitions
                 .Where(sd => sd.Implementation?.SourceLocation != null &&

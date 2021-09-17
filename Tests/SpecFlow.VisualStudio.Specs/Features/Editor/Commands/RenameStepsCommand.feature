@@ -19,7 +19,7 @@ Scenario: A simple step with a sigle usage is renamed from step definition (code
 		{
 			[When("I press add")]
 			public void WhenIPressAdd()
-			{{caret} 
+			{{caret}
 			}
 		}
 		"""
@@ -65,7 +65,7 @@ Scenario: A step is renamed from feature file
 		Feature: Addition
 
 		Scenario: Add two numbers
-			When I press add{caret} 
+			When I press add{caret}
 		"""
 	And the project is built and the initial binding discovery is performed
 	And the "Rename Step" command is being invoked
@@ -84,7 +84,7 @@ Scenario: A step is renamed from feature file
 		{
 			[When("I choose add")]
 			public void WhenIPressAdd()
-			{ 
+			{
 			}
 		}
 		"""

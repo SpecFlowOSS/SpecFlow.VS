@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
@@ -33,7 +34,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
         private StubWpfTextView CreateTextView(TestText inputText, string newLine = null)
         {
-            return StubWpfTextView.CreateTextView(_projectScope.IdeScope as StubIdeScope, inputText, newLine, _projectScope, VsContentTypes.CSharp, "Steps.cs");
+            return _projectScope.StubIdeScope.CreateTextView(
+                inputText, 
+                newLine, 
+                _projectScope, 
+                VsContentTypes.CSharp,
+                "Steps.cs");
         }
 
         private StubLogger GetStubLogger()
@@ -57,9 +63,14 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         
         private TestFeatureFile ArrangeOneFeatureFile(string featureFileContent)
         {
-            var featureFile = new TestFeatureFile("calculator.feature", featureFileContent);
+            var filePath = Path.Combine(_projectScope.ProjectFolder, "calculator.feature");
+            var featureFile = new TestFeatureFile(filePath, featureFileContent);
             if (!featureFile.IsVoid)
+            {
+                _projectScope.IdeScope.FileSystem.Directory.CreateDirectory(_projectScope.ProjectFolder);
                 _projectScope.IdeScope.FileSystem.File.WriteAllText(featureFile.FileName, featureFileContent);
+            }
+
             return featureFile;
         }
 
@@ -114,7 +125,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             TestFeatureFile[] featureFiles)
         {
             var stepDefinitionClassFile = new StepDefinitionClassFile(stepDefinitions);
-            var inputText = stepDefinitionClassFile.GetText();
+            var filePath = Path.Combine(_projectScope.ProjectFolder, "Steps.cs");
+            var inputText = stepDefinitionClassFile.GetText(filePath);
             Dump(inputText, "Generated step definition class");
 
             _projectScope.AddSpecFlowPackage();
@@ -124,8 +136,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             }
 
             var discoveryService =
-                MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope,
-                    stepDefinitionClassFile.StepDefinitions);
+                MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, stepDefinitionClassFile.StepDefinitions);
             discoveryService.WaitUntilDiscoveryPerformed();
 
             var textView = CreateTextView(inputText);
@@ -161,7 +172,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var emptyIde = new StubIdeScope(_testOutputHelper);
             var command = new RenameStepCommand(emptyIde, null, null);
             var inputText = new TestText(string.Empty);
-            var textView = StubWpfTextView.CreateTextView(emptyIde, inputText);
+            var textView = emptyIde.CreateTextView(inputText, contentType:VsContentTypes.CSharp);
             
             command.PreExec(textView, command.Targets.First());
 

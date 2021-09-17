@@ -14,7 +14,8 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
     {
         public DeveroomConfiguration DeveroomConfiguration { get; } = new DeveroomConfiguration();
         public PropertyCollection Properties { get; } = new PropertyCollection();
-        public IIdeScope IdeScope { get; }
+        public IIdeScope IdeScope => StubIdeScope;
+        public StubIdeScope StubIdeScope {get; }
         public IEnumerable<NuGetPackageReference> PackageReferences => PackageReferencesList;
         public string ProjectFolder { get; } = Path.GetTempPath();
         public string OutputAssemblyPath => Path.Combine(ProjectFolder, "out.dll");
@@ -30,9 +31,9 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public InMemoryStubProjectScope(IIdeScope ideScope)
         {
-            IdeScope = ideScope;
+            StubIdeScope = ideScope as StubIdeScope;
             Properties.AddProperty(typeof(IDeveroomConfigurationProvider), new StubDeveroomConfigurationProvider(DeveroomConfiguration));
-            ((StubIdeScope) ideScope).ProjectScopes.Add(this);
+            StubIdeScope.ProjectScopes.Add(this);
         }
 
         public void AddSpecFlowPackage()
@@ -42,6 +43,11 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public void AddFile(string targetFilePath, string template)
         {
+            if (targetFilePath != null && !Path.IsPathRooted(targetFilePath))
+                targetFilePath = Path.Combine(ProjectFolder, targetFilePath);
+
+            StubIdeScope.FileSystem.Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));
+            StubIdeScope.FileSystem.File.WriteAllText(targetFilePath, template);
             FilesAdded[targetFilePath] = template;
         }
 

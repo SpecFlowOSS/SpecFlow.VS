@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -67,7 +68,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         public void GivenThereIsASpecFlowProjectScopeWithCalculatorStepDefinitions()
         {
             GivenThereIsASpecFlowProjectScope();
-
+            var filePath = @"X:\ProjectMock\CalculatorSteps.cs";
             _discoveryService.LastDiscoveryResult.StepDefinitions = new[]
             {
                 new StepDefinition
@@ -76,14 +77,14 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                     ParamTypes = "i",
                     Type = "Given",
                     Regex = "^I have entered (.*) into the calculator$",
-                    SourceLocation = @"X:\ProjectMock\CalculatorSteps.cs|24|5"
+                    SourceLocation = filePath + "|24|5"
                 },
                 new StepDefinition
                 {
                     Method = "WhenIPressAdd",
                     Type = "When",
                     Regex = "^I press add$",
-                    SourceLocation = @"X:\ProjectMock\CalculatorSteps.cs|12|5"
+                    SourceLocation = filePath + "|12|5"
                 },
                 new StepDefinition
                 {
@@ -91,9 +92,11 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                     ParamTypes = "i",
                     Type = "Then",
                     Regex = "^the result should be (.*) on the screen$",
-                    SourceLocation = @"X:\ProjectMock\CalculatorSteps.cs|18|5"
+                    SourceLocation = filePath + "|18|5"
                 },
             };
+
+            _projectScope.AddFile(filePath, string.Empty);
         }
         
         [Given(@"the specflow.json configuration file contains")]
@@ -127,10 +130,11 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
 
         private StepDefinition CreateStepDefinitionFromTableRow(TableRow tableRow)
         {
+            var filePath = @"X:\ProjectMock\CalculatorSteps.cs";
             var stepDefinition = new StepDefinition
             {
                 Method = $"M{Guid.NewGuid():N}",
-                SourceLocation = @"X:\ProjectMock\CalculatorSteps.cs|12|5"
+                SourceLocation = filePath + "|12|5"
             };
 
             tableRow.TryGetValue("tag scope", out var tagScope);
@@ -153,6 +157,8 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                     ScenarioTitle = scenarioScope
                 };
             }
+
+            _projectScope.AddFile(filePath, string.Empty);
 
             return stepDefinition;
         }
@@ -255,6 +261,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             _ideScope.TriggerProjectsBuilt();
         }
 
+        [When("the project is built and the initial binding discovery is performed")]
         [Given("the project is built and the initial binding discovery is performed")]
         public void GivenTheProjectIsBuiltAndTheInitialBindingDiscoveryIsPerformed()
         {
@@ -433,8 +440,9 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         [Then("the editor should be updated to contain")]
         public void ThenTheEditorShouldBeUpdatedToContain(string expectedContentValue)
         {
-            var expectedContent = new TestText(expectedContentValue);
-            _ideScope.CurrentTextView.TextSnapshot.GetText().Should().Contain(expectedContent.ToString());
+            var expectedContent = new TestText(expectedContentValue).ToString();
+            var currentContent = _ideScope.CurrentTextView.TextSnapshot.GetText();
+            currentContent.Should().Contain(expectedContent);
         }
 
         private IEnumerable<DeveroomTag> GetDeveroomTags(IWpfTextView textView)
@@ -725,6 +733,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         {
             string fileContent = GetActualContent(fileName);
             var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
+            _projectScope.AddFile(filePath, fileContent);
             var parsedSnippets = ParseSnippetsFromFile(fileContent, filePath);
             expectedSnippets.CompareToSet(parsedSnippets, false);
         }
