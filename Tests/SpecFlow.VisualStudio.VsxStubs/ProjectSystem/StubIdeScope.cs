@@ -72,6 +72,9 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
         {
+            if (OpenViews.TryGetValue(sourceLocation.SourceFile, out var view))
+                return view.TextBuffer;
+
             var lines = FileSystem.File.ReadAllLines(sourceLocation.SourceFile);
             var textView = CreateTextView(new TestText(lines), filePath: sourceLocation.SourceFile);
             return textView.TextBuffer;

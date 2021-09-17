@@ -57,12 +57,19 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var text = from.usage.Step.Text;
             for (int i = 0; i < parameterMatch.StepTextParameters.Length; i++)
             {
-                resultText.Append(updatedExpression.Parts[i * 2].ExpressionText);
+                resultText.Append(GetUnescapedText(updatedExpression.Parts[i * 2]));
                 resultText.Append(text.Substring(parameterMatch.StepTextParameters[i].Index, parameterMatch.StepTextParameters[i].Length));
             }
-            resultText.Append(updatedExpression.Parts.Last().ExpressionText);
+            resultText.Append(GetUnescapedText(updatedExpression.Parts.Last()));
 
             return resultText.ToString();
+        }
+
+        private string GetUnescapedText(AnalyzedStepDefinitionExpressionPart part)
+        {
+            if (part is AnalyzedStepDefinitionExpressionSimpleTextPart simpleTextPart)
+                return simpleTextPart.UnescapedText;
+            return part.ExpressionText;
         }
 
         protected void EnsureFeatureFileOpen(SourceLocation sourceLocation, IIdeScope ideScope)

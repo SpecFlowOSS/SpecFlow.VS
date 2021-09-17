@@ -4,10 +4,12 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.Diagnostics;
+using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.UI.ViewModels;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
@@ -52,9 +54,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             return msg.Item2 == "ShowProblem: User Notification: Unable to find step definition usages: could not find any SpecFlow project with feature files.";
         }  
         
-        private static TestFeatureFile ArrangeOneFeatureFile(string featureFileContent)
+        private TestFeatureFile ArrangeOneFeatureFile(string featureFileContent)
         {
-            return new TestFeatureFile("calculator.feature", featureFileContent);
+            var featureFile = new TestFeatureFile("calculator.feature", featureFileContent);
+            if (!featureFile.IsVoid)
+                _projectScope.IdeScope.FileSystem.File.WriteAllText(featureFile.FileName, featureFileContent);
+            return featureFile;
         }
 
         private static TestStepDefinition[] ArrangeMultipleStepDefinitions()
@@ -131,7 +136,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
         private TestText Dump(IWpfTextView textView, string title)
         {
-            var testText = new TestText(textView.TextBuffer.CurrentSnapshot.Lines.Select(l => l.GetText()).ToArray());
+            return Dump(textView.TextBuffer, title);
+        }
+
+        private TestText Dump(ITextBuffer textBuffer, string title)
+        {
+            var testText = new TestText(textBuffer.CurrentSnapshot.Lines.Select(l => l.GetText()).ToArray());
             Dump(testText, title);
             return testText;
         }
@@ -368,6 +378,43 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             testText.Lines[6].Should().Be(expectedLines[0]);
             testText.Lines[7].Should().Be(expectedLines[1]);
             testText.Lines[8].Should().Be(expectedLines[2]);
+        }
+
+        [Fact]
+        public void Step_in_the_feature_file_is_renamed_simple_case()
+        {
+            var stepDefinition = ArrangeStepDefinition(@"""I press add""");
+            var featureFile = ArrangeOneFeatureFile(@"Feature: Feature1
+                Scenario: Scenario1
+                    When I press add");
+            ArrangePopup(@"I choose add");
+            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+
+            command.PreExec(textView, command.Targets.First());
+
+            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
+            var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
+            featureText.Lines[2].Should().Be(@"                    When I choose add");
+        }
+
+        [Theory]
+        [InlineData(1, @"""I press add""", @"I choose add", @"I press add", @"I choose add")]
+        [InlineData(2, @"""I press add""", @"I choose \(add\)", @"I press add", @"I choose (add)")]
+        [InlineData(3, @"""I press add (.*)""", @"I choose \(add\) (.*)", @"I press add 42", @"I choose (add) 42")]
+        public void Step_in_the_feature_file_is_renamed(int _, string originalExpression, string updatedExpression, string originalStepText, string expectedStepText)
+        {
+            var stepDefinition = ArrangeStepDefinition(originalExpression);
+            var featureFile = ArrangeOneFeatureFile($@"Feature: Feature1
+                Scenario: Scenario1
+                    When {originalStepText}");
+            ArrangePopup(updatedExpression);
+            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+
+            command.PreExec(textView, command.Targets.First());
+
+            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
+            var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
+            featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
         }
     }
 }
