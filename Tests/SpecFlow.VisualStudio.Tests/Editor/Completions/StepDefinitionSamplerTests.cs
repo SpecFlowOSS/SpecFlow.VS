@@ -51,7 +51,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Completions
         [InlineData(@"some \[context\]", @"some [context]")]
         [InlineData(@"some \[context]", @"some [context]")]
         [InlineData(@"some \[context] (.*)", @"some [context] [???]")]
-        [InlineData(@"chars \\\*\+\?\|\{\}\[\]\(\)\^\$\#", @"chars \*+?|{}[]()^$#", Skip = "TODO: improve StepDefinitionSampler")]
+        [InlineData(@"chars \\\*\+\?\|\{\}\[\]\(\)\^\$\#", @"chars \*+?|{}[]()^$#")]
         public void Unescapes_masked_chars(string regex, string expectedResult)
         {
             var sut = new StepDefinitionSampler();

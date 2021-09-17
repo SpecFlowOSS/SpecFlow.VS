@@ -202,20 +202,20 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         }
 
         [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData(@"""foo? (\d+) bar""")]
-        [InlineData(@"""foo (?:\d+) bar""")]
-        [InlineData(@"""foo [a-z] bar""")]
-        [InlineData(@"""foo. (\d+) bar""")]
-        [InlineData(@"""foo* (\d+) bar""")]
-        [InlineData(@"""foo+ (\d+) bar""")]
-        [InlineData(@"""some \\(context\\)""")]
-        [InlineData(@"""some \{context\}""")]
-        [InlineData(@"""some \[context\]""")]
-        [InlineData(@"""some \[context]""")]
-        [InlineData(@"""chars \\\\\\*\\+\\?\\|\\{\\}\\[\\]\\(\\)\\^\\$\\#""")]
-        public void StepDefinition_expression_cannot_be_modified(string emptyExpression)
+        [InlineData(1, null)]
+        [InlineData(2, "")]
+        [InlineData(3, @"""foo? (\d+) bar""")]
+        [InlineData(4, @"""foo (?:\d+) bar""")]
+        [InlineData(5, @"""foo [a-z] bar""")]
+        [InlineData(6, @"""foo. (\d+) bar""")]
+        [InlineData(7, @"""foo* (\d+) bar""")]
+        [InlineData(8, @"""foo+ (\d+) bar""")]
+        // [InlineData(9, @"""some \\(context\\)""")] -- represents `some \(context\)` that is a simple part (all op masked)
+        [InlineData(10, @"""some \{context\}""")]
+        [InlineData(11, @"""some \[context\]""")]
+        [InlineData(12, @"""some \[context]""")]
+        // [InlineData(13, @"""chars \\\\\\*\\+\\?\\|\\{\\}\\[\\]\\(\\)\\^\\$\\#""")] -- represents `chars \\\*\+\?\|\{\}\[\]\(\)\^\$\#` that is a simple part (all op masked)
+        public void StepDefinition_expression_cannot_be_modified(int _, string emptyExpression)
         {
             var stepDefinition = ArrangeStepDefinition(emptyExpression);
 

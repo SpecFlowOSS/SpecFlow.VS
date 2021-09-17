@@ -17,37 +17,44 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
         private ImmutableArray<AnalyzedStepDefinitionExpressionPart> SplitExpressionByGroups(string regexString)
         {
             var parts = new List<AnalyzedStepDefinitionExpressionPart>();
+            var escapedStringBuilder = new StringBuilder();
             var unescapedStringBuilder = new StringBuilder();
 
             var maskChar = '\\';
             var groupOpenChar = '(';
             var maskedRegexChars = new[] { maskChar, '+', '.', '*', '?', '|', '{', '[', groupOpenChar, '^', '$', '#' };
             int position = 0;
-            string unescapedString;
             bool isSimpleText = true;
             while (position < regexString.Length)
             {
                 int index = regexString.IndexOfAny(maskedRegexChars, position);
                 if (index < 0)
                 {
-                    unescapedString = regexString.Substring(position);
-                    unescapedStringBuilder.Append(unescapedString);
+                    var remainingText = regexString.Substring(position);
+                    escapedStringBuilder.Append(remainingText);
+                    unescapedStringBuilder.Append(remainingText);
                     break;
                 }
 
                 if (regexString[index] == maskChar && index < regexString.Length - 1)
                 {
-                    unescapedStringBuilder.Append(regexString.Substring(position, index - position + 2));
+                    escapedStringBuilder.Append(regexString.Substring(position, index - position + 2));
+                    unescapedStringBuilder.Append(regexString.Substring(position, index - position));
+                    unescapedStringBuilder.Append(regexString[index + 1]);
                     position = index + 2;
                 }
                 else if (regexString[index] == groupOpenChar && !IsNonCapturingGroup(regexString, index))
                 {
                     if (index > position)
-                        unescapedStringBuilder.Append(regexString.Substring(position, index - position));
+                    {
+                        var remainingText = regexString.Substring(position, index - position);
+                        escapedStringBuilder.Append(remainingText);
+                        unescapedStringBuilder.Append(remainingText);
+                    }
 
-                    unescapedString = unescapedStringBuilder.ToString();
-                    parts.Add(CreateTextPart(unescapedString, isSimpleText));
+                    parts.Add(CreateTextPart(escapedStringBuilder.ToString(), unescapedStringBuilder.ToString(), isSimpleText));
                     isSimpleText = true;
+                    escapedStringBuilder = new StringBuilder();
                     unescapedStringBuilder = new StringBuilder();
                     var groupCloseIndex = FindGroupCloseIndex(regexString, index) + 1;
                     var parameter = regexString.Substring(index, groupCloseIndex - index);
@@ -56,21 +63,21 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
                 }
                 else
                 {
-                    unescapedStringBuilder.Append(regexString.Substring(position, index - position + 1));
+                    escapedStringBuilder.Append(regexString.Substring(position, index - position + 1));
+                    unescapedStringBuilder.Append(regexString.Substring(position, index - position));
                     position = index + 1;
                     isSimpleText = false;
                 }
             }
 
-            unescapedString = unescapedStringBuilder.ToString();
-            parts.Add(CreateTextPart(unescapedString, isSimpleText));
+            parts.Add(CreateTextPart(escapedStringBuilder.ToString(), unescapedStringBuilder.ToString(), isSimpleText));
             return parts.ToImmutableArray();
         }
 
-        private AnalyzedStepDefinitionExpressionPart CreateTextPart(string text, bool isSimpleText)
+        private AnalyzedStepDefinitionExpressionPart CreateTextPart(string text, string unescapedText, bool isSimpleText)
         {
             return isSimpleText
-                ? new AnalyzedStepDefinitionExpressionSimpleTextPart(text)
+                ? new AnalyzedStepDefinitionExpressionSimpleTextPart(text, unescapedText)
                 : new AnalyzedStepDefinitionExpressionComplexTextPart(text);
         }
 

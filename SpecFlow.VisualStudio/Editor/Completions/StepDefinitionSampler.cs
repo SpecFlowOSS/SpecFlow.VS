@@ -19,18 +19,18 @@ namespace SpecFlow.VisualStudio.Editor.Completions
 
             if (analyzedStepDefinitionExpression.Parts.Length == 1)
             {
-                return regexTextCore.Replace("\\", "");
+                return GetUnescapedText(analyzedStepDefinitionExpression.Parts[0]);
             }   
             
             if (!analyzedStepDefinitionExpression.ContainsOnlySimpleText)
             {
-                return regexTextCore;//.Replace("\\", "");
+                return regexTextCore;
             }
 
             var completionTextBuilder = new StringBuilder();
             for (int i = 0; i < analyzedStepDefinitionExpression.Parts.Length; i+=2)
             {
-                completionTextBuilder.Append(analyzedStepDefinitionExpression.Parts[i].ExpressionText.Replace("\\",""));
+                completionTextBuilder.Append(GetUnescapedText(analyzedStepDefinitionExpression.Parts[i]));
                 if (i < analyzedStepDefinitionExpression.Parts.Length - 1)
                 {
                     completionTextBuilder.Append("[");
@@ -39,6 +39,13 @@ namespace SpecFlow.VisualStudio.Editor.Completions
                 }
             }
             return completionTextBuilder.ToString();
+        }
+
+        private string GetUnescapedText(AnalyzedStepDefinitionExpressionPart part)
+        {
+            if (part is AnalyzedStepDefinitionExpressionSimpleTextPart simpleTextPart)
+                return simpleTextPart.UnescapedText;
+            return part.ExpressionText;
         }
 
         private string GetPlaceHolderText(ProjectStepDefinitionBinding stepDefinitionBinding, int groupIndex)
