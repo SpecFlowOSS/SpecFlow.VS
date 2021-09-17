@@ -128,7 +128,6 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             if (Erroneous(ctx)) return;
 
             RenameStepViewModel viewModel = PrepareViewModel(ctx);
-            //TODO: validate modified expression in the UI: the parameter expressions and order cannot be changed
             var result = IdeScope.WindowManager.ShowDialog(viewModel);
             if (result != true)
                 return;
@@ -141,7 +140,6 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             ctx.UpdatedExpression = viewModel.StepText;
             ctx.AnalyzedUpdatedExpression = viewModel.ParsedUpdatedExpression;
-            //TODO: validate, although the form should have validated it anyway...
 
             _renameStepFeatureFileAction.PerformRenameStep(ctx);
             _renameStepStepDefinitionClassAction.PerformRenameStep(ctx);
@@ -150,12 +148,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private bool Erroneous(RenameStepCommandContext ctx)
         {
+            //TODO: handle warnings
             if (!ctx.IsErroneous) return false;
 
-            foreach (var issue in ctx.Issues)
-            {
-                IdeScope.Actions.ShowProblem(issue.Description);
-            }
+            var problem = string.Join(Environment.NewLine, ctx.Issues.Select(issue => issue.Description));
+            IdeScope.Actions.ShowProblem(problem);
 
             return true;
         }

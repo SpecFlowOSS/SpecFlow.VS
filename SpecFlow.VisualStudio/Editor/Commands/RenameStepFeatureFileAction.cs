@@ -28,11 +28,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 var textBufferOfFeatureFile = ideScope.GetTextBuffer(firstPosition);
                 EditTextBuffer(textBufferOfFeatureFile, fileUsage,
                     usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
-                    usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression));
+                    usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression, fileUsage.Key, ctx));
             }
         }
 
-        private string CalculateReplacementText((ITextBuffer textBufferOfFeatureFile, StepDefinitionUsage usage) from, AnalyzedStepDefinitionExpression updatedExpression)
+        private string CalculateReplacementText((ITextBuffer textBufferOfFeatureFile, StepDefinitionUsage usage) @from,
+            AnalyzedStepDefinitionExpression updatedExpression, string filePath,
+            RenameStepCommandContext renameStepCommandContext)
         {
             //TODO: make a shortcut for simple expressions (no params), in that case we just need to return viewModel.StepText
 
@@ -45,12 +47,14 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var parameterMatch = matchResult?.Items
                 .FirstOrDefault(m => m.ParameterMatch != null)
                 ?.ParameterMatch;
-
-            if (parameterMatch == null || parameterMatch.StepTextParameters.Length != updatedExpression.ParameterParts.Count())
+            
+            if (parameterMatch == null 
+                || parameterMatch.StepTextParameters.Length != updatedExpression.ParameterParts.Count() 
+                || matchedStepTag.ParentTag.GetDescendantsOfType(DeveroomTagTypes.ScenarioOutlinePlaceholder).Any())
             {
-                //TODO: show warning???
-                //TODO: change return type to something that can handle error result (and do not replace the feature file text in this case)
-                return "TODO: do not replace to this";
+                //TODO: Calculate lina and column
+                renameStepCommandContext.AddNotification($"{filePath}(12,12): Could not rename scenario outline step: {from.usage.Step.Text} ");
+                return from.usage.Step.Text;
             }
 
             var resultText = new StringBuilder();

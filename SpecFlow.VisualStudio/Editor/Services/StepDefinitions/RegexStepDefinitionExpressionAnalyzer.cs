@@ -81,15 +81,6 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
                 : new AnalyzedStepDefinitionExpressionComplexTextPart(text);
         }
 
-        private static bool IsSimpleText(string text)
-        {
-            //TODO: maybe there is a smarter/more proper way
-            text = text.Replace(' ', '_');
-            var escaped = Regex.Escape(text);
-            text = text.Replace("\\", "\\\\");
-            return escaped == text;
-        }
-
         private int FindGroupCloseIndex(string regexString, int openPosition)
         {
             int nesting = 0;

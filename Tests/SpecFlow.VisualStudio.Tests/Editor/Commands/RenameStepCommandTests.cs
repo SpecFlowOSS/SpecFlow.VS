@@ -306,7 +306,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData("10", @"""I press (.*)""", @"I press (/d)", "Parameter expression mismatch")]
         [InlineData("11", @"""I press (.*)""", @"I press (/d)(.*)", "Parameter count mismatch", "Parameter expression mismatch")]
         [InlineData("13", @"""I press add""", @"I ( add (.*)", "Parameter count mismatch")]
-        [InlineData("14", @"""I press (.*)""", @"I press add .*)", "Parameter count mismatch")]
+        [InlineData("14", @"""I press (.*)""", @"I press add .*)", "The non-parameter parts cannot contain expression operators", "Parameter count mismatch")]
         [InlineData("15", @"""I press add""", @"I pr?ess add", "The non-parameter parts cannot contain expression operators")]
         [InlineData("16", @"""I press (.*)""", @"I pr?ess (.*)", "The non-parameter parts cannot contain expression operators")]
         public void User_cannot_type_invalid_expression(string _, string testExpression, string modelStepText, params string[] errorMessages)
@@ -319,9 +319,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger();
-            stubLogger.Messages
-                .Select(m => m.Item2.Replace("ShowProblem: User Notification: ", String.Empty))
-                .Should().Contain(errorMessages);
+            stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: " + string.Join(Environment.NewLine, errorMessages));
         }
 
         [Fact]
@@ -411,6 +409,31 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var featureFile = ArrangeOneFeatureFile($@"Feature: Feature1
                 Scenario: Scenario1
                     When {originalStepText}");
+            ArrangePopup(updatedExpression);
+            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+
+            command.PreExec(textView, command.Targets.First());
+
+            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
+            var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
+            featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
+        }
+
+        [Theory]
+        [InlineData(1, @"""I press add""", @"I choose add", @"I press add", @"I choose add")]
+        [InlineData(2, @"""I press add""", @"I choose \(add\)", @"I press add", @"I choose (add)")]
+        [InlineData(3, @"""I press add (.*)""", @"I choose \(add\) (.*)", @"I press add 42", @"I choose (add) 42")]
+        [InlineData(4, @"""I press add""", @"I choose add", @"I press <p1>", @"I press <p1>")]
+        [InlineData(5, @"""I press add (.*)""", @"I choose \(add\) (.*)", @"I press <p1> 42", @"I press <p1> 42")]
+        public void Step_of_scenario_outline_in_the_feature_file_is_renamed(int _, string originalExpression, string updatedExpression, string originalStepText, string expectedStepText)
+        {
+            var stepDefinition = ArrangeStepDefinition(originalExpression);
+            var featureFile = ArrangeOneFeatureFile($@"Feature: Feature1
+                Scenario Outline: Scenario1
+                    When {originalStepText}
+                Examples:
+                    |p1 |
+                    |add|");
             ArrangePopup(updatedExpression);
             var (textView, command) = ArrangeSut(stepDefinition, featureFile);
 

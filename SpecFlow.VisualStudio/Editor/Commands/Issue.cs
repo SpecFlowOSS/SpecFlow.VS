@@ -4,7 +4,7 @@
     {
         public enum IssueKind
         {
-            Problem
+            Problem, Notification
         }
 
         public Issue(IssueKind kind, string description)

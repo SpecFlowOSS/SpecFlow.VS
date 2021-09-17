@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.Discovery;
@@ -30,11 +31,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public AnalyzedStepDefinitionExpression AnalyzedOriginalExpression { get; set; }
         public string UpdatedExpression { get; set; }
         public AnalyzedStepDefinitionExpression AnalyzedUpdatedExpression { get; set; }
-        public bool IsErroneous => Issues.Count != 0;
+        public bool IsErroneous => Issues.Any(issue=>issue.Kind == Issue.IssueKind.Problem);
 
         public void AddProblem(string description)
         {
             AddIssue(Issue.IssueKind.Problem, description);
+        }
+
+        public void AddNotification(string description)
+        {
+            AddIssue(Issue.IssueKind.Notification, description);
         }
 
         public void AddIssue(Issue.IssueKind kind, string description)
