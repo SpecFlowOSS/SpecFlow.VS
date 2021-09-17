@@ -135,7 +135,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             viewModel.ParsedUpdatedExpression = ctx.StepDefinitionExpressionAnalyzer.Parse(viewModel.StepText);
 
             var validationErrors = Validate(ctx, viewModel.StepText);
-            ctx.Issues.AddRange(validationErrors.Select(error=>new Issue(Issue.IssueKind.Problem, error)));
+            ctx.Issues.AddRange(validationErrors.Select(error=>new Problem(Problem.ProblemKind.Critical, error)));
             if (Erroneous(ctx)) return;
 
             ctx.UpdatedExpression = viewModel.StepText;
@@ -148,7 +148,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private bool Erroneous(RenameStepCommandContext ctx)
         {
-            //TODO: handle warnings
+            //TODO: handle critical/nofification
             if (!ctx.IsErroneous) return false;
 
             var problem = string.Join(Environment.NewLine, ctx.Issues.Select(issue => issue.Description));
@@ -165,7 +165,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             if (ctx.SpecFlowTestProjectsWithFeatureFiles.Length == 0)
             {
-                ctx.AddProblem("Unable to find step definition usages: could not find any SpecFlow project with feature files.");
+                ctx.AddCriticalProblem("Unable to find step definition usages: could not find any SpecFlow project with feature files.");
             }
         }
 
@@ -174,11 +174,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ctx.ProjectOfStepDefinitionClass = IdeScope.GetProject(ctx.TextBufferOfStepDefinitionClass);
             if (ctx.ProjectOfStepDefinitionClass == null)
             {
-                ctx.AddProblem("Unable to find step definition usages: the project is not initialized yet.");
+                ctx.AddCriticalProblem("Unable to find step definition usages: the project is not initialized yet.");
             }
             else if (!ctx.ProjectOfStepDefinitionClass.GetProjectSettings().IsSpecFlowProject)
             {
-                ctx.AddProblem("Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
+                ctx.AddCriticalProblem("Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
             }
         }
 
@@ -187,10 +187,10 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             switch (ctx.StepDefinitionBinding.Expression)
             {
                 case null:
-                    ctx.AddProblem( "Unable to rename step, the step definition expression cannot be detected.");
+                    ctx.AddCriticalProblem( "Unable to rename step, the step definition expression cannot be detected.");
                     return;
                 case "":
-                    ctx.AddProblem("Step definition expression is invalid");
+                    ctx.AddCriticalProblem("Step definition expression is invalid");
                     return;
             }
 
@@ -198,7 +198,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ctx.AnalyzedOriginalExpression = ctx.StepDefinitionExpressionAnalyzer.Parse(ctx.StepDefinitionBinding.Expression);
 
             if (!ctx.AnalyzedOriginalExpression.ContainsOnlySimpleText)
-                ctx.AddProblem(NonParameterPartsCannotContainExpressionOperators);
+                ctx.AddCriticalProblem(NonParameterPartsCannotContainExpressionOperators);
         }
 
         private static RenameStepViewModel PrepareViewModel(RenameStepCommandContext ctx)

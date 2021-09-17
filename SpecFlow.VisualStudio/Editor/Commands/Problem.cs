@@ -1,19 +1,19 @@
 ﻿namespace SpecFlow.VisualStudio.Editor.Commands
 {
-    public record Issue
+    public record Problem
     {
-        public enum IssueKind
+        public enum ProblemKind
         {
-            Problem, Notification
+            Critical, Notification
         }
 
-        public Issue(IssueKind kind, string description)
+        public Problem(ProblemKind kind, string description)
         {
             Kind = kind;
             Description = description;
         }
 
-        public IssueKind Kind { get; }
+        public ProblemKind Kind { get; }
         public string Description { get; }
 
         public override string ToString()

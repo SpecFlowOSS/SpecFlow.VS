@@ -13,11 +13,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public RenameStepCommandContext(IIdeScope ideScope)
         {
             IdeScope = ideScope;
-            Issues = new List<Issue>();
+            Issues = new List<Problem>();
         }
 
         public IIdeScope IdeScope { get;  }
-        public List<Issue> Issues { get; }
+        public List<Problem> Issues { get; }
         public ITextBuffer TextBufferOfStepDefinitionClass { get; set; }
         public IProjectScope ProjectOfStepDefinitionClass { get; set; }
         public IStepDefinitionExpressionAnalyzer StepDefinitionExpressionAnalyzer { get; set; }
@@ -31,21 +31,21 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public AnalyzedStepDefinitionExpression AnalyzedOriginalExpression { get; set; }
         public string UpdatedExpression { get; set; }
         public AnalyzedStepDefinitionExpression AnalyzedUpdatedExpression { get; set; }
-        public bool IsErroneous => Issues.Any(issue=>issue.Kind == Issue.IssueKind.Problem);
+        public bool IsErroneous => Issues.Any(issue=>issue.Kind == Problem.ProblemKind.Critical);
 
-        public void AddProblem(string description)
+        public void AddCriticalProblem(string description)
         {
-            AddIssue(Issue.IssueKind.Problem, description);
+            AddProblem(Problem.ProblemKind.Critical, description);
         }
 
-        public void AddNotification(string description)
+        public void AddNotificationProblem(string description)
         {
-            AddIssue(Issue.IssueKind.Notification, description);
+            AddProblem(Problem.ProblemKind.Notification, description);
         }
 
-        public void AddIssue(Issue.IssueKind kind, string description)
+        public void AddProblem(Problem.ProblemKind kind, string description)
         {
-            Issues.Add(new Issue(kind, description));
+            Issues.Add(new Problem(kind, description));
         }
     }
 }

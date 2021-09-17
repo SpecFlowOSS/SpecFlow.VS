@@ -38,7 +38,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             var syntaxTree = ctx.IdeScope.GetSyntaxTree(ctx.TextBufferOfStepDefinitionClass);
             if (!syntaxTree.TryGetRoot(out SyntaxNode? rootNode)){
-                ctx.AddProblem("Couldn't find syntax root");
+                ctx.AddCriticalProblem("Couldn't find syntax root");
                 return;
             }
 
@@ -52,7 +52,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ctx.Method = node.Parent as MethodDeclarationSyntax;
             if (ctx.Method == null)
             {
-                ctx.AddProblem($"Method not found for {ctx.StepDefinitionBinding}.");
+                ctx.AddCriticalProblem($"Method not found for {ctx.StepDefinitionBinding}.");
             }
         }
 
@@ -76,7 +76,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             if (stepDefinitionAttributeTextTokens.Length == 0)
             {
-                ctx.AddProblem($"No expressions found to replace for {ctx.StepDefinitionBinding}");
+                ctx.AddCriticalProblem($"No expressions found to replace for {ctx.StepDefinitionBinding}");
             }
 
             return stepDefinitionAttributeTextTokens;
