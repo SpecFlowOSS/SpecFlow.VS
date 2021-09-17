@@ -2,6 +2,7 @@
 using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Utilities;
+using SpecFlow.VisualStudio.Editor.Services;
 
 namespace SpecFlow.VisualStudio.Editor.Classification
 {
@@ -23,13 +24,13 @@ namespace SpecFlow.VisualStudio.Editor.Classification
 #pragma warning disable 169
 
         [Export]
-        [Name("deveroom")]
+        [Name(VsContentTypes.FeatureFile)]
         [BaseDefinition("text")]
         private static ContentTypeDefinition _typeDefinition;
         
         [Export]
         [FileExtension(".feature")]
-        [ContentType("deveroom")]
+        [ContentType(VsContentTypes.FeatureFile)]
         private static FileExtensionToContentTypeDefinition _fileExtensionToContentTypeDefinition;
 
 

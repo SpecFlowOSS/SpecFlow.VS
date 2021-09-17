@@ -34,6 +34,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         public override bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs = default(IntPtr))
         {
+            return InvokeCommand(textView);
+        }
+
+        internal bool InvokeCommand(IWpfTextView textView, Action<SourceLocation> continueWithAfterJump = null)
+        {
             Logger.LogVerbose("Go To Step Definition");
 
             var textBuffer = textView.TextBuffer;
@@ -49,13 +54,13 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 if (matchResult.HasSingleMatch)
                 {
                     var matchResultItem = matchResult.Items.First();
-                    PerformGoToDefinition(matchResultItem, textBuffer);
+                    PerformGoToDefinition(matchResultItem, textBuffer, continueWithAfterJump);
                 }
                 else
                 {
                     Logger.LogVerbose($"Jump to list step: {matchResult}");
                     IdeScope.Actions.ShowSyncContextMenu(PopupHeader, matchResult.Items.Select(m => 
-                        new ContextMenuItem(m.ToString(), _ => { PerformGoToDefinition(m, textBuffer); }, GetIcon(m))
+                        new ContextMenuItem(m.ToString(), _ => { PerformGoToDefinition(m, textBuffer, continueWithAfterJump); }, GetIcon(m))
                     ).ToArray());
                 }
             }
@@ -63,7 +68,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return true;
         }
 
-        private void PerformGoToDefinition(MatchResultItem match, ITextBuffer textBuffer)
+        private void PerformGoToDefinition(MatchResultItem match, ITextBuffer textBuffer, Action<SourceLocation> continueWithAfterJump)
         {
             MonitoringService.MonitorCommandGoToStepDefinition(match.Type == MatchResultType.Undefined);
             switch (match.Type)
@@ -73,12 +78,12 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                     break;
                 case MatchResultType.Defined:
                 case MatchResultType.Ambiguous:
-                    PerformJump(match);
+                    PerformJump(match, continueWithAfterJump);
                     break;
             }
         }
 
-        private void PerformJump(MatchResultItem match)
+        private void PerformJump(MatchResultItem match, Action<SourceLocation> continueWithAfterJump)
         {
             var sourceLocation = match.MatchedStepDefinition.Implementation.SourceLocation;
             if (sourceLocation == null)
@@ -89,7 +94,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }
 
             Logger.LogInfo($"Jumping to {match} at {sourceLocation}");
-            if (!IdeScope.Actions.NavigateTo(sourceLocation))
+            if (IdeScope.Actions.NavigateTo(sourceLocation))
+            {
+                continueWithAfterJump?.Invoke(sourceLocation);
+            }
+            else
             {
                 Logger.LogWarning($"Cannot jump to {match}: invalid source file or position. Try to build the project to refresh positions.");
                 IdeScope.Actions.ShowProblem($"Unable to jump to the step definition. Invalid source file or file position.{Environment.NewLine}{sourceLocation}");

@@ -224,15 +224,15 @@ namespace SpecFlow.VisualStudio.VsxStubs
             #endregion
         }
 
-        public static StubWpfTextView CreateTextView(StubIdeScope ideScope, TestText inputText, string newLine = null, IProjectScope projectScope = null, string contentType = "deveroom", string filePath = null)
+        public static StubWpfTextView CreateTextView(StubIdeScope ideScope, TestText inputText, string newLine = null, IProjectScope projectScope = null, string contentType = VsContentTypes.FeatureFile, string filePath = null)
         {
-            var textBuffer = VsxStubObjects.CreateTextBuffer(inputText.ToString(newLine));
+            var textBuffer = VsxStubObjects.CreateTextBuffer(inputText.ToString(newLine), contentType);
             textBuffer.Properties.AddProperty(typeof(IProjectScope), projectScope);
             if (filePath != null)
                 textBuffer.Properties.AddProperty(typeof(IVsTextBuffer), new FilePathProvider(filePath));
 
             var textView = new StubWpfTextView(textBuffer);
-            if (contentType == "deveroom")
+            if (contentType == VsContentTypes.FeatureFile)
             {
                 var tagAggregator = new StubBufferTagAggregatorFactoryService(ideScope).CreateTagAggregator<DeveroomTag>(textView.TextBuffer);
                 tagAggregator.GetTags(new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length)).ToArray();

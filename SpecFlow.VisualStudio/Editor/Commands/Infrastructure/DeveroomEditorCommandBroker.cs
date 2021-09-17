@@ -10,11 +10,12 @@ using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Utilities;
+using SpecFlow.VisualStudio.Editor.Services;
 
 namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
 {
     [Export(typeof(IVsTextViewCreationListener))]
-    [ContentType("deveroom")]
+    [ContentType(VsContentTypes.FeatureFile)]
     [TextViewRole(PredefinedTextViewRoles.Interactive)]
     public class DeveroomFeatureEditorCommandBroker : DeveroomEditorCommandBroker<IDeveroomFeatureEditorCommand>
     {
@@ -26,7 +27,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
     }
 
     [Export(typeof(IVsTextViewCreationListener))]
-    [ContentType("CSharp")]
+    [ContentType(VsContentTypes.CSharp)]
     [TextViewRole(PredefinedTextViewRoles.Interactive)]
     public class DeveroomCodeEditorCommandBroker : DeveroomEditorCommandBroker<IDeveroomCodeEditorCommand>
     {

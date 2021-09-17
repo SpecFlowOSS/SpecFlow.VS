@@ -15,6 +15,7 @@ using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Moq;
+using SpecFlow.VisualStudio.Editor.Services;
 using Xunit.Abstractions;
 
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
@@ -53,7 +54,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             return null;
         }
 
-        public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null, string contentType = "deveroom", string filePath = null)
+        public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null, string contentType = VsContentTypes.FeatureFile, string filePath = null)
         {
             if (filePath != null && !Path.IsPathRooted(filePath) && projectScope != null)
                 filePath = Path.Combine(projectScope.ProjectFolder, filePath);

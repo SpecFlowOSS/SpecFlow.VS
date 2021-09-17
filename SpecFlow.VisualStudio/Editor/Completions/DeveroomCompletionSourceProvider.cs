@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace SpecFlow.VisualStudio.Editor.Completions
 {
     [Export(typeof(ICompletionSourceProvider))]
-    [ContentType("deveroom")]
+    [ContentType(VsContentTypes.FeatureFile)]
     [Name("Deveroom Gherkin completion")]
     public class DeveroomCompletionSourceProvider : ICompletionSourceProvider
     {

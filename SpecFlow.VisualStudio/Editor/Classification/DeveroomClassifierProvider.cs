@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace SpecFlow.VisualStudio.Editor.Classification
 {
     [Export(typeof(IClassifierProvider))]
-    [ContentType("deveroom")]
+    [ContentType(VsContentTypes.FeatureFile)]
     internal class DeveroomClassifierProvider : IClassifierProvider
     {
 #pragma warning disable 649

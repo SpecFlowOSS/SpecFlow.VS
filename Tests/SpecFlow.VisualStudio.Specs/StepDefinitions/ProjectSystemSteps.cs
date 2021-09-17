@@ -167,6 +167,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             };
         }
 
+        [Given(@"^the following C\# step definition class$")]
         [Given(@"^the following C\# step definition class in the editor$")]
         public void GivenTheFollowingCStepDefinitionClassInTheEditor(string stepDefinitionClass)
         {
@@ -177,8 +178,8 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             var stepDefinitions = ParseStepDefinitions(stepDefinitionFile, filePath);
 
             RegisterStepDefinitions(stepDefinitions.ToArray());
-            WhenTheProjectIsBuilt();
-            _wpfTextView = _ideScope.CreateTextView(new TestText(stepDefinitionFile), projectScope: _projectScope, contentType: LanguageNames.CSharp, filePath: fileName);
+            //WhenTheProjectIsBuilt();
+            _wpfTextView = _ideScope.CreateTextView(new TestText(stepDefinitionFile), projectScope: _projectScope, contentType: VsContentTypes.CSharp, filePath: fileName);
         }
 
         private static string GetStepDefinitionFileContentFromClass(string stepDefinitionClass)
@@ -254,6 +255,14 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             _ideScope.TriggerProjectsBuilt();
         }
 
+        [Given("the project is built and the initial binding discovery is performed")]
+        public void GivenTheProjectIsBuiltAndTheInitialBindingDiscoveryIsPerformed()
+        {
+            WhenTheProjectIsBuilt();
+            WhenTheBindingDiscoveryIsPerformed();
+        }
+
+
         [Given(@"the following feature file ""([^""]*)""")]
         public void GivenTheFollowingFeatureFile(string fileName, string fileContent)
         {
@@ -270,11 +279,12 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         {
             var fileName = "Feature1.feature";
             var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
-            _projectScope.FilesAdded.Add(filePath, featureFileContent);
 
-            _wpfTextView = _ideScope.CreateTextView(new TestText(featureFileContent), projectScope: _projectScope);
+            _wpfTextView = _ideScope.CreateTextView(new TestText(featureFileContent), projectScope: _projectScope, filePath: filePath);
+            GivenTheFollowingFeatureFile(fileName, _wpfTextView.TextBuffer.CurrentSnapshot.GetText());
+            //WhenTheProjectIsBuilt();
         }
-        
+
         [Given(@"the initial binding discovery is performed")]
         [When(@"the initial binding discovery is performed")]
         [When(@"the binding discovery is performed")]

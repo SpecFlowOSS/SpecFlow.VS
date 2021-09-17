@@ -46,30 +46,40 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public override bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs = default(IntPtr))
         {
             Logger.LogVerbose("Rename Step");
-            var ctx = new RenameStepCommandContext(IdeScope);
 
-            var stepTag = GetDeveroomTagForCaret(textView, DeveroomTagTypes.StepBlock);
-            if (stepTag != null)
+            if (textView.TextBuffer.ContentType.IsOfType(VsContentTypes.FeatureFile))
             {
                 var goToStepDefinitionCommand = new GoToStepDefinitionCommand(IdeScope, AggregatorFactory, MonitoringService);
-                goToStepDefinitionCommand.PreExec(textView, commandKey, inArgs);
-                var tb = IdeScope.GetTextBuffer(new SourceLocation(string.Empty, 1, 1));
-  
-            }            
+                goToStepDefinitionCommand.InvokeCommand(textView, sourceLocation =>
+                {
+                    var stepDefClassTextBuffer = IdeScope.GetTextBuffer(sourceLocation);
+                    var stepDefLine = stepDefClassTextBuffer.CurrentSnapshot.GetLineFromLineNumber(sourceLocation.SourceFileLine - 1);
+                    var stepDefinitionPosition = new SnapshotPoint(stepDefClassTextBuffer.CurrentSnapshot,
+                        stepDefLine.Start.Position + sourceLocation.SourceFileColumn - 1);
+                    InvokeCommandFromStepDefinitionClass(stepDefClassTextBuffer, stepDefinitionPosition);
+                });
+                return true;
+            }
 
-            ctx.TextBufferOfStepDefinitionClass = textView.TextBuffer;
             var triggerPoint = textView.Caret.Position.BufferPosition;
+            InvokeCommandFromStepDefinitionClass(textView.TextBuffer, triggerPoint);
+            return true;
+        }
+
+        private void InvokeCommandFromStepDefinitionClass(ITextBuffer textBuffer, SnapshotPoint triggerPoint)
+        {
+            var ctx = new RenameStepCommandContext(IdeScope);
+            ctx.TextBufferOfStepDefinitionClass = textBuffer;
 
             ValidateCallerProject(ctx);
-            if (Erroneous(ctx)) return true;
+            if (Erroneous(ctx)) return;
 
             ValidateProjectsWithFeatureFiles(ctx);
-            if (Erroneous(ctx)) return true;
+            if (Erroneous(ctx)) return;
 
             var stepDefinitions = CollectStepDefinitions(ctx, triggerPoint);
 
             PerformActions(stepDefinitions, ctx);
-            return true;
         }
 
         private List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)> CollectStepDefinitions(RenameStepCommandContext ctx, SnapshotPoint triggerPoint)

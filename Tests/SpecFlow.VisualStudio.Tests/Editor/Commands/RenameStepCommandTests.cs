@@ -10,6 +10,7 @@ using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Editor.Services;
 using SpecFlow.VisualStudio.UI.ViewModels;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
@@ -32,7 +33,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
         private StubWpfTextView CreateTextView(TestText inputText, string newLine = null)
         {
-            return StubWpfTextView.CreateTextView(_projectScope.IdeScope as StubIdeScope, inputText, newLine, _projectScope, LanguageNames.CSharp, "Steps.cs");
+            return StubWpfTextView.CreateTextView(_projectScope.IdeScope as StubIdeScope, inputText, newLine, _projectScope, VsContentTypes.CSharp, "Steps.cs");
         }
 
         private StubLogger GetStubLogger()

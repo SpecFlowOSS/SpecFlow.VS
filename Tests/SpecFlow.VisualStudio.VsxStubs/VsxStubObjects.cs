@@ -4,6 +4,7 @@ using System.Reflection;
 using FluentAssertions;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Projection;
+using SpecFlow.VisualStudio.Editor.Services;
 
 namespace SpecFlow.VisualStudio.VsxStubs
 {
@@ -13,7 +14,7 @@ namespace SpecFlow.VisualStudio.VsxStubs
         public static IBufferGraphFactoryService BufferGraphFactoryService { get; private set; }
         public static ITextBufferFactoryService BufferFactoryService { get; private set; }
 
-        public static ITextBuffer CreateTextBuffer(string content)
+        public static ITextBuffer CreateTextBuffer(string content, string contentType)
         {
             VsxStubObjects.Initialize();
 
@@ -21,7 +22,7 @@ namespace SpecFlow.VisualStudio.VsxStubs
                 "Create", content);
             var contentTypeImpl = CreateInstance(
                 "Microsoft.VisualStudio.Utilities.Implementation.ContentTypeImpl, Microsoft.VisualStudio.Platform.VSEditor",
-                "deveroom", null, null);            
+                contentType, null, null);            
             var defaultTextDifferencingService = CreateInstance(
                 "Microsoft.VisualStudio.Text.Differencing.Implementation.DefaultTextDifferencingService, Microsoft.VisualStudio.Platform.VSEditor");
             var textBuffer = CreateInstance(
