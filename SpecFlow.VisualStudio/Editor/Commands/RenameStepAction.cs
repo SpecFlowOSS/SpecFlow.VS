@@ -13,15 +13,6 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ITextBuffer textBuffer,
             IEnumerable<T> expressionsToReplace,
             Func<T, Span> calculateReplaceSpan,
-            string replacementText)
-        {
-            EditTextBuffer(textBuffer, expressionsToReplace, calculateReplaceSpan, _ => replacementText);
-        }
-
-        protected static void EditTextBuffer<T>(
-            ITextBuffer textBuffer,
-            IEnumerable<T> expressionsToReplace,
-            Func<T, Span> calculateReplaceSpan,
             Func<T, string> calculateReplacementText)
         {
             using var textEdit = textBuffer.CreateEdit();

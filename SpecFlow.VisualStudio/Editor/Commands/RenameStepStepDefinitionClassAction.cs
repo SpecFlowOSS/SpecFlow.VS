@@ -21,10 +21,17 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var expressionsToReplace = ExpressionsToReplace(ctx);
             if (ctx.IsErroneous) return;
 
-            //TODO: The replacement text should be `@"expression"` if expression contains \ or " (" must be doubled) OR `"expression"` otherwise
-            EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, ctx.UpdatedExpression);
+            Func<SyntaxToken, string> replacementTextCalculation = UpdatedExpressionIsEscaped() 
+                ? FromEscapedExpression 
+                : FromSimpleExpression;
+            
+            EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, replacementTextCalculation);
 
             ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.Log(TraceLevel.Info, ctx.Method.AttributeLists.Count.ToString());
+
+            bool UpdatedExpressionIsEscaped() => ctx.UpdatedExpression.Contains('\\') || ctx.UpdatedExpression.Contains('"');
+            string FromSimpleExpression(SyntaxToken token) => $"{(IsVerbatim(token)?"@":"")}\"{ctx.UpdatedExpression}\"";
+            string FromEscapedExpression(SyntaxToken token) => $"@\"{ctx.UpdatedExpression.Replace("\"", "\"\"")}\"";
         }
 
         private void GetMethod(RenameStepCommandContext ctx)
@@ -95,9 +102,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private static Span CalculateReplaceSpan(SyntaxToken token)
         {
-            var offset = IsVerbatim(token) ? 2 : 1;
-
-            var replaceSpan = new Span(token.SpanStart + offset, token.Span.Length - offset - 1);
+            var replaceSpan = new Span(token.SpanStart, token.Span.Length);
             return replaceSpan;
         }
 

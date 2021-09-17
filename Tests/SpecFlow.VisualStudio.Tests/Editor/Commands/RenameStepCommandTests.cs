@@ -263,24 +263,24 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         }
 
         [Theory]
-        [InlineData(1, @"""I press add""", @"I choose add", @"        [When(""I choose add"")]")]
-        [InlineData(2, @"""I press add""", @"I \""choose\"" add", @"        [When(""I \""choose\"" add"")]")]
-        [InlineData(3, @"""I \""press\"" add""", @"I choose add", @"        [When(""I choose add"")]")]
-        [InlineData(4, @"""I \""press\"" add""", @"I \""choose\"" add", @"        [When(""I \""choose\"" add"")]")]
-        [InlineData(5, @"""\""I press add \""""", @"\""I choose add\""", @"        [When(""\""I choose add\"""")]")]
-        [InlineData(6, @"@""I press add""", @"I choose add", @"        [When(@""I choose add"")]")]
-        [InlineData(7, @"@""I """"press"""" add""", @"I ""choose"" add", @"        [When(@""I ""choose"" add"")]")]
-        [InlineData(8, @"""I press (/d)""", @"I choose (/d)", @"        [When(""I choose (/d)"")]")]
-        [InlineData(9, @"""I press (.*)""", @"I press (.*) button", @"        [When(""I press (.*) button"")]")]
-        [InlineData(10, @"""(.*) press add""", @"(.*) press add button", @"        [When(""(.*) press add button"")]")]
-        [InlineData(11, @"""(.*) press add""", @"On main screen (.*) press add", @"        [When(""On main screen (.*) press add"")]")]
-        [InlineData(12, @"""(.*) press (.*)""", @"(.*) choose (.*)", @"        [When(""(.*) choose (.*)"")]")]
-        [InlineData(13, @"""I press (.*)(.*)""", @"I press (.*) and (.*)", @"        [When(""I press (.*) and (.*)"")]")]
-        [InlineData(14, @"""I press add""", @"I choose \(add\)", @"        [When(@""I choose \(add\)"")]")]
-        [InlineData(15, @"@""I press add""", @"I choose \(add\)", @"        [When(@""I choose \(add\)"")]")]
-        [InlineData(16, @"@""I press add""", @"I choose ""add""", @"        [When(@""I choose """"add"""""")]")]
-        [InlineData(17, @"""I press add""", @"I choose ""add""", @"        [When(@""I choose """"add"""""")]")]
-        public void Step_definition_class_has_one_matching_expression(int _, string testExpression, string modelStepText, string expectedLine)
+        [InlineData("01", @"""I press add""", @"I choose add", @"        [When(""I choose add"")]")]
+        [InlineData("02", @"""I press add""", @"I \""choose\"" add", @"        [When(@""I \""""choose\"""" add"")]")]
+        [InlineData("03", @"""I \""press\"" add""", @"I choose add", @"        [When(""I choose add"")]")]
+        [InlineData("04", @"""I \""press\"" add""", @"I \""choose\"" add", @"        [When(@""I \""""choose\"""" add"")]")]
+        [InlineData("05", @"""\""I press add \""""", @"\""I choose add\""", @"        [When(@""\""""I choose add\"""""")]")]
+        [InlineData("06", @"@""I press add""", @"I choose add", @"        [When(@""I choose add"")]")]
+        [InlineData("07", @"@""I """"press"""" add""", @"I ""choose"" add", @"        [When(@""I """"choose"""" add"")]")]
+        [InlineData("08", @"""I press (/d)""", @"I choose (/d)", @"        [When(""I choose (/d)"")]")]
+        [InlineData("09", @"""I press (.*)""", @"I press (.*) button", @"        [When(""I press (.*) button"")]")]
+        [InlineData("10", @"""(.*) press add""", @"(.*) press add button", @"        [When(""(.*) press add button"")]")]
+        [InlineData("11", @"""(.*) press add""", @"On main screen (.*) press add", @"        [When(""On main screen (.*) press add"")]")]
+        [InlineData("12", @"""(.*) press (.*)""", @"(.*) choose (.*)", @"        [When(""(.*) choose (.*)"")]")]
+        [InlineData("13", @"""I press (.*)(.*)""", @"I press (.*) and (.*)", @"        [When(""I press (.*) and (.*)"")]")]
+        [InlineData("14", @"""I press add""", @"I choose \(add\)", @"        [When(@""I choose \(add\)"")]")]
+        [InlineData("15", @"@""I press add""", @"I choose \(add\)", @"        [When(@""I choose \(add\)"")]")]
+        [InlineData("16", @"@""I press add""", @"I choose ""add""", @"        [When(@""I choose """"add"""""")]")]
+        [InlineData("17", @"""I press add""", @"I choose ""add""", @"        [When(@""I choose """"add"""""")]")]
+        public void Step_definition_class_has_one_matching_expression(string _, string testExpression, string modelStepText, string expectedLine)
         {
             var stepDefinitions = ArrangeStepDefinition(testExpression);
             var featureFile = ArrangeOneFeatureFile(string.Empty);
@@ -294,22 +294,22 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         }
         
         [Theory]
-        [InlineData(1, @"""I press add""", @"I press (.*)", "Parameter count mismatch")]
-        [InlineData(2, @"""I press (.*)""", @"I press add", "Parameter count mismatch")]
-        [InlineData(3, @"""I press add button""", @"I press (.*) button", "Parameter count mismatch")]
-        [InlineData(4, @"""I press (.*) button""", @"I press add button", "Parameter count mismatch")]
-        [InlineData(5, @"""I press add button""", @"(.*) press add button", "Parameter count mismatch")]
-        [InlineData(6, @"""(.*) press add button""", @"I press add button", "Parameter count mismatch")]
-        [InlineData(7, @"""(.*) press add""", @"(.*) press (.*)", "Parameter count mismatch")]
-        [InlineData(8, @"""(.*) press (.*)""", @"(.*) press add", "Parameter count mismatch")]
-        [InlineData(9, @"""I press (.*)""", @"I press (.*)(.*)", "Parameter count mismatch")]
-        [InlineData(10, @"""I press (.*)""", @"I press (/d)", "Parameter expression mismatch")]
-        [InlineData(11, @"""I press (.*)""", @"I press (/d)(.*)", "Parameter count mismatch", "Parameter expression mismatch")]
-        [InlineData(13, @"""I press add""", @"I ( add (.*)", "Parameter count mismatch")]
-        [InlineData(14, @"""I press (.*)""", @"I press add .*)", "Parameter count mismatch")]
-        [InlineData(15, @"""I press add""", @"I pr?ess add", "The non-parameter parts cannot contain expression operators")]
-        [InlineData(16, @"""I press (.*)""", @"I pr?ess (.*)", "The non-parameter parts cannot contain expression operators")]
-        public void User_cannot_type_invalid_expression(int _, string testExpression, string modelStepText, params string[] errorMessages)
+        [InlineData("01", @"""I press add""", @"I press (.*)", "Parameter count mismatch")]
+        [InlineData("02", @"""I press (.*)""", @"I press add", "Parameter count mismatch")]
+        [InlineData("03", @"""I press add button""", @"I press (.*) button", "Parameter count mismatch")]
+        [InlineData("04", @"""I press (.*) button""", @"I press add button", "Parameter count mismatch")]
+        [InlineData("05", @"""I press add button""", @"(.*) press add button", "Parameter count mismatch")]
+        [InlineData("06", @"""(.*) press add button""", @"I press add button", "Parameter count mismatch")]
+        [InlineData("07", @"""(.*) press add""", @"(.*) press (.*)", "Parameter count mismatch")]
+        [InlineData("08", @"""(.*) press (.*)""", @"(.*) press add", "Parameter count mismatch")]
+        [InlineData("09", @"""I press (.*)""", @"I press (.*)(.*)", "Parameter count mismatch")]
+        [InlineData("10", @"""I press (.*)""", @"I press (/d)", "Parameter expression mismatch")]
+        [InlineData("11", @"""I press (.*)""", @"I press (/d)(.*)", "Parameter count mismatch", "Parameter expression mismatch")]
+        [InlineData("13", @"""I press add""", @"I ( add (.*)", "Parameter count mismatch")]
+        [InlineData("14", @"""I press (.*)""", @"I press add .*)", "Parameter count mismatch")]
+        [InlineData("15", @"""I press add""", @"I pr?ess add", "The non-parameter parts cannot contain expression operators")]
+        [InlineData("16", @"""I press (.*)""", @"I pr?ess (.*)", "The non-parameter parts cannot contain expression operators")]
+        public void User_cannot_type_invalid_expression(string _, string testExpression, string modelStepText, params string[] errorMessages)
         {
             var stepDefinitions = ArrangeStepDefinition(testExpression);
             var featureFile = ArrangeOneFeatureFile(string.Empty);
