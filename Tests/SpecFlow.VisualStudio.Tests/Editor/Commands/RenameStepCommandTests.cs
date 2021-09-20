@@ -71,6 +71,10 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
                 _projectScope.IdeScope.FileSystem.File.WriteAllText(featureFile.FileName, featureFileContent);
             }
 
+            if (string.IsNullOrWhiteSpace(featureFileContent)) return featureFile;
+
+            Dump(featureFile.Content, "Feature file before replace");
+
             return featureFile;
         }
 
@@ -127,7 +131,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinitionClassFile = new StepDefinitionClassFile(stepDefinitions);
             var filePath = Path.Combine(_projectScope.ProjectFolder, "Steps.cs");
             var inputText = stepDefinitionClassFile.GetText(filePath);
-            Dump(inputText, "Generated step definition class");
+            Dump(inputText.ToString(), "Generated step definition class");
 
             _projectScope.AddSpecFlowPackage();
             foreach (var featureFile in featureFiles)
@@ -146,6 +150,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             return (textView, command);
         }
 
+        private TestText Dump(TestFeatureFile featureFile, string title)
+        {
+            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
+            return Dump(featureFileTextBuffer, title);
+        }
+
         private TestText Dump(IWpfTextView textView, string title)
         {
             return Dump(textView.TextBuffer, title);
@@ -154,15 +164,14 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         private TestText Dump(ITextBuffer textBuffer, string title)
         {
             var testText = new TestText(textBuffer.CurrentSnapshot.Lines.Select(l => l.GetText()).ToArray());
-            Dump(testText, title);
+            Dump(testText.ToString(), title);
             return testText;
         }
-
-
-        private void Dump(TestText inputText, string title)
+        
+        private void Dump(string content, string title)
         {
             _testOutputHelper.WriteLine($"-------{title}-------");
-            _testOutputHelper.WriteLine(inputText.ToString());
+            _testOutputHelper.WriteLine(content);
             _testOutputHelper.WriteLine("---------------------------------------------");
         }
 
@@ -457,8 +466,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             OneFeatureFileRename(originalExpression, updatedExpression, featureFile);
 
-            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
-            var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
+            var featureText = Dump(featureFile, "Feature file after rename");
             featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
 
             ThereWereNoWarnings();
@@ -466,9 +474,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
         [Theory]
         [InlineData("01", @"""I press add""", @"I choose add", @"I press <p1>", 
-            @"calculator.feature(12,12): Could not rename scenario outline step: I press <p1>")]
+            @"calculator.feature(3,21): Could not rename scenario outline step: I press <p1>")]
         [InlineData("02", @"""I press add (.*)""", @"I choose \(add\) (.*)", 
-            @"I press <p1> 42", @"calculator.feature(12,12): Could not rename scenario outline step: I press <p1> 42")]
+            @"I press <p1> 42", @"calculator.feature(3,21): Could not rename scenario outline step: I press <p1> 42")]
         public void Step_of_scenario_outline_in_the_feature_cannot_be_renamed(string _, 
             string originalExpression, string updatedExpression, string originalStepText, 
             params string[] errorMessages)
@@ -486,7 +494,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: " + _projectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
         }
 
-        private TestFeatureFile OneFeatureFileRename(string originalExpression, string updatedExpression,
+        private void OneFeatureFileRename(string originalExpression, string updatedExpression,
             TestFeatureFile featureFile)
         {
             var stepDefinition = ArrangeStepDefinition(originalExpression);
@@ -495,7 +503,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var (textView, command) = ArrangeSut(stepDefinition, featureFile);
 
             command.PreExec(textView, command.Targets.First());
-            return featureFile;
+
+            Dump(featureFile, "Feature file after rename");
         }
 
         [Theory]

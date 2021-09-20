@@ -52,8 +52,9 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 || parameterMatch.StepTextParameters.Length != updatedExpression.ParameterParts.Count() 
                 || matchedStepTag.ParentTag.GetDescendantsOfType(DeveroomTagTypes.ScenarioOutlinePlaceholder).Any())
             {
-                //TODO: Calculate lina and column
-                renameStepCommandContext.AddNotificationProblem($"{filePath}(12,12): Could not rename scenario outline step: {from.usage.Step.Text}");
+                renameStepCommandContext.AddNotificationProblem(
+                    $"{filePath}({from.usage.SourceLocation.SourceFileLine},{from.usage.SourceLocation.SourceFileColumn}): " +
+                    $"Could not rename scenario outline step: {from.usage.Step.Text}");
                 return from.usage.Step.Text;
             }
 
