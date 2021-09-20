@@ -151,8 +151,12 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ctx.UpdatedExpression = viewModel.StepText;
             ctx.AnalyzedUpdatedExpression = viewModel.ParsedUpdatedExpression;
 
-            _renameStepFeatureFileAction.PerformRenameStep(ctx);
-            _renameStepStepDefinitionClassAction.PerformRenameStep(ctx);
+            using (IdeScope.CreateUndoContext("Rename steps"))
+            {
+                _renameStepFeatureFileAction.PerformRenameStep(ctx);
+                _renameStepStepDefinitionClassAction.PerformRenameStep(ctx);
+            }
+
             IdeScope.Actions.NavigateTo(ctx.StepDefinitionBinding.Implementation.SourceLocation);
             NotifyUserAboutIssues(ctx);
         }
