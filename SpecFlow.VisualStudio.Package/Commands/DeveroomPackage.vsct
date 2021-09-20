@@ -87,7 +87,7 @@
 	      <CommandFlag>DynamicVisibility</CommandFlag>
 	      <CommandFlag>DefaultInvisible</CommandFlag>
 	      <Strings>
-		      <ButtonText>Rename Step</ButtonText>
+		      <ButtonText>Rename Step...</ButtonText>
 		      <CommandName>Deveroom - Rename Step</CommandName>
 		      <CanonicalName>Deveroom.RenameStep</CanonicalName>
 		      <LocCanonicalName>Deveroom.RenameStep</LocCanonicalName>
