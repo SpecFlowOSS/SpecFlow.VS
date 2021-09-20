@@ -71,7 +71,7 @@ namespace SpecFlow.VisualStudio.Discovery
         {
             var parameterCount = Implementation.ParameterTypes?.Length ?? 0;
             //if (match.Groups.Count == 1 && parameterCount == 0 && step.Argument == null)
-            //    return ParameterMatch.Empty;
+            //    return ParameterMatch.NotMatch;
             var matchedStepParameters = match.Groups.OfType<Group>().Skip(1).Select(g => new MatchedStepTextParameter(g.Index, g.Length)).ToArray();
             var expectedParameterCount = matchedStepParameters.Length + (step.Argument == null ? 0 : 1);
             if (parameterCount != expectedParameterCount) //handle parameter error

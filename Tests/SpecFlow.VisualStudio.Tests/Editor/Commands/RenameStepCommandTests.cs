@@ -448,8 +448,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             command.PreExec(textView, command.Targets.First());
 
-            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
-            var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
+            var featureText = Dump(featureFile, "Feature file after rename");
             featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
             ThereWereNoWarnings();
         }
@@ -464,19 +463,18 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
                 Scenario: Scenario1
                     When {originalStepText}");
 
-            OneFeatureFileRename(originalExpression, updatedExpression, featureFile);
+            var featureText = OneFeatureFileRename(originalExpression, updatedExpression, featureFile);
 
-            var featureText = Dump(featureFile, "Feature file after rename");
             featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
 
             ThereWereNoWarnings();
         }
 
         [Theory]
-        [InlineData("01", @"""I press add""", @"I choose add", @"I press <p1>", 
-            @"calculator.feature(3,21): Could not rename scenario outline step: I press <p1>")]
+        [InlineData("01", @"""I press add""", @"I choose add", @"I press <p1>",
+            @"calculator.feature(3,21): Could not rename scenario outline step with placeholders: I press <p1>")]
         [InlineData("02", @"""I press add (.*)""", @"I choose \(add\) (.*)", 
-            @"I press <p1> 42", @"calculator.feature(3,21): Could not rename scenario outline step: I press <p1> 42")]
+            @"I press <p1> 42", @"calculator.feature(3,21): Could not rename scenario outline step with placeholders: I press <p1> 42")]
         public void Step_of_scenario_outline_in_the_feature_cannot_be_renamed(string _, 
             string originalExpression, string updatedExpression, string originalStepText, 
             params string[] errorMessages)
@@ -494,7 +492,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: " + _projectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
         }
 
-        private void OneFeatureFileRename(string originalExpression, string updatedExpression,
+        private TestText OneFeatureFileRename(string originalExpression, string updatedExpression,
             TestFeatureFile featureFile)
         {
             var stepDefinition = ArrangeStepDefinition(originalExpression);
@@ -504,7 +502,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             command.PreExec(textView, command.Targets.First());
 
-            Dump(featureFile, "Feature file after rename");
+            return Dump(featureFile, "Feature file after rename");
         }
 
         [Theory]

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿#nullable enable
+using System;
+using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.Discovery;
@@ -6,9 +8,7 @@ using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services;
 using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
 using SpecFlow.VisualStudio.ProjectSystem;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using SpecFlow.VisualStudio.ProjectSystem.Configuration;
-using SpecFlow.VisualStudio.UI.ViewModels;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
@@ -36,25 +36,10 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             AnalyzedStepDefinitionExpression updatedExpression, string filePath,
             RenameStepCommandContext renameStepCommandContext)
         {
-            //TODO: make a shortcut for simple expressions (no params), in that case we just need to return viewModel.StepText
+            ParameterMatch parameterMatch = FindParameterMatch(@from, filePath, renameStepCommandContext);
 
-            var snapshotSpan = new SnapshotSpan(from.textBufferOfFeatureFile.CurrentSnapshot, CalculateReplaceSpan(from));
-            var matchedStepTag =
-                DeveroomEditorCommandBase.GetDeveroomTagsForSpan(from.textBufferOfFeatureFile, snapshotSpan)
-                    .FirstOrDefault(t => t.Type == DeveroomTagTypes.DefinedStep);
-
-            var matchResult = matchedStepTag?.Data as MatchResult;
-            var parameterMatch = matchResult?.Items
-                .FirstOrDefault(m => m.ParameterMatch != null)
-                ?.ParameterMatch;
-            
-            if (parameterMatch == null 
-                || parameterMatch.StepTextParameters.Length != updatedExpression.ParameterParts.Count() 
-                || matchedStepTag.ParentTag.GetDescendantsOfType(DeveroomTagTypes.ScenarioOutlinePlaceholder).Any())
+            if (parameterMatch == ParameterMatch.NotMatch)
             {
-                renameStepCommandContext.AddNotificationProblem(
-                    $"{filePath}({from.usage.SourceLocation.SourceFileLine},{from.usage.SourceLocation.SourceFileColumn}): " +
-                    $"Could not rename scenario outline step: {from.usage.Step.Text}");
                 return from.usage.Step.Text;
             }
 
@@ -68,6 +53,37 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             resultText.Append(GetUnescapedText(updatedExpression.Parts.Last()));
 
             return resultText.ToString();
+        }
+
+        private static ParameterMatch FindParameterMatch(
+            (ITextBuffer textBufferOfFeatureFile, StepDefinitionUsage usage) @from,
+            string filePath, RenameStepCommandContext ctx)
+        {
+            var snapshotSpan = new SnapshotSpan(@from.textBufferOfFeatureFile.CurrentSnapshot, CalculateReplaceSpan(@from));
+            DeveroomTag matchedStepTag =
+                DeveroomEditorCommandBase.GetDeveroomTagsForSpan(@from.textBufferOfFeatureFile, snapshotSpan)
+                    .Single(t => t.Type == DeveroomTagTypes.DefinedStep);
+
+            if (matchedStepTag.Data is not MatchResult matchResult)
+                return ParameterMatch.NotMatch;
+            
+            ParameterMatch parameterMatch = matchResult.Items.Single().ParameterMatch;
+
+            if (HasScenarioOutlinePlaceholder(matchedStepTag))
+            {
+                ctx.AddNotificationProblem(
+                    $"{filePath}({@from.usage.SourceLocation.SourceFileLine},{@from.usage.SourceLocation.SourceFileColumn}): " +
+                    $"Could not rename scenario outline step with placeholders: {@from.usage.Step.Text}");
+
+                return ParameterMatch.NotMatch;
+            }
+
+            return parameterMatch;
+        }
+
+        private static bool HasScenarioOutlinePlaceholder(DeveroomTag matchedStepTag)
+        {
+            return matchedStepTag.ParentTag.GetDescendantsOfType(DeveroomTagTypes.ScenarioOutlinePlaceholder).Any();
         }
 
         private string GetUnescapedText(AnalyzedStepDefinitionExpressionPart part)
