@@ -69,14 +69,11 @@ namespace SpecFlow.VisualStudio.Discovery
             _monitoringService = _projectScope.IdeScope.MonitoringService;
             _errorListServices = _projectScope.IdeScope.DeveroomErrorListServices;
             _projectSettingsProvider = _projectScope.GetProjectSettingsProvider();
-
-            InitializeBindingRegistry();
-
             _projectSettingsProvider.WeakSettingsInitialized += ProjectSystemOnProjectsBuilt;
             _projectScope.IdeScope.WeakProjectOutputsUpdated += ProjectSystemOnProjectsBuilt;
         }
 
-        private void InitializeBindingRegistry()
+        public void InitializeBindingRegistry()
         {
             _logger.LogVerbose("Initial discovery triggered...");
             TriggerDiscovery();

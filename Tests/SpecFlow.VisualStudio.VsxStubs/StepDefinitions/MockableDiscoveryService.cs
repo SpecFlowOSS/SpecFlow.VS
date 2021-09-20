@@ -15,14 +15,9 @@ namespace SpecFlow.VisualStudio.VsxStubs.StepDefinitions
         public DateTime LastVersion { get; set; } = DateTime.UtcNow;
         public bool IsDiscoveryPerformed { get; set; }
 
-        public MockableDiscoveryService(IProjectScope projectScope, Mock<IDiscoveryResultProvider> discoveryResultProviderMock) : base(projectScope, discoveryResultProviderMock.Object)
+        public MockableDiscoveryService(IProjectScope projectScope, Mock<IDiscoveryResultProvider> discoveryResultProviderMock) 
+            : base(projectScope, discoveryResultProviderMock.Object)
         {
-            discoveryResultProviderMock.Setup(ds => ds.RunDiscovery(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ProjectSettings>())).Returns(
-                delegate
-                {
-                    System.Threading.Thread.Sleep(100); //make it a bit more realistic
-                    return LastDiscoveryResult;
-                });
         }
 
         protected override void TriggerBindingRegistryChanged()
@@ -37,23 +32,28 @@ namespace SpecFlow.VisualStudio.VsxStubs.StepDefinitions
             return new ConfigSource("MyAssembly.dll", LastVersion); // fake a valid existing test assembly
         }
 
-        public static MockableDiscoveryService Setup(IProjectScope projectScope)
+        public static MockableDiscoveryService Setup(IProjectScope projectScope, TimeSpan discoveryDelay)
         {
-            return SetupWithInitialStepDefinitions(projectScope, Array.Empty<StepDefinition>());
+            return SetupWithInitialStepDefinitions(projectScope, Array.Empty<StepDefinition>(), discoveryDelay);
         }
 
-        public static MockableDiscoveryService SetupWithInitialStepDefinitions(IProjectScope projectScope, StepDefinition[] stepDefinitions)
+        public static MockableDiscoveryService SetupWithInitialStepDefinitions(IProjectScope projectScope, StepDefinition[] stepDefinitions, TimeSpan discoveryDelay)
         {
-            var initialDiscoveryResult = new DiscoveryResult() { StepDefinitions = stepDefinitions };
             var discoveryResultProviderMock = new Mock<IDiscoveryResultProvider>(MockBehavior.Strict);
-            discoveryResultProviderMock
-                .Setup(ds => ds.RunDiscovery(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ProjectSettings>()))
-                .Returns(() => initialDiscoveryResult);
 
             var discoveryService = new MockableDiscoveryService(projectScope, discoveryResultProviderMock)
             {
-                LastDiscoveryResult = initialDiscoveryResult
+                LastDiscoveryResult = new DiscoveryResult() { StepDefinitions = stepDefinitions }
             };
+
+            discoveryResultProviderMock.Setup(ds => ds.RunDiscovery(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ProjectSettings>())).Returns(
+                delegate
+                {
+                    Thread.Sleep(discoveryDelay); //make it a bit more realistic
+                    return discoveryService.LastDiscoveryResult;
+                });
+
+            discoveryService.InitializeBindingRegistry();
 
             projectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService);
             return discoveryService;

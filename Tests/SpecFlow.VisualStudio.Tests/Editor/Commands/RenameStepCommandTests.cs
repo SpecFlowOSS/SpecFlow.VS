@@ -145,7 +145,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             }
 
             var discoveryService =
-                MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, stepDefinitionClassFile.StepDefinitions);
+                MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, stepDefinitionClassFile.StepDefinitions, TimeSpan.Zero);
             discoveryService.WaitUntilDiscoveryPerformed();
 
             var textView = CreateTextView(inputText);
