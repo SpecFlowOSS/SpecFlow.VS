@@ -166,6 +166,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             _testOutputHelper.WriteLine("---------------------------------------------");
         }
 
+        private void ThereWereNoWarnings()
+        {
+            var stubLogger = GetStubLogger();
+            stubLogger.Messages.Should().NotContain(msg => msg.Item2.Contains("ShowProblem:"));
+        }
+
         [Fact]
         public void There_is_a_project_in_ide()
         {
@@ -292,19 +298,22 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData("15", @"@""I press add""", @"I choose \(add\)", @"        [When(@""I choose \(add\)"")]")]
         [InlineData("16", @"@""I press add""", @"I choose ""add""", @"        [When(@""I choose """"add"""""")]")]
         [InlineData("17", @"""I press add""", @"I choose ""add""", @"        [When(@""I choose """"add"""""")]")]
-        public void Step_definition_class_has_one_matching_expression(string _, string testExpression, string modelStepText, string expectedLine)
+        [InlineData("18", @"""I press add (.*)""", @"I choose \(add\) (.*)", @"        [When(@""I choose \(add\) (.*)"")]")]
+
+        public void Step_definition_class_has_one_matching_expression(string _, string originalExpression, string dialogExpression, string updatedLine)
         {
-            var stepDefinitions = ArrangeStepDefinition(testExpression);
+            var stepDefinitions = ArrangeStepDefinition(originalExpression);
             var featureFile = ArrangeOneFeatureFile(string.Empty);
-            ArrangePopup(modelStepText);
+            ArrangePopup(dialogExpression);
             var (textView, command) = ArrangeSut(stepDefinitions, featureFile);
             
             command.PreExec(textView, command.Targets.First());
 
             var testText = Dump(textView, "Step definition class after rename");
-            testText.Lines[6].Should().Be(expectedLine);
+            testText.Lines[6].Should().Be(updatedLine);
+            ThereWereNoWarnings();
         }
-        
+
         [Theory]
         [InlineData("01", @"""I press add""", @"I press (.*)", "Parameter count mismatch")]
         [InlineData("02", @"""I press (.*)""", @"I press add", "Parameter count mismatch")]
@@ -346,8 +355,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             var testText = Dump(textView, "Step definition class after rename");
             testText.Lines[6].Should().Be(@"        [WhenDerived(""I choose add"")]");
+            ThereWereNoWarnings();
         }
-        
+
         [Fact]
         public void Popup_appears_when_there_are_multiple_step_definitions()
         {
@@ -361,6 +371,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             ideActions.LastShowContextMenuHeader.Should().Be("Choose step definition to rename");
             ideActions.LastShowContextMenuItems.Select(item => item.Label)
                 .Should().BeEquivalentTo(stepDefinitions.Select(sd=>sd.PopupLabel));
+            ThereWereNoWarnings();
         }
 
         [Theory]
@@ -392,6 +403,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             testText.Lines[6].Should().Be(expectedLines[0]);
             testText.Lines[7].Should().Be(expectedLines[1]);
             testText.Lines[8].Should().Be(expectedLines[2]);
+            ThereWereNoWarnings();
         }
 
         [Fact]
@@ -409,6 +421,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
             var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
             featureText.Lines[2].Should().Be(@"                    When I choose add");
+            ThereWereNoWarnings();
         }
 
         [Theory]
@@ -429,31 +442,60 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
             var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
             featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
+            ThereWereNoWarnings();
         }
 
         [Theory]
-        [InlineData(1, @"""I press add""", @"I choose add", @"I press add", @"I choose add")]
-        [InlineData(2, @"""I press add""", @"I choose \(add\)", @"I press add", @"I choose (add)")]
-        [InlineData(3, @"""I press add (.*)""", @"I choose \(add\) (.*)", @"I press add 42", @"I choose (add) 42")]
-        [InlineData(4, @"""I press add""", @"I choose add", @"I press <p1>", @"I press <p1>")]
-        [InlineData(5, @"""I press add (.*)""", @"I choose \(add\) (.*)", @"I press <p1> 42", @"I press <p1> 42")]
-        public void Step_of_scenario_outline_in_the_feature_file_is_renamed(int _, string originalExpression, string updatedExpression, string originalStepText, string expectedStepText)
+        [InlineData("01", @"""I press add""", @"I choose add", @"I press add", @"I choose add")]
+        [InlineData("02", @"""I press add""", @"I choose \(add\)", @"I press add", @"I choose (add)")]
+        [InlineData("03", @"""I press add (.*)""", @"I choose \(add\) (.*)", @"I press add 42", @"I choose (add) 42")]
+        public void Step_of_scenario_outline_in_the_feature_file_is_renamed(string _, string originalExpression, string updatedExpression, string originalStepText, string expectedStepText)
         {
-            var stepDefinition = ArrangeStepDefinition(originalExpression);
-            var featureFile = ArrangeOneFeatureFile($@"Feature: Feature1
+            TestFeatureFile featureFile = ArrangeOneFeatureFile($@"Feature: Feature1
+                Scenario: Scenario1
+                    When {originalStepText}");
+
+            OneFeatureFileRename(originalExpression, updatedExpression, featureFile);
+
+            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
+            var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
+            featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
+
+            ThereWereNoWarnings();
+        }
+
+        [Theory]
+        [InlineData("01", @"""I press add""", @"I choose add", @"I press <p1>", 
+            @"calculator.feature(12,12): Could not rename scenario outline step: I press <p1>")]
+        [InlineData("02", @"""I press add (.*)""", @"I choose \(add\) (.*)", 
+            @"I press <p1> 42", @"calculator.feature(12,12): Could not rename scenario outline step: I press <p1> 42")]
+        public void Step_of_scenario_outline_in_the_feature_cannot_be_renamed(string _, 
+            string originalExpression, string updatedExpression, string originalStepText, 
+            params string[] errorMessages)
+        {
+            TestFeatureFile featureFile = ArrangeOneFeatureFile($@"Feature: Feature1
                 Scenario Outline: Scenario1
                     When {originalStepText}
                 Examples:
                     |p1 |
                     |add|");
+
+            OneFeatureFileRename(originalExpression, updatedExpression, featureFile);
+
+            var stubLogger = GetStubLogger();
+            stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: " + _projectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
+        }
+
+        private TestFeatureFile OneFeatureFileRename(string originalExpression, string updatedExpression,
+            TestFeatureFile featureFile)
+        {
+            var stepDefinition = ArrangeStepDefinition(originalExpression);
+
             ArrangePopup(updatedExpression);
             var (textView, command) = ArrangeSut(stepDefinition, featureFile);
 
             command.PreExec(textView, command.Targets.First());
-
-            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
-            var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
-            featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
+            return featureFile;
         }
 
         [Theory]
@@ -473,6 +515,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             viewModel?.StepText.Should().Be(expectedExpression);
+            ThereWereNoWarnings();
         }
     }
 }

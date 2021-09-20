@@ -154,18 +154,26 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             _renameStepFeatureFileAction.PerformRenameStep(ctx);
             _renameStepStepDefinitionClassAction.PerformRenameStep(ctx);
             IdeScope.Actions.NavigateTo(ctx.StepDefinitionBinding.Implementation.SourceLocation);
-            if (Erroneous(ctx)) return;
+            NotifyUserAboutIssues(ctx);
+        }
+
+        private void NotifyUserAboutIssues(RenameStepCommandContext ctx)
+        {
+            if (!ctx.Issues.Any()) return;
+            ShowProblem(ctx);
         }
 
         private bool Erroneous(RenameStepCommandContext ctx)
         {
-            //TODO: handle critical/nofification
             if (!ctx.IsErroneous) return false;
+            ShowProblem(ctx);
+            return true;
+        }
 
+        private void ShowProblem(RenameStepCommandContext ctx)
+        {
             var problem = string.Join(Environment.NewLine, ctx.Issues.Select(issue => issue.Description));
             IdeScope.Actions.ShowProblem(problem);
-
-            return true;
         }
 
         private void ValidateProjectsWithFeatureFiles(RenameStepCommandContext ctx)
