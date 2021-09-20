@@ -31,9 +31,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         private readonly IFileSystem _fileSystem;
 
         private NotificationService _notificationService;
-
         private static DispatcherTimer _welcomeMessageTimer;
-        private static string _deveroomNews = null;
 
         [ImportingConstructor]
         public WelcomeService([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider, IRegistryManager registryManager, IVersionProvider versionProvider, IGuidanceConfiguration guidanceConfiguration, IFileSystem fileSystem)
@@ -64,9 +62,29 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
             if (!status.IsInstalled)
             {
-                // new user
-                browserNotificationService.ShowPage(_guidanceConfiguration.Installation.Url);
-                monitoringService.MonitorExtensionInstalled();
+                if (status.Is2019Installed)
+                {
+                    var installed2019Version = status.Installed2019Version.ToString();
+                    monitoringService.MonitorExtensionUpgraded(installed2019Version);
+                    
+                    ScheduleWelcomeDialog(ideScope, new WelcomeDialogViewModel(),
+                        (viewModel, elapsed) =>
+                        {
+                            monitoringService.MonitorUpgradeDialogDismissed(new Dictionary<string, object>
+                            {
+                                { "OldExtensionVersion", installed2019Version },
+                                { "NewExtensionVersion", currentVersion },
+                                { "WelcomeScreenSeconds", (int)elapsed.TotalSeconds },
+                                { "VisitedPages", viewModel.VisitedPages.Count },
+                            });
+                        });
+                }
+                else
+                {
+                    // new user
+                    browserNotificationService.ShowPage(_guidanceConfiguration.Installation.Url);
+                    monitoringService.MonitorExtensionInstalled();
+                }
 
                 status.InstallDate = today;
                 status.InstalledVersion = currentVersion;

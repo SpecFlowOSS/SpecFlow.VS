@@ -15,6 +15,7 @@ namespace SpecFlow.VisualStudio.Analytics
     public class RegistryManager : IRegistryManager
     {
         private const string REG_PATH = @"Software\TechTalk\SpecFlow";
+        private const string Version2019 = "version";
         private const string Version = "version.vs2022";
         private const string InstallDate = "installDate.vs2022";
         private const string LastUsedDate = "lastUsedDate";
@@ -38,7 +39,8 @@ namespace SpecFlow.VisualStudio.Analytics
             {
                 if (key == null)
                     return status;
-
+                
+                status.Installed2019Version = ReadStringValue(key, Version2019, s => new Version(s)); 
                 status.InstalledVersion = ReadStringValue(key, Version, s => new Version(s));
                 status.InstallDate = ReadIntValue(key, InstallDate, DeserializeDate);
                 status.LastUsedDate = ReadIntValue(key, LastUsedDate, DeserializeDate);
