@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
 {
@@ -13,8 +12,6 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
             var parts = SplitExpressionByGroups(expression);
             return new AnalyzedStepDefinitionExpression(parts);
         }
-
-        //TODO: rename Complex part to ...WithOperators
 
         private ImmutableArray<AnalyzedStepDefinitionExpressionPart> SplitExpressionByGroups(string regexString)
         {
@@ -80,7 +77,7 @@ namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
         {
             return isSimpleText
                 ? new AnalyzedStepDefinitionExpressionSimpleTextPart(text, unescapedText)
-                : new AnalyzedStepDefinitionExpressionComplexTextPart(text);
+                : new AnalyzedStepDefinitionExpressionWithOperatorsTextPart(text);
         }
 
         private int FindGroupCloseIndex(string regexString, int openPosition)

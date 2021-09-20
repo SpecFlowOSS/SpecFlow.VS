@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using SpecFlow.VisualStudio.Configuration;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Commands;
@@ -20,11 +18,9 @@ using SpecFlow.VisualStudio.UI.ViewModels;
 using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using FluentAssertions;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.Language.Intellisense;
-using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -184,7 +180,6 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             var stepDefinitions = ParseStepDefinitions(stepDefinitionFile, filePath);
 
             RegisterStepDefinitions(stepDefinitions.ToArray());
-            //WhenTheProjectIsBuilt();
             _wpfTextView = _ideScope.CreateTextView(new TestText(stepDefinitionFile), projectScope: _projectScope, contentType: VsContentTypes.CSharp, filePath: fileName);
         }
 

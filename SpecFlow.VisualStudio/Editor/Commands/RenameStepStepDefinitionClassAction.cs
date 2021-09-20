@@ -21,18 +21,17 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var expressionsToReplace = ExpressionsToReplace(ctx);
             if (ctx.IsErroneous) return;
 
-            //TODO: rename Complex part to ...WithOperators
-            Func<SyntaxToken, string> replacementTextCalculation = UpdatedExpressionIsEscaped() 
-                ? FromEscapedExpression 
+            Func<SyntaxToken, string> replacementTextCalculation = UpdatedExpressionHasOperators() 
+                ? FromExpressionWithoutOperators 
                 : FromSimpleExpression;
             
             EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, replacementTextCalculation);
 
             ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.Log(TraceLevel.Info, ctx.Method.AttributeLists.Count.ToString());
 
-            bool UpdatedExpressionIsEscaped() => ctx.UpdatedExpression.Contains('\\') || ctx.UpdatedExpression.Contains('"');
+            bool UpdatedExpressionHasOperators() => ctx.UpdatedExpression.Contains('\\') || ctx.UpdatedExpression.Contains('"');
             string FromSimpleExpression(SyntaxToken token) => $"{(IsVerbatim(token)?"@":"")}\"{ctx.UpdatedExpression}\"";
-            string FromEscapedExpression(SyntaxToken token) => $"@\"{ctx.UpdatedExpression.Replace("\"", "\"\"")}\"";
+            string FromExpressionWithoutOperators(SyntaxToken token) => $"@\"{ctx.UpdatedExpression.Replace("\"", "\"\"")}\"";
         }
 
         private void GetMethod(RenameStepCommandContext ctx)
