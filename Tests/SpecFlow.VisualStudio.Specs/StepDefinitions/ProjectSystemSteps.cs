@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Commands;
@@ -322,7 +324,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                 }
                 case "Find Step Definition Usages":
                 {
-                    var command = new FindStepDefinitionCommand(_ideScope,
+                    var command = new FindStepDefinitionUsagesCommand(_ideScope,
                         new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
                     command.PreExec(_wpfTextView, command.Targets.First());
                     Wait.For(() => ActionsMock.IsComplete.Should().BeTrue());
@@ -388,6 +390,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                     var command = new RenameStepCommand(_ideScope,
                         new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
                     command.PreExec(_wpfTextView, command.Targets.First());
+
                     break;
                 }
                 default:
@@ -680,7 +683,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         }
 
         [When("I specify {string} as renamed step")]
-        public void WhenISpecifyAsRenamedStep(string renamedStep)
+        public async Task WhenISpecifyAsRenamedStep(string renamedStep)
         {
             _ideScope.StubWindowManager.RegisterWindowAction<RenameStepViewModel>(
                 viewModel =>
@@ -688,10 +691,14 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                     viewModel.StepText = renamedStep;
                 });
             WhenIInvokeTheCommand(_commandToInvokeDeferred);
+
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+            await _projectScope.StubIdeScope.AnalyticsTransmitter
+                .WaitForEvent("Rename step command executed", cts.Token);
         }
 
         [Then("invoking the first item from the jump list renames the {string} {string} step definition")]
-        public void ThenInvokingTheFirstItemFromTheJumpListRenamesTheStepDefinition(string expression, string stepType)
+        public async Task ThenInvokingTheFirstItemFromTheJumpListRenamesTheStepDefinition(string expression, string stepType)
         {
             const string renamedExpression = "renamed step";
             _ideScope.StubWindowManager.RegisterWindowAction<RenameStepViewModel>(
@@ -702,6 +709,10 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
                 });
 
             InvokeFirstContextMenuItem();
+
+            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+            await _projectScope.StubIdeScope.AnalyticsTransmitter
+                .WaitForEvent("Rename step command executed", cts.Token);
 
             string fileContent = _wpfTextView.TextSnapshot.GetText();
             var parsedSnippets = ParseSnippetsFromFile(fileContent);

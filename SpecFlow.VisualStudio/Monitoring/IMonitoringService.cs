@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Notifications;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
@@ -27,6 +28,7 @@ namespace SpecFlow.VisualStudio.Monitoring
         void MonitorCommandAutoFormatDocument(bool isSelectionFormatting);
         void MonitorCommandAddFeatureFile(ProjectSettings projectSettings);
         void MonitorCommandAddSpecFlowConfigFile(ProjectSettings projectSettings);
+        void MonitorCommandRenameStepExecuted(RenameStepCommandContext ctx);
 
         void MonitorSpecFlowDiscovery(bool isFailed, string errorMessage, int stepDefinitionCount, ProjectSettings projectSettings);
         void MonitorSpecFlowGeneration(bool isFailed, ProjectSettings projectSettings);

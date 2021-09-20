@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
-using SpecFlow.VisualStudio.UI.ViewModels;
+using SpecFlow.VisualStudio.ProjectSystem;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
@@ -11,19 +12,23 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         protected static void EditTextBuffer<T>(
             ITextBuffer textBuffer,
+            IIdeScope ideScope,
             IEnumerable<T> expressionsToReplace,
             Func<T, Span> calculateReplaceSpan,
             Func<T, string> calculateReplacementText)
         {
-            using var textEdit = textBuffer.CreateEdit();
-
-            foreach (var token in expressionsToReplace)
+            ideScope.RunOnUiThread(() =>
             {
-                var replaceSpan = calculateReplaceSpan(token);
-                textEdit.Replace(replaceSpan, calculateReplacementText(token));
-            }
+                using var textEdit = textBuffer.CreateEdit();
 
-            textEdit.Apply();
+                foreach (var token in expressionsToReplace)
+                {
+                    var replaceSpan = calculateReplaceSpan(token);
+                    textEdit.Replace(replaceSpan, calculateReplacementText(token));
+                }
+
+                textEdit.Apply();
+            });
         }
     }
 }

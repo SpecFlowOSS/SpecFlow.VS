@@ -26,7 +26,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 var firstPosition = fileUsage.First().SourceLocation;
                 EnsureFeatureFileOpen(firstPosition, ideScope);
                 var textBufferOfFeatureFile = ideScope.GetTextBuffer(firstPosition);
-                EditTextBuffer(textBufferOfFeatureFile, fileUsage,
+                EditTextBuffer(textBufferOfFeatureFile, ctx.IdeScope, fileUsage,
                     usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
                     usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression, fileUsage.Key, ctx));
             }

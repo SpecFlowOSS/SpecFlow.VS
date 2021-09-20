@@ -20,14 +20,14 @@ using Microsoft.VisualStudio.Text.Tagging;
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
     [Export(typeof(IDeveroomCodeEditorCommand))]
-    public class FindStepDefinitionCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand
+    public class FindStepDefinitionUsagesCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand
     {
         const string PopupHeader = "Step definition usages";
 
         private readonly StepDefinitionUsageFinder _stepDefinitionUsageFinder;
 
         [ImportingConstructor]
-        public FindStepDefinitionCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService) : base(ideScope, aggregatorFactory, monitoringService)
+        public FindStepDefinitionUsagesCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService) : base(ideScope, aggregatorFactory, monitoringService)
         {
             _stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope.FileSystem, ideScope.Logger, ideScope.MonitoringService);
         }

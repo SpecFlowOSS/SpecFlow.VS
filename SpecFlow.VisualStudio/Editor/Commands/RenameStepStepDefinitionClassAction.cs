@@ -25,7 +25,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 ? FromExpressionWithoutOperators 
                 : FromSimpleExpression;
             
-            EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, expressionsToReplace, CalculateReplaceSpan, replacementTextCalculation);
+            EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, ctx.IdeScope, expressionsToReplace, CalculateReplaceSpan, replacementTextCalculation);
 
             ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.Log(TraceLevel.Info, ctx.Method.AttributeLists.Count.ToString());
 

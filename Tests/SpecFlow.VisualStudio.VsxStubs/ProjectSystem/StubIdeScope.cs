@@ -14,7 +14,6 @@ using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
-using Microsoft.VisualStudio.TextManager.Interop;
 using Moq;
 using SpecFlow.VisualStudio.Editor.Services;
 using Xunit.Abstractions;
@@ -23,6 +22,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 {
     public class StubIdeScope : IIdeScope
     {
+        public StubAnalyticsTransmitter AnalyticsTransmitter { get; } = new StubAnalyticsTransmitter();
         public IDictionary<string, StubWpfTextView> OpenViews { get; } = new Dictionary<string, StubWpfTextView>();
         public StubLogger StubLogger { get; } = new StubLogger();
         public DeveroomCompositeLogger CompositeLogger { get; } = new DeveroomCompositeLogger
@@ -97,6 +97,11 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             return CSharpSyntaxTree.ParseText(fileContent);
         }
 
+        public void RunOnUiThread(Action action)
+        {
+            action();
+        }
+
         public IProjectScope[] GetProjectsWithFeatureFiles()
         {
             return ProjectScopes.ToArray();
@@ -109,7 +114,12 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public StubIdeScope(ITestOutputHelper testOutputHelper)
         {
-            MonitoringService = new Mock<IMonitoringService>().Object;
+            MonitoringService = 
+                new MonitoringService(
+                    AnalyticsTransmitter, 
+                    new Mock<IWelcomeService>().Object, 
+                    new Mock<ITelemetryConfigurationHolder>().Object);
+
             CompositeLogger.Add(new DeveroomXUnitLogger(testOutputHelper));
             CompositeLogger.Add(StubLogger);
             Actions = new StubIdeActions(this);

@@ -136,6 +136,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return VsIdeScope.GetSyntaxTree(textBuffer);
         }
 
+        public void RunOnUiThread(Action action)
+        {
+            VsIdeScope.RunOnUiThread(action);
+        }
+
         public IProjectScope[] GetProjectsWithFeatureFiles()
         {
             return VsIdeScope.GetProjectsWithFeatureFiles();

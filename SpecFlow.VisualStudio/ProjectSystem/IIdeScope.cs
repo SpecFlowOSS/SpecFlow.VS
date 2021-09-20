@@ -29,5 +29,6 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         IDisposable CreateUndoContext(string undoLabel);
         ITextBuffer GetTextBuffer(SourceLocation sourceLocation);
         SyntaxTree GetSyntaxTree(ITextBuffer textBuffer);
+        void RunOnUiThread(Action action);
     }
 }

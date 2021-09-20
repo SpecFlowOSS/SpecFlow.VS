@@ -170,6 +170,18 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return null;
         }
 
+        public void RunOnUiThread(Action action)
+        {
+            if (ThreadHelper.CheckAccess())
+            {
+                action();
+            }
+            else
+            {
+                ThreadHelper.Generic.BeginInvoke(action);
+            }
+        }
+
         private void SolutionEventListenerOnLoaded(object sender, EventArgs e)
         {
             Logger.LogVerbose("Solution loaded");
