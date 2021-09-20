@@ -37,7 +37,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return InvokeCommand(textView);
         }
 
-        internal bool InvokeCommand(IWpfTextView textView, Action<SourceLocation> continueWithAfterJump = null)
+        internal bool InvokeCommand(IWpfTextView textView, Action<ProjectStepDefinitionBinding> continueWithAfterJump = null)
         {
             Logger.LogVerbose("Go To Step Definition");
 
@@ -68,7 +68,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return true;
         }
 
-        private void PerformGoToDefinition(MatchResultItem match, ITextBuffer textBuffer, Action<SourceLocation> continueWithAfterJump)
+        private void PerformGoToDefinition(MatchResultItem match, ITextBuffer textBuffer, Action<ProjectStepDefinitionBinding> continueWithAfterJump)
         {
             MonitoringService.MonitorCommandGoToStepDefinition(match.Type == MatchResultType.Undefined);
             switch (match.Type)
@@ -83,7 +83,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             }
         }
 
-        private void PerformJump(MatchResultItem match, Action<SourceLocation> continueWithAfterJump)
+        private void PerformJump(MatchResultItem match, Action<ProjectStepDefinitionBinding> continueWithAfterJump)
         {
             var sourceLocation = match.MatchedStepDefinition.Implementation.SourceLocation;
             if (sourceLocation == null)
@@ -96,7 +96,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             Logger.LogInfo($"Jumping to {match} at {sourceLocation}");
             if (IdeScope.Actions.NavigateTo(sourceLocation))
             {
-                continueWithAfterJump?.Invoke(sourceLocation);
+                continueWithAfterJump?.Invoke(match.MatchedStepDefinition);
             }
             else
             {

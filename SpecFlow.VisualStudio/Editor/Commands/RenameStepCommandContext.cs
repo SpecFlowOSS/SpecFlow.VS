@@ -16,6 +16,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             Issues = new List<Problem>();
         }
 
+        public SnapshotPoint TriggerPointOfStepDefinitionClass { get; set; }
         public IIdeScope IdeScope { get;  }
         public List<Problem> Issues { get; }
         public ITextBuffer TextBufferOfStepDefinitionClass { get; set; }
