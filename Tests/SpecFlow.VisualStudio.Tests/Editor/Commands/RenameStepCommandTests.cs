@@ -26,6 +26,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
     public class RenameStepCommandTests
     {
+        private static readonly string _warningHeader = "ShowProblem: User Notification: The following problems occurred:" + Environment.NewLine;
         private readonly ITestOutputHelper _testOutputHelper;
         private readonly InMemoryStubProjectScope _projectScope;
 
@@ -63,7 +64,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
         private static bool SpecflowProjectMustHaveFeatureFiles(Tuple<TraceLevel, string> msg)
         {
-            return msg.Item2 == "ShowProblem: User Notification: Unable to find step definition usages: could not find any SpecFlow project with feature files.";
+            return WithoutWarningHeader(msg.Item2) == "Unable to find step definition usages: could not find any SpecFlow project with feature files.";
         }  
         
         private TestFeatureFile ArrangeOneFeatureFile(string featureFileContent)
@@ -186,6 +187,11 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             stubLogger.Messages.Should().NotContain(msg => msg.Item2.Contains("ShowProblem:"));
         }
 
+        public static string WithoutWarningHeader(string message)
+        {
+            return message.Replace(_warningHeader, "");
+        }
+
         [Fact]
         public void There_is_a_project_in_ide()
         {
@@ -197,7 +203,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger(emptyIde);
-            stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: Unable to find step definition usages: the project is not initialized yet.");
+            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be("Unable to find step definition usages: the project is not initialized yet.");
         }
 
         [Fact]
@@ -210,7 +216,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger();
-            stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
+            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be("Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
         }
 
         [Fact]
@@ -230,7 +236,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Fact]
         public async Task There_must_be_at_lest_one_step_definition()
         {
-            await StepDefinitionMustHaveValidExpression(TestStepDefinition.Void, "ShowProblem: User Notification: No step definition found that is related to this position");
+            await StepDefinitionMustHaveValidExpression(TestStepDefinition.Void, "No step definition found that is related to this position");
         }
 
         [Fact]
@@ -240,7 +246,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             stepDefinition.TestExpression = SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken);
             stepDefinition.Regex = default;
 
-            await StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: Unable to rename step, the step definition expression cannot be detected.");
+            await StepDefinitionMustHaveValidExpression(stepDefinition, "Unable to rename step, the step definition expression cannot be detected.");
         }
 
         [Theory]
@@ -261,7 +267,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             var stepDefinition = ArrangeStepDefinition(emptyExpression);
 
-            await StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: The non-parameter parts cannot contain expression operators");
+            await StepDefinitionMustHaveValidExpression(stepDefinition, "The non-parameter parts cannot contain expression operators");
         }
 
         [Theory]
@@ -270,7 +276,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             var stepDefinition = ArrangeStepDefinition(invalidExpression);
 
-            await StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: Step definition expression is invalid");
+            await StepDefinitionMustHaveValidExpression(stepDefinition, "Step definition expression is invalid");
         }
 
         [Fact]
@@ -279,7 +285,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinition = ArrangeStepDefinition("ConstantValue");
             stepDefinition.Regex = "^I press add$";
 
-            await StepDefinitionMustHaveValidExpression(stepDefinition, "ShowProblem: User Notification: No expressions found to replace for [When(I press add)]: WhenIPressAdd");
+            await StepDefinitionMustHaveValidExpression(stepDefinition, "No expressions found to replace for [When(I press add)]: WhenIPressAdd");
         }
 
         private async Task StepDefinitionMustHaveValidExpression(TestStepDefinition stepDefinition, string errorMessage)
@@ -291,7 +297,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             Dump(textView, "Step definition class after rename");
             var stubLogger = GetStubLogger();
-            stubLogger.Messages.Last().Item2.Should().Be(errorMessage);
+            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be(errorMessage);
         }
 
         private Task<IAnalyticsEvent> Invoke(RenameStepCommand command, StubWpfTextView textView)
@@ -367,10 +373,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             await Invoke(command, textView);
 
             var stubLogger = GetStubLogger();
-            var logMessage = stubLogger.Messages.Last().Item2;
-            const string userNotificationPrefix = "ShowProblem: User Notification: ";
-            logMessage.Should().StartWith(userNotificationPrefix);
-            var actualErrorMessages = logMessage.Substring(userNotificationPrefix.Length).Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            var logMessage = WithoutWarningHeader(stubLogger.Messages.Last().Item2);
+            var actualErrorMessages = logMessage.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             actualErrorMessages.Should().BeEquivalentTo(errorMessages);
         }
 
@@ -514,7 +518,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             await OneFeatureFileRename(originalExpression, updatedExpression, featureFile);
 
             var stubLogger = GetStubLogger();
-            stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: " + _projectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
+            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be(_projectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
         }
 
         private async Task<TestText> OneFeatureFileRename(string originalExpression, string updatedExpression,

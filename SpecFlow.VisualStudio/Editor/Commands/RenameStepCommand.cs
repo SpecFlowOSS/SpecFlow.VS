@@ -113,8 +113,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             switch (stepDefinitions.Count)
             {
                 case 0:
-                    IdeScope.Actions.ShowProblem("No step definition found that is related to this position");
-                    MonitoringService.MonitorCommandRenameStepExecuted(ctx);
+                    ctx.AddCriticalProblem("No step definition found that is related to this position");
+                    NotifyUserAboutIssues(ctx);
                     break;
                 case 1:
                 {
@@ -205,8 +205,9 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private void ShowProblem(RenameStepCommandContext ctx)
         {
-            var problem = string.Join(Environment.NewLine, ctx.Issues.Select(issue => issue.Description));
-            IdeScope.Actions.ShowProblem(problem);
+            var problems = string.Join(Environment.NewLine, ctx.Issues.Select(issue => issue.Description));
+            IdeScope.Actions.ShowProblem(
+                $"The following problems occurred:{Environment.NewLine}{problems}", "Rename Step");
             MonitoringService.MonitorCommandRenameStepExecuted(ctx);
         }
 

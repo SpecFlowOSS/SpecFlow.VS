@@ -28,7 +28,7 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Center">Original expression</Label>
-                <Label Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Content="{Binding OriginalStepText}" />
+                <TextBlock Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" Text="{Binding OriginalStepText}" TextWrapping="WrapWithOverflow"/>
                 <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Step expression:</Label>
                 <TextBox Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="{Binding StepText, UpdateSourceTrigger=PropertyChanged}"/>
                 <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" VerticalAlignment="Center" Foreground="Red" Content="{Binding ValidationError}" />

@@ -24,9 +24,21 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         {
             Logger.LogWarning($"User Notification: {description}");
             var caption = title == null ? "Visual Studio Extension for SpecFlow" : $"SpecFlow: {title}";
-            MessageBox.Show(description, caption, MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+            IdeScope.RunOnUiThread(() =>
+            {
+                MessageBox.Show(
+                    description, 
+                    caption, 
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.OK);
+            });
         }
 
+        /// <summary>
+        /// Have to be called from UI thread
+        /// </summary>
+        /// <param name="questionDescription"></param>
         public void ShowQuestion(QuestionDescription questionDescription)
         {
             Logger.LogInfo($"User Question: {questionDescription.Description}");
