@@ -24,7 +24,7 @@ namespace SpecFlow.VisualStudio.VsxStubs
         {
             if (typeof(T) == typeof(DeveroomTag))
             {
-                var taggerProvider = new DeveroomTaggerProvider(_ideScope, null);
+                var taggerProvider = new DeveroomTaggerProvider(_ideScope);
                 taggerProvider.CreateImmediateParsingTagger = true;
 
                 return new StubTagAggregator<T>((ITagger<T>)taggerProvider.CreateTagger<DeveroomTag>(textBuffer), VsxStubObjects.BufferGraphFactoryService.CreateBufferGraph(textBuffer));
