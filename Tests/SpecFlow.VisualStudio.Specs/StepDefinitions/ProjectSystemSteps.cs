@@ -694,7 +694,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
 
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
             await _projectScope.StubIdeScope.AnalyticsTransmitter
-                .WaitForEvent("Rename step command executed", cts.Token);
+                .WaitForEventAsync("Rename step command executed", cts.Token);
         }
 
         [Then("invoking the first item from the jump list renames the {string} {string} step definition")]
@@ -712,7 +712,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
 
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
             await _projectScope.StubIdeScope.AnalyticsTransmitter
-                .WaitForEvent("Rename step command executed", cts.Token);
+                .WaitForEventAsync("Rename step command executed", cts.Token);
 
             string fileContent = _wpfTextView.TextSnapshot.GetText();
             var parsedSnippets = ParseSnippetsFromFile(fileContent);

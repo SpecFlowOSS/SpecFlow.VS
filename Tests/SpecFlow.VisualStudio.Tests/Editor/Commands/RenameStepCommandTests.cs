@@ -299,7 +299,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
             return _projectScope.StubIdeScope.AnalyticsTransmitter
-                .WaitForEvent("Rename step command executed", cts.Token);
+                .WaitForEventAsync("Rename step command executed", cts.Token);
         }
 
         [Theory]
@@ -424,7 +424,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
             await _projectScope.StubIdeScope.AnalyticsTransmitter
-                .WaitForEvent("Rename step command executed", cts.Token);
+                .WaitForEventAsync("Rename step command executed", cts.Token);
 
             var testText = Dump(textView, "Step definition class after rename");
             testText.Lines[6].Should().Be(expectedLines[0]);
