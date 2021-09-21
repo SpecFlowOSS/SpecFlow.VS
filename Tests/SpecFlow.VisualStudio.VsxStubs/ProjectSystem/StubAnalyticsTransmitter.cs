@@ -11,7 +11,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
     public class StubAnalyticsTransmitter : IAnalyticsTransmitter
     {
         private ConcurrentBag<IAnalyticsEvent> Events { get; } =new ();
-        private TaskCompletionSource<IAnalyticsEvent> _taskCompletionSource = new();
+        private readonly TaskCompletionSource<IAnalyticsEvent> _taskCompletionSource = new();
 
         public void TransmitEvent(IAnalyticsEvent runtimeEvent)
         {
@@ -29,15 +29,10 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                var comparand = _taskCompletionSource;
-                
                 var analyticsEvent = Events.FirstOrDefault(ev => ev.EventName == eventName);
                 if (analyticsEvent != null) return analyticsEvent;
 
-                var original = Interlocked.CompareExchange(ref _taskCompletionSource,
-                    new TaskCompletionSource<IAnalyticsEvent>(), comparand);
-
-                await Task.WhenAny(original.Task, _taskCompletionSource.Task, Task.Delay(-1, cancellationToken));
+                await Task.WhenAny(_taskCompletionSource.Task, Task.Delay(-1, cancellationToken));
             }
 
             throw new TaskCanceledException();
