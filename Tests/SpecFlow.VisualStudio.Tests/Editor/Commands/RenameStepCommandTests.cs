@@ -357,7 +357,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData("14", @"""I press (.*)""", @"I press add .*)", "The non-parameter parts cannot contain expression operators", "Parameter count mismatch")]
         [InlineData("15", @"""I press add""", @"I pr?ess add", "The non-parameter parts cannot contain expression operators")]
         [InlineData("16", @"""I press (.*)""", @"I pr?ess (.*)", "The non-parameter parts cannot contain expression operators")]
-        public async void User_cannot_type_invalid_expression(string _, string testExpression, string modelStepText, params string[] errorMessages)
+        public async Task User_cannot_type_invalid_expression(string _, string testExpression, string modelStepText, params string[] errorMessages)
         {
             var stepDefinitions = ArrangeStepDefinition(testExpression);
             var featureFile = ArrangeOneFeatureFile(string.Empty);
@@ -367,7 +367,11 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             await Invoke(command, textView);
 
             var stubLogger = GetStubLogger();
-            stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: " + string.Join(Environment.NewLine, errorMessages));
+            var logMessage = stubLogger.Messages.Last().Item2;
+            const string userNotificationPrefix = "ShowProblem: User Notification: ";
+            logMessage.Should().StartWith(userNotificationPrefix);
+            var actualErrorMessages = logMessage.Substring(userNotificationPrefix.Length).Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            actualErrorMessages.Should().BeEquivalentTo(errorMessages);
         }
 
         [Fact]
