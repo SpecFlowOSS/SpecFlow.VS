@@ -7,7 +7,7 @@
     "overview": "overview.md",
     "priceCategory": "free",
     "publisher": "techtalkspecflowteam",
-    "private": true,
+    "private": false,
     "qna": true,
     "repo": "https://github.com/SpecFlowOSS/SpecFlow.VS"
 }

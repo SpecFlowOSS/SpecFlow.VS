@@ -21,3 +21,5 @@ Read more on the [SpecFlow website](https://www.specflow.org).
 * [SpecFlow for Visual Studio on GitHub](https://github.com/SpecFlowOSS/SpecFlow.VS)
 * [SpecFlow issues on GitHub](https://github.com/SpecFlowOSS/SpecFlow/issues)
 * [Privacy Policy](https://specflow.org/privacy-policy/)
+
+*The extension is built based on the [Deveroom for SpecFlow](https://github.com/specsolutions/deveroom-visualstudio) Visual Studio extension, created by Gaspar Nagy (Spec Solutions).*
