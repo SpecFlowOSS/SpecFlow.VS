@@ -36,21 +36,21 @@ namespace SpecFlow.VisualStudio.Package
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)] // Info on this package for Help/About
-    [Guid(DeveroomPackage.PackageGuidString)]
+    [Guid(SpecFlowVsPackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideAutoLoad(UIContextGuids80.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
-    public sealed class DeveroomPackage : AsyncPackage
+    public sealed class SpecFlowVsPackage : AsyncPackage
     {
         /// <summary>
-        /// DeveroomPackage GUID string.
+        /// SpecFlowVsPackage GUID string.
         /// </summary>
-        public const string PackageGuidString = "6c1ced51-c20a-4375-87a4-89c1dc7e3c35";
+        public const string PackageGuidString = "71341911-fe1a-4053-a844-01a60e093453";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DeveroomPackage"/> class.
+        /// Initializes a new instance of the <see cref="SpecFlowVsPackage"/> class.
         /// </summary>
-        public DeveroomPackage()
+        public SpecFlowVsPackage()
         {
             // Inside this method you can place any initialization code that does not require
             // any Visual Studio service because at this point the package object is created but

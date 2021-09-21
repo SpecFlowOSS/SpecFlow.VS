@@ -42,7 +42,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <VSCTCompile Include="Commands\DeveroomPackage.vsct">
+    <VSCTCompile Include="Commands\SpecFlowVsPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
     <EmbeddedResource Include="Package\VSPackage.resx">
