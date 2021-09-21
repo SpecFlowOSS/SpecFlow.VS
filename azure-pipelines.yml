@@ -23,11 +23,9 @@ steps:
     version: 5.x
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet restore (with NuGet.config)'
+  displayName: 'dotnet restore'
   inputs:
     command: restore
-    feedsToUse: config
-    nugetConfigPath: NuGet.config
 
 - task: PowerShell@2
   displayName: 'Build Connectors'
