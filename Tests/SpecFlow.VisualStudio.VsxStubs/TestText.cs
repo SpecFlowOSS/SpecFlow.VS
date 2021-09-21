@@ -65,6 +65,7 @@ namespace SpecFlow.VisualStudio.VsxStubs
             _lines = ProcessValue(value);
         }
 
+
         private string[] ProcessValue(string value)
         {
             var result = value.Split(new[] {Environment.NewLine}, StringSplitOptions.None);

@@ -51,7 +51,7 @@ Scenario: Highlights defined/undefined steps
 			When I press add
 			Then there is an undefined step
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all section of types DefinedStep,UndefinedStep should be highlighted as
 		"""
 		Feature: Addition
@@ -71,7 +71,7 @@ Scenario: Highlights step parameters
 			When I press add
 			Then the result should be 120 on the screen
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all StepParameter section should be highlighted as
 		"""
 		Feature: Addition
@@ -95,7 +95,7 @@ Scenario: Analyses all examples of scenario outline
 			| add          |
 			| undefined op |
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all section of types DefinedStep,UndefinedStep should be highlighted as
 		"""
 		Feature: Addition
@@ -121,7 +121,7 @@ Scenario: The step definition has invalid parameter count
 		Scenario: My scenario
 			When I use a step with 1 parameter
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all BindingError section should be highlighted as
 		"""
 		Feature: Addition
@@ -143,7 +143,7 @@ Scenario: Ambiguous step definitions
 		Scenario: My scenario
 			When I use a step
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all BindingError section should be highlighted as
 		"""
 		Feature: Addition
@@ -172,7 +172,7 @@ Scenario: Matches tag scoped step definitions
 			When I use mytag scoped step
 			When I use featuretag scoped step
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all section of types DefinedStep,UndefinedStep should be highlighted as
 		"""
 		@featuretag
@@ -201,7 +201,7 @@ Scenario: Matches feature scoped step definitions
 		Scenario: Random scenario
 			When I use a feature scoped step
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all section of types DefinedStep should be highlighted as
 		"""
 		Feature: Addition
@@ -224,7 +224,7 @@ Scenario: Matches scenario scoped step definitions
 		Scenario: Random scenario
 			When I use a scenario scoped step
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all section of types DefinedStep should be highlighted as
 		"""
 		Feature: Addition
@@ -256,7 +256,7 @@ Scenario: Matches combination scoped step definitions
 		Scenario: Yet another scenario
 			When I use a feature scoped step
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all section of types DefinedStep,UndefinedStep should be highlighted as
 		"""
 		Feature: Addition
@@ -305,7 +305,7 @@ Scenario: Analyses all scopes of background steps
 		Scenario: Scenario in tagged rule
 			When I use a normal step
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all section of types DefinedStep,UndefinedStep should be highlighted as
 		"""
 		Feature: Addition

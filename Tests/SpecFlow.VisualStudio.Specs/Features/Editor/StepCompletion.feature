@@ -9,7 +9,7 @@ Scenario: Offers step definitions of the scenario block at the caret
 		  Given I have entered 50 into the calculator
 		  When {caret}
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	When I invoke the "Complete" command
 	Then a completion list should pop up with the following items
 		| item        |
@@ -24,7 +24,7 @@ Scenario: Offers step definitions when space pressed after a step keyword
 		  Given I have entered 50 into the calculator
 		  When{caret}
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	When I invoke the "Complete" command by typing " "	
 	Then a completion list should pop up with the following items
 		| item        |
@@ -38,7 +38,7 @@ Scenario: Completes step at the caret position
 		Scenario: Add two numbers
 		  When I {caret}
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	When I invoke the "Complete" command
 	And commit the "I press add" completion item
 	Then the editor should be updated to
@@ -56,7 +56,7 @@ Scenario: Replaces step at the caret position
 		Scenario: Add two numbers
 		  When I {caret} press mulitply
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	When I invoke the "Complete" command
 	And commit the "I press add" completion item
 	Then the editor should be updated to
@@ -77,7 +77,7 @@ Scenario: Offers simple step definitions with parameter placeholders
 		Scenario: Add two numbers
 		  Given {caret}
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	When I invoke the "Complete" command
 	Then a completion list should pop up with the following items
 		| item                                                |
@@ -94,7 +94,7 @@ Scenario: Offers complex step definitions as regex
 		Scenario: Add two numbers
 		  Given {caret}
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	When I invoke the "Complete" command
 	Then a completion list should pop up with the following items
 		| item                                      |
@@ -112,7 +112,7 @@ Scenario Outline: Filters completion list
 		Scenario: Add two numbers
 		  Given {caret}
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	And the "Complete" command has been invoked
 	When I invoke the "Filter Completion" command by typing "<filter text>"
 	Then a completion list should list the following items

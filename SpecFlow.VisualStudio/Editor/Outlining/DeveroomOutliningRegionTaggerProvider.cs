@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace SpecFlow.VisualStudio.Editor.Outlining
 {
     [Export(typeof(ITaggerProvider))]
-    [ContentType("deveroom")]
+    [ContentType(VsContentTypes.FeatureFile)]
     [TagType(typeof(IOutliningRegionTag))]
     public class DeveroomOutliningRegionTaggerProvider : ITaggerProvider
     {

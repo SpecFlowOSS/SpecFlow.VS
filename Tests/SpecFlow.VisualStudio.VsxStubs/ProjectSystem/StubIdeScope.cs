@@ -1,20 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Abstractions;
+using System.IO.Abstractions.TestingHelpers;
+using System.Linq;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Moq;
+using SpecFlow.VisualStudio.Editor.Services;
 using Xunit.Abstractions;
 
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 {
     public class StubIdeScope : IIdeScope
     {
+        public StubAnalyticsTransmitter AnalyticsTransmitter { get; } = new StubAnalyticsTransmitter();
+        public IDictionary<string, StubWpfTextView> OpenViews { get; } = new Dictionary<string, StubWpfTextView>();
         public StubLogger StubLogger { get; } = new StubLogger();
         public DeveroomCompositeLogger CompositeLogger { get; } = new DeveroomCompositeLogger
         {
@@ -31,12 +40,13 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public IDeveroomLogger Logger => CompositeLogger;
         public IIdeActions Actions { get; set; }
         public IDeveroomWindowManager WindowManager => StubWindowManager;
-        public IFileSystem FileSystem { get; } = new FileSystem();
+        public IFileSystem FileSystem { get; private set; } = new MockFileSystem();
         public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; } = null;
         public IDeveroomErrorListServices DeveroomErrorListServices { get; } = null;
         public StubWindowManager StubWindowManager { get; } = new StubWindowManager();
         public List<IProjectScope> ProjectScopes { get; } = new List<IProjectScope>();
         public IMonitoringService MonitoringService { get; }
+        public IWpfTextView CurrentTextView { get; internal set; }
 
         public event EventHandler<EventArgs> WeakProjectsBuilt;
         public event EventHandler<EventArgs> WeakProjectOutputsUpdated;
@@ -44,6 +54,52 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation)
         {
             return null;
+        }
+
+        public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null, string contentType = VsContentTypes.FeatureFile, string filePath = null)
+        {
+            if (filePath != null && !Path.IsPathRooted(filePath) && projectScope != null)
+                filePath = Path.Combine(projectScope.ProjectFolder, filePath);
+
+            if (projectScope == null && filePath != null)
+            {
+                projectScope = ProjectScopes.FirstOrDefault(p =>
+                    (p as InMemoryStubProjectScope)?.FilesAdded.Any(f => f.Key == filePath) ?? false);
+            }
+
+            var textView = StubWpfTextView.CreateTextView(this, inputText, newLine, projectScope, contentType, filePath);
+            if (filePath != null)
+                OpenViews[filePath] = textView;
+
+            CurrentTextView = textView;
+
+            return textView;
+        }
+
+        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        {
+            return EnsureOpenTextView(sourceLocation).TextBuffer;
+        }
+
+        public IWpfTextView EnsureOpenTextView(SourceLocation sourceLocation)
+        {
+            if (OpenViews.TryGetValue(sourceLocation.SourceFile, out var view))
+                return view;
+
+            var lines = FileSystem.File.ReadAllLines(sourceLocation.SourceFile);
+            var textView = CreateTextView(new TestText(lines), filePath: sourceLocation.SourceFile);
+            return textView;
+        }
+
+        public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
+        {
+            var fileContent = textBuffer.CurrentSnapshot.GetText();
+            return CSharpSyntaxTree.ParseText(fileContent);
+        }
+
+        public void RunOnUiThread(Action action)
+        {
+            action();
         }
 
         public IProjectScope[] GetProjectsWithFeatureFiles()
@@ -58,7 +114,12 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public StubIdeScope(ITestOutputHelper testOutputHelper)
         {
-            MonitoringService = new Mock<IMonitoringService>().Object;
+            MonitoringService = 
+                new MonitoringService(
+                    AnalyticsTransmitter, 
+                    new Mock<IWelcomeService>().Object, 
+                    new Mock<ITelemetryConfigurationHolder>().Object);
+
             CompositeLogger.Add(new DeveroomXUnitLogger(testOutputHelper));
             CompositeLogger.Add(StubLogger);
             Actions = new StubIdeActions(this);
@@ -69,6 +130,11 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         {
             WeakProjectsBuilt?.Invoke(this, EventArgs.Empty);
             WeakProjectOutputsUpdated?.Invoke(this, EventArgs.Empty);
+        }
+
+        public void UsePhysicalFileSystem()
+        {
+            FileSystem = new FileSystem();
         }
 
         class ActionsSetter : IDisposable

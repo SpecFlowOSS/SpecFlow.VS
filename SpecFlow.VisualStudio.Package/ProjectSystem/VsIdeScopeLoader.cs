@@ -9,8 +9,10 @@ using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using EnvDTE;
+using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
+using Project = EnvDTE.Project;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
 {
@@ -122,6 +124,21 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         public IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation)
         {
             return VsIdeScope.CreatePersistentTrackingPosition(sourceLocation);
+        }
+
+        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        {
+            return VsIdeScope.GetTextBuffer(sourceLocation);
+        }
+
+        public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
+        {
+            return VsIdeScope.GetSyntaxTree(textBuffer);
+        }
+
+        public void RunOnUiThread(Action action)
+        {
+            VsIdeScope.RunOnUiThread(action);
         }
 
         public IProjectScope[] GetProjectsWithFeatureFiles()

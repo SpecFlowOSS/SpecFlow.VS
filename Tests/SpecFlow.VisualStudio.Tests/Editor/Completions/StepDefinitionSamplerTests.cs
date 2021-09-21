@@ -35,7 +35,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Completions
         [InlineData("I have entered (.*) into the calculator", "I have entered [string] into the calculator", "System.String")]
         [InlineData("I have entered (.*) into the calculator", "I have entered [Version] into the calculator", "System.Version")]
         [InlineData("I have entered (.*) and (.*) into the calculator", "I have entered [int] and [???] into the calculator", "System.Int32")]
-        public void Emits_param_placeholders(string regex, string expectedResult, string paramType)
+        [InlineData("I have entered (.*) and ([^\"]*) into the calculator", "I have entered [int] and [string] into the calculator", "System.Int32", "System.String")]
+        public void Emits_param_placeholders(string regex, string expectedResult, params string[] paramType)
         {
             var sut = new StepDefinitionSampler();
 
@@ -49,6 +50,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Completions
         [InlineData(@"some \{context\}", @"some {context}")]
         [InlineData(@"some \[context\]", @"some [context]")]
         [InlineData(@"some \[context]", @"some [context]")]
+        [InlineData(@"some \[context] (.*)", @"some [context] [???]")]
         [InlineData(@"chars \\\*\+\?\|\{\}\[\]\(\)\^\$\#", @"chars \*+?|{}[]()^$#")]
         public void Unescapes_masked_chars(string regex, string expectedResult)
         {

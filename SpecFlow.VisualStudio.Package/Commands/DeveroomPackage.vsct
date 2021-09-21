@@ -81,6 +81,19 @@
           <ToolTipText>Finds usages of the step definition in feature files.</ToolTipText>
         </Strings>
       </Button>
+      <Button guid="guidDeveroomPackageCmdSet" id="RenameStepCommandId" priority="0x0101" type="Button">
+	      <Parent guid="guidDeveroomPackageCmdSet" id="EditorContextMenuGroup" />
+	      <Icon guid="guidImages" id="bmpSpecFlow" />
+	      <CommandFlag>DynamicVisibility</CommandFlag>
+	      <CommandFlag>DefaultInvisible</CommandFlag>
+	      <Strings>
+		      <ButtonText>Rename Step...</ButtonText>
+		      <CommandName>Deveroom - Rename Step</CommandName>
+		      <CanonicalName>Deveroom.RenameStep</CanonicalName>
+		      <LocCanonicalName>Deveroom.RenameStep</LocCanonicalName>
+		      <ToolTipText>Rephrases scenario step text.</ToolTipText>
+	      </Strings>
+      </Button>
       <Button guid="guidDeveroomPackageCmdSet" id="RegenerateAllFeatureFileCodeBehindCommandId" priority="0x0101" type="Button">
         <Parent guid="guidDeveroomPackageCmdSet" id="ProjectContextMenuGroup" />
         <Icon guid="guidImages" id="bmpSpecFlow" />
@@ -110,6 +123,7 @@
   <KeyBindings>
     <KeyBinding guid="guidDeveroomPackageCmdSet" id="DefineStepsCommandId" editor="guidVSStd97" key1="B" mod1="Control" key2="D" />
     <KeyBinding guid="guidDeveroomPackageCmdSet" id="FindStepDefinitionUsagesCommandId" editor="guidVSStd97" key1="B" mod1="Control" key2="F" />
+    <KeyBinding guid="guidDeveroomPackageCmdSet" id="RenameStepCommandId" editor="guidVSStd97" key1="B" mod1="Control" key2="R" />
   </KeyBindings>
 
   <Symbols>
@@ -124,6 +138,7 @@
       <IDSymbol name="DefineStepsCommandId" value="0x0100" />
       <IDSymbol name="FindStepDefinitionUsagesCommandId" value="0x0101" />
       <IDSymbol name="RegenerateAllFeatureFileCodeBehindCommandId" value="0x0102" />
+      <IDSymbol name="RenameStepCommandId" value="0x0103" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{ca66370a-5382-4dd1-bb96-f4e09d54aa29}" >

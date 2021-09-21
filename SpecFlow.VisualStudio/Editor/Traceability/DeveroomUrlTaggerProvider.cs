@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace SpecFlow.VisualStudio.Editor.Traceability
 {
     [Export(typeof(ITaggerProvider))]
-    [ContentType("deveroom")]
+    [ContentType(VsContentTypes.FeatureFile)]
     [TagType(typeof(UrlTag))]
     public class DeveroomUrlTaggerProvider : ITaggerProvider
     {

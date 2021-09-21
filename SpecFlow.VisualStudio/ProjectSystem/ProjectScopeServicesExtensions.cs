@@ -16,8 +16,12 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
         public static IDiscoveryService GetDiscoveryService(this IProjectScope projectScope)
         {
-            return projectScope.Properties.GetOrCreateSingletonProperty(() => 
-                (IDiscoveryService)new DiscoveryService(projectScope));
+            return projectScope.Properties.GetOrCreateSingletonProperty(() =>
+            {
+                IDiscoveryService discoveryService = new DiscoveryService(projectScope);
+                discoveryService.InitializeBindingRegistry();
+                return discoveryService;
+            });
         }
 
         public static GenerationService GetGenerationService(this IProjectScope projectScope)

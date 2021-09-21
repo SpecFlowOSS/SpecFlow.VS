@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using System.Text.RegularExpressions;
-using SpecFlow.VisualStudio.Editor.Services;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
 using Gherkin.Ast;
 
@@ -11,19 +10,35 @@ namespace SpecFlow.VisualStudio.Discovery
         public bool IsValid => Regex != null && Error == null;
         public string Error { get; }
         public ScenarioBlock StepDefinitionType { get; }
-        public string Expression { get; set; }
+        public string SpecifiedExpression { get; set; }
         public Regex Regex { get; }
         public Scope Scope { get; }
         public ProjectStepDefinitionImplementation Implementation { get; }
 
-        public ProjectStepDefinitionBinding(ScenarioBlock stepDefinitionType, Regex regex, Scope scope, ProjectStepDefinitionImplementation implementation, string expression = null, string error = null)
+        public string Expression => SpecifiedExpression ?? GetSpecifiedExpressionFromRegex();
+
+        public ProjectStepDefinitionBinding(ScenarioBlock stepDefinitionType, Regex regex, Scope scope, ProjectStepDefinitionImplementation implementation, string specifiedExpression = null, string error = null)
         {
             StepDefinitionType = stepDefinitionType;
             Regex = regex;
             Scope = scope;
             Implementation = implementation;
-            Expression = expression;
+            SpecifiedExpression = specifiedExpression;
             Error = error;
+        }
+
+        private string GetSpecifiedExpressionFromRegex()
+        {
+            var result = Regex?.ToString();
+            if (result == null)
+                return null;
+
+            // remove only ONE ^/$ from around the regex
+            if (result.StartsWith("^"))
+                result = result.Substring(1);
+            if (result.EndsWith("$"))
+                result = result.Substring(0, result.Length - 1);
+            return result;
         }
 
         public MatchResultItem Match(Step step, IGherkinDocumentContext context, string stepText = null)
@@ -56,7 +71,7 @@ namespace SpecFlow.VisualStudio.Discovery
         {
             var parameterCount = Implementation.ParameterTypes?.Length ?? 0;
             //if (match.Groups.Count == 1 && parameterCount == 0 && step.Argument == null)
-            //    return ParameterMatch.Empty;
+            //    return ParameterMatch.NotMatch;
             var matchedStepParameters = match.Groups.OfType<Group>().Skip(1).Select(g => new MatchedStepTextParameter(g.Index, g.Length)).ToArray();
             var expectedParameterCount = matchedStepParameters.Length + (step.Argument == null ? 0 : 1);
             if (parameterCount != expectedParameterCount) //handle parameter error
@@ -67,7 +82,7 @@ namespace SpecFlow.VisualStudio.Discovery
 
         public override string ToString()
         {
-            return $"[{StepDefinitionType}({Expression ?? Regex?.ToString()})]: {Implementation}";
+            return $"[{StepDefinitionType}({Expression})]: {Implementation}";
         }
     }
 }

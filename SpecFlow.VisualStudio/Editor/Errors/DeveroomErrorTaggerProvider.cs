@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace SpecFlow.VisualStudio.Editor.Errors
 {
     [Export(typeof(ITaggerProvider))]
-    [ContentType("deveroom")]
+    [ContentType(VsContentTypes.FeatureFile)]
     [TagType(typeof(ErrorTag))]
     class DeveroomErrorTaggerProvider : ITaggerProvider
     {

@@ -52,10 +52,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
 
         protected IEnumerable<DeveroomTag> GetDeveroomTagsForCaret(IWpfTextView textView, bool forceUpToDate)
         {
-            var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer);
+            return GetDeveroomTagsForSpan(textView.TextBuffer, new SnapshotSpan(textView.Caret.Position.BufferPosition, 0), forceUpToDate);
+        }
+
+        //TODO: maybe move to DeveroomTaggerProvider
+        internal static IEnumerable<DeveroomTag> GetDeveroomTagsForSpan(ITextBuffer textBuffer, SnapshotSpan span, bool forceUpToDate = true)
+        {
+            var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textBuffer);
             if (tagger != null)
             {
-                var spans = new NormalizedSnapshotSpanCollection(new SnapshotSpan(textView.Caret.Position.BufferPosition, 0));
+                var spans = new NormalizedSnapshotSpanCollection(span);
                 return tagger.GetTags(spans, forceUpToDate).Select(t => t.Tag);
             }
             return Enumerable.Empty<DeveroomTag>();
@@ -71,9 +77,9 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
             //}
         }
 
-        protected string GetEditorDocumentPath(IWpfTextView textView)
+        protected string GetEditorDocumentPath(ITextBuffer textBuffer)
         {
-            if (!textView.TextBuffer.Properties.TryGetProperty(typeof(IVsTextBuffer), out IVsTextBuffer bufferAdapter))
+            if (!textBuffer.Properties.TryGetProperty(typeof(IVsTextBuffer), out IVsTextBuffer bufferAdapter))
                 return null;
 
             if (!(bufferAdapter is IPersistFileFormat persistFileFormat))

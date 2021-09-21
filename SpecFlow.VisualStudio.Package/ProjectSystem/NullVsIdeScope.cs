@@ -10,8 +10,11 @@ using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.UI;
 using SpecFlow.VisualStudio.UI.ViewModels;
 using EnvDTE;
+using Microsoft.CodeAnalysis;
 using Microsoft.VisualStudio.Text;
+using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Notifications;
+using Project = EnvDTE.Project;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
 {
@@ -114,6 +117,10 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
             }
 
+            public void MonitorCommandRenameStepExecuted(RenameStepCommandContext ctx)
+            {
+            }
+
             public void MonitorSpecFlowDiscovery(bool isFailed, string errorMessage, int stepDefinitionCount, ProjectSettings projectSettings)
             {
             }
@@ -192,12 +199,26 @@ namespace SpecFlow.VisualStudio.ProjectSystem
 
         public IProjectScope[] GetProjectsWithFeatureFiles()
         {
-            return new IProjectScope[0];
+            return Array.Empty<IProjectScope>();
         }
 
         public IDisposable CreateUndoContext(string undoLabel)
         {
             return null;
+        }
+
+        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        {
+            return null;
+        }
+
+        public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
+        {
+            return null;
+        }
+
+        public void RunOnUiThread(Action action)
+        {
         }
 
         public IProjectScope GetProject(ITextBuffer textBuffer)

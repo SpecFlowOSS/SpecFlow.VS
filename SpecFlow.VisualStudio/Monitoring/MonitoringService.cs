@@ -4,6 +4,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using SpecFlow.VisualStudio.Analytics;
 using SpecFlow.VisualStudio.Common;
+using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Notifications;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
@@ -149,6 +150,14 @@ namespace SpecFlow.VisualStudio.Monitoring
                 GetProjectSettingsProps(settings)));
         }
 
+        public void MonitorCommandRenameStepExecuted(RenameStepCommandContext ctx)
+        {
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("Rename step command executed",
+                new Dictionary<string, object>()
+                {
+                    { "Erroneous", ctx.IsErroneous }
+                }));
+        }
 
         //SPECFLOW
 

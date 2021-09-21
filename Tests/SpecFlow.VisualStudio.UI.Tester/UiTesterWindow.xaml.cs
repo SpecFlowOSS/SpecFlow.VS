@@ -83,5 +83,20 @@ namespace SpecFlow.VisualStudio.UI.Tester
             var dialog = new AddNewSpecFlowProjectDialog(viewModel);
             dialog.ShowDialog();
         }
+
+        private void Test_RenameStep(object sender, RoutedEventArgs e)
+        {
+            var viewModel = RenameStepViewModel.DesignData;
+            var dialog = new RenameStepDialog(viewModel);
+            var result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                string resultMessage =
+                    $"Renamed Step={viewModel.StepText}";
+
+                MessageBox.Show(resultMessage);
+            }
+        }
     }
 }

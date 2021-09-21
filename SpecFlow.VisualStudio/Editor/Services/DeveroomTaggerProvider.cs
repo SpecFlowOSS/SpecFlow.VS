@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.Utilities;
 namespace SpecFlow.VisualStudio.Editor.Services
 {
     [Export(typeof(ITaggerProvider))]
-    [ContentType("deveroom")]
+    [ContentType(VsContentTypes.FeatureFile)]
     [TagType(typeof(DeveroomTag))]
     public class DeveroomTaggerProvider : ITaggerProvider
     {

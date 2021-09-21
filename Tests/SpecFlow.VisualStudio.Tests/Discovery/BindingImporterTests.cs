@@ -149,7 +149,7 @@ namespace SpecFlow.VisualStudio.Tests.Discovery
             var result = sut.ImportStepDefinition(CreateStepDefinition(regex: "^my step$", 
                 expression: "my step", error: "this is an error"));
 
-            result.Expression.Should().Be("my step");
+            result.SpecifiedExpression.Should().Be("my step");
             result.Error.Should().Be("this is an error");
             result.IsValid.Should().BeFalse();
         }

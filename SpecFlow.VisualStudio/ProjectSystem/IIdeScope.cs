@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Abstractions;
+using Microsoft.CodeAnalysis;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
@@ -26,5 +27,8 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         IProjectScope[] GetProjectsWithFeatureFiles();
 
         IDisposable CreateUndoContext(string undoLabel);
+        ITextBuffer GetTextBuffer(SourceLocation sourceLocation);
+        SyntaxTree GetSyntaxTree(ITextBuffer textBuffer);
+        void RunOnUiThread(Action action);
     }
 }

@@ -41,7 +41,7 @@ namespace SpecFlow.VisualStudio.Discovery
         {
             Type = type;
             MatchedStepDefinition = matchedStepDefinition;
-            ParameterMatch = parameterMatch;
+            ParameterMatch = parameterMatch ?? throw new ArgumentNullException(nameof(parameterMatch));
             UndefinedStep = undefinedStep;
             Errors = errors ?? EmptyErrors;
         }
@@ -81,7 +81,7 @@ namespace SpecFlow.VisualStudio.Discovery
         public static MatchResultItem CreateUndefined(Step step, string customStepText)
         {
             return new MatchResultItem(MatchResultType.Undefined,
-                null, null, null, new UndefinedStepDescriptor(step, customStepText));
+                null, ParameterMatch.NotMatch, null, new UndefinedStepDescriptor(step, customStepText));
         }
     }
 }

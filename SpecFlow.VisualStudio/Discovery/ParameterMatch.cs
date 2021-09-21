@@ -6,7 +6,7 @@ namespace SpecFlow.VisualStudio.Discovery
 {
     public class ParameterMatch
     {
-        public static readonly ParameterMatch Empty = new ParameterMatch(new MatchedStepTextParameter[0], null, new string[0]);
+        public static readonly ParameterMatch NotMatch = new (Array.Empty<MatchedStepTextParameter>(), null, Array.Empty<string>());
 
         public MatchedStepTextParameter[] StepTextParameters { get; }
         public StepArgument StepArgument { get; }

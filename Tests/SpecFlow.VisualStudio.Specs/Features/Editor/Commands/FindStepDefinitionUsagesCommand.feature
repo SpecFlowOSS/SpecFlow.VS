@@ -28,7 +28,7 @@ Scenario: Finds usage of a step definition with a single usage
 			}
 		}
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	When I invoke the "Find Step Definition Usages" command
 	Then a jump list "Step definition usages" is opened with the following steps
 		| step                                    |
@@ -58,7 +58,7 @@ Scenario: Finds usage of a step definition with a few usage
 			}
 		}
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	When I invoke the "Find Step Definition Usages" command
 	Then a jump list "Step definition usages" is opened with the following steps
 		| step                                    |
@@ -87,7 +87,7 @@ Scenario: The step definition is not used
 			}
 		}
 		"""
-	And the initial binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	When I invoke the "Find Step Definition Usages" command
 	Then a jump list "Step definition usages" is opened with the following steps
 		| step                     |

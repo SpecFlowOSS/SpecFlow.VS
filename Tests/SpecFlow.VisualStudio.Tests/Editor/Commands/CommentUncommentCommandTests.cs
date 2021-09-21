@@ -6,6 +6,7 @@ using SpecFlow.VisualStudio.VsxStubs;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Moq;
+using SpecFlow.VisualStudio.Editor.Services;
 using SpecFlow.VisualStudio.ProjectSystem;
 using Xunit;
 
@@ -103,7 +104,7 @@ Scenario: bar
         protected IWpfTextView CreateTextView(TestText inputText, int selectionStartLine, int selectionStartColumn,
             int? selectionEndLine, int? selectionEndColumn)
         {
-            var textBuffer = VsxStubObjects.CreateTextBuffer(inputText.ToString());
+            var textBuffer = VsxStubObjects.CreateTextBuffer(inputText.ToString(), VsContentTypes.FeatureFile);
             IWpfTextView textView = new StubWpfTextView(textBuffer);
 
             if (selectionEndColumn != null && selectionEndLine != null)
