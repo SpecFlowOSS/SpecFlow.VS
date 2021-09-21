@@ -297,6 +297,11 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         private Task<IAnalyticsEvent> Invoke(RenameStepCommand command, StubWpfTextView textView)
         {
             command.PreExec(textView, command.Targets.First());
+            return WaitForCommandToComplete();
+        }
+
+        private Task<IAnalyticsEvent> WaitForCommandToComplete()
+        {
             var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
             return _projectScope.StubIdeScope.AnalyticsTransmitter
                 .WaitForEventAsync("Rename step command executed", cts.Token);
@@ -352,14 +357,14 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData("14", @"""I press (.*)""", @"I press add .*)", "The non-parameter parts cannot contain expression operators", "Parameter count mismatch")]
         [InlineData("15", @"""I press add""", @"I pr?ess add", "The non-parameter parts cannot contain expression operators")]
         [InlineData("16", @"""I press (.*)""", @"I pr?ess (.*)", "The non-parameter parts cannot contain expression operators")]
-        public void User_cannot_type_invalid_expression(string _, string testExpression, string modelStepText, params string[] errorMessages)
+        public async void User_cannot_type_invalid_expression(string _, string testExpression, string modelStepText, params string[] errorMessages)
         {
             var stepDefinitions = ArrangeStepDefinition(testExpression);
             var featureFile = ArrangeOneFeatureFile(string.Empty);
             ArrangePopup(modelStepText);
             var (textView, command) = ArrangeSut(stepDefinitions, featureFile);
 
-            command.PreExec(textView, command.Targets.First());
+            await Invoke(command, textView);
 
             var stubLogger = GetStubLogger();
             stubLogger.Messages.Last().Item2.Should().Be("ShowProblem: User Notification: " + string.Join(Environment.NewLine, errorMessages));
@@ -422,9 +427,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var chosenItem = ideActions.LastShowContextMenuItems[chosenOption];
             chosenItem.Command(chosenItem);
 
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
-            await _projectScope.StubIdeScope.AnalyticsTransmitter
-                .WaitForEventAsync("Rename step command executed", cts.Token);
+            await WaitForCommandToComplete();
 
             var testText = Dump(textView, "Step definition class after rename");
             testText.Lines[6].Should().Be(expectedLines[0]);
