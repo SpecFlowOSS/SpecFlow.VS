@@ -15,7 +15,7 @@ namespace SpecFlow.VisualStudio.Diagnostics
         public DeveroomDebugLogger(TraceLevel level = DefaultDebugTraceLevel)
         {
             Level = level;
-            var env = Environment.GetEnvironmentVariable("DEVEROOM_DEBUG");
+            var env = Environment.GetEnvironmentVariable("SPECFLOWVS_DEBUG");
             if (env != null)
             {
                 if (env.Equals("1") || env.Equals("true", StringComparison.InvariantCultureIgnoreCase))
@@ -29,7 +29,7 @@ namespace SpecFlow.VisualStudio.Diagnostics
 
         public void Log(TraceLevel messageLevel, string message)
         {
-            Debug.WriteLineIf(messageLevel <= Level, $"{messageLevel}: {message}", "Deveroom");
+            Debug.WriteLineIf(messageLevel <= Level, $"{messageLevel}: {message}", "SpecFlowVs");
         }
     }
 }

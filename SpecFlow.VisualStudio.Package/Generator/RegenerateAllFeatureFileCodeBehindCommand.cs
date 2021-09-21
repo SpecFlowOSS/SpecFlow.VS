@@ -25,7 +25,7 @@ namespace SpecFlow.VisualStudio.Generator
 
         public void Register(OleMenuCommandService menuCommandService)
         {
-            var menuCommand = new OleMenuCommand(InvokeHandler, new CommandID(DeveroomCommands.DefaultCommandSet, DeveroomCommands.RegenerateAllFeatureFileCodeBehindCommandId));
+            var menuCommand = new OleMenuCommand(InvokeHandler, new CommandID(SpecFlowVsCommands.DefaultCommandSet, SpecFlowVsCommands.RegenerateAllFeatureFileCodeBehindCommandId));
             menuCommand.BeforeQueryStatus += MenuCommandOnBeforeQueryStatus;
             menuCommandService.AddCommand(menuCommand);
         }

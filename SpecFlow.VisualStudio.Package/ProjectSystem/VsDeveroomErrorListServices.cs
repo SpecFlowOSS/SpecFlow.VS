@@ -20,8 +20,8 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         {
             var errorListProvider = new ErrorListProvider(vsIdeScope.ServiceProvider)
             {
-                ProviderName = "Deveroom",
-                ProviderGuid = new Guid("{0394E2AB-B68C-4A22-8F35-BDA6C349A5E7}")
+                ProviderName = "SpecFlow",
+                ProviderGuid = new Guid("{886045DC-B789-4428-86D3-A90E13B6E11F}")
             };
             errorListProvider.Subcategories.AddRange(Enum.GetNames(typeof(DeveroomUserErrorCategory)));
             return errorListProvider;

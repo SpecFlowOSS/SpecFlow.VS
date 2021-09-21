@@ -20,7 +20,7 @@ namespace SpecFlow.VisualStudio.Editor.Completions
         private readonly IProjectScope _project;
 
         public DeveroomCompletionSource(ITextBuffer buffer, ITagAggregator<DeveroomTag> tagAggregator, IIdeScope ideScope) 
-            : base("Deveroom", buffer)
+            : base("SpecFlow", buffer)
         {
             _tagAggregator = tagAggregator;
             _ideScope = ideScope;

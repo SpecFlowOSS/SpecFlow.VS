@@ -48,7 +48,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinKeywordClassificationFormat()
             {
-                this.DisplayName = "Deveroom Keyword";
+                this.DisplayName = "SpecFlow Keyword";
             }
         }
 
@@ -67,7 +67,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinTagClassificationFormat()
             {
-                this.DisplayName = "Deveroom Tag";
+                this.DisplayName = "SpecFlow Tag";
             }
         }
 
@@ -86,7 +86,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinDescriptionClassificationFormat()
             {
-                this.DisplayName = "Deveroom Description";
+                this.DisplayName = "SpecFlow Description";
                 this.IsItalic = true;
             }
         }
@@ -106,7 +106,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinDocStringClassificationFormat()
             {
-                this.DisplayName = "Deveroom Doc String";
+                this.DisplayName = "SpecFlow Doc String";
             }
         }
 
@@ -125,7 +125,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinDataTableClassificationFormat()
             {
-                this.DisplayName = "Deveroom Data Table";
+                this.DisplayName = "SpecFlow Data Table";
             }
         }
 
@@ -144,7 +144,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinDataTableHeaderClassificationFormat()
             {
-                this.DisplayName = "Deveroom Data Table Header";
+                this.DisplayName = "SpecFlow Data Table Header";
                 this.IsItalic = true;
             }
         }
@@ -164,7 +164,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinCommentClassificationFormat()
             {
-                this.DisplayName = "Deveroom Comment";
+                this.DisplayName = "SpecFlow Comment";
             }
         }
 
@@ -182,7 +182,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinUndefinedStepClassificationFormat()
             {
-                this.DisplayName = "Deveroom Undefined Step";
+                this.DisplayName = "SpecFlow Undefined Step";
                 this.ForegroundColor = (Color)ColorConverter.ConvertFromString("#887DBA");
             }
         }
@@ -202,7 +202,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinStepParameterClassificationFormat()
             {
-                this.DisplayName = "Deveroom Step Parameter";
+                this.DisplayName = "SpecFlow Step Parameter";
             }
         }
 
@@ -221,7 +221,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public GherkinScenarioOutlinePlaceholderClassificationFormat()
             {
-                this.DisplayName = "Deveroom Scenario Outline Placeholder";
+                this.DisplayName = "SpecFlow Scenario Outline Placeholder";
                 this.IsItalic = true;
             }
         }
@@ -244,7 +244,7 @@ namespace SpecFlow.VisualStudio.Editor.Classification
         {
             public DebugEditorClassificationFormat()
             {
-                this.DisplayName = "Deveroom Debugging Editor";
+                this.DisplayName = "SpecFlow Debugging Editor";
                 this.BackgroundColor = Colors.Yellow;
             }
         }

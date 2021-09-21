@@ -41,7 +41,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         public override DeveroomEditorCommandTargetKey[] Targets => new[]
         {
-            new DeveroomEditorCommandTargetKey(DeveroomCommands.DefaultCommandSet, DeveroomCommands.RenameStepCommandId)
+            new DeveroomEditorCommandTargetKey(SpecFlowVsCommands.DefaultCommandSet, SpecFlowVsCommands.RenameStepCommandId)
         };
 
         public override bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs = default(IntPtr))

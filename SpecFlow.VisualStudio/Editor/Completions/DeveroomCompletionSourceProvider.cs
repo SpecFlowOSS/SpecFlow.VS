@@ -12,7 +12,7 @@ namespace SpecFlow.VisualStudio.Editor.Completions
 {
     [Export(typeof(ICompletionSourceProvider))]
     [ContentType(VsContentTypes.FeatureFile)]
-    [Name("Deveroom Gherkin completion")]
+    [Name("SpecFlow Gherkin completion")]
     public class DeveroomCompletionSourceProvider : ICompletionSourceProvider
     {
         private readonly IBufferTagAggregatorFactoryService _aggregatorFactory;

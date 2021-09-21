@@ -2,9 +2,9 @@
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
-    public static class DeveroomCommands
+    public static class SpecFlowVsCommands
     {
-        public static readonly Guid DefaultCommandSet = new Guid("7b9f385f-5db1-4fc3-9202-064b4a3fa987");
+        public static readonly Guid DefaultCommandSet = new("7b9f385f-5db1-4fc3-9202-064b4a3fa987");
 
         public const int DefineStepsCommandId = 0x0100;
         public const int FindStepDefinitionUsagesCommandId = 0x0101;

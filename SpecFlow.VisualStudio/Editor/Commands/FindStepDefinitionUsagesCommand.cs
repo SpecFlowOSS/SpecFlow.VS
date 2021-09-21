@@ -34,7 +34,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         public override DeveroomEditorCommandTargetKey[] Targets => new[]
         {
-            new DeveroomEditorCommandTargetKey(DeveroomCommands.DefaultCommandSet, DeveroomCommands.FindStepDefinitionUsagesCommandId),
+            new DeveroomEditorCommandTargetKey(SpecFlowVsCommands.DefaultCommandSet, SpecFlowVsCommands.FindStepDefinitionUsagesCommandId),
         };
 
         public override DeveroomEditorCommandStatus QueryStatus(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey)
