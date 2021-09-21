@@ -56,3 +56,5 @@ All contributors are welcome! For more information see the [Contribution guideli
 SpecFlow for VisualStudio is licensed under the [MIT license](LICENSE).
 
 Copyright (c) 2019-2021 Gaspar Nagy (Spec Solutions), Tricentis GmbH
+
+The extension is built based on the [Deveroom for SpecFlow](https://github.com/specsolutions/deveroom-visualstudio) Visual Studio extension, created by Gaspar Nagy (Spec Solutions).
