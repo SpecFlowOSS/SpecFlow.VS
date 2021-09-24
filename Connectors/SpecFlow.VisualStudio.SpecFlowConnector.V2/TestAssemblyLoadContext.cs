@@ -244,7 +244,26 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
             var compilationLibrary = _dependencyContext.CompileLibraries.FirstOrDefault(
                 compileLibrary => string.Equals(compileLibrary.Name, assemblyName.Name, StringComparison.OrdinalIgnoreCase));
 
+            if (compilationLibrary == null)
+            {
+                compilationLibrary = GetFallbackCompilationLibrary(assemblyName);
+            }
+
             return TryLoadFromAssembly(compilationLibrary);
+        }
+
+        private CompilationLibrary GetFallbackCompilationLibrary(AssemblyName assemblyName)
+        {
+            // This reference might help finding dependencies that are otherwise not listed in the
+            // deps.json file of the test assembly. E.g. Microsoft.AspNetCore.Http.Features in the SpecFlow ASP.NET MVC sample
+            return new CompilationLibrary(
+                "package",
+                assemblyName.Name,
+                assemblyName.Version.ToString(),
+                null, //hash
+                new[] { assemblyName.Name + ".dll" },
+                Array.Empty<Dependency>(),
+                true);
         }
 
         private Assembly TryLoadFromAssembly(CompilationLibrary library)
