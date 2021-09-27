@@ -1,5 +1,7 @@
 # v$vNext$ - $buildDate$
 
+# v2021.0.187 - 2021-09-24
+
 * Fix: Could not load file or assembly error when opening ASP.NET MVC test projects.
 
 # v2021.0.185 - 2021-09-21
