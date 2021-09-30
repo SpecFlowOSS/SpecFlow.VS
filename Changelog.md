@@ -1,6 +1,7 @@
 # v$vNext$ - $buildDate$
 
 * Fix: Support floating versions of SpecFlow package references
+* Fix: (#6) "Could not load file or assembly" by adding NugetCacheAssemblyResolver
 
 # v2021.0.187 - 2021-09-24
 
