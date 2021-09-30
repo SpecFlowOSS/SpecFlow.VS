@@ -18,6 +18,43 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
 
         public Assembly Assembly { get; }
 
+        class NugetCacheAssemblyResolver : ICompilationAssemblyResolver
+        {
+            public bool TryResolveAssemblyPaths(CompilationLibrary library, List<string> assemblies)
+            {
+                var nugetCachePath = NugetCacheExpandedPath();
+                var directory = Path.Combine(nugetCachePath, library.Path, "lib");
+                if (!Directory.Exists(directory))
+                    return false;
+
+                var libs = Directory.GetDirectories(directory);
+                foreach (var lib in libs)
+                {
+                    var assemblyFilePath = Path.Combine(lib, library.Name+".dll");
+                    assemblies.Add(assemblyFilePath);
+                }
+
+                return libs.Any();
+            }
+
+            private string NugetCacheExpandedPath()
+            {
+                var nugetCachePath = NugetCachePath();
+                nugetCachePath = Environment.ExpandEnvironmentVariables(nugetCachePath);
+                return nugetCachePath;
+            }
+
+            private static string NugetCachePath()
+            {
+                var nugetCachePath = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+                if (nugetCachePath is not null) return nugetCachePath;
+                nugetCachePath = Environment.GetEnvironmentVariable("NuGetCachePath");
+                if (nugetCachePath is not null) return nugetCachePath;
+                nugetCachePath = @"%userprofile%\.nuget\packages";
+                return nugetCachePath;
+            }
+        }
+
         class AspNetCoreAssemblyResolver : ICompilationAssemblyResolver
         {
             public bool TryResolveAssemblyPaths(CompilationLibrary library, List<string> assemblies)
@@ -99,7 +136,8 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
                 new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)),
                 new ReferenceAssemblyPathResolver(),
                 new PackageCompilationAssemblyResolver(),
-                new AspNetCoreAssemblyResolver()
+                new AspNetCoreAssemblyResolver(),
+                new NugetCacheAssemblyResolver()
             });
         }
 
@@ -244,12 +282,14 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
             var compilationLibrary = _dependencyContext.CompileLibraries.FirstOrDefault(
                 compileLibrary => string.Equals(compileLibrary.Name, assemblyName.Name, StringComparison.OrdinalIgnoreCase));
 
-            if (compilationLibrary == null)
-            {
-                compilationLibrary = GetFallbackCompilationLibrary(assemblyName);
-            }
+            assembly = TryLoadFromAssembly(compilationLibrary);
+            if (assembly != null)
+                return assembly;
+            
+            compilationLibrary = GetFallbackCompilationLibrary(assemblyName);
+            assembly = TryLoadFromAssembly(compilationLibrary);
 
-            return TryLoadFromAssembly(compilationLibrary);
+            return assembly;
         }
 
         private CompilationLibrary GetFallbackCompilationLibrary(AssemblyName assemblyName)
@@ -263,7 +303,9 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
                 null, //hash
                 new[] { assemblyName.Name + ".dll" },
                 Array.Empty<Dependency>(),
-                true);
+                true,
+                Path.Combine(assemblyName.Name, assemblyName.Version.ToString()),
+                string.Empty);
         }
 
         private Assembly TryLoadFromAssembly(CompilationLibrary library)
