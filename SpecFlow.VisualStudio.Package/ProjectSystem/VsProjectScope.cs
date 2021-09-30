@@ -58,7 +58,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             try
             {
                 return VsUtils.GetInstalledNuGetPackages((IdeScope as VsIdeScope).ServiceProvider, _project.FullName)
-                    .Select(pmd => new NuGetPackageReference(pmd.Id, new NuGetVersion(pmd.Version), pmd.InstallPath))
+                    .Select(pmd => new NuGetPackageReference(pmd.Id, new NuGetVersion(pmd.Version, pmd.RequestedRange), pmd.InstallPath))
                     .ToArray();
             }
             catch (Exception e)

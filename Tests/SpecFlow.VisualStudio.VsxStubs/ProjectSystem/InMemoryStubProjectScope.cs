@@ -38,7 +38,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public void AddSpecFlowPackage()
         {
-            PackageReferencesList.Add(new NuGetPackageReference("SpecFlow", new NuGetVersion("2.3.2"), Path.Combine(ProjectFolder, "packages", "SpecFlow")));
+            PackageReferencesList.Add(new NuGetPackageReference("SpecFlow", new NuGetVersion("2.3.2", "2.3.2"), Path.Combine(ProjectFolder, "packages", "SpecFlow")));
         }
 
         public void AddFile(string targetFilePath, string template)

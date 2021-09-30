@@ -42,7 +42,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Settings
                     specFlowSettings.Traits |= specFlowTrait;
 
             if (configuration.SpecFlow.Version != null)
-                specFlowSettings.Version = new NuGetVersion(configuration.SpecFlow.Version);
+                specFlowSettings.Version = new NuGetVersion(configuration.SpecFlow.Version, configuration.SpecFlow.Version);
 
             if (configuration.SpecFlow.GeneratorFolder != null)
             {
@@ -85,7 +85,8 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Settings
             if (specFlowVersion == null)
                 return null;
 
-            var specFlowNuGetVersion = new NuGetVersion($"{specFlowVersion.FileMajorPart}.{specFlowVersion.FileMinorPart}.{specFlowVersion.FileBuildPart}");
+            var versionSpecifier = $"{specFlowVersion.FileMajorPart}.{specFlowVersion.FileMinorPart}.{specFlowVersion.FileBuildPart}";
+            var specFlowNuGetVersion = new NuGetVersion(versionSpecifier, versionSpecifier);
 
             var configFilePath = GetSpecFlowConfigFilePath(_projectScope);
 

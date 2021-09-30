@@ -27,17 +27,17 @@ namespace SpecFlow.VisualStudio.Tests.ProjectSystem
 
         private static NuGetPackageReference CreateSpecFlowPackageRef()
         {
-            return new NuGetPackageReference("SpecFlow", new NuGetVersion("2.4.1"), SpecFlowPackagePath);
+            return new NuGetPackageReference("SpecFlow", new NuGetVersion("2.4.1", "2.4.1"), SpecFlowPackagePath);
         }
 
         private static NuGetPackageReference CreateSpecFlowMsTestPackageRef()
         {
-            return new NuGetPackageReference("SpecFlow.MsTest", new NuGetVersion("2.4.1"), SpecFlowMsTestPackagePath);
+            return new NuGetPackageReference("SpecFlow.MsTest", new NuGetVersion("2.4.1", "2.4.1"), SpecFlowMsTestPackagePath);
         }
 
         private NuGetPackageReference CreateSpecSyncPackageRef(string path = SpecSyncPackagePath)
         {
-            return new NuGetPackageReference("SpecSync.AzureDevOps.SpecFlow.2-4", new NuGetVersion("2.0.0"), path);
+            return new NuGetPackageReference("SpecSync.AzureDevOps.SpecFlow.2-4", new NuGetVersion("2.0.0", "2.0.0"), path);
         }
 
         private SpecFlowPackageDetector CreateSut()
@@ -98,7 +98,7 @@ namespace SpecFlow.VisualStudio.Tests.ProjectSystem
 
             result.Should().NotBeNull();
             result.PackageName.Should().Be("SpecFlow");
-            result.Version.Should().Be(new NuGetVersion("2.4.1"));
+            result.Version.Should().Be(new NuGetVersion("2.4.1", "2.4.1"));
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace SpecFlow.VisualStudio.Tests.ProjectSystem
 
             result.Should().NotBeNull();
             result.PackageName.Should().Be("SpecFlow");
-            result.Version.Should().Be(new NuGetVersion("2.4.0"));
+            result.Version.Should().Be(new NuGetVersion("2.4.0", "2.4.0"));
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace SpecFlow.VisualStudio.Tests.ProjectSystem
 
             result.Should().NotBeNull();
             result.PackageName.Should().Be("SpecFlow");
-            result.Version.Should().Be(new NuGetVersion("2.4.0"));
+            result.Version.Should().Be(new NuGetVersion("2.4.0", "2.4.0"));
             result.InstallPath.Should().BeEquivalentTo(SpecFlow240PackagePathSolutionPackages);
         }
 

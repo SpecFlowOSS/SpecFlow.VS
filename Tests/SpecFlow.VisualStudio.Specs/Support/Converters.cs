@@ -29,7 +29,7 @@ namespace SpecFlow.VisualStudio.Specs.Support
         [StepArgumentTransformation(@"v(\d[\d\.\-\w]+)")]
         public NuGetVersion VersionConverter(string versionString)
         {
-            return new NuGetVersion(versionString);
+            return new NuGetVersion(versionString, versionString);
         }
 
         [StepArgumentTransformation]

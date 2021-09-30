@@ -72,7 +72,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             string knownExtensionSpecFlowVersion = null;
             foreach (var packageReference in packageReferences)
             {
-                if (packageReference.PackageName == SpecFlowPackageName)
+                if (packageReference.PackageName == SpecFlowPackageName && !packageReference.Version.IsFloating)
                     return packageReference;
 
                 if (packageReference.InstallPath == null)
@@ -106,7 +106,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                 var specFlowInstallPath = ReplacePackageNamePart(knownExtensionPackage.InstallPath, knownExtensionPackage.PackageName, SpecFlowPackageName);
                 specFlowInstallPath = ReplacePackageVersionPart(specFlowInstallPath, knownExtensionPackage.Version.ToString(), knownExtensionSpecFlowVersion);
                 if (specFlowInstallPath != knownExtensionPackage.InstallPath && _fileSystem.Directory.Exists(specFlowInstallPath))
-                    return new NuGetPackageReference(SpecFlowPackageName, new NuGetVersion(knownExtensionSpecFlowVersion), specFlowInstallPath);
+                    return new NuGetPackageReference(SpecFlowPackageName, new NuGetVersion(knownExtensionSpecFlowVersion, knownExtensionSpecFlowVersion), specFlowInstallPath);
             }
 
             return null;

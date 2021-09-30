@@ -228,7 +228,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
 
         private StubProjectScope GetProjectScope()
         {
-            var installedPackages = ProjectGenerator.InstalledNuGetPackages.Select(p => new NuGetPackageReference(p.PackageName, new NuGetVersion(p.Version), p.InstallPath));
+            var installedPackages = ProjectGenerator.InstalledNuGetPackages.Select(p => new NuGetPackageReference(p.PackageName, new NuGetVersion(p.Version, p.Version), p.InstallPath));
             var projectScope = new StubProjectScope(
                 ProjectGenerator.TargetFolder,
                 ProjectGenerator.GetOutputAssemblyPath(),
