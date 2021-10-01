@@ -7,7 +7,7 @@
         xmlns:vm="clr-namespace:SpecFlow.VisualStudio.UI.ViewModels;assembly=SpecFlow.VisualStudio"
         mc:Ignorable="d" d:DataContext="{Binding Source={x:Static vm:RenameStepViewModel.DesignData}}"
         DataContext="{Binding ViewModel, RelativeSource={RelativeSource Self}}"                  
-        Title="Rename Steps - Deveroom" Height="250" Width="750">
+        Title="Rename Steps - SpecFlow" Height="250" Width="750">
     <local:DialogWindow.Resources>
         <ResourceDictionary Source="..\DeveroomResources.xaml" />
     </local:DialogWindow.Resources>
