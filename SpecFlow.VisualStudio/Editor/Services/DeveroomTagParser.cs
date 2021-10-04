@@ -168,7 +168,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
                     AddPlaceholderTags(fileSnapshot, stepTag, step);
                 }
 
-                var match = bindingRegistry?.MatchStep(step, scenarioDefinitionTag);
+                var match = bindingRegistry.MatchStep(step, scenarioDefinitionTag);
                 if (match != null)
                 {
                     if (match.HasDefined || match.HasAmbiguous)

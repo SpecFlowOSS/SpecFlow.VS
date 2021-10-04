@@ -497,9 +497,10 @@ namespace SpecFlow.VisualStudio.VsxStubs
         public void ForceReparse()
         {
             var tagger = DeveroomTaggerProvider.GetDeveroomTagger(TextBuffer);
-            tagger?.GetTags(
+            tagger.InvalidateCache();
+            tagger.GetTags(
                 new NormalizedSnapshotSpanCollection(new[]
-                    {new SnapshotSpan(TextSnapshot, 0, TextSnapshot.Length)}), true).ToArray();
+                    {new SnapshotSpan(TextSnapshot, 0, TextSnapshot.Length)})).ToArray();
         }
 
     }

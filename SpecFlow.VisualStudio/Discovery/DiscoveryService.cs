@@ -17,16 +17,6 @@ namespace SpecFlow.VisualStudio.Discovery
 {
     public class DiscoveryService : IDiscoveryService
     {
-        enum DiscoveryStatus
-        {
-            Uninitialized,
-            UninitializedProjectSettings,
-            TestAssemblyNotFound,
-            Error,
-            Discovered,
-            NonSpecFlowTestProject
-        }
-
         private readonly IProjectScope _projectScope;
         private readonly IDiscoveryResultProvider _discoveryResultProvider;
         private readonly IDeveroomLogger _logger;
@@ -35,24 +25,8 @@ namespace SpecFlow.VisualStudio.Discovery
         private readonly IDeveroomErrorListServices _errorListServices;
 
         private bool _isDiscovering;
-        private ProjectBindingRegistryCache _cached = new ProjectBindingRegistryCache(DiscoveryStatus.Uninitialized);
+        private ProjectBindingRegistryCache _cached = new ProjectBindingRegistryCacheUninitialized();
         private IFileSystem FileSystem => _projectScope.IdeScope.FileSystem;
-
-        private class ProjectBindingRegistryCache
-        {
-            public DiscoveryStatus Status { get; }
-            public ProjectBindingRegistry BindingRegistry { get; }
-            public ProjectSettings ProjectSettings { get; }
-            public DateTime? TestAssemblyWriteTimeUtc { get; }
-
-            public ProjectBindingRegistryCache(DiscoveryStatus status, ProjectBindingRegistry bindingRegistry = null, ProjectSettings projectSettings = null, DateTime? testAssemblyWriteTimeUtc = null)
-            {
-                Status = status;
-                BindingRegistry = bindingRegistry;
-                ProjectSettings = projectSettings;
-                TestAssemblyWriteTimeUtc = testAssemblyWriteTimeUtc;
-            }
-        }
 
         public event EventHandler<EventArgs> BindingRegistryChanged;
         public event EventHandler<EventArgs> WeakBindingRegistryChanged
@@ -95,18 +69,9 @@ namespace SpecFlow.VisualStudio.Discovery
 
         private bool IsCacheUpToDate()
         {
-            var cached = _cached;
-            if (cached.Status != DiscoveryStatus.Discovered &&
-                cached.Status != DiscoveryStatus.NonSpecFlowTestProject)
-                return false;
-
             var projectSettings = _projectScope.GetProjectSettings();
             var testAssemblySource = GetTestAssemblySource(projectSettings);
-            if (!Equals(cached.ProjectSettings, projectSettings) ||
-                cached.TestAssemblyWriteTimeUtc != testAssemblySource?.LastChangeTime)
-                return false;
-
-            return true;
+            return _cached.IsUpToDate(projectSettings, testAssemblySource?.LastChangeTime ?? DateTime.MinValue);
         }
 
         protected virtual ConfigSource GetTestAssemblySource(ProjectSettings projectSettings)
@@ -141,14 +106,14 @@ namespace SpecFlow.VisualStudio.Discovery
             if (projectSettings.IsUninitialized)
             {
                 _logger.LogVerbose("Uninitialized project settings");
-                return new ProjectBindingRegistryCache(DiscoveryStatus.UninitializedProjectSettings);
+                return new ProjectBindingRegistryCacheUninitializedProjectSettings();
             }
 
             if (!projectSettings.IsSpecFlowTestProject)
             {
                 _logger.LogVerbose("Non-SpecFlow test project");
                 _logger.LogWarning($"Could not detect the SpecFlow version of the project that is required for navigation, step completion and other features. {Environment.NewLine}  Currently only NuGet package referenced can be detected. Please check https://github.com/specsolutions/deveroom-visualstudio/issues/14 for details.");
-                return new ProjectBindingRegistryCache(DiscoveryStatus.NonSpecFlowTestProject, projectSettings: projectSettings);
+                return new ProjectBindingRegistryCacheNonSpecFlowTestProject();
             }
 
             testAssemblySource = GetTestAssemblySource(projectSettings);
@@ -162,7 +127,7 @@ namespace SpecFlow.VisualStudio.Discovery
                     Message = message,
                     Type = TaskErrorCategory.Warning
                 }});
-                return new ProjectBindingRegistryCache(DiscoveryStatus.TestAssemblyNotFound, projectSettings: projectSettings);
+                return new ProjectBindingRegistryCacheTestAssemblyNotFound();
             }
 
             return null;
@@ -217,7 +182,7 @@ namespace SpecFlow.VisualStudio.Discovery
             stopwatch.Start();
             var result = InvokeDiscovery(projectSettings, testAssemblySource);
             stopwatch.Stop();
-            if (result.Status == DiscoveryStatus.Discovered)
+            if (result.IsDiscovered)
                 _logger.LogVerbose($"Discovery: {stopwatch.ElapsedMilliseconds} ms");
             return result;
         }
@@ -227,10 +192,10 @@ namespace SpecFlow.VisualStudio.Discovery
             try
             {
                 var result = _discoveryResultProvider.RunDiscovery(testAssemblySource.FilePath, projectSettings.SpecFlowConfigFilePath, projectSettings);
-                var bindingRegistry = new ProjectBindingRegistry();
+                ProjectBindingRegistry bindingRegistry = null;
                 if (result.IsFailed)
                 {
-                    bindingRegistry.IsFailed = true;
+                    bindingRegistry = ProjectBindingRegistry.Invalid;
                     _logger.LogWarning(result.ErrorMessage);
                     _logger.LogWarning($"The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled. {Environment.NewLine}  Please check the error message above and report to https://github.com/SpecFlowOSS/SpecFlow.VS/issues if you cannot fix.");
 
@@ -245,10 +210,11 @@ namespace SpecFlow.VisualStudio.Discovery
                 {
                     var bindingImporter = new BindingImporter(result.SourceFiles, result.TypeNames, _logger);
 
-                    bindingRegistry.StepDefinitions = result.StepDefinitions
+                    var stepDefinitions = result.StepDefinitions
                         .Select(sd => bindingImporter.ImportStepDefinition(sd))
                         .Where(psd => psd != null)
                         .ToArray();
+                    bindingRegistry = new ProjectBindingRegistry(stepDefinitions);
                     _logger.LogInfo(
                         $"{bindingRegistry.StepDefinitions.Length} step definitions discovered for project {_projectScope.ProjectName}");
 
@@ -274,13 +240,20 @@ namespace SpecFlow.VisualStudio.Discovery
                 }
 
                 _monitoringService.MonitorSpecFlowDiscovery(bindingRegistry.IsFailed, result.ErrorMessage, bindingRegistry.StepDefinitions.Length, projectSettings);
-                return new ProjectBindingRegistryCache(DiscoveryStatus.Discovered, bindingRegistry, projectSettings, testAssemblySource.LastChangeTime);
+                return new ProjectBindingRegistryCacheDiscovered(bindingRegistry, projectSettings, testAssemblySource.LastChangeTime);
             }
             catch (Exception ex)
             {
                 _logger.LogException(_monitoringService, ex);
-                return new ProjectBindingRegistryCache(DiscoveryStatus.Error);
+                return new ProjectBindingRegistryCacheError();
             }
+        }
+
+        public void ReplaceBindingRegistry(ProjectBindingRegistry bindingRegistry)
+        {
+            CalculateSourceLocationTrackingPositions(bindingRegistry);
+            var newBindingRegistryCache = _cached.WithBindingRegistry(bindingRegistry);
+            PublishBindingRegistryResult(newBindingRegistryCache);
         }
 
         private void PublishBindingRegistryResult(ProjectBindingRegistryCache projectBindingRegistryCache)

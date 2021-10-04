@@ -10,7 +10,7 @@ namespace SpecFlow.VisualStudio.Discovery
         public bool IsValid => Regex != null && Error == null;
         public string Error { get; }
         public ScenarioBlock StepDefinitionType { get; }
-        public string SpecifiedExpression { get; set; }
+        public string SpecifiedExpression { get; }
         public Regex Regex { get; }
         public Scope Scope { get; }
         public ProjectStepDefinitionImplementation Implementation { get; }
@@ -39,6 +39,11 @@ namespace SpecFlow.VisualStudio.Discovery
             if (result.EndsWith("$"))
                 result = result.Substring(0, result.Length - 1);
             return result;
+        }
+
+        private static Regex GetRegexFromSpecifiedExpression(string expression)
+        {
+            return new Regex($"^{expression}$", RegexOptions.CultureInvariant);
         }
 
         public MatchResultItem Match(Step step, IGherkinDocumentContext context, string stepText = null)
@@ -83,6 +88,12 @@ namespace SpecFlow.VisualStudio.Discovery
         public override string ToString()
         {
             return $"[{StepDefinitionType}({Expression})]: {Implementation}";
+        }
+
+        public ProjectStepDefinitionBinding WithSpecifiedExpression(string expression)
+        {
+            var regex = GetRegexFromSpecifiedExpression(expression);
+            return new ProjectStepDefinitionBinding(StepDefinitionType, regex, Scope, Implementation, expression, Error);
         }
     }
 }

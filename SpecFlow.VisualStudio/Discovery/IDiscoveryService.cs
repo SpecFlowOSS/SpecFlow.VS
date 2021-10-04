@@ -10,5 +10,6 @@ namespace SpecFlow.VisualStudio.Discovery
         Task<ProjectBindingRegistry> GetBindingRegistryAsync();
         void CheckBindingRegistry();
         void InitializeBindingRegistry();
+        void ReplaceBindingRegistry(ProjectBindingRegistry bindingRegistry);
     }
 }

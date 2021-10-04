@@ -221,8 +221,8 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
 
             Wait.For(() =>
             {
-                (_bindingRegistry = discoveryService.GetBindingRegistry())
-                    .Should().NotBeNull("binding should be discovered");
+                _bindingRegistry = discoveryService.GetBindingRegistry();
+                _bindingRegistry.IsFailed.Should().BeFalse("binding should be discovered");
             }, 20000);
         }
 

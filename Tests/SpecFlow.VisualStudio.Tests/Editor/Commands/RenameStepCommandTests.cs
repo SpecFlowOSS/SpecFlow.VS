@@ -1,24 +1,16 @@
-﻿#pragma warning disable VSTHRD200
-
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using SpecFlow.VisualStudio.Analytics;
-using SpecFlow.VisualStudio.Editor.Commands;
-using SpecFlow.VisualStudio.VsxStubs;
-using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
+using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Editor.Services;
+using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.UI.ViewModels;
+using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
-using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -26,32 +18,16 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
     public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     {
-        private static readonly string _warningHeader = "ShowProblem: User Notification: The following problems occurred:" + Environment.NewLine;
+        public RenameStepCommandTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper,
+            ps => new RenameStepCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
+            "Rename step command executed",
+            "ShowProblem: User Notification: The following problems occurred:" + Environment.NewLine)
+        { }
 
-        public RenameStepCommandTests(ITestOutputHelper testOutputHelper) : 
-            base(testOutputHelper, 
-                ps=>new RenameStepCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
-                "Rename step command executed")
+        private bool SpecflowProjectMustHaveFeatureFiles(Tuple<TraceLevel, string> msg)
         {
-        }
-
-        private StubLogger GetStubLogger()
-        {
-            var stubLogger = (ProjectScope.IdeScope.Logger as DeveroomCompositeLogger).Single(logger =>
-                logger.GetType() == typeof(StubLogger)) as StubLogger;
-            return stubLogger;
-        }
-
-        private static StubLogger GetStubLogger(StubIdeScope ideScope)
-        {
-            var stubLogger = (ideScope.Logger as DeveroomCompositeLogger).Single(logger =>
-                logger.GetType() == typeof(StubLogger)) as StubLogger;
-            return stubLogger;
-        }
-
-        private static bool SpecflowProjectMustHaveFeatureFiles(Tuple<TraceLevel, string> msg)
-        {
-            return WithoutWarningHeader(msg.Item2) == "Unable to find step definition usages: could not find any SpecFlow project with feature files.";
+            return WithoutWarningHeader(msg.Item2) ==
+                   "Unable to find step definition usages: could not find any SpecFlow project with feature files.";
         }
 
         private void ArrangePopup(string modelStepText)
@@ -60,15 +36,10 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
                 .RegisterWindowAction<RenameStepViewModel>(model => model.StepText = modelStepText);
         }
 
-        private void ThereWereNoWarnings()
+        private async Task BindingRegistryIsModified(string dialogExpression)
         {
-            var stubLogger = GetStubLogger();
-            stubLogger.Messages.Should().NotContain(msg => msg.Item2.Contains("ShowProblem:"));
-        }
-
-        public static string WithoutWarningHeader(string message)
-        {
-            return message.Replace(_warningHeader, "");
+            var bindingRegistry = await ProjectScope.GetDiscoveryService().GetBindingRegistryAsync();
+            bindingRegistry.StepDefinitions.Should().Contain(sd => sd.Expression == dialogExpression);
         }
 
         [Fact]
@@ -77,12 +48,13 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var emptyIde = new StubIdeScope(TestOutputHelper);
             var command = new RenameStepCommand(emptyIde, null, emptyIde.MonitoringService);
             var inputText = new TestText(string.Empty);
-            var textView = emptyIde.CreateTextView(inputText, contentType:VsContentTypes.CSharp);
-            
+            var textView = emptyIde.CreateTextView(inputText, contentType: VsContentTypes.CSharp);
+
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger(emptyIde);
-            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be("Unable to find step definition usages: the project is not initialized yet.");
+            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should()
+                .Be("Unable to find step definition usages: the project is not initialized yet.");
         }
 
         [Fact]
@@ -95,7 +67,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger();
-            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be("Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
+            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be(
+                "Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
         }
 
         [Fact]
@@ -115,7 +88,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Fact]
         public async Task There_must_be_at_lest_one_step_definition()
         {
-            await StepDefinitionMustHaveValidExpression(TestStepDefinition.Void, "No step definition found that is related to this position");
+            await StepDefinitionMustHaveValidExpression(TestStepDefinition.Void,
+                "No step definition found that is related to this position");
         }
 
         [Fact]
@@ -125,7 +99,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             stepDefinition.TestExpression = SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken);
             stepDefinition.Regex = default;
 
-            await StepDefinitionMustHaveValidExpression(stepDefinition, "Unable to rename step, the step definition expression cannot be detected.");
+            await StepDefinitionMustHaveValidExpression(stepDefinition,
+                "Unable to rename step, the step definition expression cannot be detected.");
         }
 
         [Theory]
@@ -146,7 +121,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             var stepDefinition = ArrangeStepDefinition(emptyExpression);
 
-            await StepDefinitionMustHaveValidExpression(stepDefinition, "The non-parameter parts cannot contain expression operators");
+            await StepDefinitionMustHaveValidExpression(stepDefinition,
+                "The non-parameter parts cannot contain expression operators");
         }
 
         [Theory]
@@ -164,7 +140,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinition = ArrangeStepDefinition("ConstantValue");
             stepDefinition.Regex = "^I press add$";
 
-            await StepDefinitionMustHaveValidExpression(stepDefinition, "No expressions found to replace for [When(I press add)]: WhenIPressAdd");
+            await StepDefinitionMustHaveValidExpression(stepDefinition,
+                "No expressions found to replace for [When(I press add)]: WhenIPressAdd");
         }
 
         private async Task StepDefinitionMustHaveValidExpression(TestStepDefinition stepDefinition, string errorMessage)
@@ -211,6 +188,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var testText = Dump(textView, "Step definition class after rename");
             testText.Lines[6].Should().Be(updatedLine);
             ThereWereNoWarnings();
+            await BindingRegistryIsModified(dialogExpression);
         }
 
         [Theory]
@@ -390,7 +368,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         private async Task<TestText> OneFeatureFileRename(string originalExpression, string updatedExpression,
             TestFeatureFile featureFile)
         {
-            var stepDefinition = ArrangeStepDefinition(originalExpression);
+            var stepDefinition = CommandTestBase<RenameStepCommand>.ArrangeStepDefinition(originalExpression);
 
             ArrangePopup(updatedExpression);
             var (textView, command) = ArrangeSut(stepDefinition, featureFile);

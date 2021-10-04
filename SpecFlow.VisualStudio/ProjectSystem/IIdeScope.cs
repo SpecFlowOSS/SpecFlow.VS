@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Abstractions;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
@@ -29,7 +30,8 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         IDisposable CreateUndoContext(string undoLabel);
         bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer);
         SyntaxTree GetSyntaxTree(ITextBuffer textBuffer);
-        void RunOnUiThread(Action action);
+        Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException);
+        Task RunOnUiThread(Action action);
         void OpenIfNotOpened(string path);
     }
 }

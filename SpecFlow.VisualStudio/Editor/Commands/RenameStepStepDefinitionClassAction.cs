@@ -3,17 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.VisualStudio.Text;
+using SpecFlow.VisualStudio.Diagnostics;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal class RenameStepStepDefinitionClassAction : RenameStepAction
     {
-        public override void PerformRenameStep(RenameStepCommandContext ctx)
+        public override async Task PerformRenameStep(RenameStepCommandContext ctx)
         {
             GetMethod(ctx);
             if (ctx.IsErroneous) return;
@@ -25,9 +27,9 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 ? FromExpressionWithoutOperators 
                 : FromSimpleExpression;
             
-            EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, ctx.IdeScope, expressionsToReplace, CalculateReplaceSpan, replacementTextCalculation);
+            await EditTextBuffer(ctx.TextBufferOfStepDefinitionClass, ctx.IdeScope, expressionsToReplace, CalculateReplaceSpan, replacementTextCalculation);
 
-            ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.Log(TraceLevel.Info, ctx.Method.AttributeLists.Count.ToString());
+            ctx.ProjectOfStepDefinitionClass.IdeScope.Logger.LogInfo(ctx.Method.AttributeLists.Count.ToString());
 
             bool UpdatedExpressionHasOperators() => ctx.UpdatedExpression.Contains('\\') || ctx.UpdatedExpression.Contains('"');
             string FromSimpleExpression(SyntaxToken token) => $"{(IsVerbatim(token)?"@":"")}\"{ctx.UpdatedExpression}\"";

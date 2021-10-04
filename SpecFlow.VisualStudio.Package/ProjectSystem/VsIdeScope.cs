@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.ComponentModel.Composition;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using SpecFlow.VisualStudio.Common;
 using SpecFlow.VisualStudio.Diagnostics;
@@ -175,7 +176,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return null;
         }
 
-        public Task RunOnBackGroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
         {
             return ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
@@ -191,16 +192,20 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             }).Task;
         }
 
-        public void RunOnUiThread(Action action)
+        public Task RunOnUiThread(Action action)
         {
             if (ThreadHelper.CheckAccess())
             {
                 action();
+                return Task.CompletedTask;
             }
-            else
+
+            var task = ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
-                ThreadHelper.Generic.BeginInvoke(action);
-            }
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                action();
+            });
+            return task.JoinAsync();
         }
 
         public void OpenIfNotOpened(string path)

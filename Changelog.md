@@ -1,6 +1,7 @@
 # v$vNext$ - $buildDate$
 
 * Fix: (#10) Use loaded content in StepDefinitionUsageFinder if the file is open already
+* Feature: (#9) Rebuild stepDefinitions after rename step
 
 # v2021.0.195 - 2021-10-08
 

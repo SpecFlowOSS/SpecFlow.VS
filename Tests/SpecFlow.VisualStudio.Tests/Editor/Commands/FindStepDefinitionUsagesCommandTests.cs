@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.Text;
-using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Commands;
-using SpecFlow.VisualStudio.Editor.Services;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
-using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
-using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,7 +14,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         public FindStepDefinitionUsagesCommandTests(ITestOutputHelper testOutputHelper) : 
             base(testOutputHelper, 
                 ps => new FindStepDefinitionUsagesCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
-                "FindStepDefinitionUsages command executed")
+                "FindStepDefinitionUsages command executed",
+                "???")
         {
         }
 

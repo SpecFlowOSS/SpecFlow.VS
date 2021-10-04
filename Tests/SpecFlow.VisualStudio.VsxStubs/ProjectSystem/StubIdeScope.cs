@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SpecFlow.VisualStudio.Diagnostics;
@@ -104,9 +105,26 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             return CSharpSyntaxTree.ParseText(fileContent);
         }
 
-        public void RunOnUiThread(Action action)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
+        {
+            return Task.Run(async () =>
+            {
+                try
+                {
+                    await action();
+                }
+                catch (Exception e)
+                {
+                    Logger.LogException(MonitoringService, e);
+                    onException(e);
+                }
+            });
+        }
+
+        public Task RunOnUiThread(Action action)
         {
             action();
+            return Task.CompletedTask;
         }
 
         public void OpenIfNotOpened(string path)
@@ -153,27 +171,5 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             FileSystem = new FileSystem();
         }
 
-        class ActionsSetter : IDisposable
-        {
-            private readonly StubIdeScope _ideScope;
-            private readonly IIdeActions _originalActions;
-
-            public ActionsSetter(StubIdeScope ideScope, IIdeActions actions)
-            {
-                _ideScope = ideScope;
-                _originalActions = _ideScope.Actions;
-                _ideScope.Actions = actions;
-            }
-
-            public void Dispose()
-            {
-                _ideScope.Actions = _originalActions;
-            }
-        }
-
-        public IDisposable SetActions(IIdeActions actions)
-        {
-            return new ActionsSetter(this, actions);
-        }
     }
 }

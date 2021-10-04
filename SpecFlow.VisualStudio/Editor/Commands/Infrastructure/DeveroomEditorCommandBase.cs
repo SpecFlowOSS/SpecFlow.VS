@@ -40,41 +40,29 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
 
         protected DeveroomTag GetDeveroomTagForCaret(IWpfTextView textView, params string[] tagTypes)
         {
-            var tag = DumpDeveroomTags(GetDeveroomTagsForCaret(textView, false)).FirstOrDefault(t => tagTypes.Contains(t.Type));
+            var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer);
+            var tag = DumpDeveroomTags(tagger.GetDeveroomTagsForCaret(textView)).FirstOrDefault(t => tagTypes.Contains(t.Type));
             if (tag != null &&
                 tag.Span.Snapshot.Version.VersionNumber != textView.TextSnapshot.Version.VersionNumber)
             {
                 Logger.LogWarning("Snapshot version mismatch");
-                tag = DumpDeveroomTags(GetDeveroomTagsForCaret(textView, true)).FirstOrDefault(t => tagTypes.Contains(t.Type));
+                tagger.InvalidateCache();
+                tag = DumpDeveroomTags(tagger.GetDeveroomTagsForCaret(textView)).FirstOrDefault(t => tagTypes.Contains(t.Type));
             }
             return tag;
         }
 
-        protected IEnumerable<DeveroomTag> GetDeveroomTagsForCaret(IWpfTextView textView, bool forceUpToDate)
-        {
-            return GetDeveroomTagsForSpan(textView.TextBuffer, new SnapshotSpan(textView.Caret.Position.BufferPosition, 0), forceUpToDate);
-        }
-
-        //TODO: maybe move to DeveroomTaggerProvider
-        internal static IEnumerable<DeveroomTag> GetDeveroomTagsForSpan(ITextBuffer textBuffer, SnapshotSpan span, bool forceUpToDate = true)
-        {
-            var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textBuffer);
-            if (tagger != null)
-            {
-                var spans = new NormalizedSnapshotSpanCollection(span);
-                return tagger.GetTags(spans, forceUpToDate).Select(t => t.Tag);
-            }
-            return Enumerable.Empty<DeveroomTag>();
-        }
-
         protected IEnumerable<DeveroomTag> DumpDeveroomTags(IEnumerable<DeveroomTag> deveroomTags)
         {
+#if DEBUG
+            foreach (var deveroomTag in deveroomTags)
+            {
+                Logger.LogVerbose($"  Tag: {deveroomTag.Type}");
+                yield return deveroomTag;
+            }
+#else
             return deveroomTags;
-            //foreach (var deveroomTag in deveroomTags)
-            //{
-            //    Logger.LogVerbose($"  Tag: {deveroomTag.Type}");
-            //    yield return deveroomTag;
-            //}
+#endif
         }
 
         protected string GetEditorDocumentPath(ITextBuffer textBuffer)

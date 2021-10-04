@@ -2,9 +2,9 @@
 using System;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 using SpecFlow.VisualStudio.Editor.Services;
 using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
 using SpecFlow.VisualStudio.ProjectSystem;
@@ -14,7 +14,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal class RenameStepFeatureFileAction : RenameStepAction
     {
-        public override void PerformRenameStep(RenameStepCommandContext ctx)
+        public override async Task PerformRenameStep(RenameStepCommandContext ctx)
         {
             IIdeScope ideScope = ctx.ProjectOfStepDefinitionClass.IdeScope;
             var stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope);
@@ -27,7 +27,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 var firstPosition = fileUsage.First().SourceLocation;
                 EnsureFeatureFileOpen(firstPosition, ideScope);
                 ideScope.GetTextBuffer(firstPosition, out var textBufferOfFeatureFile);
-                EditTextBuffer(textBufferOfFeatureFile, ctx.IdeScope, fileUsage,
+                await EditTextBuffer(textBufferOfFeatureFile, ctx.IdeScope, fileUsage,
                     usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
                     usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression, fileUsage.Key, ctx));
             }
@@ -61,8 +61,12 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             string filePath, RenameStepCommandContext ctx)
         {
             var snapshotSpan = new SnapshotSpan(@from.textBufferOfFeatureFile.CurrentSnapshot, CalculateReplaceSpan(@from));
+            DeveroomTagger? tagger = DeveroomTaggerProvider.GetDeveroomTagger(@from.textBufferOfFeatureFile);
+            tagger.InvalidateCache();
+            var deveroomTagsForSpan = tagger.GetDeveroomTagsForSpan(snapshotSpan).ToList();
             DeveroomTag matchedStepTag =
-                DeveroomEditorCommandBase.GetDeveroomTagsForSpan(@from.textBufferOfFeatureFile, snapshotSpan)
+                deveroomTagsForSpan
+                    .DefaultIfEmpty(new DeveroomTag(DeveroomTagTypes.DefinedStep, new SnapshotSpan()))
                     .Single(t => t.Type == DeveroomTagTypes.DefinedStep);
 
             if (matchedStepTag.Data is not MatchResult matchResult)

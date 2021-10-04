@@ -205,5 +205,37 @@ namespace SpecFlow.VisualStudio.Tests.Discovery
             result.Errors.Should().Contain(m => m.Contains("parameter"));
         }
 
+        [Theory]
+        [InlineData("I press add", "I press add")]
+        [InlineData("I press (.*)", "I press add")]
+        public void Match_after_ReplaceStepDefinition(string expression,string stepText)
+        {
+            var original = CreateStepDefinitionBinding("original");
+            var replacement = CreateStepDefinitionBinding(expression);
+            MatchAfterReplaceStepDefinition(expression, stepText, original, replacement);
+        }
+
+        [Theory]
+        [InlineData("I press add", "I press add")]
+        [InlineData("I press (.*)", "I press add")]
+        public void Match_after_ReplaceStepDefinition_WithSpecifiedExpression(string expression, string stepText)
+        {
+            var original = CreateStepDefinitionBinding("original");
+            var replacement = original.WithSpecifiedExpression(expression);
+            MatchAfterReplaceStepDefinition(expression, stepText, original, replacement);
+        }
+
+        private void MatchAfterReplaceStepDefinition(string expression, string stepText, ProjectStepDefinitionBinding original,
+            ProjectStepDefinitionBinding replacement)
+        {
+            _stepDefinitionBindings.Add(original);
+            var sut = CreateSut();
+            var modifiedSut = sut.ReplaceStepDefinition(original, replacement);
+
+            var result = modifiedSut.MatchStep(CreateStep(text: stepText));
+            var matchItem = AssertSingleDefined(result);
+            matchItem.MatchedStepDefinition.Expression.Should().Be(expression);
+            matchItem.MatchedStepDefinition.Regex.ToString().Should().Be($"^{expression}$");
+        }
     }
 }

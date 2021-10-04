@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO.Abstractions;
 using System.Threading;
+using System.Threading.Tasks;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
@@ -218,7 +219,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return null;
         }
 
-        public Task RunOnBackGroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
         {
             return Task.CompletedTask;
         }

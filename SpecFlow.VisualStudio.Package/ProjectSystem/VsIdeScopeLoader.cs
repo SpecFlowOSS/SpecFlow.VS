@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Monitoring;
@@ -136,14 +137,14 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return VsIdeScope.GetSyntaxTree(textBuffer);
         }
 
-        public Task RunOnBackGroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
         {
-            return VsIdeScope.RunOnBackGroundThread(action, onException);
+            return VsIdeScope.RunOnBackgroundThread(action, onException);
         }
 
-        public void RunOnUiThread(Action action)
+        public Task RunOnUiThread(Action action)
         {
-            VsIdeScope.RunOnUiThread(action);
+            return VsIdeScope.RunOnUiThread(action);
         }
 
         public void OpenIfNotOpened(string path)

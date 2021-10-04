@@ -80,6 +80,8 @@ namespace SpecFlow.VisualStudio.Editor.Completions
             var bindingRegistry = discoveryService?.GetBindingRegistry();
             if (bindingRegistry == null)
                 return new List<Completion>();
+            if (bindingRegistry.IsFailed)
+                return new List<Completion>();
 
             var sampler = new StepDefinitionSampler();
 

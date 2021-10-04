@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.ProjectSystem;
@@ -8,16 +9,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 {
     internal abstract class RenameStepAction : IRenameStepAction
     {
-        public abstract void PerformRenameStep(RenameStepCommandContext ctx);
+        public abstract Task PerformRenameStep(RenameStepCommandContext ctx);
 
-        protected static void EditTextBuffer<T>(
+        protected static Task EditTextBuffer<T>(
             ITextBuffer textBuffer,
             IIdeScope ideScope,
             IEnumerable<T> expressionsToReplace,
             Func<T, Span> calculateReplaceSpan,
             Func<T, string> calculateReplacementText)
         {
-            ideScope.RunOnUiThread(() =>
+            return ideScope.RunOnUiThread(() =>
             {
                 using var textEdit = textBuffer.CreateEdit();
 

@@ -1,6 +1,6 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
-using System.IO.Abstractions;
 using System.Linq;
 using SpecFlow.VisualStudio.Configuration;
 using SpecFlow.VisualStudio.Diagnostics;
@@ -120,10 +120,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
             if (featureNode == null)
                 yield break;
 
-            var dummyRegistry = new ProjectBindingRegistry
-            {
-                StepDefinitions = stepDefinitions
-            };
+            var dummyRegistry = new ProjectBindingRegistry(stepDefinitions);
 
             var featureContext = new UsageFinderContext(featureNode);
 

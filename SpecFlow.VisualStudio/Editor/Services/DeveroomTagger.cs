@@ -8,6 +8,7 @@ using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 
 namespace SpecFlow.VisualStudio.Editor.Services
@@ -117,15 +118,11 @@ namespace SpecFlow.VisualStudio.Editor.Services
         {
             _tagsCache.Invalidate(true);
             RaiseTagsChanged();
-            var fileSnapshot = _buffer.CurrentSnapshot;
-            TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(fileSnapshot, 0, fileSnapshot.Length)));
         }
 
-        //TODO: why forceUpToDate is not used???
-        public IEnumerable<ITagSpan<DeveroomTag>> GetTags(NormalizedSnapshotSpanCollection spans, bool forceUpToDate)
+        public void InvalidateCache()
         {
             _tagsCache.Invalidate();
-            return GetTags(spans);
         }
 
         public IEnumerable<ITagSpan<DeveroomTag>> GetTags(NormalizedSnapshotSpanCollection spans)
@@ -159,12 +156,23 @@ namespace SpecFlow.VisualStudio.Editor.Services
             return currentTagsCache?.Tags;
         }
 
+        public IEnumerable<DeveroomTag> GetDeveroomTagsForCaret(IWpfTextView textView)
+        {
+            return GetDeveroomTagsForSpan(new SnapshotSpan(textView.Caret.Position.BufferPosition, 0));
+        }
+
+        public IEnumerable<DeveroomTag> GetDeveroomTagsForSpan(SnapshotSpan span)
+        {
+            var spans = new NormalizedSnapshotSpanCollection(span);
+            return GetTags(spans).Select(t => t.Tag);
+        }
+
         private void ReCalculate(ITextSnapshot fileSnapshot)
         {
             var recalculated = _tagsCache.ReCalculate((() =>
             {
                 var configuration = _deveroomConfigurationProvider.GetConfiguration();
-                var bindingRegistry = _discoveryService?.GetBindingRegistry();
+                var bindingRegistry = _discoveryService?.GetBindingRegistry() ?? ProjectBindingRegistry.Invalid;
                 var bindingRegistryVersion = bindingRegistry?.Version;
                 var currentTagsCache = _tagsCache.Value;
                 if (currentTagsCache != null &&

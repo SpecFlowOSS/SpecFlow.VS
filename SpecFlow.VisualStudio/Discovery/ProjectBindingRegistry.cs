@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -10,13 +11,20 @@ namespace SpecFlow.VisualStudio.Discovery
 {
     public class ProjectBindingRegistry
     {
+        public static ProjectBindingRegistry Invalid = new(Array.Empty<ProjectStepDefinitionBinding>());
         private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
         private const string DocStringDefaultTypeName = TypeShortcuts.StringType;
 
         private static int _versionCounter = 0;
+
+        public ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions)
+        {
+            StepDefinitions = stepDefinitions.ToImmutableArray();
+        }
+
         public int Version { get; } = Interlocked.Increment(ref _versionCounter);
-        public ProjectStepDefinitionBinding[] StepDefinitions { get; set; } = new ProjectStepDefinitionBinding[0];
-        public bool IsFailed { get; set; }
+        public ImmutableArray<ProjectStepDefinitionBinding> StepDefinitions { get; }
+        public bool IsFailed => this == Invalid;
 
         public MatchResult MatchStep(Step step, IGherkinDocumentContext context = null)
         {
@@ -164,6 +172,11 @@ namespace SpecFlow.VisualStudio.Discovery
                     sdMatches = matchesWithScope;
             }
             return sdMatches;
+        }
+
+        public ProjectBindingRegistry ReplaceStepDefinition(ProjectStepDefinitionBinding original, ProjectStepDefinitionBinding replacement)
+        {
+            return new ProjectBindingRegistry(StepDefinitions.Select(sd => sd == original ? replacement : sd));
         }
     }
 }

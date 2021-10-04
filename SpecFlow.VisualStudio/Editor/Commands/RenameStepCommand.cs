@@ -5,6 +5,7 @@ using System.Collections.Immutable;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
@@ -168,33 +169,35 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private void PerformModifications(RenameStepCommandContext ctx)
         {
-            InvokeOnBackgroundThread(() =>
+            InvokeOnBackgroundThread(ctx, async () =>
             {
                 using (IdeScope.CreateUndoContext("Rename steps"))
                 {
-                    _renameStepFeatureFileAction.PerformRenameStep(ctx);
-                    _renameStepStepDefinitionClassAction.PerformRenameStep(ctx);
+                    await _renameStepFeatureFileAction.PerformRenameStep(ctx);
+                    await _renameStepStepDefinitionClassAction.PerformRenameStep(ctx);
                 }
 
                 IdeScope.Actions.NavigateTo(ctx.StepDefinitionBinding.Implementation.SourceLocation);
-                NotifyUserAboutIssues(ctx);
+                UpdateBindingRegistry(ctx);
             });
         }
 
-        private void InvokeOnBackgroundThread(Action action)
+        private void InvokeOnBackgroundThread(RenameStepCommandContext ctx, Func<Task> action)
         {
-            Task.Run(action);
+            _ = ctx.IdeScope.RunOnBackgroundThread(action, e=> ctx.AddCriticalProblem(e.Message))
+                .ContinueWith(_=>NotifyUserAboutIssues(ctx), TaskScheduler.Default);
         }
 
-        private void NotifyUserAboutIssues(RenameStepCommandContext ctx)
+        private Task NotifyUserAboutIssues(RenameStepCommandContext ctx)
         {
             if (!ctx.Issues.Any())
             {
                 MonitoringService.MonitorCommandRenameStepExecuted(ctx);
-                return;
+                return Task.CompletedTask;
             }
 
             ShowProblem(ctx);
+            return Task.CompletedTask;
         }
 
         private bool Erroneous(RenameStepCommandContext ctx)
@@ -288,11 +291,27 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         private ProjectStepDefinitionBinding[] GetStepDefinitions(RenameStepCommandContext ctx)
         {
             var fileName = GetEditorDocumentPath(ctx.TextBufferOfStepDefinitionClass);
+            var bindingRegistry = GetBindingRegistry(ctx);
+            return FindStepDefinitionUsagesCommand.GetStepDefinitions(fileName, ctx.TriggerPointOfStepDefinitionClass, bindingRegistry);
+        }
+
+        private ProjectBindingRegistry GetBindingRegistry(RenameStepCommandContext ctx)
+        {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
             var bindingRegistry = discoveryService.GetBindingRegistry();
-            if (bindingRegistry == null)
-                Logger.LogWarning($"Unable to get step definitions from project '{ctx.ProjectOfStepDefinitionClass.ProjectName}', usages will not be found for this project.");
-            return FindStepDefinitionUsagesCommand.GetStepDefinitions(fileName, ctx.TriggerPointOfStepDefinitionClass, bindingRegistry);
+            if (bindingRegistry.IsFailed)
+                Logger.LogWarning(
+                    $"Unable to get step definitions from project '{ctx.ProjectOfStepDefinitionClass.ProjectName}', usages will not be found for this project.");
+            return bindingRegistry;
+        }
+
+        private void UpdateBindingRegistry(RenameStepCommandContext ctx)
+        {
+            var bindingRegistry = GetBindingRegistry(ctx);
+            bindingRegistry =
+                bindingRegistry.ReplaceStepDefinition(ctx.StepDefinitionBinding, ctx.StepDefinitionBinding.WithSpecifiedExpression(ctx.UpdatedExpression));
+            var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
+            discoveryService.ReplaceBindingRegistry(bindingRegistry);
         }
     }
 }

@@ -6,6 +6,9 @@
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
     <DefineConstants>TRACE;</DefineConstants>
     <LangVersion>latest</LangVersion>
+    <NoWarn>
+        VSTHRD200<!--Use "Async" suffix in names of methods that return an awaitable type.-->
+    </NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

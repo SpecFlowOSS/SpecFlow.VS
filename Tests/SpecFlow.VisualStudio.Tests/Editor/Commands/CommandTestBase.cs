@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using SpecFlow.VisualStudio.Analytics;
+using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
@@ -27,8 +29,13 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         protected readonly InMemoryStubProjectScope ProjectScope;
         private readonly Func<IProjectScope, T> _commandFactory;
         private readonly string _completedEventSignal;
+        private readonly string _warningHeader;
 
-        protected CommandTestBase(ITestOutputHelper testOutputHelper, Func<IProjectScope, T> commandFactory, string completedEventSignal)
+        protected CommandTestBase(
+            ITestOutputHelper testOutputHelper, 
+            Func<IProjectScope, T> commandFactory, 
+            string completedEventSignal, 
+            string warningHeader)
         {
             TestOutputHelper = testOutputHelper;
             _commandFactory = commandFactory;
@@ -36,6 +43,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             ProjectScope = new InMemoryStubProjectScope(ideScope);
             _completedEventSignal = completedEventSignal;
+            _warningHeader = warningHeader;
         }
 
         protected (StubWpfTextView textView, T command) ArrangeSut(
@@ -196,6 +204,29 @@ $@"Feature: Feature1
             textEdit.Replace(span, replacementText);
 
             textEdit.Apply();
+        }
+
+        protected StubLogger GetStubLogger()
+        {
+            return GetStubLogger(ProjectScope.IdeScope as StubIdeScope);
+        }
+
+        protected static StubLogger GetStubLogger(StubIdeScope ideScope)
+        {
+            var stubLogger = (ideScope.Logger as DeveroomCompositeLogger).Single(logger =>
+                logger.GetType() == typeof(StubLogger)) as StubLogger;
+            return stubLogger;
+        }
+
+        public string WithoutWarningHeader(string message)
+        {
+            return message.Replace(_warningHeader, "");
+        }
+
+        protected void ThereWereNoWarnings()
+        {
+            var stubLogger = GetStubLogger();
+            stubLogger.Messages.Should().NotContain(msg => msg.Item2.Contains("ShowProblem:"));
         }
     }
 }
