@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: 'windows-2019'
+  vmImage: 'windows-2022'
 
 variables:
   solution: '**/*.sln'
@@ -31,27 +31,20 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
-  displayName: 'Run Unit Tests'
+- task: DotNetCoreCLI@2
+  displayName: Run Unit Tests
   inputs:
-    testAssemblyVer2: |
-     **\$(buildConfiguration)\**\*tests*.dll
-     !**\obj\**
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    command: test
+    projects: '**/*[Tt]ests/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) --no-build'
 
-- task: VSTest@2
-  displayName: 'Run SpecFlow Scenarios'
+- task: DotNetCoreCLI@2
+  displayName: Run SpecFlow Scenarios
   inputs:
-    testAssemblyVer2: |
-     **\$(buildConfiguration)\**\*specs*.dll
-     !**\obj\**
-    testFiltercriteria: '$(specsFilterCriteria)'
-    otherConsoleOptions: '/platform:x64'
+    command: test
+    projects: '**/*[Ss]pecs/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) --runtime win-x64'
     testRunTitle: 'Deveroom Specs'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    rerunFailedTests: true
 
 - task: CopyFiles@2
   displayName: 'Copy dlls and changelog'

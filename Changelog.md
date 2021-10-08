@@ -1,5 +1,7 @@
 # v$vNext$ - $buildDate$
 
+* Feature: Support .NET6
+
 # v2021.0.191 - 2021-10-06
 
 * Fix: Support floating versions of SpecFlow package references
