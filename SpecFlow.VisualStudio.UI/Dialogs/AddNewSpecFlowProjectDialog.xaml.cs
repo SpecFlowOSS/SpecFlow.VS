@@ -1,16 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Microsoft.VisualStudio.Shell.Interop;
 using SpecFlow.VisualStudio.UI.ViewModels;
 
@@ -39,6 +28,13 @@ namespace SpecFlow.VisualStudio.UI.Dialogs
         {
             DialogResult = true;
             Close();
+        }
+
+        private void TestFramework_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count ==0) return;
+            ViewModel.UnitTestFramework = e.AddedItems[0].ToString();
+            e.Handled = true;
         }
     }
 }

@@ -216,8 +216,9 @@
                             <Label>Framework</Label>
                             <ComboBox x:Name="DotNetFrameworkComboBox" SelectedValuePath="Tag" IsEditable="True" IsReadOnly="True" Margin="0,0,0,0" Padding="8,8,8,8" SelectedValue="{Binding DotNetFramework}" IsSynchronizedWithCurrentItem="True">
                                 <ComboBoxItem Tag="netcoreapp2.1">.NET Core 2.1</ComboBoxItem>
-                                <ComboBoxItem Tag="netcoreapp3.1" IsSelected="True">.NET Core 3.1</ComboBoxItem>
+                                <ComboBoxItem Tag="netcoreapp3.1">.NET Core 3.1</ComboBoxItem>
                                 <ComboBoxItem Tag="net5.0">.NET 5.0</ComboBoxItem>
+                                <ComboBoxItem Tag="net6.0" IsSelected="True">.NET 6.0</ComboBoxItem>
                                 <ComboBoxItem Tag="net461">.NET Framework 4.6.1</ComboBoxItem>
                                 <ComboBoxItem Tag="net462">.NET Framework 4.6.2</ComboBoxItem>
                                 <ComboBoxItem Tag="net47">.NET Framework 4.7</ComboBoxItem>
@@ -229,12 +230,17 @@
 
                         <StackPanel Grid.Row="1" Grid.Column="0">
                             <Label>Test Framework</Label>
-                            <ComboBox x:Name="UnitTestFrameworkComboBox" SelectedValuePath="Tag" IsEditable="True" IsReadOnly="True" Margin="0,0,0,0" Padding="8,8,8,8" SelectedValue="{Binding UnitTestFramework}" IsSynchronizedWithCurrentItem="True">
-                                <ComboBoxItem Tag="runner" IsSelected="True">SpecFlow+ Runner</ComboBoxItem>
-                                <ComboBoxItem Tag="xunit">xUnit</ComboBoxItem>
-                                <ComboBoxItem Tag="nunit">NUnit</ComboBoxItem>
-                                <ComboBoxItem Tag="mstest">MSTest</ComboBoxItem>
-                            </ComboBox>
+                            <ComboBox x:Name="UnitTestFrameworkComboBox"
+                                      SelectedValuePath="Tag"
+                                      IsEditable="True"
+                                      IsReadOnly="True" 
+                                      Margin="0,0,0,0" 
+                                      Padding="8,8,8,8" 
+                                      ItemsSource="{Binding TestFrameworks}" 
+                                      SelectedValue="{Binding UnitTestFramework}"
+                                      IsSynchronizedWithCurrentItem="True"
+                                      SelectionChanged="TestFramework_SelectionChanged"
+                            />
                         </StackPanel>
 
                         <StackPanel Grid.Row="2" Grid.Column="0">

@@ -81,7 +81,13 @@ namespace SpecFlow.VisualStudio.UI.Tester
         {
             var viewModel = AddNewSpecFlowProjectViewModel.DesignData;
             var dialog = new AddNewSpecFlowProjectDialog(viewModel);
-            dialog.ShowDialog();
+            var result = dialog.ShowDialog();
+            if (result != true) return;
+
+            string resultMessage =
+                $"Chosen {viewModel.DotNetFramework} with {viewModel.UnitTestFramework}";
+
+            MessageBox.Show(resultMessage);
         }
 
         private void Test_RenameStep(object sender, RoutedEventArgs e)
