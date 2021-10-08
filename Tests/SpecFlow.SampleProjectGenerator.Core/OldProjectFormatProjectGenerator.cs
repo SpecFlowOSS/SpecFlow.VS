@@ -8,7 +8,7 @@ namespace SpecFlow.SampleProjectGenerator
         public override string GetOutputAssemblyPath(string config = "Debug")
             => Path.Combine("bin", config, AssemblyFileName);
 
-        public OldProjectFormatProjectGenerator(GeneratorOptions options, Action<string> consoleWriteLine = null) : base(options, consoleWriteLine)
+        public OldProjectFormatProjectGenerator(GeneratorOptions options, Action<string> consoleWriteLine) : base(options, consoleWriteLine)
         {
         }
 
@@ -25,6 +25,11 @@ namespace SpecFlow.SampleProjectGenerator
         protected override string GetPackagesFolder()
         {
             return Path.Combine(_options.TargetFolder, "packages");
+        }
+
+        protected override int ExecBuild()
+        {
+            return Exec(_options.TargetFolder, ToolLocator.GetToolPath(ExternalTools.MsBuild, _consoleWriteLine));
         }
     }
 }

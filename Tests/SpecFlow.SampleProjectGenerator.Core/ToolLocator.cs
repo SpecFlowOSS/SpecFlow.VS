@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
 namespace SpecFlow.SampleProjectGenerator
 {
@@ -25,8 +26,6 @@ namespace SpecFlow.SampleProjectGenerator
 
             var executable = $"{tool}.exe";
             toolPath = GetToolPathInternal(tool, executable);
-            if (toolPath == null)
-                throw new InvalidOperationException($"Could not find tool: {executable}. Try adding it to PATH or declaring an environment variable: {GetConfigEnvVarName(tool)}");
 
             consoleWriteLine($"Found {tool} at '{toolPath}'");
             _locationCache = _locationCache.Add(tool, toolPath);
@@ -58,6 +57,8 @@ namespace SpecFlow.SampleProjectGenerator
                     yield return Environment.ExpandEnvironmentVariables(@"%ProgramW6432%\Git\bin");
                     break;
                 case ExternalTools.MsBuild:
+                    yield return
+                        Environment.ExpandEnvironmentVariables(@"%ProgramW6432%\Microsoft Visual Studio\2022\Preview\MSBuild\Current\Bin");
                     var editions = new[] {"Community", "Professional", "Enterprise"};
                     var versions = new[] {"2017", "2019"};
                     var msBuildVersions = new[] {"Current", "15.0"};
@@ -75,15 +76,17 @@ namespace SpecFlow.SampleProjectGenerator
             if (configuredPath != null)
                 return configuredPath;
 
+            var errorMessage = new StringBuilder($"Could not find tool: {executable}. Try adding it to PATH or declaring an environment variable: {GetConfigEnvVarName(tool)}");
             var probingPaths = GetProbingPaths(tool);
             foreach (var probingPath in probingPaths)
             {
                 var executablePath = Path.Combine(probingPath, executable);
                 if (File.Exists(executablePath))
                     return executablePath;
+                errorMessage.AppendLine().Append(executablePath);
             }
 
-            return null;
-        }
+            throw new InvalidOperationException(errorMessage.ToString());
+        }       
     }
 }

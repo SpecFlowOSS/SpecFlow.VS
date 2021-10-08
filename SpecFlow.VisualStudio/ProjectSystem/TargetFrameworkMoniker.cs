@@ -10,8 +10,10 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         private const string NetCoreShortValuePrefix = "netcoreapp";
         private const string NetFrameworkShortValuePrefix = "net";
         private const string Net5ShortValuePrefix = "net5";
+        private const string Net6ShortValuePrefix = "net6";
 
         // e.g.
+        // * .NET 6:    .NETCoreApp,Version=v6.0
         // * .NET 5:    .NETCoreApp,Version=v5.0
         // * .NET Core: .NETCoreApp,Version=v2.1
         // * .NET Fw:   .NETFramework,Version=v4.5.2
@@ -58,10 +60,21 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             else if (shortValue.StartsWith(Net5ShortValuePrefix))
             {
                 value = $".NETCoreApp,Version=v{shortValue.Substring(Net5ShortValuePrefix.Length-1)}";
+            }            
+            else if (shortValue.StartsWith(Net6ShortValuePrefix))
+            {
+                value = $".NETCoreApp,Version=v{shortValue.Substring(Net5ShortValuePrefix.Length-1)}";
             }
             else if (shortValue.StartsWith(NetFrameworkShortValuePrefix))
             {
-                value = $".NETFramework,Version=v{shortValue[NetFrameworkShortValuePrefix.Length]}.{shortValue[NetFrameworkShortValuePrefix.Length + 1]}.{shortValue[NetFrameworkShortValuePrefix.Length + 2]}";
+                if (shortValue.Length == 5)
+                {
+                    value = $".NETFramework,Version=v{shortValue[NetFrameworkShortValuePrefix.Length]}.{shortValue[NetFrameworkShortValuePrefix.Length + 1]}";
+                }
+                else
+                {
+                    value = $".NETFramework,Version=v{shortValue[NetFrameworkShortValuePrefix.Length]}.{shortValue[NetFrameworkShortValuePrefix.Length + 1]}.{shortValue[NetFrameworkShortValuePrefix.Length + 2]}";
+                }
             }
             return Create(value);
         }

@@ -9,7 +9,7 @@ namespace SpecFlow.SampleProjectGenerator
         public override string GetOutputAssemblyPath(string config = "Debug")
             => Path.Combine("bin", config, _options.TargetFramework, AssemblyFileName);
 
-        public NewProjectFormatProjectGenerator(GeneratorOptions options, Action<string> consoleWriteLine = null) : base(options, consoleWriteLine)
+        public NewProjectFormatProjectGenerator(GeneratorOptions options, Action<string> consoleWriteLine) : base(options, consoleWriteLine)
         {
         }
 
@@ -53,24 +53,12 @@ namespace SpecFlow.SampleProjectGenerator
                 throw new Exception($"dotnet restore failed with exit code {exitCode}");
             }
 
-            if (_options.SpecFlowVersion >= new Version("3.0.0"))
-            {
-                exitCode = ExecDotNet("build");
-                if (exitCode != 0)
-                {
-                    _consoleWriteLine($"dotnet build exit code: {exitCode}");
-                    throw new Exception($"dotnet build failed with exit code {exitCode}");
-                }
-            }
-            else
-            {
-                base.BuildProject();
-            }
+            base.BuildProject();
         }
 
-        private int ExecDotNet(params string[] args)
+        protected override int ExecBuild()
         {
-            return Exec(_options.TargetFolder, Environment.ExpandEnvironmentVariables(@"%ProgramW6432%\dotnet\dotnet.exe"), args);
+            return ExecDotNet("build");
         }
     }
 }

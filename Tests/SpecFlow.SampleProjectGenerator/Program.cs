@@ -28,7 +28,7 @@ namespace SpecFlow.SampleProjectGenerator
 
         private static void RunOptionsAndReturnExitCode(GeneratorOptions opts)
         {
-            var generator = opts.CreateProjectGenerator();
+            var generator = opts.CreateProjectGenerator(Console.WriteLine);
             generator.Generate();
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using SpecFlow.VisualStudio.Configuration;
 using SpecFlow.VisualStudio.Diagnostics;
@@ -17,9 +18,11 @@ namespace SpecFlow.VisualStudio.Connectors
         private const string ConnectorV2NetCore21 = @"V2-netcoreapp2.1\specflow-vs.dll";
         private const string ConnectorV2NetCore31 = @"V2-netcoreapp3.1\specflow-vs.dll";
         private const string ConnectorV2Net50 = @"V2-net5.0\specflow-vs.dll";
+        private const string ConnectorV2Net60 = @"V2-net6.0\specflow-vs.dll";
         private const string ConnectorV3NetCore21 = @"V3-netcoreapp2.1\specflow-vs.dll";
         private const string ConnectorV3NetCore31 = @"V3-netcoreapp3.1\specflow-vs.dll";
         private const string ConnectorV3Net50 = @"V3-net5.0\specflow-vs.dll";
+        private const string ConnectorV3Net60 = @"V3-net6.0\specflow-vs.dll";
         private const string GenerationCommandName = "generation";
         private const string BindingDiscoveryCommandName = "binding discovery";
 
@@ -29,6 +32,7 @@ namespace SpecFlow.VisualStudio.Connectors
         private readonly string _extensionFolder;
         private readonly ProcessorArchitectureSetting _processorArchitecture;
         private readonly NuGetVersion _specFlowVersion;
+        private Version _netCoreVersion;
 
         public OutProcSpecFlowConnector(DeveroomConfiguration configuration, IDeveroomLogger logger,
             TargetFrameworkMoniker targetFrameworkMoniker, string extensionFolder,
@@ -72,7 +76,7 @@ namespace SpecFlow.VisualStudio.Connectors
                 };
             }
 
-            _logger.LogVerbose(connectorPath);
+            _logger.LogVerbose($"{workingDirectory}>{connectorPath} {string.Join(" ", arguments)}");
 
 #if DEBUG
             _logger.LogVerbose(result.StandardOut);
@@ -133,10 +137,22 @@ namespace SpecFlow.VisualStudio.Connectors
 
         private bool IsNetCoreVersionOrLater(int major, int minor)
         {
-            return _targetFrameworkMoniker != null &&
-                   _targetFrameworkMoniker.IsNetCore &&
-                   _targetFrameworkMoniker.HasVersion &&
-                   _targetFrameworkMoniker.Version >= new Version(major, minor);
+            if (!_targetFrameworkMoniker.IsNetCore) 
+                return false;
+
+            var version = new Version(major, minor);
+            return NetCoreVersion >= version;
+        }
+
+        private Version NetCoreVersion => _netCoreVersion ??= GetNetCoreVersion();
+
+        private Version GetNetCoreVersion()
+        {
+            var dotnet = GetDotNetCommand();
+            var result = ProcessHelper.RunProcess("./", dotnet, new[] {"--version"}, encoding: Encoding.UTF8);
+            var resultParts = result.StandardOut.Split('-');
+            var dotnetVersion = new Version(resultParts[0]);
+            return dotnetVersion;
         }
 
         private string GetConnectorPath(List<string> arguments)
@@ -145,6 +161,10 @@ namespace SpecFlow.VisualStudio.Connectors
 
             if (_specFlowVersion != null && _specFlowVersion.Version >= new Version(3, 9, 22))
             {
+                //V3-net6.0
+                if (IsNetCoreVersionOrLater(6, 0))
+                    return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV3Net60);             
+                
                 //V3-net5.0
                 if (IsNetCoreVersionOrLater(5, 0))
                     return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV3Net50);
@@ -157,6 +177,10 @@ namespace SpecFlow.VisualStudio.Connectors
                 if (IsNetCoreVersionOrLater(2, 0))
                     return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV3NetCore21);
             }
+
+            //V2-net6.0
+            if (IsNetCoreVersionOrLater(6, 0))
+                return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV2Net60);
 
             //V2-net5.0
             if (IsNetCoreVersionOrLater(5, 0))

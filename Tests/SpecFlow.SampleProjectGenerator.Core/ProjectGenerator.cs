@@ -21,7 +21,7 @@ namespace SpecFlow.SampleProjectGenerator
         public List<string> FeatureFiles { get; } = new List<string>();
         public List<NuGetPackageData> InstalledNuGetPackages { get; } = new List<NuGetPackageData>();
 
-        protected ProjectGenerator(GeneratorOptions options, Action<string> consoleWriteLine = null)
+        protected ProjectGenerator(GeneratorOptions options, Action<string> consoleWriteLine)
         {
             _options = options;
             _consoleWriteLine = consoleWriteLine ?? Console.WriteLine;
@@ -121,13 +121,16 @@ namespace SpecFlow.SampleProjectGenerator
 
         protected virtual void BuildProject()
         {
-            var exitCode = ExecMsBuild();
+            var exitCode = ExecBuild();
+            
             if (exitCode != 0)
             {
                 _consoleWriteLine($"Build exit code: {exitCode}");
                 throw new Exception($"Build failed with exit code {exitCode}");
             }
         }
+
+        protected abstract int ExecBuild();
 
         private void SetPlatformTarget(string projectFilePath)
         {
@@ -410,9 +413,10 @@ namespace SpecFlow.SampleProjectGenerator
             return Exec(_options.TargetFolder, ToolLocator.GetToolPath(ExternalTools.Git, _consoleWriteLine), args);
         }
 
-        public int ExecMsBuild(params string[] args)
+
+        protected int ExecDotNet(params string[] args)
         {
-            return Exec(_options.TargetFolder, ToolLocator.GetToolPath(ExternalTools.MsBuild, _consoleWriteLine), args);
+            return Exec(_options.TargetFolder, Environment.ExpandEnvironmentVariables(@"%ProgramW6432%\dotnet\dotnet.exe"), args);
         }
 
         protected int Exec(string workingDirectory, string tool, params string[] args)

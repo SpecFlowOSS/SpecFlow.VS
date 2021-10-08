@@ -64,3 +64,21 @@ Scenario Outline: Regression tests for special discovery combinations
 Examples: 
 	| case                          | version | framework | test runner tool |
 	| v3.8 + MsTest discovery issue | v3.8.14 | net5.0    | MsTest           |
+
+Scenario Outline: Dicover bindings with the right SpecFlow connector
+    Given there is a simple SpecFlow project for <version>
+    And the project uses the new project format
+    And the target framework is <framework>
+    And the project is built
+    When the binding discovery performed
+    Then the discovery succeeds with several step definitions
+Examples:
+    | case             | version | framework     |
+    | V3-net6.0        | v3.9.22 | net6.0        |
+    | V3-net5.0        | v3.9.22 | net5.0        |
+    | V3-netcoreapp3.1 | v3.9.22 | netcoreapp3.1 |
+    | V3-netcoreapp2.1 | v3.9.22 | netcoreapp2.1 |
+    | V2-net6.0        | v3.9.8  | net6.0        |
+    | V2-net5.0        | v3.9.8  | net5.0        |
+    | V2-netcoreapp3.1 | v3.9.8  | netcoreapp3.1 |
+    | V2-netcoreapp2.1 | v3.9.8  | netcoreapp2.1 |

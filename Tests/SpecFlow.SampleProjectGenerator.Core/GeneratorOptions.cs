@@ -11,7 +11,7 @@ namespace SpecFlow.SampleProjectGenerator
         private const string LatestSpecFlowVersion = "2.3.2";
         public const string SpecFlowV3Version = "3.6.23";
         public const string UnicodeBindingRegex = "Unicode Алло Χαίρετε Árvíztűrő tükörfúrógép";
-        public const string DefaultTargetFramework = "net461";
+        public const string DefaultTargetFramework = "net48";
 
         [Option("force", Required = false, Default = false)]
         public bool Force { get; set; }
@@ -148,10 +148,17 @@ namespace SpecFlow.SampleProjectGenerator
             return builder.ToString();
         }
 
-        public IProjectGenerator CreateProjectGenerator(Action<string> consoleWriteLine = null)
+        public IProjectGenerator CreateProjectGenerator(Action<string> consoleWriteLine)
         {
             if (NewProjectFormat)
+            {
+                if (TargetFramework is "net452" or "net461")
+                {
+                    return new NewProjectFormatForNetFrameworkProjectGenerator(this, consoleWriteLine);
+                }
+
                 return new NewProjectFormatProjectGenerator(this, consoleWriteLine);
+            }
 
             return new OldProjectFormatProjectGenerator(this, consoleWriteLine);
         }
