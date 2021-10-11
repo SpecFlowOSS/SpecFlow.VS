@@ -10,14 +10,22 @@ using SpecFlow.VisualStudio.Editor.Services.Parser;
 using SpecFlow.VisualStudio.Monitoring;
 using FluentAssertions;
 using Moq;
+using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Services
 {
     public class StepDefinitionUsageFinderTests
     {
+        private readonly ITestOutputHelper _testOutputHelper;
         private string _featureFilePath = "SampleFeature.feature";
         private DeveroomConfiguration _configuration = new DeveroomConfiguration();
+
+        public StepDefinitionUsageFinderTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
 
         private ProjectStepDefinitionBinding CreateStepDefinitionBinding(string regex, params string[] parameterTypes)
         {
@@ -33,7 +41,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Services
 
         private StepDefinitionUsageFinder CreateSut()
         {
-            return new StepDefinitionUsageFinder(new MockFileSystem(), new DeveroomDebugLogger(), new Mock<IMonitoringService>().Object);
+            var ideScope = new StubIdeScope(_testOutputHelper);
+            return new StepDefinitionUsageFinder(ideScope);
         }
 
         [Fact]

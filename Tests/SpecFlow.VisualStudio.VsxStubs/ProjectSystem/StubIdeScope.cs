@@ -76,9 +76,16 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             return textView;
         }
 
-        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        public bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer)
         {
-            return EnsureOpenTextView(sourceLocation).TextBuffer;
+            if (OpenViews.TryGetValue(sourceLocation.SourceFile, out var view))
+            {
+                textBuffer =view.TextBuffer;
+                return true;
+            }
+
+            textBuffer = default;
+            return false;
         }
 
         public IWpfTextView EnsureOpenTextView(SourceLocation sourceLocation)
@@ -100,6 +107,15 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public void RunOnUiThread(Action action)
         {
             action();
+        }
+
+        public void OpenIfNotOpened(string path)
+        {
+            if (OpenViews.TryGetValue(path, out _))
+                return;
+
+            var lines = FileSystem.File.ReadAllLines(path);
+            CreateTextView(new TestText(lines), filePath: path);
         }
 
         public IProjectScope[] GetProjectsWithFeatureFiles()

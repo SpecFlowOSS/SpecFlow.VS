@@ -24,33 +24,20 @@ using Xunit.Abstractions;
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
-    public class RenameStepCommandTests
+    public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     {
         private static readonly string _warningHeader = "ShowProblem: User Notification: The following problems occurred:" + Environment.NewLine;
-        private readonly ITestOutputHelper _testOutputHelper;
-        private readonly InMemoryStubProjectScope _projectScope;
 
-        public RenameStepCommandTests(ITestOutputHelper testOutputHelper)
+        public RenameStepCommandTests(ITestOutputHelper testOutputHelper) : 
+            base(testOutputHelper, 
+                ps=>new RenameStepCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
+                "Rename step command executed")
         {
-            _testOutputHelper = testOutputHelper;
-            StubIdeScope ideScope = new StubIdeScope(testOutputHelper);
-            
-            _projectScope = new InMemoryStubProjectScope(ideScope);
-        }
-
-        private StubWpfTextView CreateTextView(TestText inputText, string newLine = null)
-        {
-            return _projectScope.StubIdeScope.CreateTextView(
-                inputText, 
-                newLine, 
-                _projectScope, 
-                VsContentTypes.CSharp,
-                "Steps.cs");
         }
 
         private StubLogger GetStubLogger()
         {
-            var stubLogger = (_projectScope.IdeScope.Logger as DeveroomCompositeLogger).Single(logger =>
+            var stubLogger = (ProjectScope.IdeScope.Logger as DeveroomCompositeLogger).Single(logger =>
                 logger.GetType() == typeof(StubLogger)) as StubLogger;
             return stubLogger;
         }
@@ -65,120 +52,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         private static bool SpecflowProjectMustHaveFeatureFiles(Tuple<TraceLevel, string> msg)
         {
             return WithoutWarningHeader(msg.Item2) == "Unable to find step definition usages: could not find any SpecFlow project with feature files.";
-        }  
-        
-        private TestFeatureFile ArrangeOneFeatureFile(string featureFileContent)
-        {
-            var filePath = Path.Combine(_projectScope.ProjectFolder, "calculator.feature");
-            var featureFile = new TestFeatureFile(filePath, featureFileContent);
-            if (!featureFile.IsVoid)
-            {
-                _projectScope.IdeScope.FileSystem.Directory.CreateDirectory(_projectScope.ProjectFolder);
-                _projectScope.IdeScope.FileSystem.File.WriteAllText(featureFile.FileName, featureFileContent);
-            }
-
-            if (string.IsNullOrWhiteSpace(featureFileContent)) return featureFile;
-
-            Dump(featureFile.Content, "Feature file before replace");
-
-            return featureFile;
-        }
-
-        private static TestStepDefinition[] ArrangeMultipleStepDefinitions()
-        {
-            var stepDefinitions = new[]
-            {
-                ArrangeStepDefinition(@"""I press add""", "When"),
-                ArrangeStepDefinition(@"""I press add""", "Given"),
-                ArrangeStepDefinition(@"""I select add""", "When")
-            };
-            return stepDefinitions;
-        }
-
-        private static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord = "When", string attributeName = null)
-        {
-            var token =  textExpression==null
-                    ? SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken)
-                    : SyntaxFactory.ParseToken(textExpression);
-            var testStepDefinition = new TestStepDefinition
-            {
-                Method = keyWord + "IPressAdd",
-                Type = keyWord,
-                TestExpression = token,
-                AttributeName = attributeName ?? keyWord
-            };
-            return testStepDefinition;
         }
 
         private void ArrangePopup(string modelStepText)
         {
-            (_projectScope.IdeScope.WindowManager as StubWindowManager)
+            (ProjectScope.IdeScope.WindowManager as StubWindowManager)
                 .RegisterWindowAction<RenameStepViewModel>(model => model.StepText = modelStepText);
-        }
-
-        private (StubWpfTextView textView, RenameStepCommand command) ArrangeSut(
-            TestStepDefinition stepDefinition, TestFeatureFile featureFile)
-        {
-            var stepDefinitions = stepDefinition.IsVoid
-                ? Array.Empty<TestStepDefinition>() 
-                : new[] {stepDefinition};
-
-            var featureFiles = featureFile.IsVoid
-                ? Array.Empty<TestFeatureFile>()
-                : new[] { featureFile };
-
-            return ArrangeSut(stepDefinitions, featureFiles);
-        }
-
-        private (StubWpfTextView textView, RenameStepCommand command) ArrangeSut(
-            TestStepDefinition[] stepDefinitions,
-            TestFeatureFile[] featureFiles)
-        {
-            var stepDefinitionClassFile = new StepDefinitionClassFile(stepDefinitions);
-            var filePath = Path.Combine(_projectScope.ProjectFolder, "Steps.cs");
-            var inputText = stepDefinitionClassFile.GetText(filePath);
-            Dump(inputText.ToString(), "Generated step definition class");
-
-            _projectScope.AddSpecFlowPackage();
-            foreach (var featureFile in featureFiles)
-            {
-                _projectScope.AddFile(featureFile.FileName, featureFile.Content);
-            }
-
-            var discoveryService =
-                MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, stepDefinitionClassFile.StepDefinitions, TimeSpan.Zero);
-            discoveryService.WaitUntilDiscoveryPerformed();
-
-            var textView = CreateTextView(inputText);
-            inputText.MoveCaretTo(textView, stepDefinitionClassFile.CaretPositionLine, stepDefinitionClassFile.CaretPositionColumn);
-
-            var command = new RenameStepCommand(_projectScope.IdeScope, null, _projectScope.IdeScope.MonitoringService);
-            return (textView, command);
-        }
-
-        private TestText Dump(TestFeatureFile featureFile, string title)
-        {
-            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
-            return Dump(featureFileTextBuffer, title);
-        }
-
-        private TestText Dump(IWpfTextView textView, string title)
-        {
-            return Dump(textView.TextBuffer, title);
-        }
-
-        private TestText Dump(ITextBuffer textBuffer, string title)
-        {
-            var testText = new TestText(textBuffer.CurrentSnapshot.Lines.Select(l => l.GetText()).ToArray());
-            Dump(testText.ToString(), title);
-            return testText;
-        }
-        
-        private void Dump(string content, string title)
-        {
-            _testOutputHelper.WriteLine($"-------{title}-------");
-            _testOutputHelper.WriteLine(content);
-            _testOutputHelper.WriteLine("---------------------------------------------");
         }
 
         private void ThereWereNoWarnings()
@@ -195,7 +74,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Fact]
         public void There_is_a_project_in_ide()
         {
-            var emptyIde = new StubIdeScope(_testOutputHelper);
+            var emptyIde = new StubIdeScope(TestOutputHelper);
             var command = new RenameStepCommand(emptyIde, null, emptyIde.MonitoringService);
             var inputText = new TestText(string.Empty);
             var textView = emptyIde.CreateTextView(inputText, contentType:VsContentTypes.CSharp);
@@ -209,7 +88,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Fact]
         public void Only_specflow_projects_are_supported()
         {
-            var command = new RenameStepCommand(_projectScope.IdeScope, null, _projectScope.IdeScope.MonitoringService);
+            var command = new RenameStepCommand(ProjectScope.IdeScope, null, ProjectScope.IdeScope.MonitoringService);
             var inputText = new TestText(string.Empty);
             var textView = CreateTextView(inputText);
 
@@ -222,8 +101,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [Fact]
         public void Specflow_projects_must_have_feature_files()
         {
-            _projectScope.AddSpecFlowPackage();
-            var command = new RenameStepCommand(_projectScope.IdeScope, null, _projectScope.IdeScope.MonitoringService);
+            ProjectScope.AddSpecFlowPackage();
+            var command = new RenameStepCommand(ProjectScope.IdeScope, null, ProjectScope.IdeScope.MonitoringService);
             var inputText = new TestText(string.Empty);
 
             var textView = CreateTextView(inputText);
@@ -298,19 +177,6 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             Dump(textView, "Step definition class after rename");
             var stubLogger = GetStubLogger();
             WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be(errorMessage);
-        }
-
-        private Task<IAnalyticsEvent> Invoke(RenameStepCommand command, StubWpfTextView textView)
-        {
-            command.PreExec(textView, command.Targets.First());
-            return WaitForCommandToComplete();
-        }
-
-        private Task<IAnalyticsEvent> WaitForCommandToComplete()
-        {
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
-            return _projectScope.StubIdeScope.AnalyticsTransmitter
-                .WaitForEventAsync("Rename step command executed", cts.Token);
         }
 
         [Theory]
@@ -402,7 +268,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             command.PreExec(textView, command.Targets.First());
 
-            var ideActions = _projectScope.IdeScope.Actions as StubIdeActions;
+            var ideActions = ProjectScope.IdeScope.Actions as StubIdeActions;
             ideActions.LastShowContextMenuHeader.Should().Be("Choose step definition to rename");
             ideActions.LastShowContextMenuItems.Select(item => item.Label)
                 .Should().BeEquivalentTo(stepDefinitions.Select(sd=>sd.PopupLabel));
@@ -431,7 +297,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             command.PreExec(textView, command.Targets.First());
             
-            var ideActions = _projectScope.IdeScope.Actions as StubIdeActions;
+            var ideActions = ProjectScope.IdeScope.Actions as StubIdeActions;
             var chosenItem = ideActions.LastShowContextMenuItems[chosenOption];
             chosenItem.Command(chosenItem);
 
@@ -456,7 +322,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             await Invoke(command, textView);
 
-            var featureFileTextBuffer = _projectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1));
+            ProjectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1), out var featureFileTextBuffer);
             var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
             featureText.Lines[2].Should().Be(@"                    When I choose add");
             ThereWereNoWarnings();
@@ -518,7 +384,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             await OneFeatureFileRename(originalExpression, updatedExpression, featureFile);
 
             var stubLogger = GetStubLogger();
-            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be(_projectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
+            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be(ProjectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
         }
 
         private async Task<TestText> OneFeatureFileRename(string originalExpression, string updatedExpression,
@@ -544,7 +410,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinition = ArrangeStepDefinition(originalCSharpExpression);
             var featureFile = ArrangeOneFeatureFile(string.Empty);
             RenameStepViewModel viewModel = null;
-            (_projectScope.IdeScope.WindowManager as StubWindowManager)?
+            (ProjectScope.IdeScope.WindowManager as StubWindowManager)?
                 .RegisterWindowAction<RenameStepViewModel>(model => viewModel = model);
             var (textView, command) = ArrangeSut(stepDefinition, featureFile);
 

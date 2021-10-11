@@ -6,8 +6,9 @@ using SpecFlow.VisualStudio.Configuration;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
-using SpecFlow.VisualStudio.Monitoring;
 using Gherkin.Ast;
+using Microsoft.VisualStudio.Text;
+using SpecFlow.VisualStudio.ProjectSystem;
 
 namespace SpecFlow.VisualStudio.Editor.Services
 {
@@ -30,15 +31,11 @@ namespace SpecFlow.VisualStudio.Editor.Services
 
     public class StepDefinitionUsageFinder
     {
-        private readonly IFileSystem _fileSystem;
-        private readonly IDeveroomLogger _logger;
-        private readonly IMonitoringService _monitoringService;
+        private readonly IIdeScope _ideScope;
 
-        public StepDefinitionUsageFinder(IFileSystem fileSystem, IDeveroomLogger logger, IMonitoringService monitoringService)
+        public StepDefinitionUsageFinder(IIdeScope ideScope)
         {
-            _fileSystem = fileSystem;
-            _logger = logger;
-            _monitoringService = monitoringService;
+            _ideScope = ideScope;
         }
 
         public IEnumerable<StepDefinitionUsage> FindUsages(ProjectStepDefinitionBinding[] stepDefinitions, string[] featureFiles, DeveroomConfiguration configuration)
@@ -48,24 +45,55 @@ namespace SpecFlow.VisualStudio.Editor.Services
 
         private IEnumerable<StepDefinitionUsage> FindUsages(ProjectStepDefinitionBinding[] stepDefinitions, string featureFilePath, DeveroomConfiguration configuration)
         {
-            var featureFileContent = LoadContent(featureFilePath);
-            if (featureFileContent == null)
-                return Enumerable.Empty<StepDefinitionUsage>();
-
-            return FindUsagesFromContent(stepDefinitions, featureFileContent, featureFilePath, configuration);
+            return LoadContent(featureFilePath, out string featureFileContent) 
+                ? FindUsagesFromContent(stepDefinitions, featureFileContent, featureFilePath, configuration) 
+                : Enumerable.Empty<StepDefinitionUsage>();
         }
 
-        private string LoadContent(string featureFilePath)
+        private bool LoadContent(string featureFilePath, out string content)
+        {
+            if (LoadAlreadyOpenedContent(featureFilePath, out string openedContent))
+            {
+                content = openedContent;
+                return true;
+            }
+
+            if (LoadContentFromFile(featureFilePath, out string fileContent))
+            {
+                content = fileContent;
+                return true;
+            }
+
+            content = string.Empty;
+            return false;
+        }
+
+        private bool LoadContentFromFile(string featureFilePath, out string content)
         {
             try
             {
-                return _fileSystem.File.ReadAllText(featureFilePath);
+                content = _ideScope.FileSystem.File.ReadAllText(featureFilePath);
+                return true;
             }
             catch (Exception ex)
             {
-                _logger.LogDebugException(ex);
-                return null;
+                _ideScope.Logger.LogDebugException(ex);
+                content = string.Empty;
+                return false;
             }
+        }
+
+        private bool LoadAlreadyOpenedContent(string featureFilePath, out string content)
+        {
+            var sl = new SourceLocation(featureFilePath, 1, 1); 
+            if (!_ideScope.GetTextBuffer(sl, out ITextBuffer tb))
+            {
+                content = string.Empty;
+                return false;
+            }
+
+            content = tb.CurrentSnapshot.GetText();
+            return true;
         }
 
         class UsageFinderContext : IGherkinDocumentContext
@@ -84,8 +112,8 @@ namespace SpecFlow.VisualStudio.Editor.Services
             string featureFileContent, string featureFilePath, DeveroomConfiguration configuration)
         {
             var dialectProvider = SpecFlowGherkinDialectProvider.Get(configuration.DefaultFeatureLanguage);
-            var parser = new DeveroomGherkinParser(dialectProvider, _monitoringService);
-            parser.ParseAndCollectErrors(featureFileContent, _logger, 
+            var parser = new DeveroomGherkinParser(dialectProvider, _ideScope.MonitoringService);
+            parser.ParseAndCollectErrors(featureFileContent, _ideScope.Logger, 
                 out var gherkinDocument, out _);
 
             var featureNode = gherkinDocument?.Feature;

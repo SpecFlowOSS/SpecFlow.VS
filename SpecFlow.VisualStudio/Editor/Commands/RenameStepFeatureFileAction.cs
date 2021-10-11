@@ -17,15 +17,16 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         public override void PerformRenameStep(RenameStepCommandContext ctx)
         {
             IIdeScope ideScope = ctx.ProjectOfStepDefinitionClass.IdeScope;
-            var stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope.FileSystem, ideScope.Logger, ideScope.MonitoringService);
-            var featureFiles = ctx.ProjectOfStepDefinitionClass.GetProjectFiles(".feature");
+            var stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope);
+            string[]? featureFiles = ctx.ProjectOfStepDefinitionClass.GetProjectFiles(".feature");
             var configuration = ctx.ProjectOfStepDefinitionClass.GetDeveroomConfiguration();
-            var projectUsages = stepDefinitionUsageFinder.FindUsages(new[] { ctx.StepDefinitionBinding }, featureFiles, configuration).ToArray();
+      
+            StepDefinitionUsage[] projectUsages = stepDefinitionUsageFinder.FindUsages(new[] { ctx.StepDefinitionBinding }, featureFiles, configuration).ToArray();
             foreach (var fileUsage in projectUsages.GroupBy(u => u.SourceLocation.SourceFile))
             {
                 var firstPosition = fileUsage.First().SourceLocation;
                 EnsureFeatureFileOpen(firstPosition, ideScope);
-                var textBufferOfFeatureFile = ideScope.GetTextBuffer(firstPosition);
+                ideScope.GetTextBuffer(firstPosition, out var textBufferOfFeatureFile);
                 EditTextBuffer(textBufferOfFeatureFile, ctx.IdeScope, fileUsage,
                     usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
                     usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression, fileUsage.Key, ctx));
@@ -95,9 +96,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         protected void EnsureFeatureFileOpen(SourceLocation sourceLocation, IIdeScope ideScope)
         {
-            ideScope.Actions.NavigateTo(sourceLocation);
+            ideScope.OpenIfNotOpened(sourceLocation.SourceLocationSpan?.FilePath ?? sourceLocation.SourceFile);
         }
-
 
         private static Span CalculateReplaceSpan((ITextBuffer textBuffer, StepDefinitionUsage usage) from)
         {

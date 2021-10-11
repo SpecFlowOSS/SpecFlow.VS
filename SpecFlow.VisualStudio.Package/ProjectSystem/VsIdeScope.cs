@@ -153,13 +153,18 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return new DeveroomUndoContext(Dte, undoLabel);
         }
 
-        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        public bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer)
         {
-            if (sourceLocation.SourceLocationSpan?.IsDocumentOpen == true && sourceLocation.SourceLocationSpan?.Document?.TextBuffer != null)
-                return sourceLocation.SourceLocationSpan.Document.TextBuffer;
+            if (sourceLocation.SourceLocationSpan?.IsDocumentOpen == true &&
+                sourceLocation.SourceLocationSpan?.Document?.TextBuffer != null)
+            {
+                textBuffer = sourceLocation.SourceLocationSpan.Document.TextBuffer;
+                return true;
+            }
 
-            var wpfTextView = VsUtils.GetWpfTextViewFromFilePath(sourceLocation.SourceFile, ServiceProvider, true);
-            return wpfTextView?.TextBuffer;
+            var wpfTextView = VsUtils.GetWpfTextViewFromFilePath(sourceLocation.SourceFile, ServiceProvider);
+            textBuffer = wpfTextView?.TextBuffer;
+            return textBuffer != null;
         }
 
         public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
@@ -168,6 +173,22 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             if (roslynDocument != null && roslynDocument.TryGetSyntaxTree(out var syntaxTree))
                 return syntaxTree;
             return null;
+        }
+
+        public Task RunOnBackGroundThread(Func<Task> action, Action<Exception> onException)
+        {
+            return ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+            {
+                try
+                {
+                    await action();
+                }
+                catch (Exception e)
+                {
+                    Logger.LogException(MonitoringService, e);
+                    onException(e);
+                }
+            }).Task;
         }
 
         public void RunOnUiThread(Action action)
@@ -180,6 +201,11 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             {
                 ThreadHelper.Generic.BeginInvoke(action);
             }
+        }
+
+        public void OpenIfNotOpened(string path)
+        {
+            VsUtils.OpenIfNotOpened(path, ServiceProvider);
         }
 
         private void SolutionEventListenerOnLoaded(object sender, EventArgs e)

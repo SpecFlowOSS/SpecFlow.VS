@@ -126,9 +126,9 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return VsIdeScope.CreatePersistentTrackingPosition(sourceLocation);
         }
 
-        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        public bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer)
         {
-            return VsIdeScope.GetTextBuffer(sourceLocation);
+            return VsIdeScope.GetTextBuffer(sourceLocation, out textBuffer);
         }
 
         public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
@@ -136,9 +136,19 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return VsIdeScope.GetSyntaxTree(textBuffer);
         }
 
+        public Task RunOnBackGroundThread(Func<Task> action, Action<Exception> onException)
+        {
+            return VsIdeScope.RunOnBackGroundThread(action, onException);
+        }
+
         public void RunOnUiThread(Action action)
         {
             VsIdeScope.RunOnUiThread(action);
+        }
+
+        public void OpenIfNotOpened(string path)
+        {
+            VsIdeScope.OpenIfNotOpened(path);
         }
 
         public IProjectScope[] GetProjectsWithFeatureFiles()

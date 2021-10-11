@@ -56,7 +56,8 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 {
                     ctx.StepDefinitionBinding = projectStepDefinitionBinding;
                     var sourceLocation = projectStepDefinitionBinding.Implementation.SourceLocation;
-                    ctx.TextBufferOfStepDefinitionClass = IdeScope.GetTextBuffer(sourceLocation);
+                    IdeScope.GetTextBuffer(sourceLocation, out var textBuffer);
+                    ctx.TextBufferOfStepDefinitionClass = textBuffer;
                     var stepDefLine = ctx.TextBufferOfStepDefinitionClass.CurrentSnapshot.GetLineFromLineNumber(sourceLocation.SourceFileLine - 1);
                     ctx.TriggerPointOfStepDefinitionClass = new SnapshotPoint(ctx.TextBufferOfStepDefinitionClass.CurrentSnapshot,
                         stepDefLine.Start.Position + sourceLocation.SourceFileColumn - 1);

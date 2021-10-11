@@ -1,5 +1,9 @@
 # v$vNext$ - $buildDate$
 
+* Fix: (#10) Use loaded content in StepDefinitionUsageFinder if the file is open already
+
+# v2021.0.195 - 2021-10-08
+
 * Feature: Support .NET6
 
 # v2021.0.191 - 2021-10-06

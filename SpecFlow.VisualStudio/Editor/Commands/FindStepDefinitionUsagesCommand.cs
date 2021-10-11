@@ -29,7 +29,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         [ImportingConstructor]
         public FindStepDefinitionUsagesCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService) : base(ideScope, aggregatorFactory, monitoringService)
         {
-            _stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope.FileSystem, ideScope.Logger, ideScope.MonitoringService);
+            _stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope);
         }
 
         public override DeveroomEditorCommandTargetKey[] Targets => new[]

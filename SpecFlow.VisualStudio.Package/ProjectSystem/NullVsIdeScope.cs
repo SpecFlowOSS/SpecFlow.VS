@@ -207,9 +207,10 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return null;
         }
 
-        public ITextBuffer GetTextBuffer(SourceLocation sourceLocation)
+        public bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer)
         {
-            return null;
+            textBuffer = default;
+            return false;
         }
 
         public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
@@ -217,7 +218,17 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return null;
         }
 
-        public void RunOnUiThread(Action action)
+        public Task RunOnBackGroundThread(Func<Task> action, Action<Exception> onException)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task RunOnUiThread(Action action)
+        {
+            return Task.CompletedTask;
+        }
+
+        public void OpenIfNotOpened(string path)
         {
         }
 
