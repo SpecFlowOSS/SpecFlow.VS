@@ -189,9 +189,8 @@ $@"Feature: Feature1
 
         protected Task<IAnalyticsEvent> WaitForCommandToComplete()
         {
-            var cts = new CancellationTokenSource(TimeSpan.FromSeconds(1));
             return ProjectScope.StubIdeScope.AnalyticsTransmitter
-                .WaitForEventAsync(_completedEventSignal, cts.Token);
+                .WaitForEventAsync(_completedEventSignal);
         }
 
         protected void ModifyFeatureFileInEditor(TestFeatureFile featureFile, Span span, string replacementText)

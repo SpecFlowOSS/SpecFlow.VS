@@ -1,5 +1,6 @@
 # v$vNext$ - $buildDate$
 
+* Fix: Fix possible deadlock in StubAnalyticsTransmitter
 * Fix: (#10) Use loaded content in StepDefinitionUsageFinder if the file is open already
 * Feature: (#9) Rebuild stepDefinitions after rename step
 
