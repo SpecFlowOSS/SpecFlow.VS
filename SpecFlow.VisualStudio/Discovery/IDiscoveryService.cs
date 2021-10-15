@@ -11,5 +11,6 @@ namespace SpecFlow.VisualStudio.Discovery
         void CheckBindingRegistry();
         void InitializeBindingRegistry();
         void ReplaceBindingRegistry(ProjectBindingRegistry bindingRegistry);
+        Task ProcessAsync(CSharpStepDefinitionFile stepDefinitionFile);
     }
 }

@@ -12,14 +12,12 @@ public abstract class EditorTestBase
         ProjectScope = new InMemoryStubProjectScope(ideScope);
     }
 
-    protected StubWpfTextView ArrangeTextView(
+    protected async Task<StubWpfTextView> ArrangeTextView(
         TestStepDefinition[] stepDefinitions,
         TestFeatureFile[] featureFiles)
     {
         var stepDefinitionClassFile = new StepDefinitionClassFile(stepDefinitions);
-        var filePath = Path.Combine(ProjectScope.ProjectFolder, "Steps.cs");
-        var inputText = stepDefinitionClassFile.GetText(filePath);
-        Dump(inputText.ToString(), "Generated step definition class");
+        var textView = CreateTextView(stepDefinitionClassFile);
 
         ProjectScope.AddSpecFlowPackage();
         foreach (var featureFile in featureFiles)
@@ -28,11 +26,8 @@ public abstract class EditorTestBase
         }
 
         var discoveryService =
-            MockableDiscoveryService.SetupWithInitialStepDefinitions(ProjectScope, stepDefinitionClassFile.StepDefinitions, TimeSpan.Zero);
-        discoveryService.WaitUntilDiscoveryPerformed();
-
-        var textView = CreateTextView(inputText);
-        inputText.MoveCaretTo(textView, stepDefinitionClassFile.CaretPositionLine, stepDefinitionClassFile.CaretPositionColumn);
+            MockableDiscoveryService.SetupWithInitialStepDefinitions(ProjectScope, stepDefinitionClassFile.StepDefinitions, TimeSpan.FromMilliseconds(10));
+        await discoveryService.WaitUntilDiscoveryPerformed();
 
         return textView;
     }
@@ -64,14 +59,34 @@ public abstract class EditorTestBase
         TestOutputHelper.WriteLine("---------------------------------------------");
     }
 
-    protected StubWpfTextView CreateTextView(TestText inputText, string newLine = null)
+    protected StubWpfTextView CreateTextView(StepDefinitionClassFile stepDefinitionClassFile)
+    {
+        var filePath = Path.Combine(ProjectScope.ProjectFolder, "Steps.cs");
+        var inputText = stepDefinitionClassFile.GetText(filePath);
+        Dump(inputText.ToString(), "Generated step definition class");
+        var contentType = VsContentTypes.CSharp;
+        var textView = CreateTextView(inputText, contentType, filePath);
+        inputText.MoveCaretTo(textView, stepDefinitionClassFile.CaretPositionLine,
+            stepDefinitionClassFile.CaretPositionColumn);
+
+        return textView;
+    }
+
+
+    protected StubWpfTextView CreateTextView(TestFeatureFile featureFile)
+    {
+        var inputText = new TestText(featureFile.Content);
+        return CreateTextView(inputText, VsContentTypes.FeatureFile, featureFile.FileName);
+    }
+
+    protected StubWpfTextView CreateTextView(TestText inputText, string contentType, string filePath)
     {
         return ProjectScope.StubIdeScope.CreateTextView(
             inputText,
-            newLine,
+            Environment.NewLine,
             ProjectScope,
-            VsContentTypes.CSharp,
-            "Steps.cs");
+            contentType,
+            filePath);
     }
 
     protected TestFeatureFile ArrangeOneFeatureFile()
@@ -108,6 +123,11 @@ public abstract class EditorTestBase
             ArrangeStepDefinition(@"""I select add""")
         };
         return stepDefinitions;
+    }
+
+    protected static TestStepDefinition ArrangeStepDefinition()
+    {
+        return ArrangeStepDefinition(@"""I press add""", "When");
     }
 
     protected static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord = "When",
@@ -153,7 +173,12 @@ public abstract class EditorTestBase
     protected void ThereWereNoWarnings()
     {
         var stubLogger = GetStubLogger();
-        stubLogger.Messages.Should().NotContain(msg => msg.Message.Contains("ShowProblem:"));
+        stubLogger.Logs.Should().NotContain(msg => msg.Message.Contains("ShowProblem:"));
     }
 
+    protected async Task BindingRegistryIsModified(string expression)
+    {
+        var bindingRegistry = await ProjectScope.GetDiscoveryService().GetBindingRegistryAsync();
+        bindingRegistry.StepDefinitions.Should().Contain(sd => sd.Expression == expression, $"after modification I should see <{expression}>");
+    }
 }

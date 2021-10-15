@@ -4,6 +4,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
     <LangVersion>latest</LangVersion>
+    <NoWarn>VSTHRD200<!--Use "Async" suffix in names of methods that return an awaitable type.--></NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

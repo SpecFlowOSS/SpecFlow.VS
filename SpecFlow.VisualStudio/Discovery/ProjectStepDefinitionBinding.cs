@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
 using Gherkin.Ast;

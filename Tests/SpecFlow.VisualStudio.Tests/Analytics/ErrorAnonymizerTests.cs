@@ -48,7 +48,7 @@ namespace SpecFlow.VisualStudio.Tests.Analytics
         public void SimplifyStackTrace_keeps_own_stack_trace_entries()
         {
             const string stackTrace = @"
-   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.InvokeAndWaitAnalyticsEvent(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
    at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath)
 ";
@@ -62,7 +62,7 @@ namespace SpecFlow.VisualStudio.Tests.Analytics
         public void SimplifyStackTrace_minimizes_stack_trace()
         {
             const string stackTrace = @"
-   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.InvokeAndWaitAnalyticsEvent(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\ReflectionExtensions.cs:line 17
    at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\Discovery\ReflectionSpecFlowDiscoverer.cs:line 25
 ";
@@ -83,7 +83,7 @@ namespace SpecFlow.VisualStudio.Tests.Analytics
    at TechTalk.SpecFlow.Bindings.Discovery.BindingSourceProcessor.ProcessStepDefinitions(BindingSourceMethod bindingSourceMethod, BindingScope[] methodScopes) 
    at TechTalk.SpecFlow.Bindings.Discovery.BindingSourceProcessor.ProcessMethod(BindingSourceMethod bindingSourceMethod) 
    at TechTalk.SpecFlow.Bindings.Discovery.RuntimeBindingRegistryBuilder.BuildBindingsFromType(Type type) 
-   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.InvokeAndWaitAnalyticsEvent(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
 ";
 

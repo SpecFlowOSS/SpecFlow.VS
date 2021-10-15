@@ -267,3 +267,4 @@ Deveroom.VisualStudio.Package/Changelog.txt
 !**/LocalNuGetFeed/*.nupkg
 launchSettings.json
 /GitExtensions.settings.backup
+*.received.txt

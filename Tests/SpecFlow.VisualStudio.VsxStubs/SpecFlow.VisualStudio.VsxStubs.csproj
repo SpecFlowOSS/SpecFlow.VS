@@ -4,7 +4,9 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
     <VsEditorAssembliesLocation Condition="'$(VsEditorAssembliesLocation)' == ''">..\ExternalTestDependencies\VS\</VsEditorAssembliesLocation>
-    <NoWarn>CS0067</NoWarn> <!--The event 'xxx' is never used-->
+    <NoWarn>CS0067;VSTHRD200</NoWarn>
+    <!--CS0067: The event 'xxx' is never used-->
+    <!--VSTHRD200: Use "Async" suffix in names of methods that return an awaitable type.-->
   </PropertyGroup>
 
   <ItemGroup>
