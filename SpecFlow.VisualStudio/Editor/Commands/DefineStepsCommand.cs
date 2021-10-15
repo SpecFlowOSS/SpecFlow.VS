@@ -148,7 +148,7 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
         projectScope.IdeScope.Actions.NavigateTo(new SourceLocation(targetFilePath, 9, 1));
 
         _ = projectScope.IdeScope.RunOnBackgroundThread(
-            () => RebuildBindingRegistry(projectScope, targetFilePath, template), _ => { });
+            () => RebuildBindingRegistry(projectScope, targetFilePath, template), _ => { Finished.Set(); });
     }
 
     private async Task RebuildBindingRegistry(IProjectScope projectScope, string targetFilePath, string template)

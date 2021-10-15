@@ -6,7 +6,7 @@ public class DefineStepsCommandTests : CommandTestBase<DefineStepsCommand>
 {
     public DefineStepsCommandTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper,
         ps => new DefineStepsCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
-        "???",
+        "RunOnBackgroundThread DefineStepsCommand succeed",
         "ShowProblem: User Notification: ")
     {
     }
@@ -65,7 +65,6 @@ public class DefineStepsCommandTests : CommandTestBase<DefineStepsCommand>
         Dump(ProjectScope.StubIdeScope.CurrentTextView, "Created stepDefinition file");
         createdStepDefinitionContent.Should().Contain(expression);
 
-        Thread.Sleep(1000); //TODO: implement non-blocking wait
         await BindingRegistryIsModified(expression);
     }
 }
