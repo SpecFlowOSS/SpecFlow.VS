@@ -1,5 +1,0 @@
-﻿b[0] = Dan
-b[1] = James
-b[2] = Jason
-b[3] = Katrina
-b[4] = Llewellyn

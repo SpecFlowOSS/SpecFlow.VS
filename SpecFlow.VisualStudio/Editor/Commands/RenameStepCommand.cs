@@ -184,7 +184,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
         private void InvokeOnBackgroundThread(RenameStepCommandContext ctx, Func<Task> action)
         {
-            _ = ctx.IdeScope.RunOnBackgroundThread(action, e=> ctx.AddCriticalProblem(e.Message))
+            _ = ctx.IdeScope.RunOnBackgroundThread(action, e=> ctx.AddCriticalProblem(e.Message), nameof(RenameStepCommand))
                 .ContinueWith(_=>NotifyUserAboutIssues(ctx), TaskScheduler.Default);
         }
 

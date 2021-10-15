@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Discovery;
@@ -14,8 +16,13 @@ using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.Snippets.Fallback;
 using SpecFlow.VisualStudio.UI.ViewModels;
 using Gherkin.Ast;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
+using SpecFlow.VisualStudio.Editor.Services.Parser;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 namespace SpecFlow.VisualStudio.Editor.Commands
 {
@@ -162,6 +169,15 @@ namespace SpecFlow.VisualStudio.Editor.Commands
 
             projectScope.AddFile(targetFilePath, template);
             projectScope.IdeScope.Actions.NavigateTo(new SourceLocation(targetFilePath, 9, 1));
+
+            _ = projectScope.IdeScope.RunOnBackgroundThread(()=>RebuildBindingRegistry(projectScope, targetFilePath, template), _=>{ }, nameof(DefineStepsCommand));
+        }
+
+        private static Task RebuildBindingRegistry(IProjectScope projectScope, string targetFilePath, string template)
+        {
+            var discoveryService = projectScope.GetDiscoveryService();
+            CSharpStepDefinitionFile stepDefinitionFile = new CSharpStepDefinitionFile(targetFilePath, template);
+            return discoveryService.ProcessAsync(stepDefinitionFile);
         }
     }
 }

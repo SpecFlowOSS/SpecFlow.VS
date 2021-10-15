@@ -14,7 +14,11 @@ namespace SpecFlow.VisualStudio.Analytics
     [Export(typeof(IRegistryManager))]
     public class RegistryManager : IRegistryManager
     {
+#if DEBUG
+        private const string REG_PATH = @"Software\TechTalk\SpecFlow\Debug";
+#else
         private const string REG_PATH = @"Software\TechTalk\SpecFlow";
+#endif
         private const string Version2019 = "version";
         private const string Version = "version.vs2022";
         private const string InstallDate = "installDate.vs2022";

@@ -1,6 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
 * Fix: (#23) SpecFlow templates come first in the "Add New Item" dialog
+* Feature: (#11) Upadte binding registry after define step
 
 # v2021.1.4 - 2021-11-25
 

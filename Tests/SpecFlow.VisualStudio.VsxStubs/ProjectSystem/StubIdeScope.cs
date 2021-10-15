@@ -105,17 +105,20 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             return CSharpSyntaxTree.ParseText(fileContent);
         }
 
-        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, string threadName)
         {
             return Task.Run(async () =>
             {
                 try
                 {
                     await action();
+                    AnalyticsTransmitter.TransmitEvent(new StubAnalyticsEvent($"{nameof(RunOnBackgroundThread)} {threadName} succeed"));
                 }
                 catch (Exception e)
                 {
                     Logger.LogException(MonitoringService, e);
+                    AnalyticsTransmitter.TransmitEvent(new StubAnalyticsEvent($"{nameof(RunOnBackgroundThread)} {threadName} failed", 
+                        new Dictionary<string, object>{["exception"] = e}));
                     onException(e);
                 }
             });

@@ -176,7 +176,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return null;
         }
 
-        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, string threadName)
         {
             return ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {

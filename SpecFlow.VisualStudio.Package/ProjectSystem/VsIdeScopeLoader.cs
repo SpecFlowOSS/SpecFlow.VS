@@ -137,9 +137,9 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return VsIdeScope.GetSyntaxTree(textBuffer);
         }
 
-        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, string threadName)
         {
-            return VsIdeScope.RunOnBackgroundThread(action, onException);
+            return VsIdeScope.RunOnBackgroundThread(action, onException, threadName);
         }
 
         public Task RunOnUiThread(Action action)

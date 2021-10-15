@@ -1,11 +1,14 @@
 ﻿
+using System.Collections.Concurrent;
+using System.Collections.Immutable;
+
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEditorCommandBase
 {
     private readonly Func<IProjectScope, T> _commandFactory;
     private readonly string _completedEventSignal;
-    private readonly string _warningHeader;
+    protected readonly string _warningHeader;
 
     protected CommandTestBase(
         ITestOutputHelper testOutputHelper,
@@ -18,7 +21,7 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         _warningHeader = warningHeader;
     }
 
-    protected (StubWpfTextView textView, T command) ArrangeSut(
+    protected Task<(StubWpfTextView textView, T command)> ArrangeSut(
         TestStepDefinition stepDefinition, TestFeatureFile featureFile)
     {
         var stepDefinitions = stepDefinition.IsVoid
@@ -32,20 +35,25 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         return ArrangeSut(stepDefinitions, featureFiles);
     }
 
-    protected (StubWpfTextView textView, T command) ArrangeSut(
+    protected async Task<(StubWpfTextView textView, T command)> ArrangeSut(
         TestStepDefinition[] stepDefinitions,
         TestFeatureFile[] featureFiles)
     {
-        var textView = ArrangeTextView(stepDefinitions, featureFiles);
+        var textView = await ArrangeTextView(stepDefinitions, featureFiles);
 
         var command = _commandFactory(ProjectScope);
         return (textView, command);
     }
 
-    protected Task<IAnalyticsEvent> Invoke(T command, StubWpfTextView textView)
+    protected Task<IAnalyticsEvent> InvokeAndWaitAnalyticsEvent(T command, StubWpfTextView textView)
     {
-        command.PreExec(textView, command.Targets.First());
+        Invoke(command, textView);
         return WaitForCommandToComplete();
+    }
+
+    protected static bool Invoke(T command, StubWpfTextView textView)
+    {
+        return command.PreExec(textView, command.Targets.First());
     }
 
     protected Task<IAnalyticsEvent> WaitForCommandToComplete()
@@ -54,8 +62,9 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
             .WaitForEventAsync(_completedEventSignal);
     }
 
-    public string WithoutWarningHeader(string message)
+    public ImmutableArray<string> WarningMessages()
     {
-        return message.Replace(_warningHeader, "");
+        var stubLogger = GetStubLogger();
+        return stubLogger.Warnings().WithoutHeader(_warningHeader).Messages;
     }
 }

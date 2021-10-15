@@ -1,0 +1,19 @@
+﻿ProjectBindingRegistry:
+  ProjectStepDefinitionBinding-0:
+    IsValid:`True`
+    Error:``
+    StepDefinitionType:`When`
+    SpecifiedExpression:`I press add`
+    Regex:`^I press add$`
+    Scope:``
+    Implementation:
+      Method:`Feature1StepDefinitions.WhenIPressAdd`
+      ParameterTypes:[0]
+      SourceLocation:
+        SourceFile:`C:\<Full path to>\IPressAdd.cs`
+        SourceFileColumn:`9`
+        SourceFileEndColumn:`9`
+        SourceFileEndLine:`13`
+        SourceLocationSpan:``
+        SourceFileLine:`11`
+    Expression:`I press add`
