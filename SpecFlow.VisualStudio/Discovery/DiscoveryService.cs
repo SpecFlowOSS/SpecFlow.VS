@@ -71,7 +71,7 @@ namespace SpecFlow.VisualStudio.Discovery
         {
             var projectSettings = _projectScope.GetProjectSettings();
             var testAssemblySource = GetTestAssemblySource(projectSettings);
-            return _cached.IsUpToDate(projectSettings, testAssemblySource?.LastChangeTime ?? DateTime.MinValue);
+            return _cached.IsUpToDate(projectSettings, testAssemblySource?.LastChangeTime ?? DateTimeOffset.MinValue);
         }
 
         protected virtual ConfigSource GetTestAssemblySource(ProjectSettings projectSettings)
