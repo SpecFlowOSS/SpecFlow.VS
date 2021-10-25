@@ -7,9 +7,9 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
     public class ConfigSource
     {
         public string FilePath { get; }
-        public DateTime LastChangeTime { get; }
+        public DateTimeOffset LastChangeTime { get; }
 
-        public ConfigSource(string filePath, DateTime lastChangeTime)
+        public ConfigSource(string filePath, DateTimeOffset lastChangeTime)
         {
             FilePath = filePath;
             LastChangeTime = lastChangeTime;

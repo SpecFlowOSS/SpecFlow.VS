@@ -19,10 +19,10 @@ namespace SpecFlow.VisualStudio.Editor.Services
         {
             public int SnapshotVersion { get; }
             public int? BindingRegistryVersion { get; }
-            public DateTime ConfigurationChangeTime { get; }
+            public DateTimeOffset ConfigurationChangeTime { get; }
             public ICollection<DeveroomTag> Tags { get; }
 
-            public TagsCache(ITextSnapshot snapshot, int? bindingRegistryVersion, DateTime configurationChangeTime, ICollection<DeveroomTag> tags)
+            public TagsCache(ITextSnapshot snapshot, int? bindingRegistryVersion, DateTimeOffset configurationChangeTime, ICollection<DeveroomTag> tags)
             {
                 SnapshotVersion = snapshot.Version.VersionNumber;
                 Tags = tags;

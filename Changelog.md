@@ -1,5 +1,9 @@
 # v$vNext$ - $buildDate$
 
+* Fix: (#14) Remove implicit convetion of DateTime.MinValue (local) to DateTimeOffset (UTC) resulting in ArgumentOutOfRangeException
+
+# v2021.0.198 - 2021-10-15
+
 * Fix: Fix possible deadlock in StubAnalyticsTransmitter
 * Fix: (#10) Use loaded content in StepDefinitionUsageFinder if the file is open already
 * Feature: (#9) Rebuild stepDefinitions after rename step

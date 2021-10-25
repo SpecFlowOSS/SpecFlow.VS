@@ -4,7 +4,7 @@ namespace SpecFlow.VisualStudio.Configuration
 {
     public class DeveroomConfiguration
     {
-        public DateTime ConfigurationChangeTime { get; set; } = DateTime.MinValue;
+        public DateTimeOffset ConfigurationChangeTime { get; set; } = DateTimeOffset.MinValue;
 
         public string ConfigurationBaseFolder { get; set; }
 
