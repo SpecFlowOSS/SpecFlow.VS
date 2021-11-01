@@ -1,5 +1,9 @@
 # v$vNext$ - $buildDate$
 
+* Feature: (#17) Add item template for Hooks
+
+# v2021.0.199 - 2021-10-29
+
 * Fix: (#14) Remove implicit convetion of DateTime.MinValue (local) to DateTimeOffset (UTC) resulting in ArgumentOutOfRangeException
 
 # v2021.0.198 - 2021-10-15
