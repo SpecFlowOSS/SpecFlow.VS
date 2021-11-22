@@ -45,7 +45,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
             if (tag != null &&
                 tag.Span.Snapshot.Version.VersionNumber != textView.TextSnapshot.Version.VersionNumber)
             {
-                Logger.LogWarning("Snapshot version mismatch");
+                Logger.LogVerbose("Snapshot version mismatch");
                 tagger.InvalidateCache();
                 tag = DumpDeveroomTags(tagger.GetDeveroomTagsForCaret(textView)).FirstOrDefault(t => tagTypes.Contains(t.Type));
             }

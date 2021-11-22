@@ -25,7 +25,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
 
         public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
         {
-            return buffer.Properties.GetOrCreateSingletonProperty(creator: () => (ITagger<T>)new DeveroomTagger(buffer, _ideScope, CreateImmediateParsingTagger), key: typeof(DeveroomTagger));
+            return buffer.Properties.GetOrCreateSingletonProperty(creator: () => (ITagger<T>)new DeveroomTagger(buffer, _ideScope, CreateImmediateParsingTagger, new ActionThrottlerFactory()), key: typeof(DeveroomTagger));
         }
 
         public static DeveroomTagger GetDeveroomTagger(ITextBuffer buffer)

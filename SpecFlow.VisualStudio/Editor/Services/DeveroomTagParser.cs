@@ -37,7 +37,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
             catch (Exception ex)
             {
                 _logger.LogException(_monitoringService, ex, "Unhandled parsing error");
-                return new List<DeveroomTag>();
+                return Array.Empty<DeveroomTag>();
             }
             finally
             {

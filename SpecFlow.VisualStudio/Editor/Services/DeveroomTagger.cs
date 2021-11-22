@@ -44,12 +44,12 @@ namespace SpecFlow.VisualStudio.Editor.Services
         private readonly IDiscoveryService _discoveryService;
         private readonly IDeveroomConfigurationProvider _deveroomConfigurationProvider;
         private readonly ProjectSettingsProvider _projectSettingsProvider;
-        private readonly ActionThrottler _actionThrottler;
+        private readonly IActionThrottler _actionThrottler;
         private readonly CalculationCache<TagsCache> _tagsCache = new CalculationCache<TagsCache>();
 
         public event EventHandler<SnapshotSpanEventArgs> TagsChanged;
 
-        public DeveroomTagger(ITextBuffer buffer, IIdeScope ideScope, bool immediateParsing)
+        public DeveroomTagger(ITextBuffer buffer, IIdeScope ideScope, bool immediateParsing, IActionThrottlerFactory actionThrottlerFactory)
         {
             _buffer = buffer;
             _ideScope = ideScope;
@@ -62,7 +62,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
             InitializeWithDiscoveryService(ideScope, project);
 
             _deveroomTagParser = new DeveroomTagParser(ideScope.Logger, ideScope.MonitoringService);
-            _actionThrottler = new ActionThrottler(() =>
+            _actionThrottler = actionThrottlerFactory.Build(() =>
             {
                 if (ideScope.IsSolutionLoaded)
                     ReCalculate(buffer.CurrentSnapshot);
