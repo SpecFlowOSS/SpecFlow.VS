@@ -641,7 +641,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         public void ThenAShowProblemDialogShouldBeOpenedWith(string expectedDialog, string expectedMessage)
         {
             _ideScope.StubLogger.Messages.Should()
-                .Contain(m => m.Item2.Contains(expectedDialog) && m.Item2.Contains(expectedMessage));
+                .Contain(m => m.Message.Contains(expectedDialog) && m.Message.Contains(expectedMessage));
         }
 
         [Given(@"the ""(.*)"" command is being invoked")]

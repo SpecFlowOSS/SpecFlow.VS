@@ -4,7 +4,25 @@ using System.Windows.Threading;
 
 namespace SpecFlow.VisualStudio.Editor.Services
 {
-    public class ActionThrottler
+    public interface IActionThrottlerFactory
+    {
+        IActionThrottler Build(Action action);
+    }
+
+    public class ActionThrottlerFactory : IActionThrottlerFactory
+    {
+        public IActionThrottler Build(Action action)
+        {
+            return new ActionThrottler(action);
+        }
+    }
+
+    public interface IActionThrottler
+    {
+        void TriggerAction(bool forceDelayed = false, bool forceDirect = false);
+    }
+
+    public class ActionThrottler : IActionThrottler
     {
         private const bool EnableDebugTrace = false;
         private readonly DispatcherTimer _dispatcherTimer;

@@ -13,6 +13,7 @@ using SpecFlow.VisualStudio.VsxStubs;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using Xunit;
 using Xunit.Abstractions;
+#pragma warning disable xUnit1026 //Theory method 'xxx' does not use parameter '_'
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
@@ -24,9 +25,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             "ShowProblem: User Notification: The following problems occurred:" + Environment.NewLine)
         { }
 
-        private bool SpecflowProjectMustHaveFeatureFiles(Tuple<TraceLevel, string> msg)
+        private bool SpecflowProjectMustHaveFeatureFiles(LogMessage msg)
         {
-            return WithoutWarningHeader(msg.Item2) ==
+            return WithoutWarningHeader(msg.Message) ==
                    "Unable to find step definition usages: could not find any SpecFlow project with feature files.";
         }
 
@@ -53,7 +54,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger(emptyIde);
-            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should()
+            WithoutWarningHeader(stubLogger.Messages.Last().Message).Should()
                 .Be("Unable to find step definition usages: the project is not initialized yet.");
         }
 
@@ -67,7 +68,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger();
-            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be(
+            WithoutWarningHeader(stubLogger.Messages.Last().Message).Should().Be(
                 "Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
         }
 
@@ -153,7 +154,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             Dump(textView, "Step definition class after rename");
             var stubLogger = GetStubLogger();
-            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be(errorMessage);
+            WithoutWarningHeader(stubLogger.Messages.Last().Message).Should().Be(errorMessage);
         }
 
         [Theory]
@@ -217,7 +218,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             await Invoke(command, textView);
 
             var stubLogger = GetStubLogger();
-            var logMessage = WithoutWarningHeader(stubLogger.Messages.Last().Item2);
+            var logMessage = WithoutWarningHeader(stubLogger.Messages.Last().Message);
             var actualErrorMessages = logMessage.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             actualErrorMessages.Should().BeEquivalentTo(errorMessages);
         }
@@ -362,7 +363,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             await OneFeatureFileRename(originalExpression, updatedExpression, featureFile);
 
             var stubLogger = GetStubLogger();
-            WithoutWarningHeader(stubLogger.Messages.Last().Item2).Should().Be(ProjectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
+            WithoutWarningHeader(stubLogger.Messages.Last().Message).Should().Be(ProjectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
         }
 
         private async Task<TestText> OneFeatureFileRename(string originalExpression, string updatedExpression,

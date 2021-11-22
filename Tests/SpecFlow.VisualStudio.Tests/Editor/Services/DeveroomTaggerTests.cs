@@ -1,0 +1,177 @@
+﻿using System.Diagnostics;
+using System.IO.Abstractions.TestingHelpers;
+using System.Windows.Threading;
+using Microsoft.VisualStudio.Utilities;
+using Moq;
+using SpecFlow.VisualStudio.Monitoring;
+
+#nullable enable
+namespace SpecFlow.VisualStudio.Tests.Editor.Services;
+
+public class DeveroomTaggerTests
+{
+    protected record Sut(
+        Mock<IIdeScope> IdeScope,
+        Mock<ITextBuffer> TextBuffer,
+        Mock<IActionThrottlerFactory> ActionThrottlerFactory,
+        Mock<ITextSnapshot> TextSnapshot,
+        Mock<ITextVersion> TextSnapShotVersion) : IActionThrottler
+    {
+        private Action _recalculateAction;
+        public IReadOnlyCollection<SnapshotSpanEventArgs> TagsChangedEvents => _tagsChangedEvents;
+        private readonly List<SnapshotSpanEventArgs> _tagsChangedEvents = new();
+
+        public DeveroomTagger BuildTagger()
+        {
+            var deveroomTagger = new DeveroomTagger(TextBuffer.Object, IdeScope.Object, false, ActionThrottlerFactory.Object);
+            deveroomTagger.TagsChanged += DeveroomTagger_TagsChanged;
+            return deveroomTagger;
+        }
+
+        private void DeveroomTagger_TagsChanged(object sender, SnapshotSpanEventArgs e)
+        {
+            _tagsChangedEvents.Add(e);
+        }
+
+        public StubWpfTextView BuildTextView() => new StubWpfTextView(TextBuffer.Object);
+
+        public Sut SetAction(Action action)
+        {
+            _recalculateAction = action;
+            return this;
+        }
+
+        public void TriggerAction(bool forceDelayed = false, bool forceDirect = false)
+        {
+            if (forceDelayed) return;
+            _recalculateAction();
+        }
+
+        public IEnumerable<LogMessage> LoggerMessages => ((IdeScope.Object.Logger as StubLogger)!).Messages;
+        public IEnumerable<LogMessage> LoggerErrorMessages => LoggerMessages.Where(m=>m.Level == TraceLevel.Error || m.Message.Contains("Exception"));
+
+        public void AssertNoErrorLogged() => LoggerErrorMessages.Should().BeEmpty();
+    }
+
+    public DeveroomTaggerTests(ITestOutputHelper testOutputHelper)
+    {
+    }
+
+    protected Sut ArrangeSut()
+    {
+        var actionThrottlerFactory = new Mock<IActionThrottlerFactory>(MockBehavior.Strict);
+        var logger = new StubLogger();
+        var ideScope = new Mock<IIdeScope>(MockBehavior.Strict);
+        var projectScope = new Mock<IProjectScope>(MockBehavior.Strict);
+        var propertyCollection = new PropertyCollection();
+        var textBuffer = new Mock<ITextBuffer>(MockBehavior.Strict);
+        var textSnapshot = new Mock<ITextSnapshot>(MockBehavior.Strict);
+        var textSnapshotVersion = new Mock<ITextVersion>(MockBehavior.Strict);
+
+        var sut = new Sut(ideScope, textBuffer, actionThrottlerFactory, textSnapshot, textSnapshotVersion);
+        
+        actionThrottlerFactory.Setup(atf => atf.Build(It.IsAny<Action>()))
+            .Returns<Action>(action => sut.SetAction(action));
+
+        ideScope.Setup(s => s.GetProject(textBuffer.Object)).Returns(projectScope.Object);
+        ideScope.SetupGet(s => s.Logger).Returns(logger);
+        ideScope.SetupGet(s => s.FileSystem).Returns(new MockFileSystem());
+        ideScope.SetupGet(s => s.MonitoringService).Returns(
+            new MonitoringService(
+                new StubAnalyticsTransmitter(),
+                Mock.Of<IWelcomeService>(),
+                Mock.Of<ITelemetryConfigurationHolder>()
+            ));
+        ideScope.SetupGet(s => s.DeveroomErrorListServices).Returns(Mock.Of<IDeveroomErrorListServices>);
+        ideScope.SetupGet(s => s.IsSolutionLoaded).Returns(true);
+        
+        projectScope.SetupGet(s => s.Properties).Returns(propertyCollection);
+        projectScope.SetupGet(s => s.IdeScope).Returns(ideScope.Object);
+        projectScope.SetupGet(s => s.PackageReferences).Returns((NuGetPackageReference[])null!);
+        projectScope.SetupGet(s => s.OutputAssemblyPath).Returns(".");
+        projectScope.SetupGet(s => s.PlatformTargetName).Returns(string.Empty);
+        projectScope.SetupGet(s => s.TargetFrameworkMoniker).Returns(string.Empty);
+        projectScope.SetupGet(s => s.TargetFrameworkMonikers).Returns(string.Empty);
+        projectScope.SetupGet(s => s.DefaultNamespace).Returns(string.Empty);
+        projectScope.SetupGet(s => s.ProjectFullName).Returns("SpecFlow.VisualStudio.Tests.dll.config");
+        projectScope.SetupGet(s => s.ProjectFolder).Returns(string.Empty);
+        projectScope.Setup(s => s.GetFeatureFileCount()).Returns(0);
+        
+        textBuffer.SetupGet(t => t.CurrentSnapshot).Returns(textSnapshot.Object);
+        textBuffer.SetupGet(t => t.Properties).Returns(new PropertyCollection());
+
+        textSnapshot.SetupGet(s => s.Length).Returns(0);
+        textSnapshot.SetupGet(s => s.Version).Returns(textSnapshotVersion.Object);
+        textSnapshot.Setup(s => s.GetText()).Returns(string.Empty);
+
+        textSnapshotVersion.SetupGet(v => v.VersionNumber).Returns(0);
+        
+        VsxStubObjects.Initialize();
+
+        return sut;
+    }
+
+    [Fact]
+    public void GetDeveroomTagsForCaret_returns_empty_collection_after_instantiation()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        DeveroomTagger tagger = sut.BuildTagger();
+
+        //act
+        IEnumerable<DeveroomTag> tags = tagger.GetDeveroomTagsForCaret(sut.BuildTextView());
+
+        ////assert
+        tags.Should().BeEmpty();
+        sut.TagsChangedEvents.Should().BeEmpty();
+        sut.AssertNoErrorLogged();
+    }
+
+    [Fact]
+    public void GetDeveroomTagsForCaretReturns_collection_after_recalculate_action_is_triggered_by_throttler()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        DeveroomTagger tagger = sut.BuildTagger();
+        sut.TextSnapshot.Setup(s => s.GetText()).Returns(string.Empty);
+        sut.TriggerAction();
+        
+        //act
+        IEnumerable<DeveroomTag> tags = tagger.GetDeveroomTagsForCaret(sut.BuildTextView());
+
+        ////assert
+        tags.Single().Type.Should().Be("Document", "the feature file has no content");
+        sut.AssertNoErrorLogged();
+    }
+
+    [Fact]
+    public void TagsChanged_event_fired()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.BuildTagger();
+
+        //act
+        sut.TriggerAction();
+
+        ////assert
+        sut.TagsChangedEvents.Should().HaveCount(1);
+        sut.AssertNoErrorLogged();
+    }
+
+    [Fact]
+    public void Parsed_only_once_when_triggered_with_the_same_data()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.BuildTagger();
+
+        //act
+        sut.TriggerAction();
+        sut.TriggerAction();
+
+        ////assert
+        sut.TextSnapshot.Verify(s=>s.GetText(), Times.Once);
+        sut.AssertNoErrorLogged();
+    }
+}
