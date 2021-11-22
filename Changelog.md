@@ -4,6 +4,7 @@
 * Fix: (#18) InvokeDiscovery: The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled
 * Feature: Update SpecFlow Project Templates for .NET 6 language features VS2022
 * Fix: Resolve some compiler warnings caused by inconsistent nuget references
+* Fix: Warning about non-SpecFlow project is shown after every build
 
 # v2021.0.201 - 2021-11-15
 

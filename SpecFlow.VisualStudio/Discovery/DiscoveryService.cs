@@ -112,7 +112,8 @@ namespace SpecFlow.VisualStudio.Discovery
             if (!projectSettings.IsSpecFlowTestProject)
             {
                 _logger.LogVerbose("Non-SpecFlow test project");
-                _logger.LogWarning($"Could not detect the SpecFlow version of the project that is required for navigation, step completion and other features. {Environment.NewLine}  Currently only NuGet package referenced can be detected. Please check https://github.com/specsolutions/deveroom-visualstudio/issues/14 for details.");
+                if (_cached is ProjectBindingRegistryCacheUninitialized)
+                    _logger.LogWarning($"Could not detect the SpecFlow version of the project that is required for navigation, step completion and other features. {Environment.NewLine}  Currently only NuGet package referenced can be detected. Please check https://github.com/specsolutions/deveroom-visualstudio/issues/14 for details.");
                 return new ProjectBindingRegistryCacheNonSpecFlowTestProject();
             }
 
