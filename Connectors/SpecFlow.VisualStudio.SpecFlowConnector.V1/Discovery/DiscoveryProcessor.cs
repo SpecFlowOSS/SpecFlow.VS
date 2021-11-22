@@ -1,11 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using SpecFlow.VisualStudio.SpecFlowConnector.AppDomainHelper;
-using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V19;
-using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V20;
-using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V21;
-using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V22;
-using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V30;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
 {
@@ -22,46 +17,38 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
         {
             using (AssemblyHelper.SubscribeResolveForAssembly(_options.AssemblyFilePath))
             {
-                var appDomainConfig = $"{_options.AssemblyFilePath}.config";
-                if (!File.Exists(appDomainConfig))
-                    appDomainConfig = null;
-                var appDomain = new AppDomainManager(_options.AssemblyFilePath, appDomainConfig, false, null);
-
-                var specFlowVersion = GetSpecFlowVersion();
-                var discovererType = typeof(SpecFlowV30P220Discoverer); // assume recent version
-                if (specFlowVersion != null)
-                {
-                    var versionNumber =
-                        ((specFlowVersion.FileMajorPart * 100) + specFlowVersion.FileMinorPart) * 1000 + specFlowVersion.FileBuildPart;
-
-                    if (versionNumber >= 3_00_220)
-                        discovererType = typeof(SpecFlowV30P220Discoverer);
-                    else if (versionNumber >= 3_00_000)
-                        discovererType = typeof(SpecFlowV30Discoverer);
-                    else if (versionNumber >= 2_02_000)
-                        discovererType = typeof(SpecFlowV22Discoverer);
-                    else if (versionNumber >= 2_01_000)
-                        discovererType = typeof(SpecFlowV21Discoverer);
-                    else if (versionNumber >= 2_00_000)
-                        discovererType = typeof(SpecFlowV20Discoverer);
-                    else if (versionNumber >= 1_09_000)
-                        discovererType = typeof(SpecFlowV19Discoverer);
-                }
-
-                appDomain.CreateObjectFrom<AssemblyHelper>(typeof(AssemblyHelper).Assembly.Location, typeof(AssemblyHelper).FullName, _options.TargetFolder);
-                appDomain.CreateObjectFrom<AssemblyHelper>(typeof(AssemblyHelper).Assembly.Location, typeof(AssemblyHelper).FullName, _options.ConnectorFolder);
-                using (var discoverer = appDomain.CreateObject<IRemotingSpecFlowDiscoverer>(discovererType.Assembly.GetName(), discovererType.FullName))
-                {
-                    return discoverer.Discover(_options.AssemblyFilePath, _options.ConfigFilePath);
-                }
+                IRemotingSpecFlowDiscoverer discoverer = GetDiscoverer();
+                return discoverer.Discover(_options.AssemblyFilePath, _options.ConfigFilePath);
             }
         }
 
-        private FileVersionInfo GetSpecFlowVersion()
+        private IRemotingSpecFlowDiscoverer GetDiscoverer()
+        {
+            var versionNumber = GetSpecFlowVersion();
+
+            if (versionNumber >= 3_07_013)
+                return new SpecFlowVLatestDiscoverer();
+            if (versionNumber >= 3_00_000)
+                return new SpecFlowV30Discoverer();
+            else if (versionNumber >= 2_02_000)
+                return  new SpecFlowV22Discoverer();
+            else if (versionNumber >= 2_01_000)
+                return  new SpecFlowV21Discoverer();
+            else if (versionNumber >= 2_00_000)
+                return  new SpecFlowV20Discoverer();
+            else
+                return  new SpecFlowV19Discoverer();
+        }
+
+        private int GetSpecFlowVersion()
         {
             var specFlowAssemblyPath = Path.Combine(_options.TargetFolder, "TechTalk.SpecFlow.dll");
-            var fileVersionInfo = File.Exists(specFlowAssemblyPath) ? FileVersionInfo.GetVersionInfo(specFlowAssemblyPath) : null;
-            return fileVersionInfo;
+            if (File.Exists(specFlowAssemblyPath)) {
+                var specFlowVersion = FileVersionInfo.GetVersionInfo(specFlowAssemblyPath);
+                var versionNumber = ((specFlowVersion.FileMajorPart * 100) + specFlowVersion.FileMinorPart) * 1000 + specFlowVersion.FileBuildPart;
+                return versionNumber;
+            }
+            return int.MaxValue;
         }
     }
 }

@@ -2,8 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using SpecFlow.VisualStudio.SpecFlowConnector.AppDomainHelper;
-using SpecFlow.VisualStudio.SpecFlowConnector.Generation.V19;
-using SpecFlow.VisualStudio.SpecFlowConnector.Generation.V22;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation
 {
@@ -22,7 +20,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation
             using (AssemblyHelper.SubscribeResolveForAssembly(generatorAssemblyPath))
             {
                 var specFlowAssemblyPath = Path.Combine(_options.SpecFlowToolsFolder, "TechTalk.SpecFlow.dll");
-                var specFlowVersion = File.Exists(specFlowAssemblyPath) ? FileVersionInfo.GetVersionInfo(specFlowAssemblyPath) : null;
+                FileVersionInfo specFlowVersion = File.Exists(specFlowAssemblyPath) ? FileVersionInfo.GetVersionInfo(specFlowAssemblyPath) : null;
 
                 var generatorType = typeof(SpecFlowV22Generator);
                 if (specFlowVersion != null)
@@ -30,6 +28,8 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation
                     var versionNumber =
                         ((specFlowVersion.FileMajorPart * 100) + specFlowVersion.FileMinorPart) * 1000 + specFlowVersion.FileBuildPart;
 
+                    if (versionNumber >= 3_00_000)
+                        throw new NotSupportedException($"Design time code generation is not supported in this specflow version: {specFlowVersion.FileVersion}");
                     if (versionNumber >= 2_02_000)
                         generatorType = typeof(SpecFlowV22Generator);
                     else if (versionNumber >= 1_09_000)

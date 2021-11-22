@@ -45,6 +45,26 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests
                 var testAssembly = Assembly.LoadFrom(testAssemblyPath);
                 return DiscoverInternal(testAssembly, testAssemblyPath, configFilePath);
             }
+
+            protected override object CreateGlobalContainer(Assembly testAssembly, string configFilePath)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override void RegisterTypeAs<TType, TInterface>(object globalContainer)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override T Resolve<T>(object globalContainer)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, object globalContainer)
+            {
+                throw new NotImplementedException();
+            }
         }
 
         class StubSymbolReader : IDeveroomSymbolReader

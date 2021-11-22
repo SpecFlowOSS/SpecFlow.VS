@@ -18,6 +18,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Discovery\ISpecFlowDiscoverer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Discovery\NoInvokeDependencyProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Discovery\SpecFlow21ConfigurationLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Discovery\SpecFlowConfigurationLoader.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ImplicitUsings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReflectionExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SourceDiscovery\DnLib\DnLibDeveroomSymbolReader.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)SourceDiscovery\IDeveroomSymbolReader.cs" />

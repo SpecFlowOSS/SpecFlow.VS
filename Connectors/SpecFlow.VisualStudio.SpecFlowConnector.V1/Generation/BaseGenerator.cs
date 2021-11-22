@@ -50,7 +50,8 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation
         {
             ITestGeneratorFactory testGeneratorFactory = new TestGeneratorFactory();
             var projectSettings = new ProjectSettings(); //TODO: load settings
-            projectSettings.ConfigurationHolder = configFilePath == null ? new SpecFlowConfigurationHolder()
+            projectSettings.ConfigurationHolder = configFilePath == null
+                ? new SpecFlowConfigurationHolder()
                 : CreateConfigHolder(configFilePath);
             projectSettings.ProjectFolder = projectFolder;
             projectSettings.ProjectPlatformSettings.Language = targetExtension == ".cs"
@@ -58,8 +59,10 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation
                 : GenerationTargetLanguage.VB;
             projectSettings.DefaultNamespace = projectDefaultNamespace;
 
-            return testGeneratorFactory.CreateGenerator(projectSettings);
+            return CreateGenerator(testGeneratorFactory, projectSettings);
         }
+
+        protected abstract ITestGenerator CreateGenerator(ITestGeneratorFactory testGeneratorFactory, ProjectSettings projectSettings);
 
         protected abstract SpecFlowConfigurationHolder CreateConfigHolder(string configFilePath);
 

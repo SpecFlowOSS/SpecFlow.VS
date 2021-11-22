@@ -55,15 +55,16 @@ Examples:
 	| MsTest           | 
 
 Scenario Outline: Regression tests for special discovery combinations
-	Given there is a simple SpecFlow project with test runner "<test runner tool>" for <version>
-	And the project uses the new project format
-	And the target framework is <framework>
-	And the project is built
-	When the binding discovery performed
-	Then the discovery succeeds with several step definitions
+    Given there is a simple SpecFlow project with test runner "<test runner tool>" for <version>
+    And the project uses the new project format
+    And the target framework is <framework>
+    And the project is built
+    When the binding discovery performed
+    Then the discovery succeeds with several step definitions
 Examples: 
-	| case                          | version | framework | test runner tool |
-	| v3.8 + MsTest discovery issue | v3.8.14 | net5.0    | MsTest           |
+    | case                           | version | framework | test runner tool |
+    | v3.8 + MsTest discovery issue  | v3.8.14 | net5.0    | MsTest           |
+    | (#18) Netframework with MsTest | v3.9.40 | net48     | MsTest           |
 
 Scenario Outline: Dicover bindings with the right SpecFlow connector
     Given there is a simple SpecFlow project for <version>
