@@ -1,5 +1,6 @@
 ﻿# v$vNext$ - $buildDate$
  
+* Feature: Update SpecFlow Project Templates for .NET 6 language features VS2022
 * Fix: Resolve some compiler warnings caused by inconsistent nuget references
 
 # v2021.0.201 - 2021-11-15

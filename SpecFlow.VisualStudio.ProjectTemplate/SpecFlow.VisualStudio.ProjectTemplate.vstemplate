@@ -22,6 +22,7 @@
       <Folder Name="Support" />
       <ProjectItem ReplaceParameters="true">Features\Calculator.feature</ProjectItem>
       <ProjectItem ReplaceParameters="true">StepDefinitions\CalculatorStepDefinitions.cs</ProjectItem>
+      <ProjectItem ReplaceParameters="true">ImplicitUsings.cs</ProjectItem>
     </Project>
   </TemplateContent>
   <WizardExtension>

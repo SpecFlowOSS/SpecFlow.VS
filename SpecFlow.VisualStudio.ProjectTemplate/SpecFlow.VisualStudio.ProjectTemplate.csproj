@@ -4,6 +4,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
     <AutoGenerateBindingRedirects>True</AutoGenerateBindingRedirects>
+    <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -16,10 +17,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ImplicitUsings.cs" />
     <Compile Remove="StepDefinitions\CalculatorStepDefinitions.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="ImplicitUsings.cs" />
     <None Include="StepDefinitions\CalculatorStepDefinitions.cs" />
     <None Include="ProjectTemplate.csproj" />
   </ItemGroup>
