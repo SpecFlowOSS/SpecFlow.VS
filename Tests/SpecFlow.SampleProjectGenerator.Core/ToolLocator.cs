@@ -57,11 +57,14 @@ namespace SpecFlow.SampleProjectGenerator
                     yield return Environment.ExpandEnvironmentVariables(@"%ProgramW6432%\Git\bin");
                     break;
                 case ExternalTools.MsBuild:
-                    yield return
-                        Environment.ExpandEnvironmentVariables(@"%ProgramW6432%\Microsoft Visual Studio\2022\Preview\MSBuild\Current\Bin");
                     var editions = new[] {"Community", "Professional", "Enterprise"};
                     var versions = new[] {"2017", "2019"};
                     var msBuildVersions = new[] {"Current", "15.0"};
+                    foreach (var edition in editions)
+                    {
+                        yield return
+                            Environment.ExpandEnvironmentVariables($@"%ProgramW6432%\Microsoft Visual Studio\2022\{edition}\MSBuild\Current\Bin");
+                    }
                     foreach (var version in versions)
                         foreach (var edition in editions)
                             foreach (var msBuildVersion in msBuildVersions)

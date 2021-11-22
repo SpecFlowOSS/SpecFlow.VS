@@ -1,4 +1,8 @@
-# v$vNext$ - $buildDate$
+﻿# v$vNext$ - $buildDate$
+ 
+* Fix: Resolve some compiler warnings caused by inconsistent nuget references
+
+# v2021.0.201 - 2021-11-15
 
 * Feature: (#17) Add item template for Hooks
 

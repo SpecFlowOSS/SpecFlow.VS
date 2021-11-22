@@ -14,14 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="dnlib" Version="3.2.0" />
+    <PackageReference Include="dnlib" Version="3.3.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.5.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="SpecFlow" Version="3.0.220" />
     <PackageReference Include="SpecFlow.CustomPlugin" Version="3.0.220" />
   </ItemGroup>
 

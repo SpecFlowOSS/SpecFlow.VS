@@ -15,14 +15,6 @@ steps:
   inputs:
     command: restore
 
-- task: PowerShell@2
-  displayName: 'Build Connectors'
-  inputs:
-    targetType: 'inline'
-    script: |
-        cd .\Connectors
-        .\build.ps1 $(buildConfiguration)
-
 - task: VSBuild@1
   displayName: 'Build Solution'
   inputs:
@@ -30,6 +22,14 @@ steps:
     msbuildArgs: '/p:DeployExtension=false /p:AppInsightsInstrumentationKey=$(AppInsightsInstrumentationKey) /nowarn:VSTHRD010'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: PowerShell@2
+  displayName: 'Build Connectors'
+  inputs:
+    targetType: 'inline'
+    script: |
+        cd .\Connectors
+        .\build.ps1 $(buildConfiguration)
 
 - task: DotNetCoreCLI@2
   displayName: Run Unit Tests

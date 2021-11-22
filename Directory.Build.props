@@ -2,7 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="Nerdbank.GitVersioning"
-                      Version="3.4.231"
+                      Version="3.4.244"
                       PrivateAssets="all"
                       Condition="!Exists('packages.config')" />
   </ItemGroup>
@@ -12,8 +12,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>VSTHRD010;VSTHRD110;NU1603</NoWarn>
-	<LangVersion>latest</LangVersion>
+    <NoWarn>VSTHRD010;VSTHRD110;NU1603;VSTHRD200</NoWarn>
+    <!--VSTHRD200: Use "Async" suffix in names of methods that return an awaitable type.-->
+    <LangVersion>10</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
 </Project>
