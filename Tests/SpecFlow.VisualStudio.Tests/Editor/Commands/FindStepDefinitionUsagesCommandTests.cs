@@ -1,11 +1,11 @@
-﻿
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.Text;
 using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 using Xunit;
 using Xunit.Abstractions;
+#pragma warning disable xUnit1026 //Theory method 'xxx' does not use parameter '_'
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 {
