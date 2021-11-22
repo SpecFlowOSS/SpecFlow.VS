@@ -1,5 +1,6 @@
 ﻿# v$vNext$ - $buildDate$
- 
+
+* Fix: (#18) InvokeDiscovery: The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled
 * Feature: Update SpecFlow Project Templates for .NET 6 language features VS2022
 * Fix: Resolve some compiler warnings caused by inconsistent nuget references
 

@@ -25,9 +25,10 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
         public static T ReflectionCallMethod<T>(this object obj, string methodName, Type[] parameterTypes, params object[] args)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
-            var methodInfo = obj.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, parameterTypes, null);
+            var objType = obj.GetType();
+            var methodInfo = objType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, parameterTypes, null);
             if (methodInfo == null)
-                throw new ArgumentException($"Cannot find method {methodName} on type {obj.GetType().FullName}");
+                throw new ArgumentException($"Cannot find method {methodName} on type {objType.FullName}");
             return (T)methodInfo.Invoke(obj, args);
         }
 
@@ -102,6 +103,11 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
         }
 
         //BoDi
+        public static bool ReflectionIsRegistered<T>(this object container, string name)
+        {
+            return container.ReflectionCallMethod<bool>(nameof(BoDi.IObjectContainer.IsRegistered),
+                new[] { typeof(string) }, name);
+        }
 
         public static T ReflectionResolve<T>(this object container)
         {
@@ -113,8 +119,8 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
         public static void ReflectionRegisterTypeAs<TType, TInterface>(this object container) where TType : class, TInterface
         {
             container.ReflectionCallMethod(nameof(BoDi.IObjectContainer.RegisterTypeAs),
-                new[] { typeof(Type), typeof(Type) },
-                typeof(TType), typeof(TInterface));
+                new[] { typeof(Type), typeof(Type), typeof(string) },
+                typeof(TType), typeof(TInterface), null);
         }
     }
 }

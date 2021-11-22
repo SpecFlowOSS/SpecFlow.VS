@@ -62,6 +62,11 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
                     }
                 };
             }
+            catch (Exception)
+            {
+                Console.Error.WriteLine($"Exception in:{GetType().FullName}");
+                throw;
+            }
         }
 
         private Exception GetRegexError(Exception exception)

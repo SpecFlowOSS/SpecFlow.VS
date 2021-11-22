@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using FluentAssertions;
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 using TechTalk.SpecFlow.Configuration;
@@ -8,7 +6,7 @@ using Xunit;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests
 {
-    public class SpecFlow21ConfigurationLoaderTests
+    public class SpecFlowConfigurationLoaderTests
     {
         private readonly SpecFlowConfiguration _defaultConfig = ConfigurationLoader.GetDefault();
 
@@ -26,7 +24,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests
 </configuration>";
             var filePath = Path.GetTempPath() + ".config";
             File.WriteAllText(filePath, configFileContent);
-            var sut = new SpecFlow21ConfigurationLoader(filePath);
+            var sut = new SpecFlowConfigurationLoader(filePath);
 
             var config = sut.Load(_defaultConfig);
 
@@ -47,7 +45,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests
 }";
             var filePath = Path.GetTempPath() + ".json";
             File.WriteAllText(filePath, configFileContent);
-            var sut = new SpecFlow21ConfigurationLoader(filePath, true);
+            var sut = new SpecFlow21ConfigurationLoader(filePath);
 
             var config = sut.Load(_defaultConfig);
 
@@ -66,7 +64,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests
 }";
             var filePath = Path.GetTempPath() + ".json";
             File.WriteAllText(filePath, configFileContent);
-            var sut = new SpecFlow21ConfigurationLoader(filePath, true);
+            var sut = new SpecFlowConfigurationLoader(filePath);
 
             var config = sut.Load(_defaultConfig);
 
@@ -77,7 +75,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests
         [Fact]
         public void Loads_input_config_for_null_config_file()
         {
-            var sut = new SpecFlow21ConfigurationLoader(null);
+            var sut = new SpecFlowConfigurationLoader(null);
 
             var config = sut.Load(_defaultConfig);
 
@@ -87,7 +85,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests
         [Fact]
         public void Loads_default_config_for_null_config_file_and_null_input()
         {
-            var sut = new SpecFlow21ConfigurationLoader(null);
+            var sut = new SpecFlowConfigurationLoader(null);
 
             var config = sut.Load(null);
 
@@ -104,11 +102,12 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.V1.Tests
 </configuration>";
             var filePath = Path.GetTempPath() + ".config";
             File.WriteAllText(filePath, configFileContent);
-            var sut = new SpecFlow21ConfigurationLoader(filePath);
+            var sut = new SpecFlowConfigurationLoader(filePath);
 
             var config = sut.Load(_defaultConfig);
 
             config.Should().BeSameAs(_defaultConfig);
         }
     }
+
 }
