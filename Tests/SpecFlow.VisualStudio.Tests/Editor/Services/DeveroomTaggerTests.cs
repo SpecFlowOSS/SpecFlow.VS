@@ -110,6 +110,22 @@ public class DeveroomTaggerTests
         sut.AssertNoErrorLogged();
     }
 
+    [Fact(Skip = "Doesn't work yet")] //TODO: Discuss with Gáspár
+    public void TagsChanged_event_not_fired_when_triggered_with_the_same_data()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.BuildTagger();
+
+        //act
+        sut.TriggerAction();
+        sut.TriggerAction();
+
+        ////assert
+        sut.TagsChangedEvents.Should().HaveCount(1);
+        sut.AssertNoErrorLogged();
+    }
+
     [Fact]
     public void Parsed_only_once_when_triggered_with_the_same_data()
     {
@@ -176,5 +192,43 @@ public class DeveroomTaggerTests
         {
             LoggerErrorMessages.Should().BeEmpty();
         }
+    }
+
+    [Theory]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(5)]
+    [InlineData(6)]
+    [InlineData(7)]
+    public async Task Parallel(int threads)
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.BuildTagger();
+
+        var reCalculationInProgress = new ManualResetEvent(false);
+        var cev = new CountdownEvent(threads-1);
+        sut.TextSnapshot.SetupGet(s => s.Version).Returns(() =>
+        {
+            cev.Signal();
+            reCalculationInProgress.WaitOne();
+            return sut.TextSnapShotVersion.Object;
+            //s.WaitOne()
+        });
+
+        var tasks = new Task[threads];
+        for (int i = 0; i < threads; i++)
+            tasks[i] = Task.Run(() => sut.TriggerAction());
+
+        //act
+        cev.Wait(TimeSpan.FromMilliseconds(100));
+        cev.CurrentCount.Should().Be(0);
+        cev.Reset((threads-1)*2);
+        reCalculationInProgress.Set();
+        await Task.WhenAll(tasks);
+
+        ////assert
+        sut.TextSnapshot.Verify(s => s.GetText(), Times.Exactly(2));
+        sut.AssertNoErrorLogged();
     }
 }
