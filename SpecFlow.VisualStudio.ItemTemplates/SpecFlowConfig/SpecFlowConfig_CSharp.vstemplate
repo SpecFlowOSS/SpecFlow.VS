@@ -11,7 +11,7 @@
     <ProjectItem SubType="" TargetFileName="specflow.json" ReplaceParameters="true">specflow.json</ProjectItem>
   </TemplateContent>
   <WizardExtension>
-    <Assembly>SpecFlow.VisualStudio.Package, Version=2021.1.0.0, Culture=neutral, PublicKeyToken=0778194805d6db41</Assembly>
+    <Assembly>SpecFlow.VisualStudio.Package, Version=2021.2.0.0, Culture=neutral, PublicKeyToken=0778194805d6db41</Assembly>
     <FullClassName>SpecFlow.VisualStudio.Wizards.VsSpecFlowConfigFileWizard</FullClassName>
   </WizardExtension>
 </VSTemplate>
