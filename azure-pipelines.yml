@@ -1,5 +1,6 @@
 trigger:
 - main
+- develop
 
 pool:
   vmImage: 'windows-2022'
