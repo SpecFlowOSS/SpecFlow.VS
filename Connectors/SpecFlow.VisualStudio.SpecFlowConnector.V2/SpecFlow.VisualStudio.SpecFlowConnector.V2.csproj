@@ -4,13 +4,11 @@
     <OutputType>Exe</OutputType>
     <AssemblyName>specflow-vs</AssemblyName>
     <TargetFrameworks>netcoreapp2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
-    <Configurations>Debug;Release;Debug_x86;Release_x86</Configurations>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>SpecFlow.VisualStudio.SpecFlowConnector</RootNamespace>
     <DefineConstants>OLD_JSONNET_API</DefineConstants>
-	<LangVersion>latest</LangVersion>
     <_OutputCopyLocation>$(SolutionDir)Connectors\bin\$(configuration)</_OutputCopyLocation>
   </PropertyGroup>
 
@@ -19,25 +17,27 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.5.0" />
     <PackageReference Include="SpecFlow.CustomPlugin" Version="3.0.220" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
+    <ProjectReference
+      Include="..\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
   </ItemGroup>
 
   <Import Project="..\..\SpecFlow.VisualStudio.Common\SpecFlow.VisualStudio.Common.projitems" Label="Shared" />
-  <Import Project="..\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.projitems" Label="Shared" />
+  <Import Project="..\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.projitems"
+          Label="Shared" />
 
-  <!--<Target Name="CustomAfterBuild" AfterTargets="Build">
+  <Target Name="CustomAfterBuild" AfterTargets="Build" Condition="$(configuration)=='Debug'">
+
     <ItemGroup>
       <_FilesToCopy Include="$(OutputPath)\*" />
     </ItemGroup>
 
     <Message Text="_FilesToCopy: @(_FilesToCopy)" Importance="high" />
-
-    <Message Text="DestFiles:&#xD;&#xA;        @(_FilesToCopy->'$(_OutputCopyLocation)\V2-$(TargetFramework)\%(RecursiveDir)%(Filename)%(Extension)')" Importance="high" />
+    <Message
+      Text="DestFiles:&#xD;&#xA;        @(_FilesToCopy->'$(_OutputCopyLocation)\V2-$(TargetFramework)\%(RecursiveDir)%(Filename)%(Extension)')"
+      Importance="high" />
 
     <RemoveDir Directories="$(_OutputCopyLocation)\V2-$(TargetFramework)" />
-    <Copy SourceFiles="@(_FilesToCopy)" DestinationFiles="@(_FilesToCopy->'$(_OutputCopyLocation)\V2-$(TargetFramework)\%(RecursiveDir)%(Filename)%(Extension)')" />
-  </Target>-->
+    <Copy SourceFiles="@(_FilesToCopy)"
+          DestinationFiles="@(_FilesToCopy->'$(_OutputCopyLocation)\V2-$(TargetFramework)\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
 </Project>
