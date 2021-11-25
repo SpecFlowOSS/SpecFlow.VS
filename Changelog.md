@@ -1,5 +1,9 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Fix: (#25) Disable postbuild events from connectors
+
+# v2021.1.2 - 2021-11-24
+
 * Fix: (#20) 'GetDeveroomTagForCaret: Snapshot version mismatch' when tables are auto formatted
 * Fix: (#18) InvokeDiscovery: The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled
 * Feature: Update SpecFlow Project Templates for .NET 6 language features VS2022

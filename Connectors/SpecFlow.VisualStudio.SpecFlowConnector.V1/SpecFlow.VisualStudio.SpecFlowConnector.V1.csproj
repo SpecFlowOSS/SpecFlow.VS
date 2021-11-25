@@ -33,7 +33,7 @@
 
   <Import Project="..\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.projitems" Label="Shared" />
 
-  <Target Name="CustomAfterBuild" AfterTargets="Build">
+  <!--<Target Name="CustomAfterBuild" AfterTargets="Build">
     <Message Text="$(OutputPath)" Importance="high" />
     
     <ItemGroup>
@@ -45,5 +45,5 @@
  
     <RemoveDir Directories="$(_OutputCopyLocation)\V1" />
     <Copy SourceFiles="@(_FilesToCopy)" DestinationFiles="@(_FilesToCopy->'$(_OutputCopyLocation)\V1\%(RecursiveDir)%(Filename)%(Extension)')" />
-  </Target>
+  </Target>-->
 </Project>
