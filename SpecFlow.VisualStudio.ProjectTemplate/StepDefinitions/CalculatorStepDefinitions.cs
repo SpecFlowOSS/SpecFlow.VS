@@ -1,4 +1,4 @@
-namespace $safeprojectname$.StepDefinitions
+namespace $safeprojectname$.StepDefinitions;
 ﻿[Binding]
 public sealed class CalculatorStepDefinitions
 {

@@ -1,6 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
 * Fix: (#25) Disable postbuild events from connectors
+* Fix: Add missing semicolon to generated CalculatorStepDefinitions.cs template
 
 # v2021.1.2 - 2021-11-24
 
