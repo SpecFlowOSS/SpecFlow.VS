@@ -15,13 +15,7 @@ namespace SpecFlow.VisualStudio.Connectors
     {
         private const string ConnectorV1AnyCpu = @"V1\specflow-vs.exe";
         private const string ConnectorV1X86 = @"V1\specflow-vs-x86.exe";
-        private const string ConnectorV2NetCore21 = @"V2-netcoreapp2.1\specflow-vs.dll";
-        private const string ConnectorV2NetCore31 = @"V2-netcoreapp3.1\specflow-vs.dll";
-        private const string ConnectorV2Net50 = @"V2-net5.0\specflow-vs.dll";
         private const string ConnectorV2Net60 = @"V2-net6.0\specflow-vs.dll";
-        private const string ConnectorV3NetCore21 = @"V3-netcoreapp2.1\specflow-vs.dll";
-        private const string ConnectorV3NetCore31 = @"V3-netcoreapp3.1\specflow-vs.dll";
-        private const string ConnectorV3Net50 = @"V3-net5.0\specflow-vs.dll";
         private const string ConnectorV3Net60 = @"V3-net6.0\specflow-vs.dll";
         private const string GenerationCommandName = "generation";
         private const string BindingDiscoveryCommandName = "binding discovery";
@@ -135,64 +129,18 @@ namespace SpecFlow.VisualStudio.Connectors
             return generationResult;
         }
 
-        private bool IsNetCoreVersionOrLater(int major, int minor)
-        {
-            if (!_targetFrameworkMoniker.IsNetCore) 
-                return false;
-
-            var version = new Version(major, minor);
-            return NetCoreVersion >= version;
-        }
-
-        private Version NetCoreVersion => _netCoreVersion ??= GetNetCoreVersion();
-
-        private Version GetNetCoreVersion()
-        {
-            var dotnet = GetDotNetCommand();
-            var result = ProcessHelper.RunProcess("./", dotnet, new[] {"--version"}, encoding: Encoding.UTF8);
-            var resultParts = result.StandardOut.Split('-');
-            var dotnetVersion = new Version(resultParts[0]);
-            return dotnetVersion;
-        }
-
         private string GetConnectorPath(List<string> arguments)
         {
             var connectorsFolder = GetConnectorsFolder();
 
-            if (_specFlowVersion != null && _specFlowVersion.Version >= new Version(3, 9, 22))
+            if (_targetFrameworkMoniker.IsNetCore)
             {
-                //V3-net6.0
-                if (IsNetCoreVersionOrLater(6, 0))
-                    return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV3Net60);             
-                
-                //V3-net5.0
-                if (IsNetCoreVersionOrLater(5, 0))
-                    return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV3Net50);
-
-                //V3-netcoreapp3.1
-                if (IsNetCoreVersionOrLater(3, 1))
-                    return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV3NetCore31);
-
-                //V3-netcoreapp2.1
-                if (IsNetCoreVersionOrLater(2, 0))
-                    return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV3NetCore21);
-            }
-
-            //V2-net6.0
-            if (IsNetCoreVersionOrLater(6, 0))
+                if (_specFlowVersion != null && _specFlowVersion.Version >= new Version(3, 9, 22))
+                {
+                    return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV3Net60);
+                }
                 return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV2Net60);
-
-            //V2-net5.0
-            if (IsNetCoreVersionOrLater(5, 0))
-                return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV2Net50);
-
-            //V2-netcoreapp3.1
-            if (IsNetCoreVersionOrLater(3, 1))
-                return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV2NetCore31);
-
-            //V2-netcoreapp2.1
-            if (IsNetCoreVersionOrLater(2, 0))
-                return GetDotNetExecCommand(arguments, connectorsFolder, ConnectorV2NetCore21);
+            }
 
             //V1
             string connectorName = ConnectorV1AnyCpu;

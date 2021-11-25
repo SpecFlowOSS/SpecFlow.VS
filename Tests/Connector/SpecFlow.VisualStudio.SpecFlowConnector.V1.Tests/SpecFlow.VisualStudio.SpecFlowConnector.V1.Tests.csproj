@@ -18,8 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
-    <ProjectReference Include="..\..\..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.V1\SpecFlow.VisualStudio.SpecFlowConnector.V1.csproj" />
+    <ProjectReference
+      Include="..\..\..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
+    <ProjectReference
+      Include="..\..\..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.V1\SpecFlow.VisualStudio.SpecFlowConnector.V1.csproj" />
   </ItemGroup>
 
 </Project>
