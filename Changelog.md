@@ -1,5 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
+* (#29) Fix missing connectors issue
+
 # v2021.1.4 - 2021-11-25
 
 * Fix: (#29) Disable postbuild events from connectors
