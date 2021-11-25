@@ -22,7 +22,7 @@
     </PackageReference>
     <PackageReference Include="SpecFlow" Version="3.9.40" />
     <PackageReference Include="SpecFlow.xUnit" Version="3.9.40" />
-    <PackageReference Include="CucumberExpressions.SpecFlow.3-8" Version="1.0.6" />
+    <PackageReference Include="CucumberExpressions.SpecFlow.3-9" Version="1.0.6" />
 
 
     <!--TODO: fix SpecFlow.xUnitAdapter for sdk-style projects-->

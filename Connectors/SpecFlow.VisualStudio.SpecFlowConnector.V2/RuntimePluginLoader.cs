@@ -5,11 +5,11 @@ using TechTalk.SpecFlow.Tracing;
 
 namespace TechTalk.SpecFlow.Plugins
 {
-    public class RuntimePluginLoader_Patch : IRuntimePluginLoader
+    public abstract class RuntimePluginLoader_Patch : IRuntimePluginLoader
     {
         private const string ASSEMBLY_NAME_PATTERN = "{0}.SpecFlowPlugin";
 
-        public IRuntimePlugin LoadPlugin(string pluginAssemblyName, ITraceListener traceListener)
+        public IRuntimePlugin LoadPlugin(string pluginAssemblyName, ITraceListener traceListener, bool _)
         {
             //var assemblyName = string.Format(ASSEMBLY_NAME_PATTERN, pluginDescriptor.Name);
             Assembly assembly;
