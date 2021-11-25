@@ -118,9 +118,14 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector
 
         public static void ReflectionRegisterTypeAs<TType, TInterface>(this object container) where TType : class, TInterface
         {
+            ReflectionRegisterTypeAs(container, typeof(TType), typeof(TInterface));
+        }
+
+        public static void ReflectionRegisterTypeAs(this object container, Type implementationType, Type interfaceType)
+        {
             container.ReflectionCallMethod(nameof(BoDi.IObjectContainer.RegisterTypeAs),
                 new[] { typeof(Type), typeof(Type), typeof(string) },
-                typeof(TType), typeof(TInterface), null);
+                implementationType, interfaceType, null);
         }
     }
 }

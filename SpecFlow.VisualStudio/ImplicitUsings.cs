@@ -7,3 +7,4 @@ global using SpecFlow.VisualStudio.ProjectSystem.Settings;
 global using Microsoft.VisualStudio.Text;
 global using Microsoft.VisualStudio.Text.Editor;
 global using Microsoft.VisualStudio.Text.Tagging;
+global using SpecFlow.VisualStudio.Annotations;
