@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)DeveroomConfigurationException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Implicitusings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)JsonSerialization.cs" />
   </ItemGroup>
 </Project>

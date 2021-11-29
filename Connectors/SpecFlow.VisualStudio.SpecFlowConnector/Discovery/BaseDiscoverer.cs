@@ -127,7 +127,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
         {
             if (!_symbolReaders.TryGetValue(assembly, out var symbolReader))
             {
-                assemblyFilePath = assemblyFilePath ?? new Uri(assembly.CodeBase).LocalPath;
+                assemblyFilePath = assemblyFilePath ?? new Uri(assembly.Location).LocalPath;
                 symbolReader = CreateSymbolReader(assemblyFilePath, warningCollector);
                 _symbolReaders.Add(assembly, symbolReader);
             }

@@ -26,7 +26,6 @@ namespace SpecFlow.VisualStudio.Connectors
         private readonly string _extensionFolder;
         private readonly ProcessorArchitectureSetting _processorArchitecture;
         private readonly NuGetVersion _specFlowVersion;
-        private Version _netCoreVersion;
 
         public OutProcSpecFlowConnector(DeveroomConfiguration configuration, IDeveroomLogger logger,
             TargetFrameworkMoniker targetFrameworkMoniker, string extensionFolder,
