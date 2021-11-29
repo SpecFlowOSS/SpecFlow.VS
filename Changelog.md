@@ -1,5 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Fix: (#23) SpecFlow templates come first in the "Add New Item" dialog
+
 # v2021.1.4 - 2021-11-25
 
 * Fix: (#29) Disable postbuild events from connectors

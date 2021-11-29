@@ -5,7 +5,6 @@
     <Description>A feature file containing executable specification in a form of BDD Gherkin scenarios.</Description>
     <ProjectType>CSharp</ProjectType>
     <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-    <SortOrder>10</SortOrder>
     <Icon>SpecFlowIcon.ico</Icon>
   </TemplateData>
   <TemplateContent>

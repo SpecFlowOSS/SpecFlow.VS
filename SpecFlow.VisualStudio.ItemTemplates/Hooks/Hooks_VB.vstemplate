@@ -4,8 +4,6 @@
 		<Name>SpecFlow Hooks (event bindings)</Name>
 		<Description>SpecFlow Hooks (event bindings)</Description>
 		<ProjectType>VisualBasic</ProjectType>
-		<NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
-		<SortOrder>10</SortOrder>
 		<Icon>SpecFlowIcon.ico</Icon>
 	</TemplateData>
 	<TemplateContent>
