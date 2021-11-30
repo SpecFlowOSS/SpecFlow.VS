@@ -1,5 +1,6 @@
 trigger:
 - main
+- Thread
 
 pool:
   vmImage: 'windows-2022'
