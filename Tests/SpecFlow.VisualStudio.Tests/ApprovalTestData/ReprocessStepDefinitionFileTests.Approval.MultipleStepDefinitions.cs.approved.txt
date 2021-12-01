@@ -1,0 +1,37 @@
+﻿ProjectBindingRegistry:
+  ProjectStepDefinitionBinding-0:
+    IsValid:`True`
+    Error:``
+    StepDefinitionType:`When`
+    SpecifiedExpression:`I press add`
+    Regex:`^I press add$`
+    Scope:``
+    Implementation:
+      Method:`TestProject.Feature1StepDefinitions.WhenIPressAdd`
+      ParameterTypes:[0]
+      SourceLocation:
+        SourceFile:`C:\<Full path to>\MultipleStepDefinitions.cs`
+        SourceFileColumn:`9`
+        SourceFileEndColumn:`9`
+        SourceFileEndLine:`13`
+        SourceLocationSpan:``
+        SourceFileLine:`11`
+    Expression:`I press add`
+  ProjectStepDefinitionBinding-0:
+    IsValid:`True`
+    Error:``
+    StepDefinitionType:`When`
+    SpecifiedExpression:`I press subtract`
+    Regex:`^I press subtract$`
+    Scope:``
+    Implementation:
+      Method:`TestProject.Feature1StepDefinitions.WhenIPressAdd`
+      ParameterTypes:[0]
+      SourceLocation:
+        SourceFile:`C:\<Full path to>\MultipleStepDefinitions.cs`
+        SourceFileColumn:`9`
+        SourceFileEndColumn:`9`
+        SourceFileEndLine:`19`
+        SourceLocationSpan:``
+        SourceFileLine:`17`
+    Expression:`I press subtract`

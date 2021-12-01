@@ -17,7 +17,7 @@ public class DeveroomTaggerTests
         Mock<ITextSnapshot> TextSnapshot,
         Mock<ITextVersion> TextSnapShotVersion) : IActionThrottler
     {
-        private Action _recalculateAction;
+        private Action _recalculateAction = () => { };
         public IReadOnlyCollection<SnapshotSpanEventArgs> TagsChangedEvents => _tagsChangedEvents;
         private readonly List<SnapshotSpanEventArgs> _tagsChangedEvents = new();
 
@@ -47,7 +47,7 @@ public class DeveroomTaggerTests
             _recalculateAction();
         }
 
-        public IEnumerable<LogMessage> LoggerMessages => ((IdeScope.Object.Logger as StubLogger)!).Messages;
+        public IEnumerable<LogMessage> LoggerMessages => ((IdeScope.Object.Logger as StubLogger)!).Logs;
         public IEnumerable<LogMessage> LoggerErrorMessages => LoggerMessages.Where(m=>m.Level == TraceLevel.Error || m.Message.Contains("Exception"));
 
         public void AssertNoErrorLogged() => LoggerErrorMessages.Should().BeEmpty();

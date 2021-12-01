@@ -41,6 +41,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
         protected DeveroomTag GetDeveroomTagForCaret(IWpfTextView textView, params string[] tagTypes)
         {
             var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer);
+            if (tagger == null) return null;
             var tag = DumpDeveroomTags(tagger.GetDeveroomTagsForCaret(textView)).FirstOrDefault(t => tagTypes.Contains(t.Type));
             if (tag != null &&
                 tag.Span.Snapshot.Version.VersionNumber != textView.TextSnapshot.Version.VersionNumber)

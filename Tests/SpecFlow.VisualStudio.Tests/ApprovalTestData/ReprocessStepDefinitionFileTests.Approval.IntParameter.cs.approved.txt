@@ -1,0 +1,20 @@
+﻿ProjectBindingRegistry:
+  ProjectStepDefinitionBinding-0:
+    IsValid:`True`
+    Error:``
+    StepDefinitionType:`When`
+    SpecifiedExpression:`I press (.*)`
+    Regex:`^I press (.*)$`
+    Scope:``
+    Implementation:
+      Method:`TestProject.Feature1StepDefinitions.WhenIPress`
+      ParameterTypes:[1]
+        - `int`
+      SourceLocation:
+        SourceFile:`C:\<Full path to>\IntParameter.cs`
+        SourceFileColumn:`9`
+        SourceFileEndColumn:`9`
+        SourceFileEndLine:`13`
+        SourceLocationSpan:``
+        SourceFileLine:`11`
+    Expression:`I press (.*)`

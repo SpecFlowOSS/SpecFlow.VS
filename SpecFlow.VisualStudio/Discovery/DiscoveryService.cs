@@ -1,17 +1,26 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Monitoring;
 using SpecFlow.VisualStudio.ProjectSystem;
 using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using Microsoft.VisualStudio.Shell;
+using SpecFlow.VisualStudio.Editor.Commands;
+using SpecFlow.VisualStudio.Editor.Services.Parser;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 namespace SpecFlow.VisualStudio.Discovery
 {
@@ -71,18 +80,32 @@ namespace SpecFlow.VisualStudio.Discovery
         {
             var projectSettings = _projectScope.GetProjectSettings();
             var testAssemblySource = GetTestAssemblySource(projectSettings);
-            return _cached.IsUpToDate(projectSettings, testAssemblySource?.LastChangeTime ?? DateTimeOffset.MinValue);
+            return _cached.IsUpToDate(projectSettings, testAssemblySource.LastChangeTime);
         }
 
         protected virtual ConfigSource GetTestAssemblySource(ProjectSettings projectSettings)
         {
             return projectSettings.IsSpecFlowTestProject ? 
-                ConfigSource.TryGetConfigSource(projectSettings.OutputAssemblyPath, FileSystem, _logger) : null;
+                ConfigSource.TryGetConfigSource(projectSettings.OutputAssemblyPath, FileSystem, _logger) : ConfigSource.Invalid;
         }
 
         public ProjectBindingRegistry GetBindingRegistry()
         {
             return _cached.BindingRegistry;
+        }
+
+        public async Task<ProjectBindingRegistry> GetBindingRegistryAsync()
+        {
+            if (!_isDiscovering)
+                return GetBindingRegistry();
+
+            var completionSource = new TaskCompletionSource<ProjectBindingRegistry>();
+            _backgroundDiscoveryCompletionSources.Enqueue(completionSource);
+
+            if (!_isDiscovering) // in case it finished discovery while we were registering the completion source
+                return GetBindingRegistry();
+
+            return await completionSource.Task;
         }
 
         private void TriggerDiscovery()
@@ -162,20 +185,6 @@ namespace SpecFlow.VisualStudio.Discovery
 
         private readonly ConcurrentQueue<TaskCompletionSource<ProjectBindingRegistry>>
             _backgroundDiscoveryCompletionSources = new ConcurrentQueue<TaskCompletionSource<ProjectBindingRegistry>>();
-
-        public async Task<ProjectBindingRegistry> GetBindingRegistryAsync()
-        {
-            if (!_isDiscovering)
-                return GetBindingRegistry();
-
-            var completionSource = new TaskCompletionSource<ProjectBindingRegistry>();
-            _backgroundDiscoveryCompletionSources.Enqueue(completionSource);
-
-            if (!_isDiscovering) // in case it finished discovery while we were registering the completion source
-                return GetBindingRegistry();
-
-            return await completionSource.Task;
-        }
 
         private ProjectBindingRegistryCache InvokeDiscoveryWithTimer(ProjectSettings projectSettings, ConfigSource testAssemblySource)
         {
@@ -304,6 +313,68 @@ namespace SpecFlow.VisualStudio.Discovery
         {
             _projectScope.IdeScope.WeakProjectsBuilt -= ProjectSystemOnProjectsBuilt;
             _projectSettingsProvider.SettingsInitialized -= ProjectSystemOnProjectsBuilt;
+        }
+
+        public async Task ProcessAsync(CSharpStepDefinitionFile stepDefinitionFile)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(stepDefinitionFile.Content);
+            var rootNode = await tree.GetRootAsync();
+
+            var allMethods = rootNode
+                .DescendantNodes()
+                .OfType<MethodDeclarationSyntax>()
+                .ToArray();
+
+            var projectStepDefinitionBindings = new List<ProjectStepDefinitionBinding>(allMethods.Length);
+            foreach (MethodDeclarationSyntax method in allMethods)
+            {
+                var attributes = RenameStepStepDefinitionClassAction.GetAttributesWithTokens(method);
+
+                var methodBodyBeginToken = method.Body.GetFirstToken();
+                var methodBodyBeginPosition = methodBodyBeginToken.GetLocation().GetLineSpan().StartLinePosition;
+                var methodBodyEndToken = method.Body.GetLastToken();
+                var methodBodyEndPosition = methodBodyEndToken.GetLocation().GetLineSpan().StartLinePosition;
+
+                Scope scope = null;
+                var parameterTypes = method.ParameterList.Parameters
+                    .Select(p => p.Type.ToString())
+                    .ToArray();
+
+                var sourceLocation = new SourceLocation(stepDefinitionFile.StepDefinitionPath, methodBodyBeginPosition.Line+1, 
+                    methodBodyBeginPosition.Character+1, 
+                    methodBodyEndPosition.Line + 1, 
+                    methodBodyEndPosition.Character + 1);
+                var implementation = new ProjectStepDefinitionImplementation(FullMethodName(method), parameterTypes, sourceLocation);
+
+                foreach (var (attribute, token) in attributes)
+                {
+                    var stepDefinitionType = (ScenarioBlock)Enum.Parse(typeof(ScenarioBlock), attribute.Name.ToString());
+                    var regex = new Regex($"^{token.ValueText}$");
+
+                    var stepDefinitionBinding = new ProjectStepDefinitionBinding(stepDefinitionType, regex, scope, implementation, token.ValueText);
+
+                    projectStepDefinitionBindings.Add(stepDefinitionBinding);
+                }
+            }
+            var bindingRegistry = await GetBindingRegistryAsync();
+            bindingRegistry = bindingRegistry
+                .Where(binding=>binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath)
+                .AddStepDefinitions(projectStepDefinitionBindings);
+            ReplaceBindingRegistry(bindingRegistry);
+        }
+
+        private static string FullMethodName(MethodDeclarationSyntax method)
+        {
+            StringBuilder sb = new StringBuilder();
+            var containingClass = method.Parent as ClassDeclarationSyntax;
+            if (containingClass.Parent is BaseNamespaceDeclarationSyntax namespaceSyntax)
+            {
+                var containingNamespace = namespaceSyntax.Name;
+                sb.Append(containingNamespace).Append('.');
+            }
+
+            sb.Append(containingClass.Identifier.Text).Append('.').Append(method.Identifier.Text);
+            return sb.ToString();
         }
     }
 }

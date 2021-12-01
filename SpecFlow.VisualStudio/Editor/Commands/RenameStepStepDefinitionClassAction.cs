@@ -61,18 +61,18 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         private static SyntaxToken[] ExpressionsToReplace(RenameStepCommandContext ctx)
         {
             var attributesWithMatchingExpression = GetAttributesWithTokens(ctx.Method)
-                .Where(awt => !awt.Item2.IsMissing && MatchesWithOriginalText(awt.Item2))
+                .Where(awt => !awt.token.IsMissing && MatchesWithOriginalText(awt.token))
                 .ToArray();
 
             if (attributesWithMatchingExpression.Length > 1)
                 attributesWithMatchingExpression =
                     attributesWithMatchingExpression
-                        .Where(awt => MatchesAttributeNameWithStepType(awt.Item1))
+                        .Where(awt => MatchesAttributeNameWithStepType(awt.attribute))
                         .ToArray();
 
             var stepDefinitionAttributeTextTokens =
                 attributesWithMatchingExpression
-                    .Select(awt => awt.Item2)
+                    .Select(awt => awt.token)
                     .OrderByDescending(tok => tok.SpanStart)
                     .ToArray();
 
@@ -87,11 +87,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             bool MatchesAttributeNameWithStepType(AttributeSyntax a) => ctx.StepDefinitionBinding.StepDefinitionType.ToString().Equals(a.Name.ToString());
         }
 
-        internal static IEnumerable<Tuple<AttributeSyntax, SyntaxToken>> GetAttributesWithTokens(MethodDeclarationSyntax method)
+        internal static IEnumerable<(AttributeSyntax attribute, SyntaxToken token)> GetAttributesWithTokens(MethodDeclarationSyntax method)
         {
             return method.AttributeLists
                 .SelectMany(al => al.Attributes)
-                .Select(a => new Tuple<AttributeSyntax, SyntaxToken>(a, GetAttributeToken(a)));
+                .Select(a => (a, GetAttributeToken(a)));
         }
 
         private static SyntaxToken GetAttributeToken(AttributeSyntax attributeSyntax)

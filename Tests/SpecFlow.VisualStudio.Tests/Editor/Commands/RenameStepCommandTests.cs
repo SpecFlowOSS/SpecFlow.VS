@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,22 +26,10 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             "ShowProblem: User Notification: The following problems occurred:" + Environment.NewLine)
         { }
 
-        private bool SpecflowProjectMustHaveFeatureFiles(LogMessage msg)
-        {
-            return WithoutWarningHeader(msg.Message) ==
-                   "Unable to find step definition usages: could not find any SpecFlow project with feature files.";
-        }
-
         private void ArrangePopup(string modelStepText)
         {
             (ProjectScope.IdeScope.WindowManager as StubWindowManager)
                 .RegisterWindowAction<RenameStepViewModel>(model => model.StepText = modelStepText);
-        }
-
-        private async Task BindingRegistryIsModified(string dialogExpression)
-        {
-            var bindingRegistry = await ProjectScope.GetDiscoveryService().GetBindingRegistryAsync();
-            bindingRegistry.StepDefinitions.Should().Contain(sd => sd.Expression == dialogExpression);
         }
 
         [Fact]
@@ -54,8 +43,10 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             command.PreExec(textView, command.Targets.First());
 
             var stubLogger = GetStubLogger(emptyIde);
-            WithoutWarningHeader(stubLogger.Messages.Last().Message).Should()
-                .Be("Unable to find step definition usages: the project is not initialized yet.");
+
+            stubLogger.Warnings().Messages
+                .Should()
+                .ContainSingle("Unable to find step definition usages: the project is not initialized yet.");
         }
 
         [Fact]
@@ -63,13 +54,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             var command = new RenameStepCommand(ProjectScope.IdeScope, null, ProjectScope.IdeScope.MonitoringService);
             var inputText = new TestText(string.Empty);
-            var textView = CreateTextView(inputText);
+            var textView = CreateTextView(inputText, VsContentTypes.CSharp, "Steps.cs");
 
             command.PreExec(textView, command.Targets.First());
 
-            var stubLogger = GetStubLogger();
-            WithoutWarningHeader(stubLogger.Messages.Last().Message).Should().Be(
-                "Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
+            WarningMessages().Should()
+                .ContainSingle("Unable to find step definition usages: the project is not detected to be a SpecFlow project.");
         }
 
         [Fact]
@@ -79,11 +69,10 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var command = new RenameStepCommand(ProjectScope.IdeScope, null, ProjectScope.IdeScope.MonitoringService);
             var inputText = new TestText(string.Empty);
 
-            var textView = CreateTextView(inputText);
+            var textView = CreateTextView(inputText, VsContentTypes.CSharp, "Steps.cs");
             command.PreExec(textView, command.Targets.First());
 
-            var stubLogger = GetStubLogger();
-            stubLogger.Messages.Should().Contain(msg => SpecflowProjectMustHaveFeatureFiles(msg));
+            WarningMessages().Should().ContainSingle("Unable to find step definition usages: could not find any SpecFlow project with feature files.");
         }
 
         [Fact]
@@ -148,13 +137,12 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         private async Task StepDefinitionMustHaveValidExpression(TestStepDefinition stepDefinition, string errorMessage)
         {
             var featureFile = ArrangeOneFeatureFile(string.Empty);
-            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
             Dump(textView, "Step definition class after rename");
-            var stubLogger = GetStubLogger();
-            WithoutWarningHeader(stubLogger.Messages.Last().Message).Should().Be(errorMessage);
+            WarningMessages().Should().Contain(errorMessage);
         }
 
         [Theory]
@@ -182,9 +170,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinitions = ArrangeStepDefinition(originalExpression);
             var featureFile = ArrangeOneFeatureFile(string.Empty);
             ArrangePopup(dialogExpression);
-            var (textView, command) = ArrangeSut(stepDefinitions, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinitions, featureFile);
             
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
             var testText = Dump(textView, "Step definition class after rename");
             testText.Lines[6].Should().Be(updatedLine);
@@ -213,12 +201,11 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinitions = ArrangeStepDefinition(testExpression);
             var featureFile = ArrangeOneFeatureFile(string.Empty);
             ArrangePopup(modelStepText);
-            var (textView, command) = ArrangeSut(stepDefinitions, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinitions, featureFile);
 
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
-            var stubLogger = GetStubLogger();
-            var logMessage = WithoutWarningHeader(stubLogger.Messages.Last().Message);
+            var logMessage = WarningMessages().Single();
             var actualErrorMessages = logMessage.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             actualErrorMessages.Should().BeEquivalentTo(errorMessages);
         }
@@ -229,9 +216,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinition = ArrangeStepDefinition(@"""I press add""", attributeName: "WhenDerived");
             var featureFile = ArrangeOneFeatureFile(string.Empty);
             ArrangePopup(@"I choose add");
-            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
             var testText = Dump(textView, "Step definition class after rename");
             testText.Lines[6].Should().Be(@"        [WhenDerived(""I choose add"")]");
@@ -239,11 +226,11 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         }
 
         [Fact]
-        public void Popup_appears_when_there_are_multiple_step_definitions()
+        public async Task Popup_appears_when_there_are_multiple_step_definitions()
         {
             var stepDefinitions = ArrangeMultipleStepDefinitions();
             var featureFiles = new[] {ArrangeOneFeatureFile(string.Empty)};
-            var (textView, command) = ArrangeSut( stepDefinitions, featureFiles);
+            var (textView, command) = await ArrangeSut( stepDefinitions, featureFiles);
 
             command.PreExec(textView, command.Targets.First());
 
@@ -272,7 +259,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinitions = ArrangeMultipleStepDefinitions();
             var featureFiles = new[] { ArrangeOneFeatureFile(string.Empty) };
             ArrangePopup(@"I choose add");
-            var (textView, command) = ArrangeSut(stepDefinitions, featureFiles);
+            var (textView, command) = await ArrangeSut(stepDefinitions, featureFiles);
 
             command.PreExec(textView, command.Targets.First());
             
@@ -297,9 +284,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
                 Scenario: Scenario1
                     When I press add");
             ArrangePopup(@"I choose add");
-            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
             ProjectScope.IdeScope.GetTextBuffer(new SourceLocation(featureFile.FileName, 1, 1), out var featureFileTextBuffer);
             var featureText = Dump(featureFileTextBuffer, "Feature file after rename");
@@ -318,9 +305,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
                 Scenario: Scenario1
                     When {originalStepText}");
             ArrangePopup(updatedExpression);
-            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
             var featureText = Dump(featureFile, "Feature file after rename");
             featureText.Lines[2].Should().Be($@"                    When {expectedStepText}");
@@ -362,8 +349,7 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
 
             await OneFeatureFileRename(originalExpression, updatedExpression, featureFile);
 
-            var stubLogger = GetStubLogger();
-            WithoutWarningHeader(stubLogger.Messages.Last().Message).Should().Be(ProjectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
+            WarningMessages().Should().ContainSingle(ProjectScope.ProjectFolder + string.Join(Environment.NewLine, errorMessages));
         }
 
         private async Task<TestText> OneFeatureFileRename(string originalExpression, string updatedExpression,
@@ -372,9 +358,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
             var stepDefinition = CommandTestBase<RenameStepCommand>.ArrangeStepDefinition(originalExpression);
 
             ArrangePopup(updatedExpression);
-            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
             return Dump(featureFile, "Feature file after rename");
         }
@@ -384,14 +370,14 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         [InlineData(2, @"@""I press add""", @"I press add")]
         [InlineData(3, @"""I press \\(add\\)""", @"I press \(add\)")]
         [InlineData(4, @"@""I press \(add\)""", @"I press \(add\)")]
-        public void The_right_expression_is_loaded_to_the_dialog(int _, string originalCSharpExpression, string expectedExpression)
+        public async Task The_right_expression_is_loaded_to_the_dialog(int _, string originalCSharpExpression, string expectedExpression)
         {
             var stepDefinition = ArrangeStepDefinition(originalCSharpExpression);
             var featureFile = ArrangeOneFeatureFile(string.Empty);
             RenameStepViewModel viewModel = null;
             (ProjectScope.IdeScope.WindowManager as StubWindowManager)?
                 .RegisterWindowAction<RenameStepViewModel>(model => viewModel = model);
-            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
             command.PreExec(textView, command.Targets.First());
 

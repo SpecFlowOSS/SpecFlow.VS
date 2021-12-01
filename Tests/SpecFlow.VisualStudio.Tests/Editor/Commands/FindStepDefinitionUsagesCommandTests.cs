@@ -24,11 +24,11 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             var stepDefinition = ArrangeStepDefinition(@"""I choose add""");
             TestFeatureFile featureFile = ArrangeOneFeatureFile();
-            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
             ModifyFeatureFileInEditor(featureFile, new Span(50, 16), "When I choose add");
             Dump(featureFile, "After modification");
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
             (ProjectScope.IdeScope.Actions as StubIdeActions).LastShowContextMenuItems.Should()
                 .Contain(mi => mi.Label == "calculator.feature(3,8): When I choose add");
@@ -39,9 +39,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             var stepDefinition = ArrangeStepDefinition(@"""I choose add""");
             var featureFile = ArrangeOneFeatureFile();
-            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
             (ProjectScope.IdeScope.Actions as StubIdeActions).LastShowContextMenuItems.Should()
                 .Contain(mi => mi.Label == "Could not find any usage");
@@ -55,9 +55,9 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands
         {
             var stepDefinition = ArrangeStepDefinition(expression);
             var featureFile = ArrangeOneFeatureFile();
-            var (textView, command) = ArrangeSut(stepDefinition, featureFile);
+            var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
-            await Invoke(command, textView);
+            await InvokeAndWaitAnalyticsEvent(command, textView);
 
             (ProjectScope.IdeScope.Actions as StubIdeActions).LastShowContextMenuItems.Should()
                 .Contain(mi => mi.Label == "calculator.feature(3,8): When I press add");
