@@ -21,6 +21,7 @@ public class ReprocessStepDefinitionFileTests
     [InlineData("MultipleStepDefinitions.cs")]
     [InlineData("IntParameter.cs")]
     [InlineData("FileScopedNamespace.cs")]
+    [InlineData("MissingNamespace.cs")]
     public async Task Approval(string testName)
     {
         //arrange

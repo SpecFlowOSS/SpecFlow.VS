@@ -7,7 +7,7 @@
     Regex:`^I press (.*)$`
     Scope:``
     Implementation:
-      Method:`Feature1StepDefinitions.WhenIPress`
+      Method:`TestProject.Feature1StepDefinitions.WhenIPress`
       ParameterTypes:[1]
         - `int`
       SourceLocation:

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -318,17 +319,15 @@ namespace SpecFlow.VisualStudio.Discovery
         {
             SyntaxTree tree = CSharpSyntaxTree.ParseText(stepDefinitionFile.Content);
             var rootNode = await tree.GetRootAsync();
-            var syntaxNodes = new List<SyntaxNode>();
-            var dn = rootNode.DescendantNodes(sn => {
-                syntaxNodes.Add(sn);
-                return true;
-            }).ToArray();
-            var allMethods = dn.OfType<MethodDeclarationSyntax>().ToArray();
 
-            var ProjectStepDefinitionBindings = new List<ProjectStepDefinitionBinding>(allMethods.Length);
+            var allMethods = rootNode
+                .DescendantNodes()
+                .OfType<MethodDeclarationSyntax>()
+                .ToArray();
+
+            var projectStepDefinitionBindings = new List<ProjectStepDefinitionBinding>(allMethods.Length);
             foreach (MethodDeclarationSyntax method in allMethods)
             {
-                var containingClass = method.Parent as ClassDeclarationSyntax;
                 var attributes = RenameStepStepDefinitionClassAction.GetAttributesWithTokens(method);
 
                 var methodBodyBeginToken = method.Body.GetFirstToken();
@@ -345,7 +344,7 @@ namespace SpecFlow.VisualStudio.Discovery
                     methodBodyBeginPosition.Character+1, 
                     methodBodyEndPosition.Line + 1, 
                     methodBodyEndPosition.Character + 1);
-                var implementation = new ProjectStepDefinitionImplementation($"{containingClass.Identifier.Text}.{method.Identifier.Text}", parameterTypes, sourceLocation);
+                var implementation = new ProjectStepDefinitionImplementation(FullMethodName(method), parameterTypes, sourceLocation);
 
                 foreach (var (attribute, token) in attributes)
                 {
@@ -354,14 +353,28 @@ namespace SpecFlow.VisualStudio.Discovery
 
                     var stepDefinitionBinding = new ProjectStepDefinitionBinding(stepDefinitionType, regex, scope, implementation, token.ValueText);
 
-                    ProjectStepDefinitionBindings.Add(stepDefinitionBinding);
+                    projectStepDefinitionBindings.Add(stepDefinitionBinding);
                 }
             }
             var bindingRegistry = await GetBindingRegistryAsync();
             bindingRegistry = bindingRegistry
                 .Where(binding=>binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath)
-                .AddStepDefinitions(ProjectStepDefinitionBindings);
+                .AddStepDefinitions(projectStepDefinitionBindings);
             ReplaceBindingRegistry(bindingRegistry);
+        }
+
+        private static string FullMethodName(MethodDeclarationSyntax method)
+        {
+            StringBuilder sb = new StringBuilder();
+            var containingClass = method.Parent as ClassDeclarationSyntax;
+            if (containingClass.Parent is BaseNamespaceDeclarationSyntax namespaceSyntax)
+            {
+                var containingNamespace = namespaceSyntax.Name;
+                sb.Append(containingNamespace).Append('.');
+            }
+
+            sb.Append(containingClass.Identifier.Text).Append('.').Append(method.Identifier.Text);
+            return sb.ToString();
         }
     }
 }

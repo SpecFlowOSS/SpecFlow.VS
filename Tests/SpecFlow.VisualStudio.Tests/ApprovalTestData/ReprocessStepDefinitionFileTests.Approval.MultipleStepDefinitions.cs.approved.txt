@@ -7,7 +7,7 @@
     Regex:`^I press add$`
     Scope:``
     Implementation:
-      Method:`Feature1StepDefinitions.WhenIPressAdd`
+      Method:`TestProject.Feature1StepDefinitions.WhenIPressAdd`
       ParameterTypes:[0]
       SourceLocation:
         SourceFile:`C:\<Full path to>\MultipleStepDefinitions.cs`
@@ -25,7 +25,7 @@
     Regex:`^I press subtract$`
     Scope:``
     Implementation:
-      Method:`Feature1StepDefinitions.WhenIPressAdd`
+      Method:`TestProject.Feature1StepDefinitions.WhenIPressAdd`
       ParameterTypes:[0]
       SourceLocation:
         SourceFile:`C:\<Full path to>\MultipleStepDefinitions.cs`
