@@ -1,7 +1,7 @@
 ﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation;
 
 /// <summary>
-/// Design time code generation is not supported after specflow version >= 3.0.0
+///     Design time code generation is not supported after specflow version >= 3.0.0
 /// </summary>
 public abstract class SpecFlowVLatestGenerator : BaseGenerator
 {
@@ -12,17 +12,18 @@ public abstract class SpecFlowVLatestGenerator : BaseGenerator
         switch (extension.ToLowerInvariant())
         {
             case ".config":
-                {
-                    return GetXmlConfigurationHolder(configFileContent);
-                }
+            {
+                return GetXmlConfigurationHolder(configFileContent);
+            }
             case ".json":
-                {
-                    if (!IsSpecFlowV2Json(configFileContent))
-                        return new SpecFlowConfigurationHolder();
+            {
+                if (!IsSpecFlowV2Json(configFileContent))
+                    return new SpecFlowConfigurationHolder();
 
-                    return new SpecFlowConfigurationHolder(ConfigSource.Json, configFileContent);
-                }
+                return new SpecFlowConfigurationHolder(ConfigSource.Json, configFileContent);
+            }
         }
+
         throw new ConfigurationErrorsException($"Invalid config type: {configFilePath}");
     }
 
@@ -39,4 +40,3 @@ public abstract class SpecFlowVLatestGenerator : BaseGenerator
         }
     }
 }
-

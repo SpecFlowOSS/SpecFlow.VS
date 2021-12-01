@@ -2,8 +2,8 @@
 
 public abstract class EditorTestBase
 {
-    protected readonly ITestOutputHelper TestOutputHelper;
     protected readonly InMemoryStubProjectScope ProjectScope;
+    protected readonly ITestOutputHelper TestOutputHelper;
 
     protected EditorTestBase(ITestOutputHelper testOutputHelper)
     {
@@ -20,13 +20,11 @@ public abstract class EditorTestBase
         var textView = CreateTextView(stepDefinitionClassFile);
 
         ProjectScope.AddSpecFlowPackage();
-        foreach (var featureFile in featureFiles)
-        {
-            ProjectScope.AddFile(featureFile.FileName, featureFile.Content);
-        }
+        foreach (var featureFile in featureFiles) ProjectScope.AddFile(featureFile.FileName, featureFile.Content);
 
         var discoveryService =
-            MockableDiscoveryService.SetupWithInitialStepDefinitions(ProjectScope, stepDefinitionClassFile.StepDefinitions, TimeSpan.FromMilliseconds(10));
+            MockableDiscoveryService.SetupWithInitialStepDefinitions(ProjectScope,
+                stepDefinitionClassFile.StepDefinitions, TimeSpan.FromMilliseconds(10));
         await discoveryService.WaitUntilDiscoveryPerformed();
 
         return textView;
@@ -127,7 +125,7 @@ public abstract class EditorTestBase
 
     protected static TestStepDefinition ArrangeStepDefinition()
     {
-        return ArrangeStepDefinition(@"""I press add""", "When");
+        return ArrangeStepDefinition(@"""I press add""");
     }
 
     protected static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord = "When",
@@ -179,6 +177,7 @@ public abstract class EditorTestBase
     protected async Task BindingRegistryIsModified(string expression)
     {
         var bindingRegistry = await ProjectScope.GetDiscoveryService().GetBindingRegistryAsync();
-        bindingRegistry.StepDefinitions.Should().Contain(sd => sd.Expression == expression, $"after modification I should see <{expression}>");
+        bindingRegistry.StepDefinitions.Should().Contain(sd => sd.Expression == expression,
+            $"after modification I should see <{expression}>");
     }
 }

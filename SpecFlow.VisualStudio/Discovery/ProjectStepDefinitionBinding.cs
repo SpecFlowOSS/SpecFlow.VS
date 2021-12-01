@@ -4,8 +4,8 @@ using System.Text.RegularExpressions;
 using SpecFlow.VisualStudio.Editor.Services.Parser;
 using Gherkin.Ast;
 
-namespace SpecFlow.VisualStudio.Discovery
-{
+namespace SpecFlow.VisualStudio.Discovery;
+
     public class ProjectStepDefinitionBinding
     {
         public bool IsValid => Regex != null && Error == null;
@@ -97,5 +97,3 @@ namespace SpecFlow.VisualStudio.Discovery
             return new ProjectStepDefinitionBinding(StepDefinitionType, regex, Scope, Implementation, expression, Error);
         }
     }
-}
-

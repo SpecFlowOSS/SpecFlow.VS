@@ -21,10 +21,8 @@ internal static class AssemblyExtensions
         var uri = new Uri(codeBase);
 
         if (directorySeparator == '/' && uri.IsUnc)
-        {
             throw new ArgumentException(
                 $"UNC-style codebase '{codeBase}' is not supported on POSIX-style file systems.", nameof(codeBase));
-        }
 
         return uri.LocalPath;
     }

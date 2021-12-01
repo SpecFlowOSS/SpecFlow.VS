@@ -1,14 +1,10 @@
-﻿
-using System.Collections.Concurrent;
-using System.Collections.Immutable;
-
-namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEditorCommandBase
 {
     private readonly Func<IProjectScope, T> _commandFactory;
     private readonly string _completedEventSignal;
-    protected readonly string _warningHeader;
+    protected readonly string WarningHeader;
 
     protected CommandTestBase(
         ITestOutputHelper testOutputHelper,
@@ -18,7 +14,7 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
     {
         _commandFactory = commandFactory;
         _completedEventSignal = completedEventSignal;
-        _warningHeader = warningHeader;
+        WarningHeader = warningHeader;
     }
 
     protected Task<(StubWpfTextView textView, T command)> ArrangeSut(
@@ -65,6 +61,6 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
     public ImmutableArray<string> WarningMessages()
     {
         var stubLogger = GetStubLogger();
-        return stubLogger.Warnings().WithoutHeader(_warningHeader).Messages;
+        return stubLogger.Warnings().WithoutHeader(WarningHeader).Messages;
     }
 }

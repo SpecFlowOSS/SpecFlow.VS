@@ -1,58 +1,8 @@
-﻿using System.Diagnostics;
-using System.IO.Abstractions.TestingHelpers;
-using System.Windows.Threading;
-using Microsoft.VisualStudio.Utilities;
-using Moq;
-using SpecFlow.VisualStudio.Monitoring;
-
-#nullable enable
+﻿#nullable enable
 namespace SpecFlow.VisualStudio.Tests.Editor.Services;
 
 public class DeveroomTaggerTests
 {
-    protected record Sut(
-        Mock<IIdeScope> IdeScope,
-        Mock<ITextBuffer> TextBuffer,
-        Mock<IActionThrottlerFactory> ActionThrottlerFactory,
-        Mock<ITextSnapshot> TextSnapshot,
-        Mock<ITextVersion> TextSnapShotVersion) : IActionThrottler
-    {
-        private Action _recalculateAction = () => { };
-        public IReadOnlyCollection<SnapshotSpanEventArgs> TagsChangedEvents => _tagsChangedEvents;
-        private readonly List<SnapshotSpanEventArgs> _tagsChangedEvents = new();
-
-        public DeveroomTagger BuildTagger()
-        {
-            var deveroomTagger = new DeveroomTagger(TextBuffer.Object, IdeScope.Object, false, ActionThrottlerFactory.Object);
-            deveroomTagger.TagsChanged += DeveroomTagger_TagsChanged;
-            return deveroomTagger;
-        }
-
-        private void DeveroomTagger_TagsChanged(object sender, SnapshotSpanEventArgs e)
-        {
-            _tagsChangedEvents.Add(e);
-        }
-
-        public StubWpfTextView BuildTextView() => new StubWpfTextView(TextBuffer.Object);
-
-        public Sut SetAction(Action action)
-        {
-            _recalculateAction = action;
-            return this;
-        }
-
-        public void TriggerAction(bool forceDelayed = false, bool forceDirect = false)
-        {
-            if (forceDelayed) return;
-            _recalculateAction();
-        }
-
-        public IEnumerable<LogMessage> LoggerMessages => ((IdeScope.Object.Logger as StubLogger)!).Logs;
-        public IEnumerable<LogMessage> LoggerErrorMessages => LoggerMessages.Where(m=>m.Level == TraceLevel.Error || m.Message.Contains("Exception"));
-
-        public void AssertNoErrorLogged() => LoggerErrorMessages.Should().BeEmpty();
-    }
-
     public DeveroomTaggerTests(ITestOutputHelper testOutputHelper)
     {
     }
@@ -69,7 +19,7 @@ public class DeveroomTaggerTests
         var textSnapshotVersion = new Mock<ITextVersion>(MockBehavior.Strict);
 
         var sut = new Sut(ideScope, textBuffer, actionThrottlerFactory, textSnapshot, textSnapshotVersion);
-        
+
         actionThrottlerFactory.Setup(atf => atf.Build(It.IsAny<Action>()))
             .Returns<Action>(action => sut.SetAction(action));
 
@@ -84,10 +34,10 @@ public class DeveroomTaggerTests
             ));
         ideScope.SetupGet(s => s.DeveroomErrorListServices).Returns(Mock.Of<IDeveroomErrorListServices>);
         ideScope.SetupGet(s => s.IsSolutionLoaded).Returns(true);
-        
+
         projectScope.SetupGet(s => s.Properties).Returns(propertyCollection);
         projectScope.SetupGet(s => s.IdeScope).Returns(ideScope.Object);
-        projectScope.SetupGet(s => s.PackageReferences).Returns((NuGetPackageReference[])null!);
+        projectScope.SetupGet(s => s.PackageReferences).Returns((NuGetPackageReference[]) null!);
         projectScope.SetupGet(s => s.OutputAssemblyPath).Returns(".");
         projectScope.SetupGet(s => s.PlatformTargetName).Returns(string.Empty);
         projectScope.SetupGet(s => s.TargetFrameworkMoniker).Returns(string.Empty);
@@ -96,7 +46,7 @@ public class DeveroomTaggerTests
         projectScope.SetupGet(s => s.ProjectFullName).Returns("SpecFlow.VisualStudio.Tests.dll.config");
         projectScope.SetupGet(s => s.ProjectFolder).Returns(string.Empty);
         projectScope.Setup(s => s.GetFeatureFileCount()).Returns(0);
-        
+
         textBuffer.SetupGet(t => t.CurrentSnapshot).Returns(textSnapshot.Object);
         textBuffer.SetupGet(t => t.Properties).Returns(new PropertyCollection());
 
@@ -105,7 +55,7 @@ public class DeveroomTaggerTests
         textSnapshot.Setup(s => s.GetText()).Returns(string.Empty);
 
         textSnapshotVersion.SetupGet(v => v.VersionNumber).Returns(0);
-        
+
         VsxStubObjects.Initialize();
 
         return sut;
@@ -135,7 +85,7 @@ public class DeveroomTaggerTests
         DeveroomTagger tagger = sut.BuildTagger();
         sut.TextSnapshot.Setup(s => s.GetText()).Returns(string.Empty);
         sut.TriggerAction();
-        
+
         //act
         IEnumerable<DeveroomTag> tags = tagger.GetDeveroomTagsForCaret(sut.BuildTextView());
 
@@ -171,7 +121,59 @@ public class DeveroomTaggerTests
         sut.TriggerAction();
 
         ////assert
-        sut.TextSnapshot.Verify(s=>s.GetText(), Times.Once);
+        sut.TextSnapshot.Verify(s => s.GetText(), Times.Once);
         sut.AssertNoErrorLogged();
+    }
+
+    protected record Sut(
+        Mock<IIdeScope> IdeScope,
+        Mock<ITextBuffer> TextBuffer,
+        Mock<IActionThrottlerFactory> ActionThrottlerFactory,
+        Mock<ITextSnapshot> TextSnapshot,
+        Mock<ITextVersion> TextSnapShotVersion) : IActionThrottler
+    {
+        private readonly List<SnapshotSpanEventArgs> _tagsChangedEvents = new();
+        private Action _recalculateAction = () => { };
+        public IReadOnlyCollection<SnapshotSpanEventArgs> TagsChangedEvents => _tagsChangedEvents;
+
+        public IEnumerable<LogMessage> LoggerMessages => (IdeScope.Object.Logger as StubLogger)!.Logs;
+
+        public IEnumerable<LogMessage> LoggerErrorMessages =>
+            LoggerMessages.Where(m => m.Level == TraceLevel.Error || m.Message.Contains("Exception"));
+
+        public void TriggerAction(bool forceDelayed = false, bool forceDirect = false)
+        {
+            if (forceDelayed) return;
+            _recalculateAction();
+        }
+
+        public DeveroomTagger BuildTagger()
+        {
+            var deveroomTagger =
+                new DeveroomTagger(TextBuffer.Object, IdeScope.Object, false, ActionThrottlerFactory.Object);
+            deveroomTagger.TagsChanged += DeveroomTagger_TagsChanged;
+            return deveroomTagger;
+        }
+
+        private void DeveroomTagger_TagsChanged(object sender, SnapshotSpanEventArgs e)
+        {
+            _tagsChangedEvents.Add(e);
+        }
+
+        public StubWpfTextView BuildTextView()
+        {
+            return new(TextBuffer.Object);
+        }
+
+        public Sut SetAction(Action action)
+        {
+            _recalculateAction = action;
+            return this;
+        }
+
+        public void AssertNoErrorLogged()
+        {
+            LoggerErrorMessages.Should().BeEmpty();
+        }
     }
 }

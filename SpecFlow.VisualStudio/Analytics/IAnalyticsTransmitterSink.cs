@@ -1,98 +1,87 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Composition;
-using System.Linq;
-using Microsoft.VisualStudio.ApplicationInsights;
-using Microsoft.VisualStudio.ApplicationInsights.Channel;
-using Microsoft.VisualStudio.ApplicationInsights.DataContracts;
+﻿namespace SpecFlow.VisualStudio.Analytics;
 
-namespace SpecFlow.VisualStudio.Analytics
+public interface IAnalyticsTransmitterSink
 {
-    public interface IAnalyticsTransmitterSink
+    void TransmitEvent(IAnalyticsEvent analyticsEvent);
+    void TransmitException(Exception exception, Dictionary<string, object> eventName);
+}
+
+[System.Composition.Export(typeof(IAnalyticsTransmitterSink))]
+public class AppInsightsAnalyticsTransmitterSink : IAnalyticsTransmitterSink
+{
+    private readonly IEnableAnalyticsChecker _enableAnalyticsChecker;
+    private readonly Lazy<TelemetryClient> _telemetryClient;
+
+    [System.Composition.ImportingConstructor]
+    public AppInsightsAnalyticsTransmitterSink(IEnableAnalyticsChecker enableAnalyticsChecker,
+        IUserUniqueIdStore userUniqueIdStore)
     {
-        void TransmitEvent(IAnalyticsEvent analyticsEvent);
-        void TransmitException(Exception exception, Dictionary<string, object> eventName);
+        _enableAnalyticsChecker = enableAnalyticsChecker;
+        _telemetryClient = new Lazy<TelemetryClient>(() => GetTelemetryClient(userUniqueIdStore.GetUserId()));
     }
 
-    [Export(typeof(IAnalyticsTransmitterSink))]
-    public class AppInsightsAnalyticsTransmitterSink : IAnalyticsTransmitterSink
+    public void TransmitEvent(IAnalyticsEvent analyticsEvent)
     {
-        private readonly IEnableAnalyticsChecker _enableAnalyticsChecker;
-        private readonly Lazy<TelemetryClient> _telemetryClient;
+        if (!_enableAnalyticsChecker.IsEnabled())
+            return;
 
-        [ImportingConstructor]
-        public AppInsightsAnalyticsTransmitterSink(IEnableAnalyticsChecker enableAnalyticsChecker, IUserUniqueIdStore userUniqueIdStore)
+        var appInsightsEvent = new EventTelemetry(analyticsEvent.EventName)
         {
-            _enableAnalyticsChecker = enableAnalyticsChecker;
-            _telemetryClient = new Lazy<TelemetryClient>(() => GetTelemetryClient(userUniqueIdStore.GetUserId()));
+            Timestamp = DateTime.UtcNow
+        };
+
+        AddProps(appInsightsEvent, analyticsEvent.Properties);
+
+        TrackTelemetry(appInsightsEvent);
+    }
+
+    public void TransmitException(Exception exception, Dictionary<string, object> additionalProps)
+    {
+        if (!_enableAnalyticsChecker.IsEnabled())
+            return;
+
+        var exceptionTelemetry = new ExceptionTelemetry(exception)
+        {
+            Timestamp = DateTime.UtcNow
+        };
+
+        AddProps(exceptionTelemetry, additionalProps);
+
+        TrackTelemetry(exceptionTelemetry);
+    }
+
+    private void AddProps(ISupportProperties telemetry, Dictionary<string, object> additionalProps)
+    {
+        foreach (var prop in additionalProps) telemetry.Properties.Add(prop.Key, prop.Value.ToString());
+    }
+
+    private void TrackTelemetry(ITelemetry telemetry)
+    {
+        switch (telemetry)
+        {
+            case EventTelemetry eventTelemetry:
+                _telemetryClient.Value.TrackEvent(eventTelemetry);
+                break;
+            case ExceptionTelemetry exceptionTelemetry:
+                _telemetryClient.Value.TrackException(exceptionTelemetry);
+                break;
         }
 
-        public void TransmitEvent(IAnalyticsEvent analyticsEvent)
+        _telemetryClient.Value.Flush();
+    }
+
+    private TelemetryClient GetTelemetryClient(string userUniqueId)
+    {
+        return new TelemetryClient
         {
-            if (!_enableAnalyticsChecker.IsEnabled())
-                return;
-
-            var appInsightsEvent = new EventTelemetry(analyticsEvent.EventName)
+            Context =
             {
-                Timestamp = DateTime.UtcNow,
-            };
-
-            AddProps(appInsightsEvent, analyticsEvent.Properties);
-
-            TrackTelemetry(appInsightsEvent);
-        }
-
-        public void TransmitException(Exception exception, Dictionary<string, object> additionalProps)
-        {
-            if (!_enableAnalyticsChecker.IsEnabled())
-                return;
-
-            var exceptionTelemetry = new ExceptionTelemetry(exception)
-            {
-                Timestamp = DateTime.UtcNow
-            };
-
-            AddProps(exceptionTelemetry, additionalProps);
-
-            TrackTelemetry(exceptionTelemetry);
-        }
-        
-        private void AddProps(ISupportProperties telemetry, Dictionary<string, object> additionalProps)
-        {
-            foreach (var prop in additionalProps)
-            {
-                telemetry.Properties.Add(prop.Key, prop.Value.ToString());
-            }
-        }
-
-        private void TrackTelemetry(ITelemetry telemetry)
-        {
-            switch (telemetry)
-            {
-                case EventTelemetry eventTelemetry:
-                    _telemetryClient.Value.TrackEvent(eventTelemetry);
-                    break;
-                case ExceptionTelemetry exceptionTelemetry:
-                    _telemetryClient.Value.TrackException(exceptionTelemetry);
-                    break;
-            }
-
-            _telemetryClient.Value.Flush();
-        }
-
-        private TelemetryClient GetTelemetryClient(string userUniqueId)
-        {
-            return new TelemetryClient
-            {
-                Context =
+                User =
                 {
-                    User =
-                    {
-                        Id = userUniqueId,
-                        AccountId = userUniqueId
-                    },
-                },
-            };
-        }
+                    Id = userUniqueId,
+                    AccountId = userUniqueId
+                }
+            }
+        };
     }
 }

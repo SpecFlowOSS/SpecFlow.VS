@@ -18,12 +18,13 @@ public class DynamicRuntimePluginLoaderFactory
     }
 
     /// <summary>
-    /// Create a Type Builder that generates a type directly into the current AppDomain.
+    ///     Create a Type Builder that generates a type directly into the current AppDomain.
     /// </summary>
     private static TypeBuilder BuildTypeBuilder(Type baseType, Type interfaceType)
     {
         var moduleBuilder = BuildModuleBuilder();
-        var typeBuilder = moduleBuilder.DefineType("DynamicRuntimePluginLoader", TypeAttributes.Class | TypeAttributes.Public, baseType, new [] {interfaceType });
+        var typeBuilder = moduleBuilder.DefineType("DynamicRuntimePluginLoader",
+            TypeAttributes.Class | TypeAttributes.Public, baseType, new[] {interfaceType});
         return typeBuilder;
     }
 
@@ -52,7 +53,8 @@ public class DynamicRuntimePluginLoaderFactory
     {
         var parameterTypes = new[] {typeof(AssemblyLoadContext)};
         ConstructorInfo baseConstructor = baseType
-            .GetConstructor(BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance, null, parameterTypes, null)!;
+            .GetConstructor(BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.Instance, null,
+                parameterTypes, null)!;
         ConstructorBuilder constructor = typeBuilder
             .DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, parameterTypes);
 
@@ -75,7 +77,7 @@ public class DynamicRuntimePluginLoaderFactory
             typeBuilder.DefineMethod(nameof(IRuntimePluginLoader_3_0_220.LoadPlugin),
                 MethodAttributes.Public | MethodAttributes.Virtual,
                 typeof(IRuntimePlugin),
-                new[] { typeof(string), typeof(ITraceListener) });
+                new[] {typeof(string), typeof(ITraceListener)});
         ILGenerator methodIl = methodBuilder.GetILGenerator();
         methodIl.Emit(OpCodes.Ldarg_0); // push "this" onto stack.
         methodIl.Emit(OpCodes.Ldarg_1); // push the string parameter

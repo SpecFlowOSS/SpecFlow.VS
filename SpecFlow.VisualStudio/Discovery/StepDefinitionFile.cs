@@ -1,13 +1,8 @@
 ﻿namespace SpecFlow.VisualStudio.Discovery;
 
-public class StepDefinitionFile
+public record CSharpStepDefinitionFile(string StepDefinitionPath, string Content)
+    : StepDefinitionFile(StepDefinitionPath, Content)
 {
-    public string StepDefinitionPath { get; }
-    public string Content { get; }
-
-    public StepDefinitionFile(string stepDefinitionPath, string content)
-    {
-        StepDefinitionPath = stepDefinitionPath;
-        Content = content;
-    }
 }
+
+public record StepDefinitionFile(string StepDefinitionPath, string Content);

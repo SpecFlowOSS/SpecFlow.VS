@@ -1,81 +1,75 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using FluentAssertions;
-using SpecFlow.VisualStudio.Analytics;
-using Xunit;
-using Xunit.Abstractions;
 
-namespace SpecFlow.VisualStudio.Tests.Analytics
+namespace SpecFlow.VisualStudio.Tests.Analytics;
+
+public class ErrorAnonymizerTests
 {
-    public class ErrorAnonymizerTests
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public ErrorAnonymizerTests(ITestOutputHelper testOutputHelper)
     {
-        private readonly ITestOutputHelper _testOutputHelper;
-
-        public ErrorAnonymizerTests(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
+        _testOutputHelper = testOutputHelper;
+    }
 
 
-        [Fact]
-        public void SimplifyStackTrace_removes_namespace_and_params()
-        {
-            const string stackTrace = @"
+    [Fact]
+    public void SimplifyStackTrace_removes_namespace_and_params()
+    {
+        const string stackTrace = @"
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
 ";
 
-            var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: false);
+        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, false);
 
-            result.Should().Be("ReflectionExtensions.ReflectionCallMethod[T](,,,)");
-        }
+        result.Should().Be("ReflectionExtensions.ReflectionCallMethod[T](,,,)");
+    }
 
-        [Fact]
-        public void SimplifyStackTrace_includes_line_number()
-        {
-            const string stackTrace = @"
+    [Fact]
+    public void SimplifyStackTrace_includes_line_number()
+    {
+        const string stackTrace = @"
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\ReflectionExtensions.cs:line 17
 ";
 
-            var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: false);
+        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, false);
 
-            result.Should().Be("ReflectionExtensions.ReflectionCallMethod[T](,,,)L17");
-        }
+        result.Should().Be("ReflectionExtensions.ReflectionCallMethod[T](,,,)L17");
+    }
 
-        [Fact]
-        public void SimplifyStackTrace_keeps_own_stack_trace_entries()
-        {
-            const string stackTrace = @"
+    [Fact]
+    public void SimplifyStackTrace_keeps_own_stack_trace_entries()
+    {
+        const string stackTrace = @"
    at System.Reflection.RuntimeMethodInfo.InvokeAndWaitAnalyticsEvent(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
    at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath)
 ";
 
-            var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: false);
+        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, false);
 
-            result.Should().Be("ReflectionExtensions.ReflectionCallMethod[T](,,,)-ReflectionSpecFlowDiscoverer.Discover(,,)");
-        }
+        result.Should()
+            .Be("ReflectionExtensions.ReflectionCallMethod[T](,,,)-ReflectionSpecFlowDiscoverer.Discover(,,)");
+    }
 
-        [Fact]
-        public void SimplifyStackTrace_minimizes_stack_trace()
-        {
-            const string stackTrace = @"
+    [Fact]
+    public void SimplifyStackTrace_minimizes_stack_trace()
+    {
+        const string stackTrace = @"
    at System.Reflection.RuntimeMethodInfo.InvokeAndWaitAnalyticsEvent(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\ReflectionExtensions.cs:line 17
    at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\Discovery\ReflectionSpecFlowDiscoverer.cs:line 25
 ";
 
-            var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: true);
+        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, true);
 
-            result.Should().Be("RE.RCM[T](,,,)L17-RSFD.D(,,)L25");
-        }
+        result.Should().Be("RE.RCM[T](,,,)L17-RSFD.D(,,)L25");
+    }
 
-        [Fact]
-        public void SimplifyStackTrace_keeps_first_4_SpecFlow_stack_trace_entries()
-        {
-            const string stackTrace = @"
+    [Fact]
+    public void SimplifyStackTrace_keeps_first_4_SpecFlow_stack_trace_entries()
+    {
+        const string stackTrace = @"
    at System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options) 
    at TechTalk.SpecFlow.Bindings.RegexFactory.Create(String regexString) 
    at TechTalk.SpecFlow.Bindings.BindingFactory.CreateStepBinding(StepDefinitionType type, String regexString, IBindingMethod bindingMethod, BindingScope bindingScope) 
@@ -87,15 +81,17 @@ namespace SpecFlow.VisualStudio.Tests.Analytics
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
 ";
 
-            var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: false);
+        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, false);
 
-            result.Should().Be("SF.RegexFactory.Create(_)-SF.BindingFactory.CreateStepBinding(,,,)-SF.BindingSourceProcessor.ProcessStepDefinitionAttribute(,,)-SF.BindingSourceProcessor.ProcessStepDefinitions(,)-ReflectionExtensions.ReflectionCallMethod[T](,,,)");
-        }
+        result.Should()
+            .Be(
+                "SF.RegexFactory.Create(_)-SF.BindingFactory.CreateStepBinding(,,,)-SF.BindingSourceProcessor.ProcessStepDefinitionAttribute(,,)-SF.BindingSourceProcessor.ProcessStepDefinitions(,)-ReflectionExtensions.ReflectionCallMethod[T](,,,)");
+    }
 
-        [Fact]
-        public void SimplifyStackTrace_simplifies_real_stack_trace()
-        {
-            const string stackTrace = @"
+    [Fact]
+    public void SimplifyStackTrace_simplifies_real_stack_trace()
+    {
+        const string stackTrace = @"
 Server stack trace:  
    at System.Text.RegularExpressions.RegexParser.ScanRegex() 
    at System.Text.RegularExpressions.RegexParser.Parse(String re, RegexOptions op) 
@@ -125,120 +121,124 @@ Exception rethrown at [0]:
    at SpecFlow.VisualStudio.SpecFlowConnector.ConsoleRunner.EntryPoint(String[] args) 
 ";
 
-            var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, minimize: true);
+        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, true);
 
-            result.Should().Be("SF.RF.C(_)-SF.BF.CSB(,,,)-SF.BSP.PSDA(,,)-SF.BSP.PSD(,)-SFV2020D.GBR(,)-BD.DI(,)-BD.D(,)-ISFD.D(,)-DP.P()-CR.EP(_)");
-        }
+        result.Should()
+            .Be(
+                "SF.RF.C(_)-SF.BF.CSB(,,,)-SF.BSP.PSDA(,,)-SF.BSP.PSD(,)-SFV2020D.GBR(,)-BD.DI(,)-BD.D(,)-ISFD.D(,)-DP.P()-CR.EP(_)");
+    }
 
-        [Fact]
-        public void SimplifyExceptions_removes_namespaces_and_simplifies_names()
+    [Fact]
+    public void SimplifyExceptions_removes_namespaces_and_simplifies_names()
+    {
+        var exceptions = new[]
         {
-            var exceptions = new string[]
-            {
-                "SomeNameSpace.Deeper.SomeException",
-                "OtherNamespace.SomeOtherException",
-            };
+            "SomeNameSpace.Deeper.SomeException",
+            "OtherNamespace.SomeOtherException"
+        };
 
-            var result = ErrorAnonymizer.SimplifyExceptions(exceptions);
+        var result = ErrorAnonymizer.SimplifyExceptions(exceptions);
 
-            result.Should().Be("SomEx-SomOthEx");
-        }
+        result.Should().Be("SomEx-SomOthEx");
+    }
 
-        [Fact]
-        public void SimplifyExceptions_removes_known_wrapper_exceptions()
+    [Fact]
+    public void SimplifyExceptions_removes_known_wrapper_exceptions()
+    {
+        var exceptions = new[]
         {
-            var exceptions = new string[]
-            {
-                "Microsoft.VisualStudio.Composition.CompositionFailedException",
-                typeof(TypeInitializationException).FullName,
-                typeof(AggregateException).FullName,
-                typeof(TargetInvocationException).FullName,
-                "SomeNameSpace.Deeper.SomeException",
-                "OtherNamespace.FooException",
-            };
+            "Microsoft.VisualStudio.Composition.CompositionFailedException",
+            typeof(TypeInitializationException).FullName,
+            typeof(AggregateException).FullName,
+            typeof(TargetInvocationException).FullName,
+            "SomeNameSpace.Deeper.SomeException",
+            "OtherNamespace.FooException"
+        };
 
-            var result = ErrorAnonymizer.SimplifyExceptions(exceptions);
+        var result = ErrorAnonymizer.SimplifyExceptions(exceptions);
 
-            result.Should().Be("SomEx-FooEx");
-        }
+        result.Should().Be("SomEx-FooEx");
+    }
 
-        [Fact]
-        public void SimplifyErrorMessage_removes_punctuation_and_minmizes_words()
+    [Fact]
+    public void SimplifyErrorMessage_removes_punctuation_and_minmizes_words()
+    {
+        //const string errorMessage = "Could not load file or assembly 'Microsoft.AspNetCore.Hosting.Abstractions, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60'. The system cannot find the file specified.";
+        const string errorMessage =
+            "Could not load file or assembly 'Microsoft.AspNetCore.Hosting.Abstractions, Version=2.1.1.0'. The system cannot find the file specified.";
+
+        var result = ErrorAnonymizer.SimplifyErrorMessage(errorMessage);
+
+        result.Should().Be("CouNotLoaFilOrAssMicAspHosAbsVer2110TheSysCanFinTheFilSpe");
+    }
+
+    [Fact]
+    public void SimplifyErrorMessage_removes_culture_and_public_key_token()
+    {
+        const string errorMessage =
+            "S Microsoft.AspNetCore.Hosting.Abstractions, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 E";
+
+        var result = ErrorAnonymizer.SimplifyErrorMessage(errorMessage);
+
+        result.Should().Be("SMicAspHosAbsVer2110E");
+    }
+
+    [Theory]
+    [InlineData(@"C:\Foo\Bar\boz.txt")]
+    [InlineData(@"'C:\Foo\Bar Bar\boz.txt'")]
+    [InlineData(@"""C:\Foo\Bar Bar\boz.txt""")]
+    public void SimplifyErrorMessage_removes_path(string path)
+    {
+        var errorMessage = $"S {path} E";
+
+        var result = ErrorAnonymizer.SimplifyErrorMessage(errorMessage);
+
+        result.Should().Be("SE");
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private void Method2()
+    {
+        Method1();
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private void Method1()
+    {
+        throw new NotImplementedException(@"test error for path C:\Foo\Bar");
+    }
+
+    private void Method3()
+    {
+        try
         {
-            //const string errorMessage = "Could not load file or assembly 'Microsoft.AspNetCore.Hosting.Abstractions, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60'. The system cannot find the file specified.";
-            const string errorMessage = "Could not load file or assembly 'Microsoft.AspNetCore.Hosting.Abstractions, Version=2.1.1.0'. The system cannot find the file specified.";
-
-            var result = ErrorAnonymizer.SimplifyErrorMessage(errorMessage);
-
-            result.Should().Be("CouNotLoaFilOrAssMicAspHosAbsVer2110TheSysCanFinTheFilSpe");
+            Method2();
         }
-
-        [Fact]
-        public void SimplifyErrorMessage_removes_culture_and_public_key_token()
+        catch (Exception e)
         {
-            const string errorMessage = "S Microsoft.AspNetCore.Hosting.Abstractions, Version=2.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 E";
-
-            var result = ErrorAnonymizer.SimplifyErrorMessage(errorMessage);
-
-            result.Should().Be("SMicAspHosAbsVer2110E");
+            throw new InvalidOperationException("wrapper exception", e);
         }
+    }
 
-        [Theory]
-        [InlineData(@"C:\Foo\Bar\boz.txt")]
-        [InlineData(@"'C:\Foo\Bar Bar\boz.txt'")]
-        [InlineData(@"""C:\Foo\Bar Bar\boz.txt""")]
-        public void SimplifyErrorMessage_removes_path(string path)
+    [Fact]
+    public void AnonymizeException_anonymizes_exception()
+    {
+        Exception exception = null;
+        try
         {
-            var errorMessage = $"S {path} E";
-
-            var result = ErrorAnonymizer.SimplifyErrorMessage(errorMessage);
-
-            result.Should().Be("SE");
+            Method3();
         }
-
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void Method2()
+        catch (Exception e)
         {
-            Method1();
+            exception = e;
         }
 
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        private void Method1()
-        {
-            throw new NotImplementedException(@"test error for path C:\Foo\Bar");
-        }
+        exception.Should().NotBeNull();
 
-        private void Method3()
-        {
-            try
-            {
-                Method2();
-            }
-            catch (Exception e)
-            {
-                throw new InvalidOperationException("wrapper exception", e);
-            }
-        }
-
-        [Fact]
-        public void AnonymizeException_anonymizes_exception()
-        {
-            Exception exception = null;
-            try
-            {
-                Method3();
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
-            exception.Should().NotBeNull();
-
-            _testOutputHelper.WriteLine(exception.ToString());
-            var result = ErrorAnonymizer.AnonymizeException(exception);
-            _testOutputHelper.WriteLine("Result: " + result);
-            result = Regex.Replace(result, @"L\d+", "");
-            result.Should().Be("InvOpeEx-NotImpEx:TesErrForPat:EAT.M1()-EAT.M2()-EAT.M3()-EAT.M3()-EAT.AE__()");
-        }
+        _testOutputHelper.WriteLine(exception.ToString());
+        var result = ErrorAnonymizer.AnonymizeException(exception);
+        _testOutputHelper.WriteLine("Result: " + result);
+        result = Regex.Replace(result, @"L\d+", "");
+        result.Should().Be("InvOpeEx-NotImpEx:TesErrForPat:EAT.M1()-EAT.M2()-EAT.M3()-EAT.M3()-EAT.AE__()");
     }
 }

@@ -1,21 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Gherkin;
-using Gherkin.Ast;
+﻿using Location = Gherkin.Ast.Location;
 
-namespace SpecFlow.VisualStudio.Editor.Services.Parser
+namespace SpecFlow.VisualStudio.Editor.Services.Parser;
+
+public class SemanticParserException : ParserException
 {
-    public class SemanticParserException : ParserException
+    public SemanticParserException(string message) : base(message)
     {
-        public SemanticParserException(string message) : base(message)
-        {
-        }
+    }
 
-        public SemanticParserException(string message, Location location) : base(message, location)
-        {
-        }
+    public SemanticParserException(string message, Location location) : base(message, location)
+    {
     }
 }
