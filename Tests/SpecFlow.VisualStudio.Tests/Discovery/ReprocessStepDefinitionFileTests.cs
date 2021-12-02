@@ -116,7 +116,7 @@ public class Foo{
         IncreaseIndent();
         var sb = new StringBuilder("ProjectBindingRegistry:");
         sb.AppendLine();
-        if (bindingRegistry.IsFailed) sb.AppendLine("{_indent}Failed");
+        if (bindingRegistry.IsFailed) sb.AppendLine($"{_indent}Failed");
         int i = 0;
         foreach (ProjectStepDefinitionBinding binding in bindingRegistry.StepDefinitions)
         {
