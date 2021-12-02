@@ -35,3 +35,4 @@
         SourceLocationSpan:``
         SourceFileLine:`17`
     Expression:`I press subtract`
+ProjectBindingRegistry:end

@@ -5,7 +5,7 @@
 public class ReprocessStepDefinitionFileTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
-    private readonly InMemoryStubProjectScope _projectScope;
+    private InMemoryStubProjectScope _projectScope;
 
     private string _indent = string.Empty;
 
@@ -40,8 +40,20 @@ public class ReprocessStepDefinitionFileTests
 
         //assert
         ProjectBindingRegistry bindingRegistry = await discoveryService.GetBindingRegistryAsync();
+        _projectScope.IdeScope.Logger.LogVerbose($"test retrieved reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
         var dumped = Dump(bindingRegistry);
         Approvals.Verify(dumped);
+    }
+
+    [Fact]
+    public async Task ManyOfMultipleStepDefinitionsApproval()
+    {
+        for (int i = 0; i < 1000; i++)
+        {
+            StubIdeScope ideScope = new StubIdeScope(_testOutputHelper);
+            _projectScope = new InMemoryStubProjectScope(ideScope);
+            await Approval("MultipleStepDefinitions.cs");
+        }
     }
 
     [Theory]
@@ -123,6 +135,7 @@ public class Foo{
             sb.AppendLine($"{_indent}ProjectStepDefinitionBinding-{i}:");
             sb.Append(Dump(binding));
         }
+        sb.AppendLine("ProjectBindingRegistry:end");
 
         DecreaseIndent();
         var dump = sb.ToString();

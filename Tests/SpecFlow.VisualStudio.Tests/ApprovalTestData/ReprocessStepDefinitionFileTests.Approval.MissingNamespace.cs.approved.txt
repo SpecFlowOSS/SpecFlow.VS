@@ -17,3 +17,4 @@
         SourceLocationSpan:``
         SourceFileLine:`6`
     Expression:`I press add`
+ProjectBindingRegistry:end

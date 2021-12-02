@@ -58,14 +58,21 @@ public class DiscoveryService : IDiscoveryService
     public async Task<ProjectBindingRegistry> GetBindingRegistryAsync()
     {
         if (!_isDiscovering)
+        {
+            _logger.LogVerbose("getting reg from cache, because !_isDiscovering");
             return GetBindingRegistry();
+        }
 
         var completionSource = new TaskCompletionSource<ProjectBindingRegistry>();
         _backgroundDiscoveryCompletionSources.Enqueue(completionSource);
 
         if (!_isDiscovering) // in case it finished discovery while we were registering the completion source
+        {
+            _logger.LogVerbose("getting reg from cache after enqueue, because !_isDiscovering");
             return GetBindingRegistry();
+        }
 
+        _logger.LogVerbose("getting reg using await");
         return await completionSource.Task;
     }
 
@@ -84,6 +91,7 @@ public class DiscoveryService : IDiscoveryService
 
     public async Task ProcessAsync(CSharpStepDefinitionFile stepDefinitionFile)
     {
+        _logger.LogVerbose("ProcessAsync started");
         SyntaxTree tree = CSharpSyntaxTree.ParseText(stepDefinitionFile.Content);
         var rootNode = await tree.GetRootAsync();
 
@@ -127,10 +135,19 @@ public class DiscoveryService : IDiscoveryService
             }
         }
 
+        _logger.LogVerbose($"ProcessAsync found {projectStepDefinitionBindings.Count} stepdefs");
+
+        if (projectStepDefinitionBindings.Count == 0)
+            throw new Exception("no stepdef found"); //TODO: just for finding the async issue
+
         var bindingRegistry = await GetBindingRegistryAsync();
+        _logger.LogVerbose($"current reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
+        if (bindingRegistry.IsFailed)
+            throw new Exception("changing invalid registry"); //TODO: do not try to modify an invalid registry, return here without doing anything. The exception throw is to better detect async issues only.
         bindingRegistry = bindingRegistry
             .Where(binding => binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath)
             .AddStepDefinitions(projectStepDefinitionBindings);
+        _logger.LogVerbose($"replacing with reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
         ReplaceBindingRegistry(bindingRegistry);
     }
 
@@ -215,11 +232,16 @@ public class DiscoveryService : IDiscoveryService
     private void TriggerDiscoveryOnBackgroundThread(ProjectSettings projectSettings, ConfigSource testAssemblySource)
     {
         _isDiscovering = true;
+        _logger.LogVerbose($"_isDiscovering = true, x was {x}");
         ThreadPool.QueueUserWorkItem(_ => DiscoveryOnBackgroundThread(projectSettings, testAssemblySource));
     }
 
+    private volatile int x = 0;
+
     private void DiscoveryOnBackgroundThread(ProjectSettings projectSettings, ConfigSource testAssemblySource)
     {
+        var currentX = Interlocked.Increment(ref x);
+        _logger.LogVerbose($"DiscoveryOnBackgroundThread start {currentX}");
         ProjectBindingRegistryCache projectBindingRegistryCache = null;
         try
         {
@@ -235,6 +257,7 @@ public class DiscoveryService : IDiscoveryService
             while (_backgroundDiscoveryCompletionSources.TryDequeue(out var completionSource))
                 completionSource.SetResult(projectBindingRegistryCache?.BindingRegistry);
             _isDiscovering = false;
+            _logger.LogVerbose($"_isDiscovering = false, {currentX}, reg v {projectBindingRegistryCache?.BindingRegistry.Version}");
         }
     }
 

@@ -18,3 +18,4 @@
         SourceLocationSpan:``
         SourceFileLine:`11`
     Expression:`I press (.*)`
+ProjectBindingRegistry:end
