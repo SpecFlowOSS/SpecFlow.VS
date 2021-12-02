@@ -254,10 +254,10 @@ public class DiscoveryService : IDiscoveryService
         }
         finally
         {
-            while (_backgroundDiscoveryCompletionSources.TryDequeue(out var completionSource))
-                completionSource.SetResult(projectBindingRegistryCache?.BindingRegistry);
             _isDiscovering = false;
             _logger.LogVerbose($"_isDiscovering = false, {currentX}, reg v {projectBindingRegistryCache?.BindingRegistry.Version}");
+            while (_backgroundDiscoveryCompletionSources.TryDequeue(out var completionSource))
+                completionSource.SetResult(projectBindingRegistryCache?.BindingRegistry);
         }
     }
 
