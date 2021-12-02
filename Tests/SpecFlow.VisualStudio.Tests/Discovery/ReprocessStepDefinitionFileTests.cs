@@ -107,7 +107,7 @@ public class Foo{
         _projectScope.AddFile("Let_IsSpecFlowTestProject_true.feature", string.Empty);
         var discoveryService =
             MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, initialStepDefinitions,
-                TimeSpan.FromMilliseconds(10));
+                TimeSpan.FromMilliseconds(500));
         await discoveryService.WaitUntilDiscoveryPerformed();
 
         return discoveryService;
