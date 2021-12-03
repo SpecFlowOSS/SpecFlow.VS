@@ -19,6 +19,8 @@ using Microsoft.VisualStudio.Shell.Events;
 using Microsoft.VisualStudio.Text;
 using Document = Microsoft.CodeAnalysis.Document;
 using Project = EnvDTE.Project;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Editor;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
 {
@@ -110,7 +112,31 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             MonitoringService.MonitorOpenProjectSystem(this);
         }
 
-        public IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation)
+        public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
+        {
+            var editorAdaptersFactoryService = VsUtils.ResolveMefDependency<IVsEditorAdaptersFactoryService>(ServiceProvider);
+
+            var sourceLocationsByFile = sourceLocations
+                .Where(sl => sl.SourceLocationSpan == null)
+                .GroupBy(sl => sl.SourceFile);
+
+            int counter = 0;
+            foreach (var sourceLocationsForFile in sourceLocationsByFile)
+            {
+                var sourceFile = sourceLocationsForFile.Key;
+                var wpfTextView = VsUtils.GetWpfTextViewFromFilePath(sourceFile, ServiceProvider, editorAdaptersFactoryService);
+
+                foreach (var sourceLocation in sourceLocationsForFile)
+                {
+                    counter++;
+                    sourceLocation.SourceLocationSpan = this.CreatePersistentTrackingPosition(sourceLocation, wpfTextView);
+                }
+            }
+
+            Logger.LogVerbose($"{counter} tracking positions calculated");
+        }
+
+        private IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation, IWpfTextView wpfTextView)
         {
             var line0 = sourceLocation.SourceFileLine - 1;
             var lineOffset = sourceLocation.SourceFileColumn - 1;
@@ -118,7 +144,6 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             var endLineOffset = sourceLocation.SourceFileEndColumn - 1 ?? lineOffset;
             try
             {
-                var wpfTextView = VsUtils.GetWpfTextViewFromFilePath(sourceLocation.SourceFile, ServiceProvider);
                 if (wpfTextView != null)
                     return _persistentSpanFactory.Create(wpfTextView.TextSnapshot, line0, lineOffset, endLine0, endLineOffset,
                         SpanTrackingMode.EdgeExclusive);
@@ -163,7 +188,9 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                 return true;
             }
 
-            var wpfTextView = VsUtils.GetWpfTextViewFromFilePath(sourceLocation.SourceFile, ServiceProvider);
+            var editorAdaptersFactoryService = VsUtils.ResolveMefDependency<IVsEditorAdaptersFactoryService>(ServiceProvider);
+
+            var wpfTextView = VsUtils.GetWpfTextViewFromFilePath(sourceLocation.SourceFile, ServiceProvider, editorAdaptersFactoryService);
             textBuffer = wpfTextView?.TextBuffer;
             return textBuffer != null;
         }

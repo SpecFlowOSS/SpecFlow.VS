@@ -57,10 +57,8 @@ namespace SpecFlow.VisualStudio
             }
         }
 
-        public static IWpfTextView GetWpfTextViewFromFilePath(string filePath, IServiceProvider serviceProvider)
+        public static IWpfTextView GetWpfTextViewFromFilePath(string filePath, IServiceProvider serviceProvider, IVsEditorAdaptersFactoryService editorAdaptersFactoryService)
         {
-            var editorAdaptersFactoryService = ResolveMefDependency<IVsEditorAdaptersFactoryService>(serviceProvider);
-
             if (GetVsWindowFrame(filePath, serviceProvider, out var windowFrame))
             {
                 // Get the IVsTextView from the windowFrame.

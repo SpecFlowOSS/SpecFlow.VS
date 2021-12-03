@@ -339,17 +339,8 @@ public class DiscoveryService : IDiscoveryService
 
     private void CalculateSourceLocationTrackingPositions(ProjectBindingRegistry bindingRegistry)
     {
-        int counter = 0;
-        foreach (var sourceLocation in bindingRegistry.StepDefinitions.Select(sd => sd.Implementation.SourceLocation)
-                     .Where(sl => sl != null))
-            if (sourceLocation.SourceLocationSpan == null)
-            {
-                counter++;
-                sourceLocation.SourceLocationSpan =
-                    _projectScope.IdeScope.CreatePersistentTrackingPosition(sourceLocation);
-            }
-
-        _logger.LogVerbose($"{counter} tracking positions calculated");
+        var sourceLocations = bindingRegistry.StepDefinitions.Select(sd => sd.Implementation.SourceLocation);
+        _projectScope.IdeScope.CalculateSourceLocationTrackingPositions(sourceLocations);
     }
 
     private void DisposeSourceLocationTrackingPositions(ProjectBindingRegistry bindingRegistry)

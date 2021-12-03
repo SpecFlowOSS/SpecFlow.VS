@@ -24,7 +24,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         event EventHandler<EventArgs> WeakProjectsBuilt;
         event EventHandler<EventArgs> WeakProjectOutputsUpdated;
 
-        IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation);
+        void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations);
         IProjectScope[] GetProjectsWithFeatureFiles();
 
         IDisposable CreateUndoContext(string undoLabel);

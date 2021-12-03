@@ -193,9 +193,8 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             DeveroomErrorListServices = null;
         }
 
-        public IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation)
+        public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
         {
-            return null;
         }
 
         public IProjectScope[] GetProjectsWithFeatureFiles()
