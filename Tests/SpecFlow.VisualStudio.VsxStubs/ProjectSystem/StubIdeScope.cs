@@ -52,9 +52,8 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public event EventHandler<EventArgs> WeakProjectsBuilt;
         public event EventHandler<EventArgs> WeakProjectOutputsUpdated;
 
-        public IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation)
+        public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
         {
-            return null;
         }
 
         public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null, string contentType = VsContentTypes.FeatureFile, string filePath = null)

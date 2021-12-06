@@ -92,7 +92,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             }
         }
 
-        #region Delegaing members
+        #region Delegating members
 
         public bool IsSolutionLoaded => VsIdeScope.IsSolutionLoaded;
 
@@ -122,9 +122,9 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             remove => VsIdeScope.WeakProjectOutputsUpdated -= value;
         }
 
-        public IPersistentSpan CreatePersistentTrackingPosition(SourceLocation sourceLocation)
+        public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
         {
-            return VsIdeScope.CreatePersistentTrackingPosition(sourceLocation);
+            VsIdeScope.CalculateSourceLocationTrackingPositions(sourceLocations);
         }
 
         public bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer)
