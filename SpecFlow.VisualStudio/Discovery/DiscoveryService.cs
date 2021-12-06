@@ -351,11 +351,8 @@ public class DiscoveryService : IDiscoveryService
 
     private void PublishBindingRegistryResult(ProjectBindingRegistryCache projectBindingRegistryCache)
     {
-        Thread.MemoryBarrier();
-        var oldCached = _cached;
         _cached = projectBindingRegistryCache;
-        DisposeSourceLocationTrackingPositions(oldCached?.BindingRegistry);
-        TriggerBindingRegistryChanged();
+        UpdateBindingRegistry(r => projectBindingRegistryCache.BindingRegistry).Wait();
     }
 
     protected virtual void TriggerBindingRegistryChanged()

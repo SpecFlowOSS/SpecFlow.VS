@@ -68,6 +68,7 @@ public class DiscoveryServiceTests
         var discoveryService = new DiscoveryService(projectScope.Object, discoveryResultProvider.Object);
 
         var oldVersions = new ConcurrentQueue<int>();
+        var initialRegistry = new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>());
 
         //act
         var updateTaskCount = 0;
@@ -101,8 +102,9 @@ public class DiscoveryServiceTests
 
         //assert
         var registry = await discoveryService.GetLatestBindingRegistry();
-        registry.Version.Should().Be(updateTaskCount + 1);
-        oldVersions.Should().Equal(Enumerable.Range(1, updateTaskCount));
+        registry.Version.Should().BeGreaterOrEqualTo(initialRegistry.Version + updateTaskCount);
+        oldVersions.Count.Should().Be(updateTaskCount);
+        oldVersions.Should().BeInAscendingOrder();
     }
 
     private Task RunInThread(Func<Task> action)
