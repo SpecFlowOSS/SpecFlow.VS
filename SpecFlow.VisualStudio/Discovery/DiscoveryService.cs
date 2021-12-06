@@ -25,6 +25,9 @@ public class DiscoveryService : IDiscoveryService
         _projectSettingsProvider = _projectScope.GetProjectSettingsProvider();
         _projectSettingsProvider.WeakSettingsInitialized += ProjectSystemOnProjectsBuilt;
         _projectScope.IdeScope.WeakProjectOutputsUpdated += ProjectSystemOnProjectsBuilt;
+
+        _currentBindingRegistrySource = new TaskCompletionSource<ProjectBindingRegistry>();
+        _currentBindingRegistrySource.SetResult(ProjectBindingRegistry.Invalid);
     }
 
     private IFileSystem FileSystem => _projectScope.IdeScope.FileSystem;
@@ -357,7 +360,7 @@ public class DiscoveryService : IDiscoveryService
 
     protected virtual void TriggerBindingRegistryChanged()
     {
-        BindingRegistryChanged?.Invoke(this, new EventArgs());
+        BindingRegistryChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private void CalculateSourceLocationTrackingPositions(ProjectBindingRegistry bindingRegistry)
@@ -377,7 +380,7 @@ public class DiscoveryService : IDiscoveryService
             sourceLocation.SourceLocationSpan = null;
         }
 
-        _logger.LogVerbose("Tracking positions disposed");
+        _logger.LogVerbose($"Tracking positions disposed on V{bindingRegistry.Version}");
     }
 
     private static string FullMethodName(MethodDeclarationSyntax method)
@@ -392,5 +395,64 @@ public class DiscoveryService : IDiscoveryService
 
         sb.Append(containingClass.Identifier.Text).Append('.').Append(method.Identifier.Text);
         return sb.ToString();
+    }
+
+    private TaskCompletionSource<ProjectBindingRegistry> _currentBindingRegistrySource;
+
+    public async Task UpdateBindingRegistry(Func<ProjectBindingRegistry, ProjectBindingRegistry> update)
+    {
+        var n = 0;
+        do
+        {
+            ++n;
+            var currentSource = _currentBindingRegistrySource;
+            var newRegistrySource = new TaskCompletionSource<ProjectBindingRegistry>();
+            
+            var originalSource =
+                Interlocked.CompareExchange(ref _currentBindingRegistrySource, newRegistrySource, currentSource);
+
+          //  _logger.LogVerbose($"Wait {n} c:{currentSource.Task.Id}-{currentSource.Task.Status} n:{newRegistrySource.Task.Id}-{newRegistrySource.Task.Status} o:{originalSource.Task.Id}-{originalSource.Task.Status} _:{_currentBindingRegistrySource.Task.Id}-{_currentBindingRegistrySource.Task.Status} ");
+            var registry = await WaitForCompletion(originalSource.Task);
+
+            if (ReferenceEquals(originalSource, currentSource))
+            {
+                _logger.LogVerbose(
+                    $"Process {n} c:{currentSource.Task.Id}-{currentSource.Task.Status} n:{newRegistrySource.Task.Id}-{newRegistrySource.Task.Status} o:{originalSource.Task.Id}-{originalSource.Task.Status} _:{_currentBindingRegistrySource.Task.Id}-{_currentBindingRegistrySource.Task.Status} ");
+
+                var updatedRegistry = update(registry);
+                if (updatedRegistry.Version < registry.Version)
+                    throw new InvalidOperationException(
+                        $"Cannot downgrade bindingRegistry from V{registry.Version} to V{updatedRegistry.Version}");
+                CalculateSourceLocationTrackingPositions(updatedRegistry);
+                newRegistrySource.SetResult(updatedRegistry);
+                DisposeSourceLocationTrackingPositions(registry);
+                TriggerBindingRegistryChanged();
+                return;
+            }
+
+            _logger.LogVerbose(
+                $"Retry {n} c:{currentSource.Task.Id}-{currentSource.Task.Status} n:{newRegistrySource.Task.Id}-{newRegistrySource.Task.Status} o:{originalSource.Task.Id}-{originalSource.Task.Status} _:{_currentBindingRegistrySource.Task.Id}-{_currentBindingRegistrySource.Task.Status} ");
+        } while (true);
+    }
+
+    public Task<ProjectBindingRegistry> GetLatestBindingRegistry()
+    {
+        return WaitForCompletion(_currentBindingRegistrySource.Task);
+    }
+
+    private async Task<ProjectBindingRegistry> WaitForCompletion(Task<ProjectBindingRegistry> task)
+    {
+        CancellationTokenSource cts = Debugger.IsAttached
+            ? new CancellationTokenSource(TimeSpan.FromMinutes(1))
+            : new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
+        var timeoutTask = Task.Delay(-1, cts.Token);
+        var result = await Task.WhenAny(task, timeoutTask);
+        if (ReferenceEquals(result, timeoutTask))
+            throw new TimeoutException("Binding registry in not processed in time");
+
+        var projectBindingRegistry = await (result as Task<ProjectBindingRegistry>)!;
+        _logger.LogVerbose($"{projectBindingRegistry.Version}");
+        return projectBindingRegistry;
     }
 }
