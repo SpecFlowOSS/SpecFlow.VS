@@ -63,18 +63,18 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                     ctx.TriggerPointOfStepDefinitionClass = new SnapshotPoint(ctx.TextBufferOfStepDefinitionClass.CurrentSnapshot,
                         stepDefLine.Start.Position + sourceLocation.SourceFileColumn - 1);
                     
-                    InvokeCommandFromStepDefinitionClass(ctx).Wait();
+                    InvokeCommandFromStepDefinitionClass(ctx);
                 });
                 return true;
             }
 
             ctx.TriggerPointOfStepDefinitionClass = textView.Caret.Position.BufferPosition;
             ctx.TextBufferOfStepDefinitionClass = textView.TextBuffer;
-            InvokeCommandFromStepDefinitionClass(ctx).Wait();
+            InvokeCommandFromStepDefinitionClass(ctx);
             return true;
         }
 
-        private async Task InvokeCommandFromStepDefinitionClass(RenameStepCommandContext ctx)
+        private void InvokeCommandFromStepDefinitionClass(RenameStepCommandContext ctx)
         {
             ValidateCallerProject(ctx);
             if (Erroneous(ctx)) return;
@@ -82,18 +82,18 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ValidateProjectsWithFeatureFiles(ctx);
             if (Erroneous(ctx)) return;
 
-            var stepDefinitions = await CollectStepDefinitions(ctx);
+            var stepDefinitions = CollectStepDefinitions(ctx);
 
             PerformActions(stepDefinitions, ctx);
         }
 
-        private async Task<List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)>> CollectStepDefinitions(RenameStepCommandContext ctx)
+        private List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)> CollectStepDefinitions(RenameStepCommandContext ctx)
         {
             var stepDefinitions =
                 new List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)>();
             foreach (IProjectScope specFlowTestProject in ctx.SpecFlowTestProjectsWithFeatureFiles)
             {
-                ProjectStepDefinitionBinding[] projectStepDefinitions = await GetStepDefinitions(ctx);
+                ProjectStepDefinitionBinding[] projectStepDefinitions = GetStepDefinitions(ctx);
                 foreach (var projectStepDefinitionBinding in projectStepDefinitions)
                 {
                     if (ctx.StepDefinitionBinding == null) 
@@ -290,17 +290,17 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return errors.ToImmutableHashSet();
         }
 
-        private async Task<ProjectStepDefinitionBinding[]> GetStepDefinitions(RenameStepCommandContext ctx)
+        private ProjectStepDefinitionBinding[] GetStepDefinitions(RenameStepCommandContext ctx)
         {
             var fileName = GetEditorDocumentPath(ctx.TextBufferOfStepDefinitionClass);
-            var bindingRegistry = await GetBindingRegistry(ctx);
+            var bindingRegistry = GetBindingRegistry(ctx);
             return FindStepDefinitionUsagesCommand.GetStepDefinitions(fileName, ctx.TriggerPointOfStepDefinitionClass, bindingRegistry);
         }
 
-        private async Task<ProjectBindingRegistry> GetBindingRegistry(RenameStepCommandContext ctx)
+        private ProjectBindingRegistry GetBindingRegistry(RenameStepCommandContext ctx)
         {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
-            var bindingRegistry = await discoveryService.GetLatestBindingRegistry();
+            var bindingRegistry = discoveryService.GetBindingRegistry();
             if (bindingRegistry.IsFailed)
                 Logger.LogWarning(
                     $"Unable to get step definitions from project '{ctx.ProjectOfStepDefinitionClass.ProjectName}', usages will not be found for this project.");
