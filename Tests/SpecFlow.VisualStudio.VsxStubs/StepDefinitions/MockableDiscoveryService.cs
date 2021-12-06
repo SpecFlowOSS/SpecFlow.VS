@@ -59,7 +59,7 @@ public class MockableDiscoveryService : DiscoveryService
 
         discoveryService.InitializeBindingRegistry();
         projectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService);
-        discoveryService._initialized.WaitOne(TimeSpan.FromSeconds(10));
+        discoveryService.Initialized.WaitOne(TimeSpan.FromSeconds(10));
 
         return discoveryService;
     }

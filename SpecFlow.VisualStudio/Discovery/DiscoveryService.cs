@@ -2,9 +2,6 @@
 
 public class DiscoveryService : IDiscoveryService
 {
-    private readonly ConcurrentQueue<TaskCompletionSource<ProjectBindingRegistry>>
-        _backgroundDiscoveryCompletionSources = new();
-
     private readonly IDiscoveryResultProvider _discoveryResultProvider;
     private readonly IDeveroomErrorListServices _errorListServices;
     private readonly IDeveroomLogger _logger;
@@ -13,8 +10,6 @@ public class DiscoveryService : IDiscoveryService
     private readonly IProjectSettingsProvider _projectSettingsProvider;
     private ProjectBindingRegistryCache _cached = new ProjectBindingRegistryCacheUninitialized();
     private ProjectBindingRegistry _cache;
-
-    private bool _isDiscovering;
 
     public DiscoveryService(IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider = null)
     {
@@ -41,7 +36,7 @@ public class DiscoveryService : IDiscoveryService
             value);
     }
 
-    protected ManualResetEvent _initialized = new (false);
+    protected ManualResetEvent Initialized = new (false);
 
     public void InitializeBindingRegistry()
     {
@@ -51,7 +46,7 @@ public class DiscoveryService : IDiscoveryService
 
     public void CheckBindingRegistry()
     {
-        if (IsCacheUpToDate() || _isDiscovering)
+        if (IsCacheUpToDate())
             return;
 
         TriggerDiscovery();
@@ -116,10 +111,6 @@ public class DiscoveryService : IDiscoveryService
 
         _logger.LogVerbose($"ProcessAsync found {projectStepDefinitionBindings.Count} stepdefs");
 
-        if (projectStepDefinitionBindings.Count == 0)
-            throw new Exception("no stepdef found"); //TODO: just for finding the async issue
-
-
         await UpdateBindingRegistry(bindingRegistry =>
         {
             _logger.LogVerbose($"current reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
@@ -152,6 +143,7 @@ public class DiscoveryService : IDiscoveryService
     {
         var projectSettings = _projectScope.GetProjectSettings();
         var testAssemblySource = GetTestAssemblySource(projectSettings);
+
         return _cached.IsUpToDate(projectSettings, testAssemblySource.LastChangeTime);
     }
 
@@ -172,7 +164,7 @@ public class DiscoveryService : IDiscoveryService
         {
             _cached = skippedResult;
             //PublishBindingRegistryResult(skippedResult);
-            _initialized.Set();
+            Initialized.Set();
             return;
         }
 
@@ -222,39 +214,11 @@ public class DiscoveryService : IDiscoveryService
 
     private void TriggerDiscoveryOnBackgroundThread(ProjectSettings projectSettings, ConfigSource testAssemblySource)
     {
-        _isDiscovering = true;
-        _logger.LogVerbose($"_isDiscovering = true, x was {x}");
         _projectScope.IdeScope.RunOnBackgroundThread(()=>UpdateBindingRegistry(_ =>
         {
-            var newRegistry = DiscoveryOnBackgroundThread(projectSettings, testAssemblySource);
+            var newRegistry = InvokeDiscoveryWithTimer(projectSettings, testAssemblySource);
             return newRegistry.BindingRegistry;
-        }), _ => {_initialized.Set(); _cache= ProjectBindingRegistry.Invalid;}, nameof(TriggerDiscoveryOnBackgroundThread));
-    }
-
-    private volatile int x = 0;
-
-    private ProjectBindingRegistryCache DiscoveryOnBackgroundThread(ProjectSettings projectSettings, ConfigSource testAssemblySource)
-    {
-        var currentX = Interlocked.Increment(ref x);
-        _logger.LogVerbose($"DiscoveryOnBackgroundThread start {currentX}");
-        ProjectBindingRegistryCache projectBindingRegistryCache = null;
-        try
-        {
-            projectBindingRegistryCache = InvokeDiscoveryWithTimer(projectSettings, testAssemblySource);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogException(_monitoringService, ex);
-        }
-        finally
-        {
-            _isDiscovering = false;
-            _logger.LogVerbose($"_isDiscovering = false, {currentX}, reg v {projectBindingRegistryCache?.BindingRegistry.Version}");
-            while (_backgroundDiscoveryCompletionSources.TryDequeue(out var completionSource))
-                completionSource.SetResult(projectBindingRegistryCache?.BindingRegistry);
-        }
-        _cached = projectBindingRegistryCache;
-        return projectBindingRegistryCache;
+        }), _ => {Initialized.Set(); _cache= ProjectBindingRegistry.Invalid;}, nameof(TriggerDiscoveryOnBackgroundThread));
     }
 
     private ProjectBindingRegistryCache InvokeDiscoveryWithTimer(ProjectSettings projectSettings,
@@ -423,7 +387,7 @@ public class DiscoveryService : IDiscoveryService
                 _cache = updatedRegistry;  
                 DisposeSourceLocationTrackingPositions(registry);
                 TriggerBindingRegistryChanged();
-                _initialized.Set();
+                Initialized.Set();
 
                 return;
             }
