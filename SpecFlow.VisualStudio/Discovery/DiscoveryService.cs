@@ -434,6 +434,9 @@ public class DiscoveryService : IDiscoveryService
                 if (updatedRegistry.IsFailed)
                     throw new InvalidOperationException($"Update failure in bindingRegistry V{registry.Version}");
                 CalculateSourceLocationTrackingPositions(updatedRegistry);
+                _logger.LogVerbose(
+                    $"Done {n} r:{updatedRegistry.Version} c:{currentSource.Task.Id}-{currentSource.Task.Status} n:{newRegistrySource.Task.Id}-{newRegistrySource.Task.Status} o:{originalSource.Task.Id}-{originalSource.Task.Status} _:{_currentBindingRegistrySource.Task.Id}-{_currentBindingRegistrySource.Task.Status} ");
+
                 newRegistrySource.SetResult(updatedRegistry);
                 DisposeSourceLocationTrackingPositions(registry);
                 TriggerBindingRegistryChanged();
@@ -457,6 +460,7 @@ public class DiscoveryService : IDiscoveryService
             ? new CancellationTokenSource(TimeSpan.FromMinutes(1))
             : new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
+        _logger.LogVerbose($"task:{task.Id}-{task.Status}");
         var timeoutTask = Task.Delay(-1, cts.Token);
         var result = await Task.WhenAny(task, timeoutTask);
         if (ReferenceEquals(result, timeoutTask))
