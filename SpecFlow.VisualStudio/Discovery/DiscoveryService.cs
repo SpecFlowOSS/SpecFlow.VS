@@ -79,13 +79,6 @@ public class DiscoveryService : IDiscoveryService
         return await completionSource.Task;
     }
 
-    public void ReplaceBindingRegistry(ProjectBindingRegistry bindingRegistry)
-    {
-        CalculateSourceLocationTrackingPositions(bindingRegistry);
-        var newBindingRegistryCache = _cached.WithBindingRegistry(bindingRegistry);
-        PublishBindingRegistryResult(newBindingRegistryCache);
-    }
-
     public void Dispose()
     {
         _projectScope.IdeScope.WeakProjectsBuilt -= ProjectSystemOnProjectsBuilt;
@@ -143,15 +136,25 @@ public class DiscoveryService : IDiscoveryService
         if (projectStepDefinitionBindings.Count == 0)
             throw new Exception("no stepdef found"); //TODO: just for finding the async issue
 
-        var bindingRegistry = await GetBindingRegistryAsync();
-        _logger.LogVerbose($"current reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
-        if (bindingRegistry.IsFailed)
-            throw new Exception("changing invalid registry"); //TODO: do not try to modify an invalid registry, return here without doing anything. The exception throw is to better detect async issues only.
-        bindingRegistry = bindingRegistry
-            .Where(binding => binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath)
-            .AddStepDefinitions(projectStepDefinitionBindings);
-        _logger.LogVerbose($"replacing with reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
-        ReplaceBindingRegistry(bindingRegistry);
+
+        await UpdateBindingRegistry(bindingRegistry =>
+        {
+            _logger.LogVerbose($"current reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
+            if (bindingRegistry.IsFailed)
+                throw
+                    new Exception(
+                        "changing invalid registry"); //TODO: do not try to modify an invalid registry, return here without doing anything. The exception throw is to better detect async issues only.
+            bindingRegistry = bindingRegistry
+                .Where(binding =>
+                    binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath)
+                .AddStepDefinitions(projectStepDefinitionBindings);
+            _logger.LogVerbose(
+                $"replacing with reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
+
+            _cached = _cached.WithBindingRegistry(bindingRegistry);
+
+            return bindingRegistry;
+        });
     }
 
     public event EventHandler<EventArgs> BindingRegistryChanged;
@@ -352,6 +355,7 @@ public class DiscoveryService : IDiscoveryService
     private void PublishBindingRegistryResult(ProjectBindingRegistryCache projectBindingRegistryCache)
     {
         _cached = projectBindingRegistryCache;
+        if (projectBindingRegistryCache.BindingRegistry.IsFailed) return;
         UpdateBindingRegistry(r => projectBindingRegistryCache.BindingRegistry).Wait();
     }
 
@@ -420,6 +424,8 @@ public class DiscoveryService : IDiscoveryService
                 if (updatedRegistry.Version < registry.Version)
                     throw new InvalidOperationException(
                         $"Cannot downgrade bindingRegistry from V{registry.Version} to V{updatedRegistry.Version}");
+                if (updatedRegistry.IsFailed)
+                    throw new InvalidOperationException($"Update failure in bindingRegistry V{registry.Version}");
                 CalculateSourceLocationTrackingPositions(updatedRegistry);
                 newRegistrySource.SetResult(updatedRegistry);
                 DisposeSourceLocationTrackingPositions(registry);

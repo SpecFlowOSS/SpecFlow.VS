@@ -63,18 +63,18 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                     ctx.TriggerPointOfStepDefinitionClass = new SnapshotPoint(ctx.TextBufferOfStepDefinitionClass.CurrentSnapshot,
                         stepDefLine.Start.Position + sourceLocation.SourceFileColumn - 1);
                     
-                    InvokeCommandFromStepDefinitionClass(ctx);
+                    InvokeCommandFromStepDefinitionClass(ctx).Wait();
                 });
                 return true;
             }
 
             ctx.TriggerPointOfStepDefinitionClass = textView.Caret.Position.BufferPosition;
             ctx.TextBufferOfStepDefinitionClass = textView.TextBuffer;
-            InvokeCommandFromStepDefinitionClass(ctx);
+            InvokeCommandFromStepDefinitionClass(ctx).Wait();
             return true;
         }
 
-        private void InvokeCommandFromStepDefinitionClass(RenameStepCommandContext ctx)
+        private async Task InvokeCommandFromStepDefinitionClass(RenameStepCommandContext ctx)
         {
             ValidateCallerProject(ctx);
             if (Erroneous(ctx)) return;
@@ -82,18 +82,18 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             ValidateProjectsWithFeatureFiles(ctx);
             if (Erroneous(ctx)) return;
 
-            var stepDefinitions = CollectStepDefinitions(ctx);
+            var stepDefinitions = await CollectStepDefinitions(ctx);
 
             PerformActions(stepDefinitions, ctx);
         }
 
-        private List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)> CollectStepDefinitions(RenameStepCommandContext ctx)
+        private async Task<List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)>> CollectStepDefinitions(RenameStepCommandContext ctx)
         {
             var stepDefinitions =
                 new List<(IProjectScope specFlowTestProject, ProjectStepDefinitionBinding projectStepDefinitionBinding)>();
             foreach (IProjectScope specFlowTestProject in ctx.SpecFlowTestProjectsWithFeatureFiles)
             {
-                ProjectStepDefinitionBinding[] projectStepDefinitions = GetStepDefinitions(ctx);
+                ProjectStepDefinitionBinding[] projectStepDefinitions = await GetStepDefinitions(ctx);
                 foreach (var projectStepDefinitionBinding in projectStepDefinitions)
                 {
                     if (ctx.StepDefinitionBinding == null) 
@@ -178,7 +178,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 }
 
                 IdeScope.Actions.NavigateTo(ctx.StepDefinitionBinding.Implementation.SourceLocation);
-                UpdateBindingRegistry(ctx);
+                await UpdateBindingRegistry(ctx);
             });
         }
 
@@ -290,30 +290,29 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             return errors.ToImmutableHashSet();
         }
 
-        private ProjectStepDefinitionBinding[] GetStepDefinitions(RenameStepCommandContext ctx)
+        private async Task<ProjectStepDefinitionBinding[]> GetStepDefinitions(RenameStepCommandContext ctx)
         {
             var fileName = GetEditorDocumentPath(ctx.TextBufferOfStepDefinitionClass);
-            var bindingRegistry = GetBindingRegistry(ctx);
+            var bindingRegistry = await GetBindingRegistry(ctx);
             return FindStepDefinitionUsagesCommand.GetStepDefinitions(fileName, ctx.TriggerPointOfStepDefinitionClass, bindingRegistry);
         }
 
-        private ProjectBindingRegistry GetBindingRegistry(RenameStepCommandContext ctx)
+        private async Task<ProjectBindingRegistry> GetBindingRegistry(RenameStepCommandContext ctx)
         {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
-            var bindingRegistry = discoveryService.GetBindingRegistry();
+            var bindingRegistry = await discoveryService.GetBindingRegistryAsync();
             if (bindingRegistry.IsFailed)
                 Logger.LogWarning(
                     $"Unable to get step definitions from project '{ctx.ProjectOfStepDefinitionClass.ProjectName}', usages will not be found for this project.");
             return bindingRegistry;
         }
 
-        private void UpdateBindingRegistry(RenameStepCommandContext ctx)
+        private Task UpdateBindingRegistry(RenameStepCommandContext ctx)
         {
-            var bindingRegistry = GetBindingRegistry(ctx);
-            bindingRegistry =
-                bindingRegistry.ReplaceStepDefinition(ctx.StepDefinitionBinding, ctx.StepDefinitionBinding.WithSpecifiedExpression(ctx.UpdatedExpression));
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
-            discoveryService.ReplaceBindingRegistry(bindingRegistry);
+            return discoveryService.UpdateBindingRegistry(bindingRegistry =>
+                bindingRegistry.ReplaceStepDefinition(ctx.StepDefinitionBinding, ctx.StepDefinitionBinding.WithSpecifiedExpression(ctx.UpdatedExpression)));
+
         }
     }
 }
