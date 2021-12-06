@@ -39,6 +39,8 @@ public class DiscoveryService : IDiscoveryService
             value);
     }
 
+    protected ManualResetEvent _initialized = new (false);
+
     public void InitializeBindingRegistry()
     {
         _logger.LogVerbose("Initial discovery triggered...");
@@ -189,6 +191,7 @@ public class DiscoveryService : IDiscoveryService
         {
             _cached = skippedResult;
             //PublishBindingRegistryResult(skippedResult);
+            _initialized.Set();
             return;
         }
 
@@ -244,7 +247,7 @@ public class DiscoveryService : IDiscoveryService
         {
             var newRegistry = DiscoveryOnBackgroundThread(projectSettings, testAssemblySource);
             return newRegistry.BindingRegistry;
-        }), _ => { }, nameof(TriggerDiscoveryOnBackgroundThread));
+        }), _ => {_initialized.Set(); }, nameof(TriggerDiscoveryOnBackgroundThread));
 
         //ThreadPool.QueueUserWorkItem(_ => DiscoveryOnBackgroundThread(projectSettings, testAssemblySource));
     }
@@ -440,7 +443,7 @@ public class DiscoveryService : IDiscoveryService
                 newRegistrySource.SetResult(updatedRegistry);
                 DisposeSourceLocationTrackingPositions(registry);
                 TriggerBindingRegistryChanged();
-                
+                _initialized.Set();
                 return;
             }
 
