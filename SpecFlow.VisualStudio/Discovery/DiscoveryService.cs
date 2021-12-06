@@ -62,27 +62,6 @@ public class DiscoveryService : IDiscoveryService
         return _cache;
     }
 
-    public async Task<ProjectBindingRegistry> GetBindingRegistryAsync()
-    {
-        if (!_isDiscovering)
-        {
-            _logger.LogVerbose("getting reg from cache, because !_isDiscovering");
-            return GetBindingRegistry();
-        }
-
-        var completionSource = new TaskCompletionSource<ProjectBindingRegistry>();
-        _backgroundDiscoveryCompletionSources.Enqueue(completionSource);
-
-        if (!_isDiscovering) // in case it finished discovery while we were registering the completion source
-        {
-            _logger.LogVerbose("getting reg from cache after enqueue, because !_isDiscovering");
-            return GetBindingRegistry();
-        }
-
-        _logger.LogVerbose("getting reg using await");
-        return await completionSource.Task;
-    }
-
     public void Dispose()
     {
         _projectScope.IdeScope.WeakProjectsBuilt -= ProjectSystemOnProjectsBuilt;

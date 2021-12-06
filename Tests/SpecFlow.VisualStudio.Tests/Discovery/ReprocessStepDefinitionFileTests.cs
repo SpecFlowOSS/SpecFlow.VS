@@ -39,7 +39,7 @@ public class ReprocessStepDefinitionFileTests
         await discoveryService.ProcessAsync(stepDefinitionFile);
 
         //assert
-        ProjectBindingRegistry bindingRegistry = await discoveryService.GetBindingRegistryAsync();
+        ProjectBindingRegistry bindingRegistry = await discoveryService.GetLatestBindingRegistry();
         _projectScope.IdeScope.Logger.LogVerbose($"test retrieved reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
         var dumped = Dump(bindingRegistry);
         Approvals.Verify(dumped);
@@ -83,7 +83,7 @@ public class Foo{
         await discoveryService.ProcessAsync(stepDefinitionFile);
 
         //assert
-        ProjectBindingRegistry bindingRegistry = await discoveryService.GetBindingRegistryAsync();
+        ProjectBindingRegistry bindingRegistry = await discoveryService.GetLatestBindingRegistry();
         Dump(bindingRegistry);
 
         _projectScope.StubIdeScope.StubLogger.Logs.Should()
