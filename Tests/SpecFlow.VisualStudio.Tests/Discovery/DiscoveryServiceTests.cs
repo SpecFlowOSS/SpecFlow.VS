@@ -42,6 +42,7 @@ public class DiscoveryServiceTests
                 Mock.Of<ITelemetryConfigurationHolder>()
             ));
         ideScope.SetupGet(s => s.DeveroomErrorListServices).Returns(Mock.Of<IDeveroomErrorListServices>);
+        ideScope.Setup(s => s.CalculateSourceLocationTrackingPositions(It.IsAny<IEnumerable<SourceLocation>>()));
 
         projectScope.SetupGet(p => p.IdeScope).Returns(ideScope.Object);
         projectScope.SetupGet(p => p.Properties).Returns(propertyCollection);
@@ -55,10 +56,10 @@ public class DiscoveryServiceTests
 
         //act
         discoveryService.InitializeBindingRegistry();
-        discoveryService.CheckBindingRegistry();
+        await discoveryService.ProcessAsync(new CSharpStepDefinitionFile(string.Empty, "class Foo{[When(\"exp\")void Bar(){}]}"));
 
         //assert
         var registry = await discoveryService.GetBindingRegistryAsync();
-        registry.Version.Should().Be(2);
+        registry.StepDefinitions.Should().ContainSingle(sd=>sd.Expression=="exp");
     }
 }
