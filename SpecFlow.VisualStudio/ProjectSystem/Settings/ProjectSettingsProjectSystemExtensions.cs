@@ -8,9 +8,9 @@
             return provider.GetProjectSettings();
         }
 
-        public static ProjectSettingsProvider GetProjectSettingsProvider(this IProjectScope projectScope)
+        public static IProjectSettingsProvider GetProjectSettingsProvider(this IProjectScope projectScope)
         {
-            return projectScope.Properties.GetOrCreateSingletonProperty(() => new ProjectSettingsProvider(projectScope, new SpecFlowProjectSettingsProvider(projectScope)));
+            return projectScope.Properties.GetOrCreateSingletonProperty<IProjectSettingsProvider>(() => new ProjectSettingsProvider(projectScope, new SpecFlowProjectSettingsProvider(projectScope)));
         }
     }
 }

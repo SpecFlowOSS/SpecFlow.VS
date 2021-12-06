@@ -9,7 +9,7 @@ using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 
 namespace SpecFlow.VisualStudio.ProjectSystem.Settings
 {
-    public class ProjectSettingsProvider : IDisposable
+    public class ProjectSettingsProvider : IDisposable, IProjectSettingsProvider
     {
         private readonly IProjectScope _projectScope;
         private readonly SpecFlowProjectSettingsProvider _specFlowProjectSettingsProvider;
@@ -25,8 +25,8 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Settings
         public event EventHandler<EventArgs> SettingsInitialized;
         public event EventHandler<EventArgs> WeakSettingsInitialized
         {
-            add => WeakEventManager<ProjectSettingsProvider, EventArgs>.AddHandler(this, nameof(SettingsInitialized), value);
-            remove => WeakEventManager<ProjectSettingsProvider, EventArgs>.RemoveHandler(this, nameof(SettingsInitialized), value);
+            add => WeakEventManager<IProjectSettingsProvider, EventArgs>.AddHandler(this, nameof(SettingsInitialized), value);
+            remove => WeakEventManager<IProjectSettingsProvider, EventArgs>.RemoveHandler(this, nameof(SettingsInitialized), value);
         }
 
         public ProjectSettingsProvider([NotNull] IProjectScope projectScope, [NotNull] SpecFlowProjectSettingsProvider specFlowProjectSettingsProvider)
@@ -190,5 +190,14 @@ namespace SpecFlow.VisualStudio.ProjectSystem.Settings
             _projectScope.GetDeveroomConfigurationProvider().WeakConfigurationChanged -= OnConfigurationChanged;
             _projectScope.IdeScope.WeakProjectsBuilt -= ProjectSystemOnProjectsBuilt;
         }
+    }
+
+    public interface IProjectSettingsProvider
+    {
+        event EventHandler<EventArgs> WeakSettingsInitialized;
+        event EventHandler<EventArgs> SettingsInitialized;
+
+        ProjectSettings GetProjectSettings();
+        ProjectSettings CheckProjectSettings();
     }
 }

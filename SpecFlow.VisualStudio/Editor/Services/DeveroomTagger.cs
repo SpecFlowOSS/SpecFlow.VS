@@ -43,7 +43,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
         private readonly IDeveroomTagParser _deveroomTagParser;
         private readonly IDiscoveryService _discoveryService;
         private readonly IDeveroomConfigurationProvider _deveroomConfigurationProvider;
-        private readonly ProjectSettingsProvider _projectSettingsProvider;
+        private readonly IProjectSettingsProvider _projectSettingsProvider;
         private readonly IActionThrottler _actionThrottler;
         private readonly CalculationCache<TagsCache> _tagsCache = new CalculationCache<TagsCache>();
 

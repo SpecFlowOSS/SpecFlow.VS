@@ -10,7 +10,7 @@ public class DiscoveryService : IDiscoveryService
     private readonly IDeveroomLogger _logger;
     private readonly IMonitoringService _monitoringService;
     private readonly IProjectScope _projectScope;
-    private readonly ProjectSettingsProvider _projectSettingsProvider;
+    private readonly IProjectSettingsProvider _projectSettingsProvider;
     private ProjectBindingRegistryCache _cached = new ProjectBindingRegistryCacheUninitialized();
 
     private bool _isDiscovering;
