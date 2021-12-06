@@ -12,6 +12,7 @@ public class DiscoveryService : IDiscoveryService
     private readonly IProjectScope _projectScope;
     private readonly IProjectSettingsProvider _projectSettingsProvider;
     private ProjectBindingRegistryCache _cached = new ProjectBindingRegistryCacheUninitialized();
+    private ProjectBindingRegistry _cache;
 
     private bool _isDiscovering;
 
@@ -26,8 +27,9 @@ public class DiscoveryService : IDiscoveryService
         _projectSettingsProvider.WeakSettingsInitialized += ProjectSystemOnProjectsBuilt;
         _projectScope.IdeScope.WeakProjectOutputsUpdated += ProjectSystemOnProjectsBuilt;
 
+        _cache = ProjectBindingRegistry.Invalid;
         _currentBindingRegistrySource = new TaskCompletionSource<ProjectBindingRegistry>();
-        _currentBindingRegistrySource.SetResult(ProjectBindingRegistry.Invalid);
+        _currentBindingRegistrySource.SetResult(_cache);
     }
 
     private IFileSystem FileSystem => _projectScope.IdeScope.FileSystem;
@@ -57,7 +59,7 @@ public class DiscoveryService : IDiscoveryService
 
     public ProjectBindingRegistry GetBindingRegistry()
     {
-        return _cached.BindingRegistry;
+        return _cache;
     }
 
     public async Task<ProjectBindingRegistry> GetBindingRegistryAsync()
@@ -247,9 +249,7 @@ public class DiscoveryService : IDiscoveryService
         {
             var newRegistry = DiscoveryOnBackgroundThread(projectSettings, testAssemblySource);
             return newRegistry.BindingRegistry;
-        }), _ => {_initialized.Set(); }, nameof(TriggerDiscoveryOnBackgroundThread));
-
-        //ThreadPool.QueueUserWorkItem(_ => DiscoveryOnBackgroundThread(projectSettings, testAssemblySource));
+        }), _ => {_initialized.Set(); _cache= ProjectBindingRegistry.Invalid;}, nameof(TriggerDiscoveryOnBackgroundThread));
     }
 
     private volatile int x = 0;
@@ -441,9 +441,11 @@ public class DiscoveryService : IDiscoveryService
                     $"Done {n} r:{updatedRegistry.Version} c:{currentSource.Task.Id}-{currentSource.Task.Status} n:{newRegistrySource.Task.Id}-{newRegistrySource.Task.Status} o:{originalSource.Task.Id}-{originalSource.Task.Status} _:{_currentBindingRegistrySource.Task.Id}-{_currentBindingRegistrySource.Task.Status} ");
 
                 newRegistrySource.SetResult(updatedRegistry);
+                _cache = updatedRegistry;  
                 DisposeSourceLocationTrackingPositions(registry);
                 TriggerBindingRegistryChanged();
                 _initialized.Set();
+
                 return;
             }
 
