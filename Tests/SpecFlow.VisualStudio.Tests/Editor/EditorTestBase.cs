@@ -25,7 +25,7 @@ public abstract class EditorTestBase
         var discoveryService =
             MockableDiscoveryService.SetupWithInitialStepDefinitions(ProjectScope,
                 stepDefinitionClassFile.StepDefinitions, TimeSpan.FromMilliseconds(10));
-        await discoveryService.WaitUntilDiscoveryPerformed();
+        await discoveryService.GetLatestBindingRegistry();
 
         return textView;
     }

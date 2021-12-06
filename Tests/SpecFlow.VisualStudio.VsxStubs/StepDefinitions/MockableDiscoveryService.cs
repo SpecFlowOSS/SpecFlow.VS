@@ -23,7 +23,7 @@ public class MockableDiscoveryService : DiscoveryService
     protected override void TriggerBindingRegistryChanged()
     {
         base.TriggerBindingRegistryChanged();
-        if (GetBindingRegistry() is null) return;
+        //if (GetBindingRegistry() is null) return;
 
         var dcs = Interlocked.Exchange(ref _discoveryCompletionSource, new TaskCompletionSource<bool>());
         dcs.SetResult(true);
@@ -48,6 +48,8 @@ public class MockableDiscoveryService : DiscoveryService
         {
             LastDiscoveryResult = new DiscoveryResult {StepDefinitions = stepDefinitions}
         };
+        var initialized = new ManualResetEvent(false);
+        discoveryService.BindingRegistryChanged += DiscoveryServiceBindingRegistryChanged;
 
         discoveryResultProviderMock
             .Setup(ds => ds.RunDiscovery(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ProjectSettings>())).Returns(
@@ -58,9 +60,16 @@ public class MockableDiscoveryService : DiscoveryService
                 });
 
         discoveryService.InitializeBindingRegistry();
-
         projectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService);
+        initialized.WaitOne(TimeSpan.FromSeconds(10));
+        discoveryService.BindingRegistryChanged -= DiscoveryServiceBindingRegistryChanged;
+
         return discoveryService;
+
+        void DiscoveryServiceBindingRegistryChanged(object sender, EventArgs e)
+        {
+            initialized.Set();
+        }
     }
 
     public Task WaitUntilDiscoveryPerformed()

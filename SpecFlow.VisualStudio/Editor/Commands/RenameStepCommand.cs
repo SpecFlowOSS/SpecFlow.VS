@@ -300,7 +300,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         private async Task<ProjectBindingRegistry> GetBindingRegistry(RenameStepCommandContext ctx)
         {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
-            var bindingRegistry = await discoveryService.GetBindingRegistryAsync();
+            var bindingRegistry = await discoveryService.GetLatestBindingRegistry();
             if (bindingRegistry.IsFailed)
                 Logger.LogWarning(
                     $"Unable to get step definitions from project '{ctx.ProjectOfStepDefinitionClass.ProjectName}', usages will not be found for this project.");

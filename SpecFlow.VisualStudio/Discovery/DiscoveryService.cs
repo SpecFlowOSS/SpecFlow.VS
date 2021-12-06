@@ -187,7 +187,8 @@ public class DiscoveryService : IDiscoveryService
             GetSkippedBindingRegistryResult(projectSettings, out var testAssemblySource);
         if (skippedResult != null)
         {
-            PublishBindingRegistryResult(skippedResult);
+            _cached = skippedResult;
+            //PublishBindingRegistryResult(skippedResult);
             return;
         }
 
@@ -239,12 +240,18 @@ public class DiscoveryService : IDiscoveryService
     {
         _isDiscovering = true;
         _logger.LogVerbose($"_isDiscovering = true, x was {x}");
-        ThreadPool.QueueUserWorkItem(_ => DiscoveryOnBackgroundThread(projectSettings, testAssemblySource));
+        _projectScope.IdeScope.RunOnBackgroundThread(()=>UpdateBindingRegistry(_ =>
+        {
+            var newRegistry = DiscoveryOnBackgroundThread(projectSettings, testAssemblySource);
+            return newRegistry.BindingRegistry;
+        }), _ => { }, nameof(TriggerDiscoveryOnBackgroundThread));
+
+        //ThreadPool.QueueUserWorkItem(_ => DiscoveryOnBackgroundThread(projectSettings, testAssemblySource));
     }
 
     private volatile int x = 0;
 
-    private void DiscoveryOnBackgroundThread(ProjectSettings projectSettings, ConfigSource testAssemblySource)
+    private ProjectBindingRegistryCache DiscoveryOnBackgroundThread(ProjectSettings projectSettings, ConfigSource testAssemblySource)
     {
         var currentX = Interlocked.Increment(ref x);
         _logger.LogVerbose($"DiscoveryOnBackgroundThread start {currentX}");
@@ -252,7 +259,6 @@ public class DiscoveryService : IDiscoveryService
         try
         {
             projectBindingRegistryCache = InvokeDiscoveryWithTimer(projectSettings, testAssemblySource);
-            PublishBindingRegistryResult(projectBindingRegistryCache);
         }
         catch (Exception ex)
         {
@@ -265,6 +271,8 @@ public class DiscoveryService : IDiscoveryService
             while (_backgroundDiscoveryCompletionSources.TryDequeue(out var completionSource))
                 completionSource.SetResult(projectBindingRegistryCache?.BindingRegistry);
         }
+        _cached = projectBindingRegistryCache;
+        return projectBindingRegistryCache;
     }
 
     private ProjectBindingRegistryCache InvokeDiscoveryWithTimer(ProjectSettings projectSettings,
@@ -352,13 +360,6 @@ public class DiscoveryService : IDiscoveryService
         }
     }
 
-    private void PublishBindingRegistryResult(ProjectBindingRegistryCache projectBindingRegistryCache)
-    {
-        _cached = projectBindingRegistryCache;
-        if (projectBindingRegistryCache.BindingRegistry.IsFailed) return;
-        UpdateBindingRegistry(r => projectBindingRegistryCache.BindingRegistry).Wait();
-    }
-
     protected virtual void TriggerBindingRegistryChanged()
     {
         BindingRegistryChanged?.Invoke(this, EventArgs.Empty);
@@ -421,6 +422,12 @@ public class DiscoveryService : IDiscoveryService
                     $"Process {n} c:{currentSource.Task.Id}-{currentSource.Task.Status} n:{newRegistrySource.Task.Id}-{newRegistrySource.Task.Status} o:{originalSource.Task.Id}-{originalSource.Task.Status} _:{_currentBindingRegistrySource.Task.Id}-{_currentBindingRegistrySource.Task.Status} ");
 
                 var updatedRegistry = update(registry);
+                if (updatedRegistry.Version == registry.Version)
+                {
+                    newRegistrySource.SetResult(updatedRegistry);
+                    return;
+                }
+
                 if (updatedRegistry.Version < registry.Version)
                     throw new InvalidOperationException(
                         $"Cannot downgrade bindingRegistry from V{registry.Version} to V{updatedRegistry.Version}");
@@ -430,6 +437,7 @@ public class DiscoveryService : IDiscoveryService
                 newRegistrySource.SetResult(updatedRegistry);
                 DisposeSourceLocationTrackingPositions(registry);
                 TriggerBindingRegistryChanged();
+                
                 return;
             }
 
