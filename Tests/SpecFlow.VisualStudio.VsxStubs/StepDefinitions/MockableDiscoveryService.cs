@@ -8,7 +8,7 @@ public class MockableDiscoveryService : DiscoveryService
     {
     }
 
-    public DiscoveryResult LastDiscoveryResult { get; set; } = new() {StepDefinitions = new StepDefinition[0]};
+    public DiscoveryResult LastDiscoveryResult { get; set; } = new() {StepDefinitions = Array.Empty<StepDefinition>()};
 
     protected override ConfigSource GetTestAssemblySource(ProjectSettings projectSettings)
     {
@@ -31,8 +31,8 @@ public class MockableDiscoveryService : DiscoveryService
         };
 
         discoveryResultProviderMock
-            .Setup(ds => ds.RunDiscovery(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ProjectSettings>())).Returns(
-                delegate
+            .Setup(ds => ds.RunDiscovery(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ProjectSettings>()))
+            .Returns(()=>
                 {
                     Thread.Sleep(discoveryDelay); //make it a bit more realistic
                     return discoveryService.LastDiscoveryResult;
