@@ -1,4 +1,5 @@
-﻿using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
+﻿using Microsoft.VisualStudio.Threading;
+using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace SpecFlow.VisualStudio.Specs.StepDefinitions;
 
@@ -208,7 +209,6 @@ public class ProjectSystemSteps : Steps
     [When(@"the project is built")]
     public void WhenTheProjectIsBuilt()
     {
-        _discoveryService.Invalidate();
         _ideScope.TriggerProjectsBuilt();
     }
 
@@ -216,8 +216,10 @@ public class ProjectSystemSteps : Steps
     [Given("the project is built and the initial binding discovery is performed")]
     public async Task GivenTheProjectIsBuiltAndTheInitialBindingDiscoveryIsPerformed()
     {
+        var bindingRegistryChanged = new AsyncManualResetEvent();
+        _discoveryService.BindingRegistryChanged += (sender, args) => bindingRegistryChanged.Set();
         WhenTheProjectIsBuilt();
-        await WhenTheBindingDiscoveryIsPerformed();
+        await bindingRegistryChanged.WaitAsync();
     }
 
 
@@ -241,14 +243,6 @@ public class ProjectSystemSteps : Steps
         _wpfTextView = _ideScope.CreateTextView(new TestText(featureFileContent), projectScope: _projectScope,
             filePath: filePath);
         GivenTheFollowingFeatureFile(fileName, _wpfTextView.TextBuffer.CurrentSnapshot.GetText());
-    }
-
-    [Given(@"the initial binding discovery is performed")]
-    [When(@"the initial binding discovery is performed")]
-    [When(@"the binding discovery is performed")]
-    public async Task WhenTheBindingDiscoveryIsPerformed()
-    {
-        await _discoveryService.WaitUntilDiscoveryPerformed();
     }
 
     [When(@"I invoke the ""(.*)"" command by typing ""(.*)""")]

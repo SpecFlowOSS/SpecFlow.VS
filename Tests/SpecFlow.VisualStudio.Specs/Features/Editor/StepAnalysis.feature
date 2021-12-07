@@ -344,8 +344,7 @@ Scenario: Step is just defined and the project is built
 	When a new step definition is added to the project as:
 		| method       | type | regex                      |
 		| ThenNewStep1 | Then | there is an undefined step |
-	And the project is built
-	And the binding discovery is performed
+	And the project is built and the initial binding discovery is performed
 	Then all section of types DefinedStep,UndefinedStep should be highlighted as
 		"""
 		Feature: Addition
