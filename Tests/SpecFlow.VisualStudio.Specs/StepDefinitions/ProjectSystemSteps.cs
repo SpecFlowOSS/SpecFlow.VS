@@ -216,10 +216,11 @@ public class ProjectSystemSteps : Steps
     [Given("the project is built and the initial binding discovery is performed")]
     public async Task GivenTheProjectIsBuiltAndTheInitialBindingDiscoveryIsPerformed()
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var bindingRegistryChanged = new AsyncManualResetEvent();
         _discoveryService.BindingRegistryChanged += (sender, args) => bindingRegistryChanged.Set();
         WhenTheProjectIsBuilt();
-        await bindingRegistryChanged.WaitAsync();
+        await bindingRegistryChanged.WaitAsync(cts.Token);
     }
 
 
