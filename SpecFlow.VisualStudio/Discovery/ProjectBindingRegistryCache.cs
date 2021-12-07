@@ -5,27 +5,27 @@ namespace SpecFlow.VisualStudio.Discovery
 {
     internal sealed class ProjectBindingRegistryCacheUninitialized : ProjectBindingRegistryCache
     {
-        public ProjectBindingRegistryCacheUninitialized() : base(ProjectBindingRegistry.Invalid)
+        public ProjectBindingRegistryCacheUninitialized() : base(ProjectBindingRegistry.Empty)
         {
         }
     }
     internal sealed class ProjectBindingRegistryCacheUninitializedProjectSettings : ProjectBindingRegistryCache
     {
-        public ProjectBindingRegistryCacheUninitializedProjectSettings() : base(ProjectBindingRegistry.Invalid)
+        public ProjectBindingRegistryCacheUninitializedProjectSettings() : base(ProjectBindingRegistry.Empty)
         {
         }
     }
 
     internal sealed class ProjectBindingRegistryCacheTestAssemblyNotFound : ProjectBindingRegistryCache
     {
-        public ProjectBindingRegistryCacheTestAssemblyNotFound() : base(ProjectBindingRegistry.Invalid)
+        public ProjectBindingRegistryCacheTestAssemblyNotFound() : base(ProjectBindingRegistry.Empty)
         {
         }
     }
 
     internal sealed class ProjectBindingRegistryCacheError : ProjectBindingRegistryCache
     {
-        public ProjectBindingRegistryCacheError() : base(ProjectBindingRegistry.Invalid)
+        public ProjectBindingRegistryCacheError() : base(ProjectBindingRegistry.Empty)
         {
         }
     }
@@ -57,7 +57,7 @@ namespace SpecFlow.VisualStudio.Discovery
 
     internal sealed class ProjectBindingRegistryCacheNonSpecFlowTestProject : ProjectBindingRegistryCache
     {
-        public ProjectBindingRegistryCacheNonSpecFlowTestProject() : base(ProjectBindingRegistry.Invalid)
+        public ProjectBindingRegistryCacheNonSpecFlowTestProject() : base(ProjectBindingRegistry.Empty)
         {
         }
     }

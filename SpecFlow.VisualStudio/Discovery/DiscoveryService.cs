@@ -22,7 +22,7 @@ public class DiscoveryService : IDiscoveryService
         _projectSettingsProvider.WeakSettingsInitialized += ProjectSystemOnProjectsBuilt;
         _projectScope.IdeScope.WeakProjectOutputsUpdated += ProjectSystemOnProjectsBuilt;
 
-        _cache = ProjectBindingRegistry.Invalid;
+        _cache = ProjectBindingRegistry.Empty;
         _currentBindingRegistrySource = new TaskCompletionSource<ProjectBindingRegistry>();
         _currentBindingRegistrySource.SetResult(_cache);
     }
@@ -121,7 +121,7 @@ public class DiscoveryService : IDiscoveryService
             bindingRegistry = bindingRegistry
                 .Where(binding =>
                     binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath)
-                .AddStepDefinitions(projectStepDefinitionBindings);
+                .WithStepDefinitions(projectStepDefinitionBindings);
             _logger.LogVerbose(
                 $"replacing with reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
 
@@ -218,7 +218,7 @@ public class DiscoveryService : IDiscoveryService
         {
             var newRegistry = InvokeDiscoveryWithTimer(projectSettings, testAssemblySource);
             return newRegistry.BindingRegistry;
-        }), _ => {Initialized.Set(); _cache= ProjectBindingRegistry.Invalid;}, nameof(TriggerDiscoveryOnBackgroundThread));
+        }), _ => {Initialized.Set(); _cache= ProjectBindingRegistry.Empty;});
     }
 
     private ProjectBindingRegistryCache InvokeDiscoveryWithTimer(ProjectSettings projectSettings,
@@ -243,7 +243,7 @@ public class DiscoveryService : IDiscoveryService
             ProjectBindingRegistry bindingRegistry = null;
             if (result.IsFailed)
             {
-                bindingRegistry = ProjectBindingRegistry.Invalid;
+                bindingRegistry = ProjectBindingRegistry.Empty;
                 _logger.LogWarning(result.ErrorMessage);
                 _logger.LogWarning(
                     $"The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled. {Environment.NewLine}  Please check the error message above and report to https://github.com/SpecFlowOSS/SpecFlow.VS/issues if you cannot fix.");

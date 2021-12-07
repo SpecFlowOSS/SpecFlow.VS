@@ -4,7 +4,7 @@ public class ProjectBindingRegistry
 {
     private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
     private const string DocStringDefaultTypeName = TypeShortcuts.StringType;
-    public static ProjectBindingRegistry Invalid = new(Array.Empty<ProjectStepDefinitionBinding>());
+    public static ProjectBindingRegistry Empty = new(Array.Empty<ProjectStepDefinitionBinding>());
 
     private static int _versionCounter;
 
@@ -15,7 +15,7 @@ public class ProjectBindingRegistry
 
     public int Version { get; } = Interlocked.Increment(ref _versionCounter);
     public ImmutableArray<ProjectStepDefinitionBinding> StepDefinitions { get; }
-    public bool IsFailed => this == Invalid;
+    public bool IsFailed => this == Empty;
 
     public MatchResult MatchStep(Step step, IGherkinDocumentContext context = null)
     {
@@ -170,14 +170,7 @@ public class ProjectBindingRegistry
         return sdMatches;
     }
 
-    public ProjectBindingRegistry AddStepDefinition(ProjectStepDefinitionBinding sd)
-    {
-        var stepDefinitions = StepDefinitions.ToList();
-        stepDefinitions.Add(sd);
-        return new ProjectBindingRegistry(stepDefinitions);
-    }
-
-    public ProjectBindingRegistry AddStepDefinitions(
+    public ProjectBindingRegistry WithStepDefinitions(
         IEnumerable<ProjectStepDefinitionBinding> projectStepDefinitionBindings)
     {
         var stepDefinitions = StepDefinitions.ToList();

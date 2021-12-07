@@ -172,7 +172,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
             var recalculated = _tagsCache.ReCalculate((() =>
             {
                 var configuration = _deveroomConfigurationProvider.GetConfiguration();
-                var bindingRegistry = _discoveryService?.GetBindingRegistry() ?? ProjectBindingRegistry.Invalid;
+                var bindingRegistry = _discoveryService?.GetBindingRegistry() ?? ProjectBindingRegistry.Empty;
                 var bindingRegistryVersion = bindingRegistry?.Version;
                 var currentTagsCache = _tagsCache.Value;
                 if (currentTagsCache != null &&
