@@ -73,6 +73,7 @@ public class DiscoveryServiceTests
         //act
         var updateTaskCount = 0;
         bool retried;
+        var sw = Stopwatch.StartNew();
         do
         {
             var tasks = new Task[10];
@@ -80,7 +81,7 @@ public class DiscoveryServiceTests
             {
                 tasks[i] = RunInThread(async () =>
                 {
-                    for (int j = 0; j < 10; ++j)
+                    for (int j = 0; j < 5+sw.ElapsedTicks % 10; ++j)
                         if ((i + j) % 7 == 6) await discoveryService.GetLatestBindingRegistry();
                         
                         else
@@ -98,9 +99,10 @@ public class DiscoveryServiceTests
             await Task.WhenAll(tasks);
             retried = stubLogger.Logs.Any(log=>log.Message.Contains("Retry"));
             stubLogger.Clear();
-        } while (!retried);
+        } while (!retried && sw.Elapsed<TimeSpan.FromMinutes(1));
 
         //assert
+        sw.Elapsed.Should().BeLessThan(TimeSpan.FromMinutes(1));
         var registry = await discoveryService.GetLatestBindingRegistry();
         registry.Version.Should().BeGreaterOrEqualTo(initialRegistry.Version + updateTaskCount);
         oldVersions.Count.Should().Be(updateTaskCount);
