@@ -130,8 +130,6 @@ namespace SpecFlow.VisualStudio.Editor.Services
                 foreach (var step in scenarioDefinition.Steps)
                 {
                     var matchResult = dummyRegistry.MatchStep(step, context);
-                    if (matchResult == null)
-                        continue; // this will not happen
                     if (matchResult.HasDefined)
                         yield return new StepDefinitionUsage(
                             GetSourceLocation(step, featureFilePath), step);

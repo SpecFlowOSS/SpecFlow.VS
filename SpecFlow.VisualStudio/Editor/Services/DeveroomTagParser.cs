@@ -153,31 +153,30 @@ public class DeveroomTagParser : IDeveroomTagParser
             if (scenarioDefinition is ScenarioOutline) AddPlaceholderTags(fileSnapshot, stepTag, step);
 
             var match = bindingRegistry.MatchStep(step, scenarioDefinitionTag);
-            if (match != null)
+
+            if (match.HasDefined || match.HasAmbiguous)
             {
-                if (match.HasDefined || match.HasAmbiguous)
+                stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.DefinedStep,
+                    GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
+                    match));
+                if (!(scenarioDefinition is ScenarioOutline) || !step.Text.Contains("<"))
                 {
-                    stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.DefinedStep,
-                        GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
-                        match));
-                    if (!(scenarioDefinition is ScenarioOutline) || !step.Text.Contains("<"))
-                    {
-                        var parameterMatch = match.Items.FirstOrDefault(m => m.ParameterMatch != null)
-                            ?.ParameterMatch;
-                        AddParameterTags(fileSnapshot, parameterMatch, stepTag, step);
-                    }
+                    var parameterMatch = match.Items.FirstOrDefault(m => m.ParameterMatch != null)
+                        ?.ParameterMatch;
+                    AddParameterTags(fileSnapshot, parameterMatch, stepTag, step);
                 }
-
-                if (match.HasUndefined)
-                    stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.UndefinedStep,
-                        GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
-                        match));
-
-                if (match.HasErrors)
-                    stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.BindingError,
-                        GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
-                        match.GetErrorMessage()));
             }
+
+            if (match.HasUndefined)
+                stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.UndefinedStep,
+                    GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
+                    match));
+
+            if (match.HasErrors)
+                stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.BindingError,
+                    GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
+                    match.GetErrorMessage()));
+            
         }
 
         if (scenarioDefinition is ScenarioOutline scenarioOutline)

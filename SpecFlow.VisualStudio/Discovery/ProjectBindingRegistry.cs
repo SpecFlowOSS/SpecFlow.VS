@@ -20,7 +20,7 @@ public class ProjectBindingRegistry
     public MatchResult MatchStep(Step step, IGherkinDocumentContext context = null)
     {
         if (IsFailed)
-            return null;
+            return MatchResult.NoMatch;
 
         var stepText = step.Text;
         if (context.IsScenarioOutline() && stepText.Contains("<"))
