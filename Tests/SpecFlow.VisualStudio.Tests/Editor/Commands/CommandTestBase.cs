@@ -58,6 +58,9 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
             ? new CancellationTokenSource(TimeSpan.FromMinutes(1))
             : new CancellationTokenSource(TimeSpan.FromSeconds(10));
         return command.Finished.WaitAsync(cts.Token);
+
+        //return ProjectScope.StubIdeScope.AnalyticsTransmitter
+        //    .WaitForEventAsync(_completedEventSignal);
     }
 
     public ImmutableArray<string> WarningMessages()
