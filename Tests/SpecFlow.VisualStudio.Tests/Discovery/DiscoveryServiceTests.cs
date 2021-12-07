@@ -114,7 +114,7 @@ public class DiscoveryServiceTests
     {
         TaskCompletionSource<bool> taskCompletionSource = new TaskCompletionSource<bool>();
 
-        Thread thread = new Thread(() =>
+        ThreadPool.QueueUserWorkItem(_ =>
         {
             try
             {
@@ -125,8 +125,7 @@ public class DiscoveryServiceTests
             {
                 taskCompletionSource.TrySetException(e);
             }
-        });
-        thread.Start();
+        }, default);
 
         return taskCompletionSource.Task;
     }
