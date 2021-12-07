@@ -74,7 +74,8 @@ public class DiscoveryServiceTests
         //act
         var updateTaskCount = 0;
         bool retried;
-        var cts = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+        var timeout = TimeSpan.FromSeconds(10);
+        var cts = new CancellationTokenSource(timeout);
         do
         {
             var tasks = new Task[10];
@@ -103,7 +104,9 @@ public class DiscoveryServiceTests
         } while (!retried && !cts.IsCancellationRequested);
 
         //assert
-        cts.IsCancellationRequested.Should().BeFalse($"started at {start} and not finished until {DateTimeOffset.UtcNow}");
+        var finish = DateTimeOffset.UtcNow;
+        cts.IsCancellationRequested.Should().BeFalse($"started at {start} and not finished until {finish}");
+        (finish - start).Should().BeLessThan(timeout, $"started at {start} and not finished until {finish}");
         var registry = await discoveryService.GetLatestBindingRegistry();
         registry.Version.Should().BeGreaterOrEqualTo(initialRegistry.Version + updateTaskCount);
         oldVersions.Count.Should().Be(updateTaskCount);
