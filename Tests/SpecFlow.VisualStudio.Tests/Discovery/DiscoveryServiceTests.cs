@@ -18,6 +18,7 @@ public class DiscoveryServiceTests
     public async Task ParallelUpdate()
     {
         //arrange
+        var start = DateTimeOffset.UtcNow;
         var projectScope = new Mock<IProjectScope>(MockBehavior.Strict);
         var ideScope = new Mock<IIdeScope>(MockBehavior.Strict);
         var stubLogger = new StubLogger();
@@ -102,7 +103,7 @@ public class DiscoveryServiceTests
         } while (!retried && !cts.IsCancellationRequested);
 
         //assert
-        cts.IsCancellationRequested.Should().BeFalse();
+        cts.IsCancellationRequested.Should().BeFalse($"started at {start} and not finished until {DateTimeOffset.UtcNow}");
         var registry = await discoveryService.GetLatestBindingRegistry();
         registry.Version.Should().BeGreaterOrEqualTo(initialRegistry.Version + updateTaskCount);
         oldVersions.Count.Should().Be(updateTaskCount);
