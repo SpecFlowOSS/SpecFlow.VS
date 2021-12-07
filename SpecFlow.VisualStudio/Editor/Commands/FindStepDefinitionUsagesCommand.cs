@@ -167,16 +167,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             var discoveryService = project.GetDiscoveryService();
             var bindingRegistry = await discoveryService.GetLatestBindingRegistry();
-            if (bindingRegistry.IsFailed)
-                Logger.LogWarning($"Unable to get step definitions from project '{project.ProjectName}', usages will not be found for this project.");
             return GetStepDefinitions(fileName, triggerPoint, bindingRegistry);
         }
 
         internal static ProjectStepDefinitionBinding[] GetStepDefinitions(string fileName, SnapshotPoint triggerPoint, ProjectBindingRegistry bindingRegistry)
         {
-            if (bindingRegistry == null)
-                return Array.Empty<ProjectStepDefinitionBinding>();
-
             return bindingRegistry.StepDefinitions
                 .Where(sd => sd.Implementation?.SourceLocation != null &&
                              sd.Implementation.SourceLocation.SourceFile == fileName &&

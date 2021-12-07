@@ -18,7 +18,7 @@ namespace SpecFlow.VisualStudio.Tests.Discovery
 
         protected ProjectBindingRegistry CreateSut()
         {
-            var projectBindingRegistry = new ProjectBindingRegistry(_stepDefinitionBindings.ToArray());
+            var projectBindingRegistry = new ProjectBindingRegistry(_stepDefinitionBindings.ToArray(), 123456);
             return projectBindingRegistry;
         }
 

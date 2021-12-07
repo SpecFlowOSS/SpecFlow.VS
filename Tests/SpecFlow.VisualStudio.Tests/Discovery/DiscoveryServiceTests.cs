@@ -69,7 +69,7 @@ public class DiscoveryServiceTests
         var discoveryService = new DiscoveryService(projectScope.Object, discoveryResultProvider.Object);
 
         var oldVersions = new ConcurrentQueue<int>();
-        var initialRegistry = new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>());
+        var initialRegistry = new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(), 123456);
 
         //act
         var updateTaskCount = 0;
@@ -94,7 +94,7 @@ public class DiscoveryServiceTests
                                 await discoveryService.UpdateBindingRegistry(old =>
                                 {
                                     oldVersions.Enqueue(old.Version);
-                                    return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>());
+                                return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(), i*1000+j);
                                 });
                             }
                     }, cts.Token);

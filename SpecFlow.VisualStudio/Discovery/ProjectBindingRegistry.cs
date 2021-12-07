@@ -4,24 +4,28 @@ public class ProjectBindingRegistry
 {
     private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
     private const string DocStringDefaultTypeName = TypeShortcuts.StringType;
-    public static ProjectBindingRegistry Empty = new(Array.Empty<ProjectStepDefinitionBinding>());
+    public static ProjectBindingRegistry Empty = new(ImmutableArray<ProjectStepDefinitionBinding>.Empty);
 
     private static int _versionCounter;
 
-    public ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions)
+    private ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions)
     {
         StepDefinitions = stepDefinitions.ToImmutableArray();
     }
 
+    public ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions, int projectHash) 
+        : this(stepDefinitions)
+    {
+        ProjectHash = projectHash;
+    }
+
     public int Version { get; } = Interlocked.Increment(ref _versionCounter);
+    public int? ProjectHash { get; }
+
     public ImmutableArray<ProjectStepDefinitionBinding> StepDefinitions { get; }
-    public bool IsFailed => this == Empty;
 
     public MatchResult MatchStep(Step step, IGherkinDocumentContext context = null)
     {
-        if (IsFailed)
-            return MatchResult.NoMatch;
-
         var stepText = step.Text;
         if (context.IsScenarioOutline() && stepText.Contains("<"))
         {

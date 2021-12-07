@@ -301,9 +301,6 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
             var bindingRegistry = discoveryService.GetBindingRegistry();
-            if (bindingRegistry.IsFailed)
-                Logger.LogWarning(
-                    $"Unable to get step definitions from project '{ctx.ProjectOfStepDefinitionClass.ProjectName}', usages will not be found for this project.");
             return bindingRegistry;
         }
 

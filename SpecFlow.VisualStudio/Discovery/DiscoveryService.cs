@@ -65,7 +65,6 @@ public class DiscoveryService : IDiscoveryService
 
     public async Task ProcessAsync(CSharpStepDefinitionFile stepDefinitionFile)
     {
-        _logger.LogVerbose("ProcessAsync started");
         SyntaxTree tree = CSharpSyntaxTree.ParseText(stepDefinitionFile.Content);
         var rootNode = await tree.GetRootAsync();
 
@@ -113,17 +112,10 @@ public class DiscoveryService : IDiscoveryService
 
         await UpdateBindingRegistry(bindingRegistry =>
         {
-            _logger.LogVerbose($"current reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
-            if (bindingRegistry.IsFailed)
-                throw
-                    new Exception(
-                        "changing invalid registry"); //TODO: do not try to modify an invalid registry, return here without doing anything. The exception throw is to better detect async issues only.
             bindingRegistry = bindingRegistry
                 .Where(binding =>
                     binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath)
                 .WithStepDefinitions(projectStepDefinitionBindings);
-            _logger.LogVerbose(
-                $"replacing with reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
 
             _cached = _cached.WithBindingRegistry(bindingRegistry);
 
@@ -145,6 +137,11 @@ public class DiscoveryService : IDiscoveryService
         var testAssemblySource = GetTestAssemblySource(projectSettings);
 
         return _cached.IsUpToDate(projectSettings, testAssemblySource.LastChangeTime);
+    }
+
+    private int CreateProjectHash(ProjectSettings projectSetting, ConfigSource configSource)
+    {
+        return projectSetting.GetHashCode() ^ configSource.GetHashCode();
     }
 
     protected virtual ConfigSource GetTestAssemblySource(ProjectSettings projectSettings)
@@ -267,7 +264,7 @@ public class DiscoveryService : IDiscoveryService
                     .Select(sd => bindingImporter.ImportStepDefinition(sd))
                     .Where(psd => psd != null)
                     .ToArray();
-                bindingRegistry = new ProjectBindingRegistry(stepDefinitions);
+                bindingRegistry = new ProjectBindingRegistry(stepDefinitions, CreateProjectHash(projectSettings, testAssemblySource));
                 _logger.LogInfo(
                     $"{bindingRegistry.StepDefinitions.Length} step definitions discovered for project {_projectScope.ProjectName}");
 
@@ -294,7 +291,7 @@ public class DiscoveryService : IDiscoveryService
                 CalculateSourceLocationTrackingPositions(bindingRegistry);
             }
 
-            _monitoringService.MonitorSpecFlowDiscovery(bindingRegistry.IsFailed, result.ErrorMessage,
+            _monitoringService.MonitorSpecFlowDiscovery(bindingRegistry.StepDefinitions.IsEmpty, result.ErrorMessage,
                 bindingRegistry.StepDefinitions.Length, projectSettings);
             return new ProjectBindingRegistryCacheDiscovered(bindingRegistry, projectSettings,
                 testAssemblySource.LastChangeTime);
@@ -377,8 +374,6 @@ public class DiscoveryService : IDiscoveryService
                 if (updatedRegistry.Version < registry.Version)
                     throw new InvalidOperationException(
                         $"Cannot downgrade bindingRegistry from V{registry.Version} to V{updatedRegistry.Version}");
-                if (updatedRegistry.IsFailed)
-                    throw new InvalidOperationException($"Update failure in bindingRegistry V{registry.Version}");
                 CalculateSourceLocationTrackingPositions(updatedRegistry);
                 _logger.LogVerbose(
                     $"Done {n} r:{updatedRegistry.Version} c:{currentSource.Task.Id}-{currentSource.Task.Status} n:{newRegistrySource.Task.Id}-{newRegistrySource.Task.Status} o:{originalSource.Task.Id}-{originalSource.Task.Status} _:{_currentBindingRegistrySource.Task.Id}-{_currentBindingRegistrySource.Task.Status} ");
