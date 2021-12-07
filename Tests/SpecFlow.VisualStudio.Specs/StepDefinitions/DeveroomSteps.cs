@@ -219,15 +219,10 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             var discoveryService = projectScope.GetDiscoveryService();
             discoveryService.Should().NotBeNull("The DiscoveryService should be available");
 
-            var sw = Stopwatch.StartNew();
-            do
-            {
-                _bindingRegistry = await discoveryService.GetLatestBindingRegistry();
-                if (!_bindingRegistry.IsFailed) break;
-                await Task.Delay(10);
-            } while (sw.Elapsed<TimeSpan.FromSeconds(10));
+             discoveryService.Initialized.WaitOne(TimeSpan.FromSeconds(10));
+             _bindingRegistry = await discoveryService.GetLatestBindingRegistry();
 
-            _bindingRegistry.IsFailed.Should().BeFalse("binding should be discovered");
+            _bindingRegistry.StepDefinitions.Should().NotBeEmpty("binding should be discovered");
         }
 
         private StubProjectScope GetProjectScope()

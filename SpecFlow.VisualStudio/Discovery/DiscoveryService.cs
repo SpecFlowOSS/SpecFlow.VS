@@ -36,7 +36,7 @@ public class DiscoveryService : IDiscoveryService
             value);
     }
 
-    protected ManualResetEvent Initialized = new (false);
+    public ManualResetEvent Initialized { get; } = new(false);
 
     public void InitializeBindingRegistry()
     {
