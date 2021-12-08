@@ -1,5 +1,6 @@
 ﻿namespace SpecFlow.VisualStudio.Discovery;
 
+[DebuggerDisplay("{Version}_{ProjectHash}")]
 public class ProjectBindingRegistry
 {
     private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
@@ -21,6 +22,11 @@ public class ProjectBindingRegistry
 
     public int Version { get; } = Interlocked.Increment(ref _versionCounter);
     public int? ProjectHash { get; }
+
+    public override string ToString()
+    {
+        return $"ProjectBindingRegistry_V{Version}_H{ProjectHash}";
+    }
 
     public ImmutableArray<ProjectStepDefinitionBinding> StepDefinitions { get; }
 
