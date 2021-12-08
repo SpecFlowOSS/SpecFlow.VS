@@ -300,7 +300,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         private ProjectBindingRegistry GetBindingRegistry(RenameStepCommandContext ctx)
         {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
-            var bindingRegistry = discoveryService.GetBindingRegistry();
+            var bindingRegistry = discoveryService.GetLastProcessedBindingRegistry();
             return bindingRegistry;
         }
 

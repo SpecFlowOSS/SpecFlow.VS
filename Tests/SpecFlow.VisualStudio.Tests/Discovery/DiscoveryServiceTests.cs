@@ -101,7 +101,7 @@ public class DiscoveryServiceTests
                 }
 
                 await Task.WhenAll(tasks);
-                retried = stubLogger.Logs.Any(log => log.Message.Contains("Iteration:2"));
+                retried = stubLogger.Logs.Any(log => log.Message.Contains("in 2 iteration"));
                 stubLogger.Clear();
             } while (!retried && !cts.IsCancellationRequested);
         }

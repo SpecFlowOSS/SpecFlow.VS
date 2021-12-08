@@ -475,7 +475,7 @@ public class ProjectSystemSteps : Steps
     [Then(@"the source file of the ""(.*)"" ""(.*)"" step definition is opened")]
     public void ThenTheSourceFileOfTheStepDefinitionIsOpened(string stepRegex, ScenarioBlock stepType)
     {
-        _stepDefinitionBinding = _discoveryService.GetBindingRegistry().StepDefinitions
+        _stepDefinitionBinding = _discoveryService.GetLastProcessedBindingRegistry().StepDefinitions
             .FirstOrDefault(b => b.StepDefinitionType == stepType && b.Regex.ToString().Contains(stepRegex));
         _stepDefinitionBinding.Should().NotBeNull($"there has to be a {stepType} stepdef with regex '{stepRegex}'");
 

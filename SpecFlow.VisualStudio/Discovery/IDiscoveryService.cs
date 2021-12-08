@@ -3,7 +3,7 @@
 public interface IDiscoveryService : IDisposable
 {
     event EventHandler<EventArgs> WeakBindingRegistryChanged;
-    ProjectBindingRegistry GetBindingRegistry();
+    ProjectBindingRegistry GetLastProcessedBindingRegistry();
     Task<ProjectBindingRegistry> GetLatestBindingRegistry();
     void CheckBindingRegistry();
     void InitializeBindingRegistry();
