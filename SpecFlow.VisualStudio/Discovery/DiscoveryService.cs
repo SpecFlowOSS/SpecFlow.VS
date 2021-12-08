@@ -8,7 +8,6 @@ public class DiscoveryService : IDiscoveryService
     private readonly IMonitoringService _monitoringService;
     private readonly IProjectScope _projectScope;
     private readonly IProjectSettingsProvider _projectSettingsProvider;
-    private ProjectBindingRegistryCache _cached = new ProjectBindingRegistryCacheUninitialized();
     private ProjectBindingRegistry _cache;
 
     public DiscoveryService(IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider = null)
@@ -117,8 +116,6 @@ public class DiscoveryService : IDiscoveryService
                     binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath)
                 .WithStepDefinitions(projectStepDefinitionBindings);
 
-            _cached = _cached.WithBindingRegistry(bindingRegistry);
-
             return bindingRegistry;
         });
     }
@@ -135,8 +132,9 @@ public class DiscoveryService : IDiscoveryService
     {
         var projectSettings = _projectScope.GetProjectSettings();
         var testAssemblySource = GetTestAssemblySource(projectSettings);
+        var currentHash = CreateProjectHash(projectSettings, testAssemblySource);
 
-        return _cached.IsUpToDate(projectSettings, testAssemblySource.LastChangeTime);
+        return _cache.ProjectHash == currentHash;
     }
 
     private int CreateProjectHash(ProjectSettings projectSetting, ConfigSource configSource)
@@ -153,43 +151,44 @@ public class DiscoveryService : IDiscoveryService
 
     private void TriggerDiscovery()
     {
-        var projectSettings = _projectScope.GetProjectSettings();
-        _errorListServices?.ClearErrors(DeveroomUserErrorCategory.Discovery);
-        ProjectBindingRegistryCache skippedResult =
-            GetSkippedBindingRegistryResult(projectSettings, out var testAssemblySource);
-        if (skippedResult != null)
-        {
-            _cached = skippedResult;
-            //PublishBindingRegistryResult(skippedResult);
-            Initialized.Set();
-            return;
-        }
-
-        TriggerDiscoveryOnBackgroundThread(projectSettings, testAssemblySource);
+        _projectScope.IdeScope.RunOnBackgroundThread(
+            () => UpdateBindingRegistry(InvokeDiscoveryWithTimer),
+            _ =>
+            {
+                Initialized.Set();
+                _cache = ProjectBindingRegistry.Empty;
+            });
     }
 
-    private ProjectBindingRegistryCache GetSkippedBindingRegistryResult(ProjectSettings projectSettings,
-        out ConfigSource testAssemblySource)
+    private ProjectBindingRegistry InvokeDiscoveryWithTimer(ProjectBindingRegistry _)
     {
-        testAssemblySource = null;
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        var result = InvokeDiscovery();
+        stopwatch.Stop(); 
+        _logger.LogVerbose($"Discovery: {stopwatch.ElapsedMilliseconds} ms");
+        return result;
+    }
+
+    private ProjectBindingRegistry InvokeDiscovery()
+    {
+        var projectSettings = _projectScope.GetProjectSettings();
+        _errorListServices?.ClearErrors(DeveroomUserErrorCategory.Discovery);
 
         if (projectSettings.IsUninitialized)
         {
             _logger.LogVerbose("Uninitialized project settings");
-            return new ProjectBindingRegistryCacheUninitializedProjectSettings();
+            return ProjectBindingRegistry.Empty;
         }
 
         if (!projectSettings.IsSpecFlowTestProject)
         {
             _logger.LogVerbose("Non-SpecFlow test project");
-            if (_cached is ProjectBindingRegistryCacheUninitialized)
-                _logger.LogWarning(
-                    $"Could not detect the SpecFlow version of the project that is required for navigation, step completion and other features. {Environment.NewLine}  Currently only NuGet package referenced can be detected. Please check https://github.com/specsolutions/deveroom-visualstudio/issues/14 for details.");
-            return new ProjectBindingRegistryCacheNonSpecFlowTestProject();
+            return ProjectBindingRegistry.Empty;
         }
 
-        testAssemblySource = GetTestAssemblySource(projectSettings);
-        if (testAssemblySource == null)
+        var testAssemblySource = GetTestAssemblySource(projectSettings);
+        if (testAssemblySource == ConfigSource.Invalid)
         {
             var message =
                 "Test assembly not found. Please build the project to enable the SpecFlow Visual Studio Extension features.";
@@ -203,104 +202,68 @@ public class DiscoveryService : IDiscoveryService
                     Type = TaskErrorCategory.Warning
                 }
             });
-            return new ProjectBindingRegistryCacheTestAssemblyNotFound();
+            return ProjectBindingRegistry.Empty;
         }
 
-        return null;
-    }
+        var result = _discoveryResultProvider.RunDiscovery(testAssemblySource.FilePath,
+            projectSettings.SpecFlowConfigFilePath, projectSettings);
 
-    private void TriggerDiscoveryOnBackgroundThread(ProjectSettings projectSettings, ConfigSource testAssemblySource)
-    {
-        _projectScope.IdeScope.RunOnBackgroundThread(()=>UpdateBindingRegistry(_ =>
+        if (result.IsFailed)
         {
-            var newRegistry = InvokeDiscoveryWithTimer(projectSettings, testAssemblySource);
-            return newRegistry.BindingRegistry;
-        }), _ => {Initialized.Set(); _cache= ProjectBindingRegistry.Empty;});
-    }
+            _logger.LogWarning(result.ErrorMessage);
+            _logger.LogWarning(
+                $"The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled. {Environment.NewLine}  Please check the error message above and report to https://github.com/SpecFlowOSS/SpecFlow.VS/issues if you cannot fix.");
 
-    private ProjectBindingRegistryCache InvokeDiscoveryWithTimer(ProjectSettings projectSettings,
-        ConfigSource testAssemblySource)
-    {
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        var result = InvokeDiscovery(projectSettings, testAssemblySource);
-        stopwatch.Stop();
-        if (result.IsDiscovered)
-            _logger.LogVerbose($"Discovery: {stopwatch.ElapsedMilliseconds} ms");
-        return result;
-    }
-
-    private ProjectBindingRegistryCache InvokeDiscovery(ProjectSettings projectSettings,
-        ConfigSource testAssemblySource)
-    {
-        try
-        {
-            var result = _discoveryResultProvider.RunDiscovery(testAssemblySource.FilePath,
-                projectSettings.SpecFlowConfigFilePath, projectSettings);
-            ProjectBindingRegistry bindingRegistry = null;
-            if (result.IsFailed)
+            _errorListServices?.AddErrors(new[]
             {
-                bindingRegistry = ProjectBindingRegistry.Empty;
-                _logger.LogWarning(result.ErrorMessage);
-                _logger.LogWarning(
-                    $"The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled. {Environment.NewLine}  Please check the error message above and report to https://github.com/SpecFlowOSS/SpecFlow.VS/issues if you cannot fix.");
-
-                _errorListServices?.AddErrors(new[]
+                new DeveroomUserError
                 {
-                    new DeveroomUserError
+                    Category = DeveroomUserErrorCategory.Discovery,
+                    Message =
+                        "The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled.",
+                    Type = TaskErrorCategory.Warning
+                }
+            });
+            return ProjectBindingRegistry.Empty;
+        }
+
+        var bindingImporter = new BindingImporter(result.SourceFiles, result.TypeNames, _logger);
+
+        var stepDefinitions = result.StepDefinitions
+            .Select(sd => bindingImporter.ImportStepDefinition(sd))
+            .Where(psd => psd != null)
+            .ToArray();
+        var bindingRegistry =
+            new ProjectBindingRegistry(stepDefinitions, CreateProjectHash(projectSettings, testAssemblySource));
+        _logger.LogInfo(
+            $"{bindingRegistry.StepDefinitions.Length} step definitions discovered for project {_projectScope.ProjectName}");
+
+        if (bindingRegistry.StepDefinitions.Any(sd => !sd.IsValid))
+        {
+            _logger.LogWarning($"Invalid step definitions found: {Environment.NewLine}" +
+                               string.Join(Environment.NewLine, bindingRegistry.StepDefinitions
+                                   .Where(sd => !sd.IsValid)
+                                   .Select(sd =>
+                                       $"  {sd}: {sd.Error} at {sd.Implementation?.SourceLocation}")));
+
+            _errorListServices?.AddErrors(
+                bindingRegistry.StepDefinitions.Where(sd => !sd.IsValid)
+                    .Select(sd => new DeveroomUserError
                     {
                         Category = DeveroomUserErrorCategory.Discovery,
-                        Message =
-                            "The project bindings (e.g. step definitions) could not be discovered. Navigation, step completion and other features are disabled.",
-                        Type = TaskErrorCategory.Warning
-                    }
-                });
-            }
-            else
-            {
-                var bindingImporter = new BindingImporter(result.SourceFiles, result.TypeNames, _logger);
-
-                var stepDefinitions = result.StepDefinitions
-                    .Select(sd => bindingImporter.ImportStepDefinition(sd))
-                    .Where(psd => psd != null)
-                    .ToArray();
-                bindingRegistry = new ProjectBindingRegistry(stepDefinitions, CreateProjectHash(projectSettings, testAssemblySource));
-                _logger.LogInfo(
-                    $"{bindingRegistry.StepDefinitions.Length} step definitions discovered for project {_projectScope.ProjectName}");
-
-                if (bindingRegistry.StepDefinitions.Any(sd => !sd.IsValid))
-                {
-                    _logger.LogWarning($"Invalid step definitions found: {Environment.NewLine}" +
-                                       string.Join(Environment.NewLine, bindingRegistry.StepDefinitions
-                                           .Where(sd => !sd.IsValid)
-                                           .Select(sd =>
-                                               $"  {sd}: {sd.Error} at {sd.Implementation?.SourceLocation}")));
-
-                    _errorListServices?.AddErrors(
-                        bindingRegistry.StepDefinitions.Where(sd => !sd.IsValid)
-                            .Select(sd => new DeveroomUserError
-                            {
-                                Category = DeveroomUserErrorCategory.Discovery,
-                                Message = sd.Error,
-                                SourceLocation = sd.Implementation?.SourceLocation,
-                                Type = TaskErrorCategory.Error
-                            })
-                    );
-                }
-
-                CalculateSourceLocationTrackingPositions(bindingRegistry);
-            }
-
-            _monitoringService.MonitorSpecFlowDiscovery(bindingRegistry.StepDefinitions.IsEmpty, result.ErrorMessage,
-                bindingRegistry.StepDefinitions.Length, projectSettings);
-            return new ProjectBindingRegistryCacheDiscovered(bindingRegistry, projectSettings,
-                testAssemblySource.LastChangeTime);
+                        Message = sd.Error,
+                        SourceLocation = sd.Implementation?.SourceLocation,
+                        Type = TaskErrorCategory.Error
+                    })
+            );
         }
-        catch (Exception ex)
-        {
-            _logger.LogException(_monitoringService, ex);
-            return new ProjectBindingRegistryCacheError();
-        }
+
+        CalculateSourceLocationTrackingPositions(bindingRegistry);
+
+        _monitoringService.MonitorSpecFlowDiscovery(bindingRegistry.StepDefinitions.IsEmpty, result.ErrorMessage,
+            bindingRegistry.StepDefinitions.Length, projectSettings);
+
+        return bindingRegistry;
     }
 
     protected virtual void TriggerBindingRegistryChanged()
@@ -403,14 +366,12 @@ public class DiscoveryService : IDiscoveryService
             ? new CancellationTokenSource(TimeSpan.FromMinutes(1))
             : new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
-        _logger.LogVerbose($"task:{task.Id}-{task.Status}");
         var timeoutTask = Task.Delay(-1, cts.Token);
         var result = await Task.WhenAny(task, timeoutTask);
         if (ReferenceEquals(result, timeoutTask))
             throw new TimeoutException("Binding registry in not processed in time");
 
         var projectBindingRegistry = await (result as Task<ProjectBindingRegistry>)!;
-        _logger.LogVerbose($"{projectBindingRegistry.Version}");
         return projectBindingRegistry;
     }
 }
