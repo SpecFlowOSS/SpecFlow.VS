@@ -1,7 +1,7 @@
 ﻿namespace SpecFlow.VisualStudio.Discovery;
 
 [DebuggerDisplay("{Version}_{ProjectHash}")]
-public class ProjectBindingRegistry
+public record ProjectBindingRegistry
 {
     private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
     private const string DocStringDefaultTypeName = TypeShortcuts.StringType;

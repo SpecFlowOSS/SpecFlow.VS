@@ -33,8 +33,6 @@ public class DiscoveryService : IDiscoveryService
             value);
     }
 
-    public ManualResetEvent Initialized { get; } = new(false);
-
     public void InitializeBindingRegistry()
     {
         _logger.LogVerbose("Initial discovery triggered...");
@@ -118,10 +116,9 @@ public class DiscoveryService : IDiscoveryService
         });
     }
 
-    public async Task UpdateBindingRegistry(Func<ProjectBindingRegistry, ProjectBindingRegistry> update)
+    public Task UpdateBindingRegistry(Func<ProjectBindingRegistry, ProjectBindingRegistry> update)
     {
-        await _projectBindingRegistryContainer.UpdateBindingRegistry(update);
-        Initialized.Set();
+        return _projectBindingRegistryContainer.UpdateBindingRegistry(update);
     }
 
     public Task<ProjectBindingRegistry> GetLatestBindingRegistry()
@@ -171,7 +168,7 @@ public class DiscoveryService : IDiscoveryService
     {
         _projectScope.IdeScope.RunOnBackgroundThread(
             () => UpdateBindingRegistry(InvokeDiscoveryWithTimer),
-            _ => Initialized.Set());
+            _ => { });
     }
 
     private ProjectBindingRegistry InvokeDiscoveryWithTimer(ProjectBindingRegistry _)
@@ -179,7 +176,6 @@ public class DiscoveryService : IDiscoveryService
         var stopwatch = new Stopwatch();
         stopwatch.Start();
         var result = InvokeDiscovery();
-        Initialized.Set();
         stopwatch.Stop();
         _logger.LogVerbose($"Discovery: {stopwatch.ElapsedMilliseconds} ms");
         return result;

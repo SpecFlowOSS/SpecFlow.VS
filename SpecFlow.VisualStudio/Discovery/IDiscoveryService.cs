@@ -7,7 +7,6 @@ public interface IDiscoveryService : IDisposable
     Task<ProjectBindingRegistry> GetLatestBindingRegistry();
     void CheckBindingRegistry();
     void InitializeBindingRegistry();
-    ManualResetEvent Initialized { get; }
 
     Task UpdateBindingRegistry(Func<ProjectBindingRegistry, ProjectBindingRegistry> update);
     Task ProcessAsync(CSharpStepDefinitionFile stepDefinitionFile);

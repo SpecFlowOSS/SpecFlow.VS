@@ -38,9 +38,11 @@ public class MockableDiscoveryService : DiscoveryService
                     return discoveryService.LastDiscoveryResult;
                 });
 
+        var initialized = new ManualResetEvent(false);
+        discoveryService.BindingRegistryChanged += (_, _) => initialized.Set(); 
         discoveryService.InitializeBindingRegistry();
         projectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService);
-        discoveryService.Initialized.WaitOne(TimeSpan.FromSeconds(10));
+        initialized.WaitOne(TimeSpan.FromSeconds(10));
 
         return discoveryService;
     }

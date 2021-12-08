@@ -216,13 +216,18 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             foreach (var step in _projectScopeConfigurationSteps)
                 step(projectScope);
 
+            var initialized = new ManualResetEvent(false);
             var discoveryService = projectScope.GetDiscoveryService();
-            discoveryService.Should().NotBeNull("The DiscoveryService should be available");
+            discoveryService.WeakBindingRegistryChanged += (_, _) => initialized.Set();
+            if (discoveryService.GetLastProcessedBindingRegistry() != ProjectBindingRegistry.Empty) initialized.Set();
+            initialized.WaitOne(TimeSpan.FromSeconds(2))
+                .Should()
+                .BeTrue("the bindingService should be initialized");
 
-             discoveryService.Initialized.WaitOne(TimeSpan.FromSeconds(10));
              _bindingRegistry = await discoveryService.GetLatestBindingRegistry();
 
-            _bindingRegistry.StepDefinitions.Should().NotBeEmpty("binding should be discovered");
+             discoveryService.GetLastProcessedBindingRegistry().Should()
+                 .NotBe(ProjectBindingRegistry.Empty, "binding should be discovered");
         }
 
         private StubProjectScope GetProjectScope()
