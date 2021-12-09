@@ -220,7 +220,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             var discoveryService = projectScope.GetDiscoveryService();
             discoveryService.WeakBindingRegistryChanged += (_, _) => initialized.Set();
             if (discoveryService.GetLastProcessedBindingRegistry() != ProjectBindingRegistry.Empty) initialized.Set();
-            initialized.WaitOne(TimeSpan.FromSeconds(2))
+            initialized.WaitOne(TimeSpan.FromSeconds(5))
                 .Should()
                 .BeTrue("the bindingService should be initialized");
 
