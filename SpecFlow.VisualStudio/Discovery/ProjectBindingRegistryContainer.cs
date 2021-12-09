@@ -105,8 +105,7 @@ public class ProjectBindingRegistryContainer : IProjectBindingRegistryContainer
         if (ReferenceEquals(result, timeoutTask))
             throw new TimeoutException("Binding registry in not processed in time");
 
-        var projectBindingRegistry = await (result as Task<ProjectBindingRegistry>)!;
-        return projectBindingRegistry;
+        return await task;
     }
 
     private void CalculateSourceLocationTrackingPositions(ProjectBindingRegistry bindingRegistry)
