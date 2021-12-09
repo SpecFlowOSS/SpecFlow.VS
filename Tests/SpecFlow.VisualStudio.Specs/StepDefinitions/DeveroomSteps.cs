@@ -220,6 +220,14 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             var discoveryService = projectScope.GetDiscoveryService();
             discoveryService.BindingRegistry.Changed += (_, _) => initialized.Set();
             if (discoveryService.BindingRegistry.Cache != ProjectBindingRegistry.Empty) initialized.Set();
+
+            var sw = Stopwatch.StartNew();
+            do
+            {
+            } while (!initialized.WaitOne(TimeSpan.FromMilliseconds(100)) && sw.Elapsed< TimeSpan.FromSeconds(20));
+
+            sw.Elapsed.Should().BeLessThan(TimeSpan.FromSeconds(1));
+            
             initialized.WaitOne(TimeSpan.FromSeconds(2))
                 .Should()
                 .BeTrue("the bindingService should be initialized");
