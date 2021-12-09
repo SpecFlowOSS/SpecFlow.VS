@@ -22,6 +22,7 @@ public record ProjectBindingRegistry
 
     public int Version { get; } = Interlocked.Increment(ref _versionCounter);
     public int? ProjectHash { get; }
+    public bool IsPatched => !ProjectHash.HasValue && this != Empty;
 
     public override string ToString()
     {
@@ -29,6 +30,7 @@ public record ProjectBindingRegistry
     }
 
     public ImmutableArray<ProjectStepDefinitionBinding> StepDefinitions { get; }
+
 
     public MatchResult MatchStep(Step step, IGherkinDocumentContext context = null)
     {

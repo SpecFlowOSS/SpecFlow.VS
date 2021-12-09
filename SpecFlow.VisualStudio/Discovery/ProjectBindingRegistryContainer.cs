@@ -18,7 +18,7 @@ public class ProjectBindingRegistryContainer : IProjectBindingRegistryContainer
 
     public ProjectBindingRegistry Cache { get; private set; }
 
-    public bool CacheIsUpToDate => _upToDateBindingRegistrySource.Task.Status == TaskStatus.RanToCompletion;
+    public bool Processing => _upToDateBindingRegistrySource.Task.Status != TaskStatus.RanToCompletion;
 
     public event EventHandler<EventArgs> Changed;
 
@@ -29,7 +29,10 @@ public class ProjectBindingRegistryContainer : IProjectBindingRegistryContainer
 
         var updatedRegistry = InvokeUpdateFunc(updateFunc, originalRegistry, newRegistrySource);
         if (updatedRegistry.Version == originalRegistry.Version)
+        {
+            newRegistrySource.SetResult(originalRegistry);
             return;
+        }
 
         CalculateSourceLocationTrackingPositions(updatedRegistry);
 
@@ -97,7 +100,7 @@ public class ProjectBindingRegistryContainer : IProjectBindingRegistryContainer
     private async Task<ProjectBindingRegistry> WaitForCompletion(Task<ProjectBindingRegistry> task)
     {
         CancellationTokenSource cts = Debugger.IsAttached
-            ? new CancellationTokenSource(TimeSpan.FromMinutes(1))
+            ? new CancellationTokenSource(TimeSpan.FromSeconds(60))
             : new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
         var timeoutTask = Task.Delay(-1, cts.Token);

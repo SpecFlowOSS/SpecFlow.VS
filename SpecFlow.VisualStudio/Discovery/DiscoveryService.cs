@@ -1,4 +1,10 @@
-﻿namespace SpecFlow.VisualStudio.Discovery;
+﻿/**
+ TODO:  DirectoryInfo->FileSystemInfo
+ TODO: IProjectBindingRegistryContainer BindingRegistry -> ?????
+TODO: Split  private ProjectBindingRegistry InvokeDiscovery()
+ **/
+
+namespace SpecFlow.VisualStudio.Discovery;
 
 public class DiscoveryService : IDiscoveryService
 {
@@ -40,7 +46,13 @@ public class DiscoveryService : IDiscoveryService
 
     public void CheckBindingRegistry()
     {
-        if (IsLastProcessedUpToDate())
+        if (BindingRegistry.Processing)
+            return;
+
+        if (BindingRegistry.Cache.IsPatched)
+            return;
+
+        if (IsCacheUpToDate())
             return;
 
         TriggerDiscovery();
@@ -58,11 +70,8 @@ public class DiscoveryService : IDiscoveryService
         CheckBindingRegistry();
     }
 
-    private bool IsLastProcessedUpToDate()
+    private bool IsCacheUpToDate()
     {
-        if (!BindingRegistry.CacheIsUpToDate)
-            return false;
-
         var projectSettings = _projectScope.GetProjectSettings();
         var testAssemblySource = GetTestAssemblySource(projectSettings);
         var currentHash = CreateProjectHash(projectSettings, testAssemblySource);
