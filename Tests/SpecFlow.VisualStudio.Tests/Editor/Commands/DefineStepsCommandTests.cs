@@ -57,7 +57,7 @@ public class DefineStepsCommandTests : CommandTestBase<DefineStepsCommand>
         var (_, command) = await ArrangeSut(TestStepDefinition.Void, featureFile);
         var textView = CreateTextView(featureFile);
 
-        Invoke(command, textView);
+        await InvokeAndWaitAnalyticsEvent(command, textView);
 
         ThereWereNoWarnings();
         var createdStepDefinitionContent =

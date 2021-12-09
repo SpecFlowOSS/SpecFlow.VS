@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DebuggableCancellationTokenSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DeveroomConfigurationException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)DiscoveryException.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)FileSystemHelper.cs" />

@@ -41,10 +41,10 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         return (textView, command);
     }
 
-    protected Task<IAnalyticsEvent> InvokeAndWaitAnalyticsEvent(T command, StubWpfTextView textView)
+    protected Task InvokeAndWaitAnalyticsEvent(T command, StubWpfTextView textView)
     {
         Invoke(command, textView);
-        return WaitForCommandToComplete();
+        return WaitForCommandToComplete(command);
     }
 
     protected static bool Invoke(T command, StubWpfTextView textView)
@@ -52,10 +52,12 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         return command.PreExec(textView, command.Targets.First());
     }
 
-    protected Task<IAnalyticsEvent> WaitForCommandToComplete()
+    protected Task WaitForCommandToComplete(T command)
     {
-        return ProjectScope.StubIdeScope.AnalyticsTransmitter
-            .WaitForEventAsync(_completedEventSignal);
+        CancellationTokenSource cts = Debugger.IsAttached
+            ? new CancellationTokenSource(TimeSpan.FromMinutes(1))
+            : new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        return command.Finished.WaitAsync(cts.Token);
     }
 
     public ImmutableArray<string> WarningMessages()

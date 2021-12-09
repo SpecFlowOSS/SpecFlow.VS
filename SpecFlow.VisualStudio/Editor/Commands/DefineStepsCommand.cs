@@ -103,6 +103,7 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
             case CreateStepDefinitionsDialogResult.CopyToClipboard:
                 Logger.LogVerbose($"Copy to clipboard: {combinedSnippet}");
                 IdeScope.Actions.SetClipboardText(combinedSnippet);
+                Finished.Set();
                 break;
         }
 
@@ -150,10 +151,11 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
             () => RebuildBindingRegistry(projectScope, targetFilePath, template), _ => { });
     }
 
-    private static Task RebuildBindingRegistry(IProjectScope projectScope, string targetFilePath, string template)
+    private async Task RebuildBindingRegistry(IProjectScope projectScope, string targetFilePath, string template)
     {
         var discoveryService = projectScope.GetDiscoveryService();
         CSharpStepDefinitionFile stepDefinitionFile = new CSharpStepDefinitionFile(targetFilePath, template);
-        return discoveryService.ProcessAsync(stepDefinitionFile);
+        await discoveryService.ProcessAsync(stepDefinitionFile);
+        Finished.Set();
     }
 }

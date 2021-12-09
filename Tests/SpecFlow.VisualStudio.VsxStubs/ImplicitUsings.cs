@@ -2,12 +2,14 @@
 global using Microsoft.VisualStudio.Text.Editor;
 global using Microsoft.VisualStudio.Text;
 global using Moq;
+global using SpecFlow.VisualStudio.Analytics;
 global using SpecFlow.VisualStudio.Diagnostics;
 global using SpecFlow.VisualStudio.Discovery;
 global using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 global using SpecFlow.VisualStudio.ProjectSystem.Settings;
 global using SpecFlow.VisualStudio.ProjectSystem;
 global using SpecFlow.VisualStudio.SpecFlowConnector.Models;
+global using System.Collections;
 global using System.Collections.Concurrent;
 global using System.Collections.Immutable;
 global using System.Diagnostics;

@@ -23,7 +23,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 {
     public class StubIdeScope : IIdeScope
     {
-        public StubAnalyticsTransmitter AnalyticsTransmitter { get; } = new StubAnalyticsTransmitter();
+        public StubAnalyticsTransmitter AnalyticsTransmitter { get; }
         public IDictionary<string, StubWpfTextView> OpenViews { get; } = new Dictionary<string, StubWpfTextView>();
         public StubLogger StubLogger { get; } = new StubLogger();
         public DeveroomCompositeLogger CompositeLogger { get; } = new DeveroomCompositeLogger
@@ -147,6 +147,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public StubIdeScope(ITestOutputHelper testOutputHelper)
         {
+            AnalyticsTransmitter = new StubAnalyticsTransmitter(Logger);
             MonitoringService = 
                 new MonitoringService(
                     AnalyticsTransmitter, 
