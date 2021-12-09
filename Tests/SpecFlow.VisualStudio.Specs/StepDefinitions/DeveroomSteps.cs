@@ -226,7 +226,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             {
             } while (!initialized.WaitOne(TimeSpan.FromMilliseconds(100)) && sw.Elapsed< TimeSpan.FromSeconds(20));
 
-            sw.Elapsed.Should().BeLessThan(TimeSpan.FromSeconds(1));
+            sw.Elapsed.Should().BeLessThan(TimeSpan.FromSeconds(3));
             
             initialized.WaitOne(TimeSpan.FromSeconds(2))
                 .Should()

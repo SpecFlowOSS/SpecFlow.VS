@@ -56,16 +56,6 @@ steps:
       arguments: '--configuration $(BuildConfiguration) --no-build'
       testRunTitle: Unit Tests ${{thing}}
     condition: succeededOrFailed()
-    
-- ${{each thing in parameters.thingsArray}}:
-  - task: DotNetCoreCLI@2
-    displayName: Run SpecFlow Scenarios ${{thing}}
-    inputs:
-      command: test
-      projects: '**/*[Ss]pecs/*.csproj'
-      arguments: '--configuration $(BuildConfiguration) --runtime win-x64'
-      testRunTitle: 'Deveroom Specs ${{thing}}'
-    condition: succeededOrFailed()
 
 - task: DotNetCoreCLI@2
   displayName: Run Unit Tests
