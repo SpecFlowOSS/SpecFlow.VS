@@ -218,15 +218,15 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
 
             var initialized = new ManualResetEvent(false);
             var discoveryService = projectScope.GetDiscoveryService();
-            discoveryService.WeakBindingRegistryChanged += (_, _) => initialized.Set();
-            if (discoveryService.GetLastProcessedBindingRegistry() != ProjectBindingRegistry.Empty) initialized.Set();
-            initialized.WaitOne(TimeSpan.FromSeconds(5))
+            discoveryService.BindingRegistry.Changed += (_, _) => initialized.Set();
+            if (discoveryService.BindingRegistry.Cache != ProjectBindingRegistry.Empty) initialized.Set();
+            initialized.WaitOne(TimeSpan.FromSeconds(2))
                 .Should()
                 .BeTrue("the bindingService should be initialized");
 
-             _bindingRegistry = await discoveryService.GetLatestBindingRegistry();
+             _bindingRegistry = await discoveryService.BindingRegistry.GetLatest();
 
-             discoveryService.GetLastProcessedBindingRegistry().Should()
+             discoveryService.BindingRegistry.Cache.Should()
                  .NotBe(ProjectBindingRegistry.Empty, "binding should be discovered");
         }
 

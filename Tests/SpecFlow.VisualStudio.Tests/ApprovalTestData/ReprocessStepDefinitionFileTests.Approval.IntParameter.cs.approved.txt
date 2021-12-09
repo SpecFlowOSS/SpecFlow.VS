@@ -11,7 +11,7 @@
       ParameterTypes:[1]
         - `int`
       SourceLocation:
-        SourceFile:`C:\<Full path to>\IntParameter.cs`
+        SourceFile:`C:\Full path to\IntParameter.cs`
         SourceFileColumn:`9`
         SourceFileEndColumn:`9`
         SourceFileEndLine:`13`

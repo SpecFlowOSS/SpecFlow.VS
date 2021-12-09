@@ -166,7 +166,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         private async Task<ProjectStepDefinitionBinding[]> GetStepDefinitionsAsync(IProjectScope project, string fileName, SnapshotPoint triggerPoint)
         {
             var discoveryService = project.GetDiscoveryService();
-            var bindingRegistry = await discoveryService.GetLatestBindingRegistry();
+            var bindingRegistry = await discoveryService.BindingRegistry.GetLatest();
             return GetStepDefinitions(fileName, triggerPoint, bindingRegistry);
         }
 

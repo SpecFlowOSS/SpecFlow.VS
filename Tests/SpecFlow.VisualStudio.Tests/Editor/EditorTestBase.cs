@@ -25,7 +25,7 @@ public abstract class EditorTestBase
         var discoveryService =
             MockableDiscoveryService.SetupWithInitialStepDefinitions(ProjectScope,
                 stepDefinitionClassFile.StepDefinitions, TimeSpan.FromMilliseconds(10));
-        await discoveryService.GetLatestBindingRegistry();
+        await discoveryService.BindingRegistry.GetLatest();
 
         return textView;
     }
@@ -176,7 +176,7 @@ public abstract class EditorTestBase
 
     protected async Task BindingRegistryIsModified(string expression)
     {
-        var bindingRegistry = await ProjectScope.GetDiscoveryService().GetLatestBindingRegistry();
+        var bindingRegistry = await ProjectScope.GetDiscoveryService().BindingRegistry.GetLatest();
         bindingRegistry.StepDefinitions.Should().Contain(sd => sd.Expression == expression,
             $"after modification I should see <{expression}>");
     }

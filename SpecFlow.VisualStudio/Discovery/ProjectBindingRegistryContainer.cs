@@ -1,10 +1,9 @@
 ﻿namespace SpecFlow.VisualStudio.Discovery;
 
-public class ProjectBindingRegistryContainer
+public class ProjectBindingRegistryContainer : IProjectBindingRegistryContainer
 {
     private readonly IIdeScope _ideScope;
     private readonly IDeveroomLogger _logger;
-    private ProjectBindingRegistry _lastProcessedBindingRegistry;
     private TaskCompletionSource<ProjectBindingRegistry> _upToDateBindingRegistrySource;
 
     public ProjectBindingRegistryContainer(IIdeScope ideScope)
@@ -12,16 +11,18 @@ public class ProjectBindingRegistryContainer
         _ideScope = ideScope;
         _logger = ideScope.Logger;
 
-        _lastProcessedBindingRegistry = ProjectBindingRegistry.Empty;
+        Cache = ProjectBindingRegistry.Empty;
         _upToDateBindingRegistrySource = new TaskCompletionSource<ProjectBindingRegistry>();
-        _upToDateBindingRegistrySource.SetResult(_lastProcessedBindingRegistry);
+        _upToDateBindingRegistrySource.SetResult(Cache);
     }
 
-    public bool ProcessingTaskSucceed => _upToDateBindingRegistrySource.Task.Status == TaskStatus.RanToCompletion;
+    public ProjectBindingRegistry Cache { get; private set; }
 
-    public event EventHandler<EventArgs> BindingRegistryChanged;
+    public bool CacheIsUpToDate => _upToDateBindingRegistrySource.Task.Status == TaskStatus.RanToCompletion;
 
-    public async Task UpdateBindingRegistry(Func<ProjectBindingRegistry, ProjectBindingRegistry> updateFunc)
+    public event EventHandler<EventArgs> Changed;
+
+    public async Task Update(Func<ProjectBindingRegistry, ProjectBindingRegistry> updateFunc)
     {
         (TaskCompletionSource<ProjectBindingRegistry> newRegistrySource, ProjectBindingRegistry originalRegistry) =
             await GetThreadSafeRegistry();
@@ -32,12 +33,17 @@ public class ProjectBindingRegistryContainer
 
         CalculateSourceLocationTrackingPositions(updatedRegistry);
 
-        _lastProcessedBindingRegistry = updatedRegistry;
+        Cache = updatedRegistry;
         newRegistrySource.SetResult(updatedRegistry);
-        BindingRegistryChanged?.Invoke(this, EventArgs.Empty);
+        Changed?.Invoke(this, EventArgs.Empty);
         _logger.LogVerbose(
             $"BindingRegistry is modified {originalRegistry}->{updatedRegistry}.");
         DisposeSourceLocationTrackingPositions(originalRegistry);
+    }
+
+    public Task<ProjectBindingRegistry> GetLatest()
+    {
+        return WaitForCompletion(_upToDateBindingRegistrySource.Task);
     }
 
     private async
@@ -86,16 +92,6 @@ public class ProjectBindingRegistryContainer
         }
 
         return updatedRegistry;
-    }
-
-    public ProjectBindingRegistry GetLastProcessedBindingRegistry()
-    {
-        return _lastProcessedBindingRegistry;
-    }
-
-    public Task<ProjectBindingRegistry> GetLatestBindingRegistry()
-    {
-        return WaitForCompletion(_upToDateBindingRegistrySource.Task);
     }
 
     private async Task<ProjectBindingRegistry> WaitForCompletion(Task<ProjectBindingRegistry> task)

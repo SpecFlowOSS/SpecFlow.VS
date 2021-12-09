@@ -107,7 +107,7 @@ Server stack trace:
    at TechTalk.SpecFlow.TestRunnerManager.BuildBindingRegistry(IEnumerable`1 bindingAssemblies) 
    at TechTalk.SpecFlow.TestRunnerManager.InitializeBindingRegistry(ITestRunner testRunner) 
    at TechTalk.SpecFlow.TestRunnerManager.CreateTestRunner(Int32 threadId) 
-   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V2020.SpecFlowV2020Discoverer.GetLastProcessedBindingRegistry(Assembly testAssembly, String configFilePath) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V2020.SpecFlowV2020Discoverer.Cache(Assembly testAssembly, String configFilePath) 
    at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.BaseDiscoverer.DiscoverInternal(String testAssemblyPath, String configFilePath) 
    at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.BaseDiscoverer.Discover(String testAssemblyPath, String configFilePath) 
    at System.Runtime.Remoting.Messaging.StackBuilderSink._PrivateProcessMessage(IntPtr md, Object[] args, Object server, Object[]& outArgs) 
@@ -125,7 +125,7 @@ Exception rethrown at [0]:
 
         result.Should()
             .Be(
-                "SF.RF.C(_)-SF.BF.CSB(,,,)-SF.BSP.PSDA(,,)-SF.BSP.PSD(,)-SFV2020D.GLPBR(,)-BD.DI(,)-BD.D(,)-ISFD.D(,)-DP.P()-CR.EP(_)");
+                "SF.RF.C(_)-SF.BF.CSB(,,,)-SF.BSP.PSDA(,,)-SF.BSP.PSD(,)-SFV2020D.C(,)-BD.DI(,)-BD.D(,)-ISFD.D(,)-DP.P()-CR.EP(_)");
     }
 
     [Fact]

@@ -6,7 +6,7 @@ public class DiscoveryService : IDiscoveryService
     private readonly IDeveroomErrorListServices _errorListServices;
     private readonly IDeveroomLogger _logger;
     private readonly IMonitoringService _monitoringService;
-    private readonly ProjectBindingRegistryContainer _projectBindingRegistryContainer;
+    public IProjectBindingRegistryContainer BindingRegistry { get; }
     private readonly IProjectScope _projectScope;
     private readonly IProjectSettingsProvider _projectSettingsProvider;
 
@@ -20,16 +20,15 @@ public class DiscoveryService : IDiscoveryService
         _projectSettingsProvider = _projectScope.GetProjectSettingsProvider();
         _projectSettingsProvider.WeakSettingsInitialized += ProjectSystemOnProjectsBuilt;
         _projectScope.IdeScope.WeakProjectOutputsUpdated += ProjectSystemOnProjectsBuilt;
-        _projectBindingRegistryContainer = new ProjectBindingRegistryContainer(_projectScope.IdeScope);
-        _projectBindingRegistryContainer.BindingRegistryChanged += TriggerBindingRegistryChanged;
+        BindingRegistry = new ProjectBindingRegistryContainer(_projectScope.IdeScope);
     }
 
     private IFileSystem FileSystem => _projectScope.IdeScope.FileSystem;
 
     public event EventHandler<EventArgs> WeakBindingRegistryChanged
     {
-        add => WeakEventManager<DiscoveryService, EventArgs>.AddHandler(this, nameof(BindingRegistryChanged), value);
-        remove => WeakEventManager<DiscoveryService, EventArgs>.RemoveHandler(this, nameof(BindingRegistryChanged),
+        add => WeakEventManager<IProjectBindingRegistryContainer, EventArgs>.AddHandler(BindingRegistry, nameof(IProjectBindingRegistryContainer.Changed), value);
+        remove => WeakEventManager<IProjectBindingRegistryContainer, EventArgs>.RemoveHandler(BindingRegistry, nameof(IProjectBindingRegistryContainer.Changed),
             value);
     }
 
@@ -47,91 +46,10 @@ public class DiscoveryService : IDiscoveryService
         TriggerDiscovery();
     }
 
-    public ProjectBindingRegistry GetLastProcessedBindingRegistry()
-    {
-        return _projectBindingRegistryContainer.GetLastProcessedBindingRegistry();
-    }
-
     public void Dispose()
     {
         _projectScope.IdeScope.WeakProjectsBuilt -= ProjectSystemOnProjectsBuilt;
         _projectSettingsProvider.SettingsInitialized -= ProjectSystemOnProjectsBuilt;
-    }
-
-    public async Task ProcessAsync(CSharpStepDefinitionFile stepDefinitionFile)
-    {
-        SyntaxTree tree = CSharpSyntaxTree.ParseText(stepDefinitionFile.Content);
-        var rootNode = await tree.GetRootAsync();
-
-        var allMethods = rootNode
-            .DescendantNodes()
-            .OfType<MethodDeclarationSyntax>()
-            .ToArray();
-
-        var projectStepDefinitionBindings = new List<ProjectStepDefinitionBinding>(allMethods.Length);
-        foreach (MethodDeclarationSyntax method in allMethods)
-        {
-            var attributes = RenameStepStepDefinitionClassAction.GetAttributesWithTokens(method);
-
-            var methodBodyBeginToken = method.Body.GetFirstToken();
-            var methodBodyBeginPosition = methodBodyBeginToken.GetLocation().GetLineSpan().StartLinePosition;
-            var methodBodyEndToken = method.Body.GetLastToken();
-            var methodBodyEndPosition = methodBodyEndToken.GetLocation().GetLineSpan().StartLinePosition;
-
-            Scope scope = null;
-            var parameterTypes = method.ParameterList.Parameters
-                .Select(p => p.Type.ToString())
-                .ToArray();
-
-            var sourceLocation = new SourceLocation(stepDefinitionFile.StepDefinitionPath,
-                methodBodyBeginPosition.Line + 1,
-                methodBodyBeginPosition.Character + 1,
-                methodBodyEndPosition.Line + 1,
-                methodBodyEndPosition.Character + 1);
-            var implementation =
-                new ProjectStepDefinitionImplementation(FullMethodName(method), parameterTypes, sourceLocation);
-
-            foreach (var (attribute, token) in attributes)
-            {
-                var stepDefinitionType = (ScenarioBlock) Enum.Parse(typeof(ScenarioBlock), attribute.Name.ToString());
-                var regex = new Regex($"^{token.ValueText}$");
-
-                var stepDefinitionBinding = new ProjectStepDefinitionBinding(stepDefinitionType, regex, scope,
-                    implementation, token.ValueText);
-
-                projectStepDefinitionBindings.Add(stepDefinitionBinding);
-            }
-        }
-
-        _logger.LogVerbose($"ProcessAsync found {projectStepDefinitionBindings.Count} stepdefs");
-
-        await UpdateBindingRegistry(bindingRegistry =>
-        {
-            bindingRegistry = bindingRegistry
-                .Where(binding =>
-                    binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath)
-                .WithStepDefinitions(projectStepDefinitionBindings);
-
-            return bindingRegistry;
-        });
-    }
-
-    public Task UpdateBindingRegistry(Func<ProjectBindingRegistry, ProjectBindingRegistry> update)
-    {
-        return _projectBindingRegistryContainer.UpdateBindingRegistry(update);
-    }
-
-    public Task<ProjectBindingRegistry> GetLatestBindingRegistry()
-    {
-        return _projectBindingRegistryContainer.GetLatestBindingRegistry();
-    }
-
-    public event EventHandler<EventArgs> BindingRegistryChanged;
-
-
-    protected virtual void TriggerBindingRegistryChanged(object sender, EventArgs e)
-    {
-        BindingRegistryChanged?.Invoke(this, e);
     }
 
     private void ProjectSystemOnProjectsBuilt(object sender, EventArgs eventArgs)
@@ -142,14 +60,14 @@ public class DiscoveryService : IDiscoveryService
 
     private bool IsLastProcessedUpToDate()
     {
-        if (!_projectBindingRegistryContainer.ProcessingTaskSucceed)
+        if (!BindingRegistry.CacheIsUpToDate)
             return false;
 
         var projectSettings = _projectScope.GetProjectSettings();
         var testAssemblySource = GetTestAssemblySource(projectSettings);
         var currentHash = CreateProjectHash(projectSettings, testAssemblySource);
 
-        return _projectBindingRegistryContainer.GetLastProcessedBindingRegistry().ProjectHash == currentHash;
+        return BindingRegistry.Cache.ProjectHash == currentHash;
     }
 
     private int CreateProjectHash(ProjectSettings projectSetting, ConfigSource configSource)
@@ -167,7 +85,7 @@ public class DiscoveryService : IDiscoveryService
     private void TriggerDiscovery()
     {
         _projectScope.IdeScope.RunOnBackgroundThread(
-            () => UpdateBindingRegistry(InvokeDiscoveryWithTimer),
+            () => BindingRegistry.Update(InvokeDiscoveryWithTimer),
             _ => { });
     }
 
@@ -273,19 +191,5 @@ public class DiscoveryService : IDiscoveryService
             bindingRegistry.StepDefinitions.Length, projectSettings);
 
         return bindingRegistry;
-    }
-
-    private static string FullMethodName(MethodDeclarationSyntax method)
-    {
-        StringBuilder sb = new StringBuilder();
-        var containingClass = method.Parent as ClassDeclarationSyntax;
-        if (containingClass.Parent is BaseNamespaceDeclarationSyntax namespaceSyntax)
-        {
-            var containingNamespace = namespaceSyntax.Name;
-            sb.Append(containingNamespace).Append('.');
-        }
-
-        sb.Append(containingClass.Identifier.Text).Append('.').Append(method.Identifier.Text);
-        return sb.ToString();
     }
 }

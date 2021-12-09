@@ -148,14 +148,24 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
         projectScope.IdeScope.Actions.NavigateTo(new SourceLocation(targetFilePath, 9, 1));
 
         _ = projectScope.IdeScope.RunOnBackgroundThread(
-            () => RebuildBindingRegistry(projectScope, targetFilePath, template), _ => { Finished.Set(); });
+            () => RebuildBindingRegistry(projectScope, new DirectoryInfo(targetFilePath), template), _ => { Finished.Set(); });
     }
 
-    private async Task RebuildBindingRegistry(IProjectScope projectScope, string targetFilePath, string template)
+    private async Task RebuildBindingRegistry(IProjectScope projectScope, DirectoryInfo targetFilePath, string template)
     {
         var discoveryService = projectScope.GetDiscoveryService();
         CSharpStepDefinitionFile stepDefinitionFile = new CSharpStepDefinitionFile(targetFilePath, template);
-        await discoveryService.ProcessAsync(stepDefinitionFile);
+        var stepDefinitionParser = new StepDefinitionFileParser(projectScope.IdeScope.Logger);
+        var projectStepDefinitionBindings = await stepDefinitionParser.Parse(stepDefinitionFile);
+        await discoveryService.BindingRegistry.Update(bindingRegistry =>
+        {
+            bindingRegistry = bindingRegistry
+                .Where(binding =>
+                    binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.StepDefinitionPath.FullName)
+                .WithStepDefinitions(projectStepDefinitionBindings);
+
+            return bindingRegistry;
+        });
         Finished.Set();
     }
 }

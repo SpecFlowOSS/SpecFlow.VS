@@ -86,12 +86,12 @@ public class DiscoveryServiceTests
                     tasks[i] = RunInThread(async () =>
                     {
                         for (int j = 0; j < 5 + DateTimeOffset.UtcNow.Ticks % 10; ++j)
-                            if ((i + j) % 7 == 6) await discoveryService.GetLatestBindingRegistry();
+                            if ((i + j) % 7 == 6) await discoveryService.BindingRegistry.GetLatest();
 
                             else
                             {
                                 Interlocked.Increment(ref updateTaskCount);
-                                await discoveryService.UpdateBindingRegistry(old =>
+                                await discoveryService.BindingRegistry.Update(old =>
                                 {
                                     oldVersions.Enqueue(old.Version);
                                 return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(), i*1000+j);
@@ -115,7 +115,7 @@ public class DiscoveryServiceTests
         var finish = DateTimeOffset.UtcNow;
         //cts.IsCancellationRequested.Should().BeFalse($"started at {start} and not finished until {finish}");
         //(finish - start).Should().BeLessThan(timeout, $"started at {start} and not finished until {finish}");
-        var registry = await discoveryService.GetLatestBindingRegistry();
+        var registry = await discoveryService.BindingRegistry.GetLatest();
         registry.Version.Should().BeGreaterOrEqualTo(initialRegistry.Version + updateTaskCount);
         oldVersions.Count.Should().Be(updateTaskCount);
         oldVersions.Should().BeInAscendingOrder();
