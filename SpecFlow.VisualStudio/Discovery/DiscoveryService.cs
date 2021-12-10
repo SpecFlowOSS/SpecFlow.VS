@@ -1,5 +1,4 @@
 ﻿/**
- TODO:  DirectoryInfo->FileSystemInfo
  TODO: IProjectBindingRegistryContainer BindingRegistry -> ?????
 TODO: Split  private ProjectBindingRegistry InvokeDiscovery()
  **/

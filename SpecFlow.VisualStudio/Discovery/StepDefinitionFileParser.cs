@@ -11,8 +11,7 @@ public class StepDefinitionFileParser
 
     public async Task<List<ProjectStepDefinitionBinding>> Parse(CSharpStepDefinitionFile stepDefinitionFile)
     {
-        SyntaxTree tree = CSharpSyntaxTree.ParseText(stepDefinitionFile.Content);
-        var rootNode = await tree.GetRootAsync();
+        var rootNode = await stepDefinitionFile.Content.GetRootAsync();
 
         var allMethods = rootNode
             .DescendantNodes()
@@ -34,7 +33,7 @@ public class StepDefinitionFileParser
                 .Select(p => p.Type.ToString())
                 .ToArray();
 
-            var sourceLocation = new SourceLocation(stepDefinitionFile.StepDefinitionPath.FullName,
+            var sourceLocation = new SourceLocation(stepDefinitionFile.FullName,
                 methodBodyBeginPosition.Line + 1,
                 methodBodyBeginPosition.Character + 1,
                 methodBodyEndPosition.Line + 1,

@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.Tests.Discovery;
+﻿using SpecFlow.VisualStudio.Common;
+
+namespace SpecFlow.VisualStudio.Tests.Discovery;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("../ApprovalTestData")]
@@ -31,7 +33,9 @@ public class ReprocessStepDefinitionFileTests
 
         NamerFactory.AdditionalInformation = testName;
         var content = File.ReadAllText(stepDefinitionPath);
-        var stepDefinitionFile = new CSharpStepDefinitionFile(new DirectoryInfo($"C:\\Full path to\\{testName}"), content);
+        var stepDefinitionFile = CSharpStepDefinitionFile
+            .FromPath($"C:\\Full path to\\{testName}")
+            .WithCSharpContent(content);
 
         var stepDefinitionParser = new StepDefinitionFileParser(_projectScope.IdeScope.Logger);
 
