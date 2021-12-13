@@ -4,7 +4,7 @@ public class MockableDiscoveryService : DiscoveryService
 {
     public MockableDiscoveryService(IProjectScope projectScope,
         Mock<IDiscoveryResultProvider> discoveryResultProviderMock)
-        : base(projectScope, discoveryResultProviderMock.Object)
+        : base(projectScope, discoveryResultProviderMock.Object, new ProjectBindingRegistryCache(projectScope.IdeScope))
     {
     }
 
@@ -39,7 +39,7 @@ public class MockableDiscoveryService : DiscoveryService
                 });
 
         var initialized = new ManualResetEvent(false);
-        discoveryService.BindingRegistry.Changed += (_, _) => initialized.Set(); 
+        discoveryService.BindingRegistryCache.Changed += (_, _) => initialized.Set(); 
         discoveryService.InitializeBindingRegistry();
         projectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService);
         initialized.WaitOne(TimeSpan.FromSeconds(10));

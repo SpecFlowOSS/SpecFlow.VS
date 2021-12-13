@@ -1,12 +1,12 @@
 ﻿namespace SpecFlow.VisualStudio.Discovery;
 
-public interface IProjectBindingRegistryContainer
+public interface IProjectBindingRegistryCache
 {
     event EventHandler<EventArgs> Changed;
 
     Task Update(Func<ProjectBindingRegistry, ProjectBindingRegistry> updateFunc);
 
-    ProjectBindingRegistry Cache { get; }
-    bool Processing { get; }    
+    ProjectBindingRegistry Value { get; }
+    bool Processing { get; }
     Task<ProjectBindingRegistry> GetLatest();
 }

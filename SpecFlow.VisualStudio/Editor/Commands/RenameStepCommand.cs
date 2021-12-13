@@ -300,14 +300,14 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         private ProjectBindingRegistry GetBindingRegistry(RenameStepCommandContext ctx)
         {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
-            var bindingRegistry = discoveryService.BindingRegistry.Cache;
+            var bindingRegistry = discoveryService.BindingRegistryCache.Value;
             return bindingRegistry;
         }
 
         private Task UpdateBindingRegistry(RenameStepCommandContext ctx)
         {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
-            return discoveryService.BindingRegistry.Update(bindingRegistry =>
+            return discoveryService.BindingRegistryCache.Update(bindingRegistry =>
                 bindingRegistry.ReplaceStepDefinition(ctx.StepDefinitionBinding, ctx.StepDefinitionBinding.WithSpecifiedExpression(ctx.UpdatedExpression)));
 
         }

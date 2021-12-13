@@ -77,7 +77,7 @@ namespace SpecFlow.VisualStudio.Editor.Completions
         private List<Completion> GetStepCompletions(DeveroomGherkinStep step)
         {
             var discoveryService = _project.GetDiscoveryService();
-            var bindingRegistry = discoveryService.BindingRegistry.Cache;
+            var bindingRegistry = discoveryService.BindingRegistryCache.Value;
 
             var sampler = new StepDefinitionSampler();
 

@@ -18,7 +18,9 @@ namespace SpecFlow.VisualStudio.ProjectSystem
         {
             return projectScope.Properties.GetOrCreateSingletonProperty(() =>
             {
-                IDiscoveryService discoveryService = new DiscoveryService(projectScope);
+                var discoveryResultProvider = new DiscoveryResultProvider(projectScope);
+                var bindingRegistryCache = new ProjectBindingRegistryCache(projectScope.IdeScope);
+                IDiscoveryService discoveryService = new DiscoveryService(projectScope, discoveryResultProvider, bindingRegistryCache);
                 discoveryService.InitializeBindingRegistry();
                 return discoveryService;
             });

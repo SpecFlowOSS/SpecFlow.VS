@@ -6,5 +6,5 @@ public interface IDiscoveryService : IDisposable
     void CheckBindingRegistry();
     void InitializeBindingRegistry();
 
-    IProjectBindingRegistryContainer BindingRegistry { get; }
+    IProjectBindingRegistryCache BindingRegistryCache { get; }
 }

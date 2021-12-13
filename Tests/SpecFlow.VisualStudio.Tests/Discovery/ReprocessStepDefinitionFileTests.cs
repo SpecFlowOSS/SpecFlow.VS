@@ -111,7 +111,7 @@ public class ReprocessStepDefinitionFileTests
         _projectScope.AddFile("Let_IsSpecFlowTestProject_true.feature", string.Empty);
         var discoveryService =
             MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, initialStepDefinitions, TimeSpan.Zero);
-        await discoveryService.BindingRegistry.GetLatest();
+        await discoveryService.BindingRegistryCache.GetLatest();
 
         return discoveryService;
     }

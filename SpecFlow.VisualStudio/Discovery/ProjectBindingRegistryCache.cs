@@ -1,22 +1,22 @@
 ﻿namespace SpecFlow.VisualStudio.Discovery;
 
-public class ProjectBindingRegistryContainer : IProjectBindingRegistryContainer
+public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 {
     private readonly IIdeScope _ideScope;
     private readonly IDeveroomLogger _logger;
     private TaskCompletionSource<ProjectBindingRegistry> _upToDateBindingRegistrySource;
 
-    public ProjectBindingRegistryContainer(IIdeScope ideScope)
+    public ProjectBindingRegistryCache(IIdeScope ideScope)
     {
         _ideScope = ideScope;
         _logger = ideScope.Logger;
 
-        Cache = ProjectBindingRegistry.Empty;
+        Value = ProjectBindingRegistry.Empty;
         _upToDateBindingRegistrySource = new TaskCompletionSource<ProjectBindingRegistry>();
-        _upToDateBindingRegistrySource.SetResult(Cache);
+        _upToDateBindingRegistrySource.SetResult(Value);
     }
 
-    public ProjectBindingRegistry Cache { get; private set; }
+    public ProjectBindingRegistry Value { get; private set; }
 
     public bool Processing => _upToDateBindingRegistrySource.Task.Status != TaskStatus.RanToCompletion;
 
@@ -36,11 +36,11 @@ public class ProjectBindingRegistryContainer : IProjectBindingRegistryContainer
 
         CalculateSourceLocationTrackingPositions(updatedRegistry);
 
-        Cache = updatedRegistry;
+        Value = updatedRegistry;
         newRegistrySource.SetResult(updatedRegistry);
         Changed?.Invoke(this, EventArgs.Empty);
         _logger.LogVerbose(
-            $"BindingRegistry is modified {originalRegistry}->{updatedRegistry}.");
+            $"BindingRegistryCache is modified {originalRegistry}->{updatedRegistry}.");
         DisposeSourceLocationTrackingPositions(originalRegistry);
     }
 

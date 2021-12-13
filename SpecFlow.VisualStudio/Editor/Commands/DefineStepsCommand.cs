@@ -158,7 +158,7 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
         var discoveryService = projectScope.GetDiscoveryService();
         var stepDefinitionParser = new StepDefinitionFileParser(projectScope.IdeScope.Logger);
         var projectStepDefinitionBindings = await stepDefinitionParser.Parse(stepDefinitionFile);
-        await discoveryService.BindingRegistry.Update(bindingRegistry =>
+        await discoveryService.BindingRegistryCache.Update(bindingRegistry =>
         {
             bindingRegistry = bindingRegistry
                 .Where(binding =>

@@ -1,5 +1,4 @@
 ﻿/**
- TODO: IProjectBindingRegistryContainer BindingRegistry -> ?????
 TODO: Split  private ProjectBindingRegistry InvokeDiscovery()
  **/
 
@@ -11,29 +10,29 @@ public class DiscoveryService : IDiscoveryService
     private readonly IDeveroomErrorListServices _errorListServices;
     private readonly IDeveroomLogger _logger;
     private readonly IMonitoringService _monitoringService;
-    public IProjectBindingRegistryContainer BindingRegistry { get; }
+    public IProjectBindingRegistryCache BindingRegistryCache { get; }
     private readonly IProjectScope _projectScope;
     private readonly IProjectSettingsProvider _projectSettingsProvider;
 
-    public DiscoveryService(IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider = null)
+    public DiscoveryService(IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider, IProjectBindingRegistryCache bindingRegistryCacheCache)
     {
         _projectScope = projectScope;
-        _discoveryResultProvider = discoveryResultProvider ?? new DiscoveryResultProvider(_projectScope);
+        _discoveryResultProvider = discoveryResultProvider;
         _logger = _projectScope.IdeScope.Logger;
         _monitoringService = _projectScope.IdeScope.MonitoringService;
         _errorListServices = _projectScope.IdeScope.DeveroomErrorListServices;
         _projectSettingsProvider = _projectScope.GetProjectSettingsProvider();
         _projectSettingsProvider.WeakSettingsInitialized += ProjectSystemOnProjectsBuilt;
         _projectScope.IdeScope.WeakProjectOutputsUpdated += ProjectSystemOnProjectsBuilt;
-        BindingRegistry = new ProjectBindingRegistryContainer(_projectScope.IdeScope);
+        BindingRegistryCache = bindingRegistryCacheCache;
     }
 
     private IFileSystem FileSystem => _projectScope.IdeScope.FileSystem;
 
     public event EventHandler<EventArgs> WeakBindingRegistryChanged
     {
-        add => WeakEventManager<IProjectBindingRegistryContainer, EventArgs>.AddHandler(BindingRegistry, nameof(IProjectBindingRegistryContainer.Changed), value);
-        remove => WeakEventManager<IProjectBindingRegistryContainer, EventArgs>.RemoveHandler(BindingRegistry, nameof(IProjectBindingRegistryContainer.Changed),
+        add => WeakEventManager<IProjectBindingRegistryCache, EventArgs>.AddHandler(BindingRegistryCache, nameof(IProjectBindingRegistryCache.Changed), value);
+        remove => WeakEventManager<IProjectBindingRegistryCache, EventArgs>.RemoveHandler(BindingRegistryCache, nameof(IProjectBindingRegistryCache.Changed),
             value);
     }
 
@@ -45,10 +44,10 @@ public class DiscoveryService : IDiscoveryService
 
     public void CheckBindingRegistry()
     {
-        if (BindingRegistry.Processing)
+        if (BindingRegistryCache.Processing)
             return;
 
-        if (BindingRegistry.Cache.IsPatched)
+        if (BindingRegistryCache.Value.IsPatched)
             return;
 
         if (IsCacheUpToDate())
@@ -75,7 +74,7 @@ public class DiscoveryService : IDiscoveryService
         var testAssemblySource = GetTestAssemblySource(projectSettings);
         var currentHash = CreateProjectHash(projectSettings, testAssemblySource);
 
-        return BindingRegistry.Cache.ProjectHash == currentHash;
+        return BindingRegistryCache.Value.ProjectHash == currentHash;
     }
 
     private int CreateProjectHash(ProjectSettings projectSetting, ConfigSource configSource)
@@ -93,7 +92,7 @@ public class DiscoveryService : IDiscoveryService
     private void TriggerDiscovery()
     {
         _projectScope.IdeScope.RunOnBackgroundThread(
-            () => BindingRegistry.Update(InvokeDiscoveryWithTimer),
+            () => BindingRegistryCache.Update(InvokeDiscoveryWithTimer),
             _ => { });
     }
 

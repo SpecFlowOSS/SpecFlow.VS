@@ -66,7 +66,7 @@ public class DiscoveryServiceTests
             .Setup(p => p.RunDiscovery(string.Empty, string.Empty, projectSettings))
             .Returns(new DiscoveryResult{StepDefinitions = Array.Empty<StepDefinition>()});
 
-        var discoveryService = new DiscoveryService(projectScope.Object, discoveryResultProvider.Object);
+        var discoveryService = new DiscoveryService(projectScope.Object, discoveryResultProvider.Object, new ProjectBindingRegistryCache(ideScope.Object));
 
         var oldVersions = new ConcurrentQueue<int>();
         var initialRegistry = new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(), 123456);
@@ -86,12 +86,12 @@ public class DiscoveryServiceTests
                     tasks[i] = RunInThread(async () =>
                     {
                         for (int j = 0; j < 5 + DateTimeOffset.UtcNow.Ticks % 10; ++j)
-                            if ((i + j) % 7 == 6) await discoveryService.BindingRegistry.GetLatest();
+                            if ((i + j) % 7 == 6) await discoveryService.BindingRegistryCache.GetLatest();
 
                             else
                             {
                                 Interlocked.Increment(ref updateTaskCount);
-                                await discoveryService.BindingRegistry.Update(old =>
+                                await discoveryService.BindingRegistryCache.Update(old =>
                                 {
                                     oldVersions.Enqueue(old.Version);
                                 return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(), i*1000+j);
@@ -115,7 +115,7 @@ public class DiscoveryServiceTests
         var finish = DateTimeOffset.UtcNow;
         //cts.IsCancellationRequested.Should().BeFalse($"started at {start} and not finished until {finish}");
         //(finish - start).Should().BeLessThan(timeout, $"started at {start} and not finished until {finish}");
-        var registry = await discoveryService.BindingRegistry.GetLatest();
+        var registry = await discoveryService.BindingRegistryCache.GetLatest();
         registry.Version.Should().BeGreaterOrEqualTo(initialRegistry.Version + updateTaskCount);
         oldVersions.Count.Should().Be(updateTaskCount);
         oldVersions.Should().BeInAscendingOrder();

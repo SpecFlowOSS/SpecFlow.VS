@@ -218,7 +218,7 @@ public class ProjectSystemSteps : Steps
     {
         var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var bindingRegistryChanged = new AsyncManualResetEvent();
-        _discoveryService.BindingRegistry.Changed += (_, _) => bindingRegistryChanged.Set();
+        _discoveryService.BindingRegistryCache.Changed += (_, _) => bindingRegistryChanged.Set();
         WhenTheProjectIsBuilt();
         await bindingRegistryChanged.WaitAsync(cts.Token);
     }
@@ -475,7 +475,7 @@ public class ProjectSystemSteps : Steps
     [Then(@"the source file of the ""(.*)"" ""(.*)"" step definition is opened")]
     public void ThenTheSourceFileOfTheStepDefinitionIsOpened(string stepRegex, ScenarioBlock stepType)
     {
-        _stepDefinitionBinding = _discoveryService.BindingRegistry.Cache.StepDefinitions
+        _stepDefinitionBinding = _discoveryService.BindingRegistryCache.Value.StepDefinitions
             .FirstOrDefault(b => b.StepDefinitionType == stepType && b.Regex.ToString().Contains(stepRegex));
         _stepDefinitionBinding.Should().NotBeNull($"there has to be a {stepType} stepdef with regex '{stepRegex}'");
 
