@@ -6,7 +6,6 @@ public class DefineStepsCommandTests : CommandTestBase<DefineStepsCommand>
 {
     public DefineStepsCommandTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper,
         ps => new DefineStepsCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
-        "RunOnBackgroundThread DefineStepsCommand succeed",
         "ShowProblem: User Notification: ")
     {
     }

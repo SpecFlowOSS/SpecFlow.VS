@@ -3,17 +3,14 @@
 public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEditorCommandBase
 {
     private readonly Func<IProjectScope, T> _commandFactory;
-    private readonly string _completedEventSignal;
     protected readonly string WarningHeader;
 
     protected CommandTestBase(
         ITestOutputHelper testOutputHelper,
         Func<IProjectScope, T> commandFactory,
-        string completedEventSignal,
         string warningHeader) : base(testOutputHelper)
     {
         _commandFactory = commandFactory;
-        _completedEventSignal = completedEventSignal;
         WarningHeader = warningHeader;
     }
 

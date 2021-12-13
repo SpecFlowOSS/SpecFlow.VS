@@ -7,7 +7,6 @@ public class FindStepDefinitionUsagesCommandTests : CommandTestBase<FindStepDefi
     public FindStepDefinitionUsagesCommandTests(ITestOutputHelper testOutputHelper) :
         base(testOutputHelper,
             ps => new FindStepDefinitionUsagesCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
-            "FindStepDefinitionUsages command executed",
             "???")
     {
     }
