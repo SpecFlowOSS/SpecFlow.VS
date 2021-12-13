@@ -174,7 +174,7 @@ namespace SpecFlow.VisualStudio.Monitoring
                 { "IsFailed", isFailed },
                 { "StepDefinitionCount", stepDefinitionCount }
             };
-            _analyticsTransmitter.TransmitEvent(new GenericEvent("SpecFlow Discovery executed",
+            _analyticsTransmitter.TransmitEvent(new GenericEvent("SpecFlow SuccessDiscovery executed",
                 GetProjectSettingsProps(projectSettings,
                     additionalProps)));
         }

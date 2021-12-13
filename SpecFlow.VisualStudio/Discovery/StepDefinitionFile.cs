@@ -1,8 +1,24 @@
 ﻿namespace SpecFlow.VisualStudio.Discovery;
 
-public record CSharpStepDefinitionFile(string StepDefinitionPath, string Content)
-    : StepDefinitionFile(StepDefinitionPath, Content)
+public record CSharpStepDefinitionFile(FileDetails StepDefinitionPath, SyntaxTree Content)
+    : StepDefinitionFile(StepDefinitionPath, Content);
+
+public record StepDefinitionFile : FileDetails
 {
+    public StepDefinitionFile(FileDetails fileDetails, SyntaxTree content)
+        : base(fileDetails)
+    {
+        Content = content;
+    }
+
+    public SyntaxTree Content { get; init; }
 }
 
-public record StepDefinitionFile(string StepDefinitionPath, string Content);
+public static class FileDetailsExtensions
+{
+    public static CSharpStepDefinitionFile WithCSharpContent(this FileDetails fileDetails, string content)
+    {
+        SyntaxTree treeContent = CSharpSyntaxTree.ParseText(content);
+        return new CSharpStepDefinitionFile(fileDetails, treeContent);
+    }
+}

@@ -9,7 +9,6 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
 {
     public RenameStepCommandTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper,
         ps => new RenameStepCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
-        "Rename step command executed",
         "ShowProblem: User Notification: The following problems occurred:" + Environment.NewLine)
     {
     }

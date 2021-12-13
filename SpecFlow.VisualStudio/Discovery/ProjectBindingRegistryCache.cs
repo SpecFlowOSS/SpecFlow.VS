@@ -1,80 +1,130 @@
-﻿using System;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
+﻿namespace SpecFlow.VisualStudio.Discovery;
 
-namespace SpecFlow.VisualStudio.Discovery
+public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 {
-    internal sealed class ProjectBindingRegistryCacheUninitialized : ProjectBindingRegistryCache
-    {
-        public ProjectBindingRegistryCacheUninitialized() : base(ProjectBindingRegistry.Invalid)
-        {
-        }
-    }
-    internal sealed class ProjectBindingRegistryCacheUninitializedProjectSettings : ProjectBindingRegistryCache
-    {
-        public ProjectBindingRegistryCacheUninitializedProjectSettings() : base(ProjectBindingRegistry.Invalid)
-        {
-        }
-    }
+    private readonly IIdeScope _ideScope;
+    private readonly IDeveroomLogger _logger;
+    private TaskCompletionSource<ProjectBindingRegistry> _upToDateBindingRegistrySource;
 
-    internal sealed class ProjectBindingRegistryCacheTestAssemblyNotFound : ProjectBindingRegistryCache
+    public ProjectBindingRegistryCache(IIdeScope ideScope)
     {
-        public ProjectBindingRegistryCacheTestAssemblyNotFound() : base(ProjectBindingRegistry.Invalid)
-        {
-        }
+        _ideScope = ideScope;
+        _logger = ideScope.Logger;
+
+        Value = ProjectBindingRegistry.Empty;
+        _upToDateBindingRegistrySource = new TaskCompletionSource<ProjectBindingRegistry>();
+        _upToDateBindingRegistrySource.SetResult(Value);
     }
 
-    internal sealed class ProjectBindingRegistryCacheError : ProjectBindingRegistryCache
+    public ProjectBindingRegistry Value { get; private set; }
+
+    public bool Processing => _upToDateBindingRegistrySource.Task.Status != TaskStatus.RanToCompletion;
+
+    public event EventHandler<EventArgs> Changed;
+
+    public async Task Update(Func<ProjectBindingRegistry, ProjectBindingRegistry> updateFunc)
     {
-        public ProjectBindingRegistryCacheError() : base(ProjectBindingRegistry.Invalid)
-        {
-        }
+        (TaskCompletionSource<ProjectBindingRegistry> newRegistrySource, ProjectBindingRegistry originalRegistry) =
+            await GetThreadSafeRegistry();
+
+        var updatedRegistry = InvokeUpdateFunc(updateFunc, originalRegistry, newRegistrySource);
+        if (updatedRegistry.Version == originalRegistry.Version)
+            return;
+
+        CalculateSourceLocationTrackingPositions(updatedRegistry);
+
+        Value = updatedRegistry;
+        newRegistrySource.SetResult(updatedRegistry);
+        Changed?.Invoke(this, EventArgs.Empty);
+        _logger.LogVerbose(
+            $"BindingRegistryCache is modified {originalRegistry}->{updatedRegistry}.");
+        DisposeSourceLocationTrackingPositions(originalRegistry);
     }
 
-    internal sealed class ProjectBindingRegistryCacheDiscovered : ProjectBindingRegistryCache
+    public Task<ProjectBindingRegistry> GetLatest()
     {
-        public ProjectBindingRegistryCacheDiscovered(ProjectBindingRegistry bindingRegistry, ProjectSettings projectSettings, DateTimeOffset lastChangeTime) 
-        : base(bindingRegistry)
-        {
-            ProjectSettings = projectSettings;
-            TestAssemblyWriteTime = lastChangeTime;
-        }
-
-        public ProjectSettings ProjectSettings { get; }
-        public DateTimeOffset TestAssemblyWriteTime { get; }
-
-        public override ProjectBindingRegistryCache WithBindingRegistry(ProjectBindingRegistry bindingRegistry)
-        {
-            return new ProjectBindingRegistryCacheDiscovered(bindingRegistry, ProjectSettings, TestAssemblyWriteTime);
-        }
-
-        public override bool IsUpToDate(ProjectSettings projectSettings, DateTimeOffset lastChangeTime)
-        {
-            return Equals(ProjectSettings, projectSettings) && TestAssemblyWriteTime == lastChangeTime;
-        }
-
-        public override bool IsDiscovered => true;
+        return WaitForCompletion(_upToDateBindingRegistrySource.Task);
     }
 
-    internal sealed class ProjectBindingRegistryCacheNonSpecFlowTestProject : ProjectBindingRegistryCache
+    private async
+        Task<(TaskCompletionSource<ProjectBindingRegistry> newRegistrySource, ProjectBindingRegistry originalRegistry)>
+        GetThreadSafeRegistry()
     {
-        public ProjectBindingRegistryCacheNonSpecFlowTestProject() : base(ProjectBindingRegistry.Invalid)
+        TaskCompletionSource<ProjectBindingRegistry> comparandSource;
+        TaskCompletionSource<ProjectBindingRegistry> originalSource;
+        TaskCompletionSource<ProjectBindingRegistry> newRegistrySource;
+        ProjectBindingRegistry originalRegistry;
+        var iteration = 0;
+        do
         {
-        }
+            iteration++;
+            comparandSource = _upToDateBindingRegistrySource;
+            newRegistrySource = new TaskCompletionSource<ProjectBindingRegistry>();
+
+            originalSource =
+                Interlocked.CompareExchange(ref _upToDateBindingRegistrySource, newRegistrySource, comparandSource);
+
+            originalRegistry = await WaitForCompletion(originalSource.Task);
+        } while (!ReferenceEquals(originalSource, comparandSource));
+
+        _logger.LogVerbose($"Got access to {originalRegistry} in {iteration} iteration(s)");
+
+        return (newRegistrySource, originalRegistry);
     }
 
-    internal abstract class ProjectBindingRegistryCache
+    private ProjectBindingRegistry InvokeUpdateFunc(Func<ProjectBindingRegistry, ProjectBindingRegistry> update,
+        ProjectBindingRegistry originalRegistry,
+        TaskCompletionSource<ProjectBindingRegistry> newRegistrySource)
     {
-        public ProjectBindingRegistry BindingRegistry { get; }
+        var updatedRegistry = update(originalRegistry);
 
-        protected ProjectBindingRegistryCache(ProjectBindingRegistry bindingRegistry)
+        if (updatedRegistry.Version == originalRegistry.Version)
         {
-            BindingRegistry = bindingRegistry;
+            newRegistrySource.SetResult(updatedRegistry);
+            return updatedRegistry;
         }
 
-        public virtual ProjectBindingRegistryCache WithBindingRegistry(ProjectBindingRegistry bindingRegistry) => this;
+        if (updatedRegistry.Version < originalRegistry.Version)
+        {
+            DisposeSourceLocationTrackingPositions(updatedRegistry);
+            throw new InvalidOperationException(
+                $"Cannot downgrade bindingRegistry from V{originalRegistry.Version} to V{updatedRegistry.Version}");
+        }
 
-        public virtual bool IsUpToDate(ProjectSettings projectSettings, DateTimeOffset lastChangeTime) => false;
+        return updatedRegistry;
+    }
 
-        public virtual bool IsDiscovered => false;
+    private async Task<ProjectBindingRegistry> WaitForCompletion(Task<ProjectBindingRegistry> task)
+    {
+        CancellationTokenSource cts = Debugger.IsAttached
+            ? new CancellationTokenSource(TimeSpan.FromSeconds(60))
+            : new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
+        var timeoutTask = Task.Delay(-1, cts.Token);
+        var result = await Task.WhenAny(task, timeoutTask);
+        if (ReferenceEquals(result, timeoutTask))
+            throw new TimeoutException("Binding registry in not processed in time");
+
+        return await task;
+    }
+
+    private void CalculateSourceLocationTrackingPositions(ProjectBindingRegistry bindingRegistry)
+    {
+        var sourceLocations = bindingRegistry.StepDefinitions.Select(sd => sd.Implementation.SourceLocation);
+        _ideScope.CalculateSourceLocationTrackingPositions(sourceLocations);
+    }
+
+    private void DisposeSourceLocationTrackingPositions(ProjectBindingRegistry bindingRegistry)
+    {
+        if (bindingRegistry == null)
+            return;
+        foreach (var sourceLocation in bindingRegistry.StepDefinitions.Select(sd => sd.Implementation.SourceLocation)
+                     .Where(sl => sl?.SourceLocationSpan != null))
+        {
+            sourceLocation.SourceLocationSpan.Dispose();
+            sourceLocation.SourceLocationSpan = null;
+        }
+
+        _logger.LogVerbose($"Tracking positions disposed on V{bindingRegistry.Version}");
     }
 }

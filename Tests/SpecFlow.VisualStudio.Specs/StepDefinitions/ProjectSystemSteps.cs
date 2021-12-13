@@ -1,4 +1,5 @@
-﻿using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
+﻿using Microsoft.VisualStudio.Threading;
+using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace SpecFlow.VisualStudio.Specs.StepDefinitions;
 
@@ -208,7 +209,6 @@ public class ProjectSystemSteps : Steps
     [When(@"the project is built")]
     public void WhenTheProjectIsBuilt()
     {
-        _discoveryService.Invalidate();
         _ideScope.TriggerProjectsBuilt();
     }
 
@@ -216,8 +216,11 @@ public class ProjectSystemSteps : Steps
     [Given("the project is built and the initial binding discovery is performed")]
     public async Task GivenTheProjectIsBuiltAndTheInitialBindingDiscoveryIsPerformed()
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        var bindingRegistryChanged = new AsyncManualResetEvent();
+        _discoveryService.BindingRegistryCache.Changed += (_, _) => bindingRegistryChanged.Set();
         WhenTheProjectIsBuilt();
-        await WhenTheBindingDiscoveryIsPerformed();
+        await bindingRegistryChanged.WaitAsync(cts.Token);
     }
 
 
@@ -241,14 +244,6 @@ public class ProjectSystemSteps : Steps
         _wpfTextView = _ideScope.CreateTextView(new TestText(featureFileContent), projectScope: _projectScope,
             filePath: filePath);
         GivenTheFollowingFeatureFile(fileName, _wpfTextView.TextBuffer.CurrentSnapshot.GetText());
-    }
-
-    [Given(@"the initial binding discovery is performed")]
-    [When(@"the initial binding discovery is performed")]
-    [When(@"the binding discovery is performed")]
-    public async Task WhenTheBindingDiscoveryIsPerformed()
-    {
-        await _discoveryService.WaitUntilDiscoveryPerformed();
     }
 
     [When(@"I invoke the ""(.*)"" command by typing ""(.*)""")]
@@ -480,7 +475,7 @@ public class ProjectSystemSteps : Steps
     [Then(@"the source file of the ""(.*)"" ""(.*)"" step definition is opened")]
     public void ThenTheSourceFileOfTheStepDefinitionIsOpened(string stepRegex, ScenarioBlock stepType)
     {
-        _stepDefinitionBinding = _discoveryService.GetBindingRegistry().StepDefinitions
+        _stepDefinitionBinding = _discoveryService.BindingRegistryCache.Value.StepDefinitions
             .FirstOrDefault(b => b.StepDefinitionType == stepType && b.Regex.ToString().Contains(stepRegex));
         _stepDefinitionBinding.Should().NotBeNull($"there has to be a {stepType} stepdef with regex '{stepRegex}'");
 

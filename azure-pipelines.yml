@@ -1,5 +1,21 @@
+parameters:
+- name: thingsArray
+  type: object
+  default:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  - 9
+  
 trigger:
 - main
+- DiscoveryService
 
 pool:
   vmImage: 'windows-2022'
@@ -30,6 +46,16 @@ steps:
     msbuildArgs: '/p:DeployExtension=false /p:AppInsightsInstrumentationKey=$(AppInsightsInstrumentationKey) /nowarn:VSTHRD010'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- ${{each thing in parameters.thingsArray}}:
+  - task: DotNetCoreCLI@2
+    displayName: Run Unit Tests ${{thing}}
+    inputs:
+      command: test
+      projects: '**/SpecFlow.VisualStudio.Tests/*.csproj'
+      arguments: '--configuration $(BuildConfiguration) --no-build'
+      testRunTitle: Unit Tests ${{thing}}
+    condition: succeededOrFailed()
 
 - task: DotNetCoreCLI@2
   displayName: Run Unit Tests

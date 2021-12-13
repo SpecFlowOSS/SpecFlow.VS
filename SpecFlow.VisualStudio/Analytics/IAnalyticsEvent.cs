@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Diagnostics;
 
 namespace SpecFlow.VisualStudio.Analytics
 {
@@ -11,6 +12,7 @@ namespace SpecFlow.VisualStudio.Analytics
     }
 
     [Export(typeof(IAnalyticsEvent))]
+    [DebuggerDisplay("{EventName}")]
     public class GenericEvent : IAnalyticsEvent
     {
         public GenericEvent(string eventName, Dictionary<string, object> properties = null)

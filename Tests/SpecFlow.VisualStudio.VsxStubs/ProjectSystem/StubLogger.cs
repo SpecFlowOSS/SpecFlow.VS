@@ -18,7 +18,7 @@ public class StubLogger : IDeveroomLogger
         Logs = new ConcurrentBag<LogMessage>(messages);
     }
 
-    public ConcurrentBag<LogMessage> Logs { get; } = new();
+    public ConcurrentBag<LogMessage> Logs { get; private set; } = new();
     public ImmutableArray<string> Messages => Logs.Select(l => l.Message).ToImmutableArray();
 
     public TraceLevel Level => TraceLevel.Verbose;
@@ -50,5 +50,10 @@ public class StubLogger : IDeveroomLogger
             _stopwatch,
             Logs.Select(m =>
                 new LogMessage(m.Level, m.Message.Replace(warningHeader, string.Empty), m.Order, m.TimeStamp)));
+    }
+
+    public void Clear()
+    {
+        Logs = new();
     }
 }

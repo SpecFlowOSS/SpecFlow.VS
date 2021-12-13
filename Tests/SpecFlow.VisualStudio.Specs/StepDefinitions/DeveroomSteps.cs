@@ -209,21 +209,26 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
         }
 
         [When(@"the binding discovery performed")]
-        public void WhenTheBindingDiscoveryPerformed()
+        public async Task WhenTheBindingDiscoveryPerformed()
         {
             var projectScope = GetProjectScope();
 
             foreach (var step in _projectScopeConfigurationSteps)
                 step(projectScope);
 
+            var initialized = new ManualResetEvent(false);
             var discoveryService = projectScope.GetDiscoveryService();
-            discoveryService.Should().NotBeNull("The DiscoveryService should be available");
+            discoveryService.BindingRegistryCache.Changed += (_, _) => initialized.Set();
+            if (discoveryService.BindingRegistryCache.Value != ProjectBindingRegistry.Empty) initialized.Set();
 
-            Wait.For(() =>
-            {
-                _bindingRegistry = discoveryService.GetBindingRegistry();
-                _bindingRegistry.IsFailed.Should().BeFalse("binding should be discovered");
-            }, 20000);
+            initialized.WaitOne(TimeSpan.FromSeconds(3))
+                .Should()
+                .BeTrue("the bindingService should be initialized");
+
+             _bindingRegistry = await discoveryService.BindingRegistryCache.GetLatest();
+
+             discoveryService.BindingRegistryCache.Value.Should()
+                 .NotBe(ProjectBindingRegistry.Empty, "binding should be discovered");
         }
 
         private StubProjectScope GetProjectScope()

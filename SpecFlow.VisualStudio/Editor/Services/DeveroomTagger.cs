@@ -43,7 +43,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
         private readonly IDeveroomTagParser _deveroomTagParser;
         private readonly IDiscoveryService _discoveryService;
         private readonly IDeveroomConfigurationProvider _deveroomConfigurationProvider;
-        private readonly ProjectSettingsProvider _projectSettingsProvider;
+        private readonly IProjectSettingsProvider _projectSettingsProvider;
         private readonly IActionThrottler _actionThrottler;
         private readonly CalculationCache<TagsCache> _tagsCache = new CalculationCache<TagsCache>();
 
@@ -172,7 +172,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
             var recalculated = _tagsCache.ReCalculate((() =>
             {
                 var configuration = _deveroomConfigurationProvider.GetConfiguration();
-                var bindingRegistry = _discoveryService?.GetBindingRegistry() ?? ProjectBindingRegistry.Invalid;
+                var bindingRegistry = _discoveryService?.BindingRegistryCache.Value ?? ProjectBindingRegistry.Empty;
                 var bindingRegistryVersion = bindingRegistry?.Version;
                 var currentTagsCache = _tagsCache.Value;
                 if (currentTagsCache != null &&
