@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Threading;
+﻿#nullable enable
 using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace SpecFlow.VisualStudio.Specs.StepDefinitions;
@@ -10,10 +10,10 @@ public class ProjectSystemSteps : Steps
     private string _commandToInvokeDeferred;
     private StubCompletionBroker _completionBroker;
     private MockableDiscoveryService _discoveryService;
+    private DeveroomEditorCommandBase _invokedCommand;
     private InMemoryStubProjectScope _projectScope;
     private ProjectStepDefinitionBinding _stepDefinitionBinding;
     private StubWpfTextView _wpfTextView;
-    private DeveroomEditorCommandBase _invokedCommand;
 
     public ProjectSystemSteps(StubIdeScope stubIdeScope)
     {
@@ -154,17 +154,13 @@ public class ProjectSystemSteps : Steps
             contentType: VsContentTypes.CSharp, filePath: fileName);
     }
 
-    private static string GetStepDefinitionFileContentFromClass(string stepDefinitionClass)
-    {
-        return string.Join(Environment.NewLine, "using System;", "using TechTalk.SpecFlow;", "", "namespace MyProject",
+    private static string GetStepDefinitionFileContentFromClass(string stepDefinitionClass) =>
+        string.Join(Environment.NewLine, "using System;", "using TechTalk.SpecFlow;", "", "namespace MyProject",
             "{", stepDefinitionClass, "}");
-    }
 
-    private static string GetStepDefinitionClassFromMethod(string stepDefinitionMethod)
-    {
-        return string.Join(Environment.NewLine, "[Binding]", "public class StepDefinitions1", "{", stepDefinitionMethod,
+    private static string GetStepDefinitionClassFromMethod(string stepDefinitionMethod) =>
+        string.Join(Environment.NewLine, "[Binding]", "public class StepDefinitions1", "{", stepDefinitionMethod,
             "}");
-    }
 
     private List<StepDefinition> ParseStepDefinitions(string stepDefinitionFileContent, string filePath)
     {
@@ -577,11 +573,9 @@ public class ProjectSystemSteps : Steps
             }).ToArray();
     }
 
-    private StepDefinitionSnippetData[] ParseSnippets(string snippetText)
-    {
-        return ParseSnippetsFromFile(
+    private StepDefinitionSnippetData[] ParseSnippets(string snippetText) =>
+        ParseSnippetsFromFile(
             GetStepDefinitionFileContentFromClass(GetStepDefinitionClassFromMethod(snippetText)));
-    }
 
     [Then(@"the define steps dialog should be opened with the following step definition skeletons")]
     public void ThenTheDefineStepsDialogShouldBeOpenedWithTheFollowingStepDefinitionSkeletons(Table expectedSkeletons)
@@ -640,7 +634,7 @@ public class ProjectSystemSteps : Steps
 
         _projectScope.StubIdeScope.AnalyticsTransmitter
             .Should()
-            .Contain(e=>e.EventName== "DefineSteps command executed", "the command is finished");
+            .Contain(e => e.EventName == "DefineSteps command executed", "the command is finished");
     }
 
     [When("I specify {string} as renamed step")]

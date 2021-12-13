@@ -1,11 +1,12 @@
-﻿namespace SpecFlow.VisualStudio.Discovery;
+﻿#nullable enable
+namespace SpecFlow.VisualStudio.Discovery;
 
 public class DiscoveryService : IDiscoveryService
 {
+    private readonly DiscoveryInvoker _discoveryInvoker;
     private readonly IDeveroomLogger _logger;
     private readonly IProjectScope _projectScope;
     private readonly IProjectSettingsProvider _projectSettingsProvider;
-    private readonly DiscoveryInvoker _discoveryInvoker;
 
     public DiscoveryService(IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider,
         IProjectBindingRegistryCache bindingRegistryCacheCache)
@@ -18,7 +19,7 @@ public class DiscoveryService : IDiscoveryService
         BindingRegistryCache = bindingRegistryCacheCache;
         _discoveryInvoker = new DiscoveryInvoker(
             _logger,
-            _projectScope.IdeScope.DeveroomErrorListServices, 
+            _projectScope.IdeScope.DeveroomErrorListServices,
             _projectScope,
             discoveryResultProvider,
             _projectScope.IdeScope.MonitoringService, GetTestAssemblySource);

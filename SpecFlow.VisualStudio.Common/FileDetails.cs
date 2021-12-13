@@ -1,14 +1,10 @@
-﻿namespace SpecFlow.VisualStudio.Common;
+﻿#nullable enable
+
+namespace SpecFlow.VisualStudio.Common;
 
 public record FileDetails
 {
-    public static FileDetails Missing = new();
-
     private readonly FileInfo _file;
-
-    private FileDetails()
-    {
-    }
 
     private FileDetails(FileInfo file)
     {

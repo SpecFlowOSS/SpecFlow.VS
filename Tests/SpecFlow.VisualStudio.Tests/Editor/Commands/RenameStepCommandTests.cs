@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-
+﻿#nullable enable
 #pragma warning disable xUnit1026 //Theory method 'xxx' does not use parameter '_'
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands;

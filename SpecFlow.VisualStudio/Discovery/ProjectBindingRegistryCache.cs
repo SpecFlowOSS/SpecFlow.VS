@@ -41,10 +41,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         DisposeSourceLocationTrackingPositions(originalRegistry);
     }
 
-    public Task<ProjectBindingRegistry> GetLatest()
-    {
-        return WaitForCompletion(_upToDateBindingRegistrySource.Task);
-    }
+    public Task<ProjectBindingRegistry> GetLatest() => WaitForCompletion(_upToDateBindingRegistrySource.Task);
 
     private async
         Task<(TaskCompletionSource<ProjectBindingRegistry> newRegistrySource, ProjectBindingRegistry originalRegistry)>

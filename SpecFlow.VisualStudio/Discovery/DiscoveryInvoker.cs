@@ -1,15 +1,18 @@
-﻿namespace SpecFlow.VisualStudio.Discovery;
+﻿#nullable enable
+namespace SpecFlow.VisualStudio.Discovery;
 
 internal class DiscoveryInvoker
 {
-    private readonly IDeveroomLogger _logger;
-    private readonly IDeveroomErrorListServices _errorListServices;
-    private readonly IProjectScope _projectScope;
     private readonly IDiscoveryResultProvider _discoveryResultProvider;
-    private readonly IMonitoringService _monitoringService;
+    private readonly IDeveroomErrorListServices _errorListServices;
     private readonly Func<ProjectSettings, ConfigSource> _getTestAssemblySource;
+    private readonly IDeveroomLogger _logger;
+    private readonly IMonitoringService _monitoringService;
+    private readonly IProjectScope _projectScope;
 
-    public DiscoveryInvoker(IDeveroomLogger logger, IDeveroomErrorListServices errorListServices, IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider, IMonitoringService monitoringService, Func<ProjectSettings, ConfigSource> getTestAssemblySource)
+    public DiscoveryInvoker(IDeveroomLogger logger, IDeveroomErrorListServices errorListServices,
+        IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider,
+        IMonitoringService monitoringService, Func<ProjectSettings, ConfigSource> getTestAssemblySource)
     {
         _logger = logger;
         _errorListServices = errorListServices;
@@ -35,7 +38,8 @@ internal class DiscoveryInvoker
             .AndCreateBindingRegistry(_monitoringService);
         stopwatch.Stop();
 
-        _logger.LogVerbose($"{bindingRegistry.StepDefinitions.Length} step definitions discovered in {stopwatch.Elapsed}");
+        _logger.LogVerbose(
+            $"{bindingRegistry.StepDefinitions.Length} step definitions discovered in {stopwatch.Elapsed}");
         return bindingRegistry;
     }
 

@@ -1,27 +1,24 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.Composition;
-using System.Diagnostics;
+﻿#nullable enable
 
-namespace SpecFlow.VisualStudio.Analytics
+namespace SpecFlow.VisualStudio.Analytics;
+
+public interface IAnalyticsEvent
 {
-    public interface IAnalyticsEvent
-    {
-        string EventName { get; }
+    string EventName { get; }
 
-        Dictionary<string, object> Properties { get; }
+    Dictionary<string, object> Properties { get; }
+}
+
+[Export(typeof(IAnalyticsEvent))]
+[DebuggerDisplay("{EventName}")]
+public class GenericEvent : IAnalyticsEvent
+{
+    public GenericEvent(string eventName, Dictionary<string, object> properties = null)
+    {
+        EventName = eventName;
+        Properties = properties ?? new Dictionary<string, object>();
     }
 
-    [Export(typeof(IAnalyticsEvent))]
-    [DebuggerDisplay("{EventName}")]
-    public class GenericEvent : IAnalyticsEvent
-    {
-        public GenericEvent(string eventName, Dictionary<string, object> properties = null)
-        {
-            EventName = eventName;
-            Properties = properties ?? new Dictionary<string, object>();
-        }
-
-        public string EventName { get; }
-        public Dictionary<string, object> Properties { get; }
-    }
+    public string EventName { get; }
+    public Dictionary<string, object> Properties { get; }
 }

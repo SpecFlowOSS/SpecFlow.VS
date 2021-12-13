@@ -136,7 +136,7 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
                        $"{indent}}}" + newLine +
                        "}" + newLine;
 
-        var targetFile = CSharpStepDefinitionFile
+        var targetFile = FileDetails
             .FromPath(targetFolder, className + ".cs")
             .WithCSharpContent(template);
 

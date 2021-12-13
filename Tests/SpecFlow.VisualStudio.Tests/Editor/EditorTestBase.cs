@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.Tests.Editor;
+﻿#nullable enable
+
+namespace SpecFlow.VisualStudio.Tests.Editor;
 
 public abstract class EditorTestBase
 {
@@ -38,10 +40,7 @@ public abstract class EditorTestBase
         return Dump(featureFileTextBuffer, title);
     }
 
-    protected TestText Dump(IWpfTextView textView, string title)
-    {
-        return Dump(textView.TextBuffer, title);
-    }
+    protected TestText Dump(IWpfTextView textView, string title) => Dump(textView.TextBuffer, title);
 
     protected TestText Dump(ITextBuffer textBuffer, string title)
     {
@@ -77,23 +76,19 @@ public abstract class EditorTestBase
         return CreateTextView(inputText, VsContentTypes.FeatureFile, featureFile.FileName);
     }
 
-    protected StubWpfTextView CreateTextView(TestText inputText, string contentType, string filePath)
-    {
-        return ProjectScope.StubIdeScope.CreateTextView(
+    protected StubWpfTextView CreateTextView(TestText inputText, string contentType, string filePath) =>
+        ProjectScope.StubIdeScope.CreateTextView(
             inputText,
             Environment.NewLine,
             ProjectScope,
             contentType,
             filePath);
-    }
 
-    protected TestFeatureFile ArrangeOneFeatureFile()
-    {
-        return ArrangeOneFeatureFile(
+    protected TestFeatureFile ArrangeOneFeatureFile() =>
+        ArrangeOneFeatureFile(
             @"Feature: Feature1
    Scenario: Scenario1
        When I press add");
-    }
 
     protected TestFeatureFile ArrangeOneFeatureFile(string featureFileContent)
     {
@@ -123,10 +118,7 @@ public abstract class EditorTestBase
         return stepDefinitions;
     }
 
-    protected static TestStepDefinition ArrangeStepDefinition()
-    {
-        return ArrangeStepDefinition(@"""I press add""");
-    }
+    protected static TestStepDefinition ArrangeStepDefinition() => ArrangeStepDefinition(@"""I press add""");
 
     protected static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord = "When",
         string attributeName = null)
@@ -156,10 +148,7 @@ public abstract class EditorTestBase
         textEdit.Apply();
     }
 
-    protected StubLogger GetStubLogger()
-    {
-        return GetStubLogger(ProjectScope.IdeScope as StubIdeScope);
-    }
+    protected StubLogger GetStubLogger() => GetStubLogger(ProjectScope.IdeScope as StubIdeScope);
 
     protected static StubLogger GetStubLogger(StubIdeScope ideScope)
     {

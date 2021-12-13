@@ -1,4 +1,4 @@
-﻿using SpecFlow.VisualStudio.Common;
+﻿#nullable enable
 
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
@@ -7,9 +7,9 @@ namespace SpecFlow.VisualStudio.Tests.Discovery;
 public class ReprocessStepDefinitionFileTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
-    private InMemoryStubProjectScope _projectScope;
 
     private string _indent = string.Empty;
+    private InMemoryStubProjectScope _projectScope;
 
     public ReprocessStepDefinitionFileTests(ITestOutputHelper testOutputHelper)
     {
@@ -33,7 +33,7 @@ public class ReprocessStepDefinitionFileTests
 
         NamerFactory.AdditionalInformation = testName;
         var content = File.ReadAllText(stepDefinitionPath);
-        var stepDefinitionFile = CSharpStepDefinitionFile
+        var stepDefinitionFile = FileDetails
             .FromPath($"C:\\Full path to\\{testName}")
             .WithCSharpContent(content);
 
@@ -43,8 +43,10 @@ public class ReprocessStepDefinitionFileTests
         var projectStepDefinitionBindings = await stepDefinitionParser.Parse(stepDefinitionFile);
 
         //assert
-        ProjectBindingRegistry bindingRegistry = ProjectBindingRegistry.Empty.WithStepDefinitions(projectStepDefinitionBindings);
-        _projectScope.IdeScope.Logger.LogVerbose($"test retrieved reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
+        ProjectBindingRegistry bindingRegistry =
+            ProjectBindingRegistry.Empty.WithStepDefinitions(projectStepDefinitionBindings);
+        _projectScope.IdeScope.Logger.LogVerbose(
+            $"test retrieved reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
         var dumped = Dump(bindingRegistry);
         Approvals.Verify(dumped);
     }
@@ -110,7 +112,8 @@ public class ReprocessStepDefinitionFileTests
         _projectScope.AddSpecFlowPackage();
         _projectScope.AddFile("Let_IsSpecFlowTestProject_true.feature", string.Empty);
         var discoveryService =
-            MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, initialStepDefinitions, TimeSpan.Zero);
+            MockableDiscoveryService.SetupWithInitialStepDefinitions(_projectScope, initialStepDefinitions,
+                TimeSpan.Zero);
         await discoveryService.BindingRegistryCache.GetLatest();
 
         return discoveryService;
@@ -137,6 +140,7 @@ public class ReprocessStepDefinitionFileTests
             sb.AppendLine($"{_indent}ProjectStepDefinitionBinding-{i}:");
             sb.Append(Dump(binding));
         }
+
         sb.AppendLine("ProjectBindingRegistry:end");
 
         DecreaseIndent();

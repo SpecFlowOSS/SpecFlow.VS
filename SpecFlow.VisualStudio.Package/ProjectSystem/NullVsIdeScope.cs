@@ -1,251 +1,218 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Abstractions;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.Monitoring;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
-using SpecFlow.VisualStudio.UI;
-using SpecFlow.VisualStudio.UI.ViewModels;
-using EnvDTE;
-using Microsoft.CodeAnalysis;
-using Microsoft.VisualStudio.Text;
-using SpecFlow.VisualStudio.Editor.Commands;
-using SpecFlow.VisualStudio.Notifications;
+﻿using Microsoft.CodeAnalysis;
 using Project = EnvDTE.Project;
 
-namespace SpecFlow.VisualStudio.ProjectSystem
+#nullable enable
+namespace SpecFlow.VisualStudio.ProjectSystem;
+
+public class NullVsIdeScope : IVsIdeScope
 {
-    public class NullVsIdeScope : IVsIdeScope
+    public NullVsIdeScope(IDeveroomLogger logger, IServiceProvider serviceProvider,
+        IMonitoringService monitoringService)
     {
-        class NullIdeActions : VsIdeActionsBase, IIdeActions, IAsyncContextMenu
-        {
-            public NullIdeActions(IVsIdeScope ideScope) : base(ideScope)
-            {
-            }
+        Logger = logger;
+        MonitoringService = monitoringService;
+        ServiceProvider = serviceProvider;
+        WindowManager = new DeveroomWindowManager(serviceProvider, monitoringService);
+        FileSystem = new FileSystem();
+        Actions = new NullIdeActions(this);
+        Dte = null;
+        DeveroomOutputPaneServices = null;
+        DeveroomErrorListServices = new NullDeveroomErrorListServices();
+    }
 
-            public bool NavigateTo(SourceLocation sourceLocation)
-            {
-                return false;
-            }
+    public bool IsSolutionLoaded { get; } = false;
 
-            public IAsyncContextMenu ShowContextMenu(string header, bool async,
-                params ContextMenuItem[] contextMenuItems)
-            {
-                return this;
-            }
+    public IDeveroomLogger Logger { get; }
+    public IMonitoringService MonitoringService { get; }
+    public IIdeActions Actions { get; }
+    public IDeveroomWindowManager WindowManager { get; }
+    public IFileSystem FileSystem { get; }
 
-            public CancellationToken CancellationToken { get; } = new CancellationToken();
-            public bool IsComplete => true;
+    public event EventHandler<EventArgs> WeakProjectsBuilt
+    {
+        add { }
+        remove { }
+    }
 
-            public void AddItems(params ContextMenuItem[] items)
-            {
-                //nop
-            }
+    public event EventHandler<EventArgs> WeakProjectOutputsUpdated
+    {
+        add { }
+        remove { }
+    }
 
-            public void Complete()
-            {
-                //nop
-            }
-        }
+    public IServiceProvider ServiceProvider { get; }
+    public DTE Dte { get; }
+    public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; }
+    public IDeveroomErrorListServices DeveroomErrorListServices { get; }
 
-        class NullMonitoringService : IMonitoringService
-        {
-            public void MonitorLoadProjectSystem()
-            {
-            }
+    public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
+    {
+    }
 
-            public void MonitorOpenProjectSystem(IIdeScope ideScope)
-            {
-            }
+    public IProjectScope[] GetProjectsWithFeatureFiles() => Array.Empty<IProjectScope>();
 
-            public void MonitorOpenProject(ProjectSettings settings, int? featureFileCount)
-            {
-            }
+    public IDisposable CreateUndoContext(string undoLabel) => null;
 
-            public void MonitorOpenFeatureFile(ProjectSettings projectSettings)
-            {
-            }
+    public bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer)
+    {
+        textBuffer = default;
+        return false;
+    }
 
-            public void MonitorExtensionInstalled()
-            {
-            }
+    public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer) => null;
 
-            public void MonitorExtensionUpgraded(string oldExtensionVersion)
-            {
-            }
+    public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException,
+        [CallerMemberName] string callerName = "???") => Task.CompletedTask;
 
-            public void MonitorExtensionDaysOfUsage(int usageDays)
-            {
-            }
+    public Task RunOnUiThread(Action action) => Task.CompletedTask;
 
-            public void MonitorParserParse(ProjectSettings settings, Dictionary<string, object> additionalProps = null)
-            {
-            }
+    public void OpenIfNotOpened(string path)
+    {
+    }
 
-            public void MonitorCommandCommentUncomment()
-            {
-            }
+    public IProjectScope GetProject(ITextBuffer textBuffer) => null;
 
-            public void MonitorCommandDefineSteps(CreateStepDefinitionsDialogResult action, int snippetCount)
-            {
-            }
+    public void Dispose()
+    {
+        //nop
+    }
 
-            public void MonitorCommandFindStepDefinitionUsages(int usagesCount, bool isCancelled)
-            {
-            }
+    public IProjectScope GetProjectScope(Project project) => throw new NotImplementedException();
 
-            public void MonitorCommandGoToStepDefinition(bool generateSnippet)
-            {
-            }
+    public static IMonitoringService GetNullMonitoringService() => new NullMonitoringService();
 
-            public void MonitorCommandAutoFormatTable()
-            {
-            }
-
-            public void MonitorCommandAutoFormatDocument(bool isSelectionFormatting)
-            {
-            }
-
-            public void MonitorCommandAddFeatureFile(ProjectSettings projectSettings)
-            {
-            }
-
-            public void MonitorCommandAddSpecFlowConfigFile(ProjectSettings projectSettings)
-            {
-            }
-
-            public void MonitorCommandRenameStepExecuted(RenameStepCommandContext ctx)
-            {
-            }
-
-            public void MonitorSpecFlowDiscovery(bool isFailed, string errorMessage, int stepDefinitionCount, ProjectSettings projectSettings)
-            {
-            }
-
-            public void MonitorSpecFlowGeneration(bool isFailed, ProjectSettings projectSettings)
-            {
-            }
-
-            public void MonitorError(Exception exception, bool? isFatal = null)
-            {
-            }
-
-            public void MonitorProjectTemplateWizardStarted()
-            {
-            }
-
-            public void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions)
-            {
-            }
-
-            public void MonitorNotificationShown(NotificationData notification)
-            {
-            }
-
-            public void MonitorNotificationDismissed(NotificationData notification)
-            {
-            }
-
-            public void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null)
-            {
-            }
-
-            public void MonitorUpgradeDialogDismissed(Dictionary<string, object> additionalProps)
-            {
-            }
-        }
-
-        public bool IsSolutionLoaded { get; } = false;
-
-        public IDeveroomLogger Logger { get; }
-        public IMonitoringService MonitoringService { get; }
-        public IIdeActions Actions { get; }
-        public IDeveroomWindowManager WindowManager { get; }
-        public IFileSystem FileSystem { get; }
-        public event EventHandler<EventArgs> WeakProjectsBuilt { add { } remove { } }
-        public event EventHandler<EventArgs> WeakProjectOutputsUpdated { add { } remove { } }
-        public IServiceProvider ServiceProvider { get; }
-        public DTE Dte { get; }
-        public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; }
-        public IDeveroomErrorListServices DeveroomErrorListServices { get; }
-
-        public IProjectScope GetProjectScope(Project project)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public NullVsIdeScope(IDeveroomLogger logger, IServiceProvider serviceProvider,
-            IMonitoringService monitoringService)
-        {
-            Logger = logger;
-            MonitoringService = monitoringService;
-            ServiceProvider = serviceProvider;
-            WindowManager = new DeveroomWindowManager(serviceProvider, monitoringService);
-            FileSystem = new FileSystem();
-            Actions = new NullIdeActions(this);
-            Dte = null;
-            DeveroomOutputPaneServices = null;
-            DeveroomErrorListServices = new NullDeveroomErrorListServices();
-        }
-
-        public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
+    private class NullIdeActions : VsIdeActionsBase, IIdeActions, IAsyncContextMenu
+    {
+        public NullIdeActions(IVsIdeScope ideScope) : base(ideScope)
         {
         }
 
-        public IProjectScope[] GetProjectsWithFeatureFiles()
-        {
-            return Array.Empty<IProjectScope>();
-        }
+        public CancellationToken CancellationToken { get; } = new();
+        public bool IsComplete => true;
 
-        public IDisposable CreateUndoContext(string undoLabel)
-        {
-            return null;
-        }
-
-        public bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer)
-        {
-            textBuffer = default;
-            return false;
-        }
-
-        public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
-        {
-            return null;
-        }
-
-        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???")
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task RunOnUiThread(Action action)
-        {
-            return Task.CompletedTask;
-        }
-
-        public void OpenIfNotOpened(string path)
-        {
-        }
-
-        public IProjectScope GetProject(ITextBuffer textBuffer)
-        {
-            return null;
-        }
-
-        public void Dispose()
+        public void AddItems(params ContextMenuItem[] items)
         {
             //nop
         }
 
-        public static IMonitoringService GetNullMonitoringService()
+        public void Complete()
         {
-            return new NullMonitoringService();
+            //nop
+        }
+
+        public bool NavigateTo(SourceLocation sourceLocation) => false;
+
+        public IAsyncContextMenu ShowContextMenu(string header, bool async,
+            params ContextMenuItem[] contextMenuItems) =>
+            this;
+    }
+
+    private class NullMonitoringService : IMonitoringService
+    {
+        public void MonitorLoadProjectSystem()
+        {
+        }
+
+        public void MonitorOpenProjectSystem(IIdeScope ideScope)
+        {
+        }
+
+        public void MonitorOpenProject(ProjectSettings settings, int? featureFileCount)
+        {
+        }
+
+        public void MonitorOpenFeatureFile(ProjectSettings projectSettings)
+        {
+        }
+
+        public void MonitorExtensionInstalled()
+        {
+        }
+
+        public void MonitorExtensionUpgraded(string oldExtensionVersion)
+        {
+        }
+
+        public void MonitorExtensionDaysOfUsage(int usageDays)
+        {
+        }
+
+        public void MonitorParserParse(ProjectSettings settings, Dictionary<string, object> additionalProps = null)
+        {
+        }
+
+        public void MonitorCommandCommentUncomment()
+        {
+        }
+
+        public void MonitorCommandDefineSteps(CreateStepDefinitionsDialogResult action, int snippetCount)
+        {
+        }
+
+        public void MonitorCommandFindStepDefinitionUsages(int usagesCount, bool isCancelled)
+        {
+        }
+
+        public void MonitorCommandGoToStepDefinition(bool generateSnippet)
+        {
+        }
+
+        public void MonitorCommandAutoFormatTable()
+        {
+        }
+
+        public void MonitorCommandAutoFormatDocument(bool isSelectionFormatting)
+        {
+        }
+
+        public void MonitorCommandAddFeatureFile(ProjectSettings projectSettings)
+        {
+        }
+
+        public void MonitorCommandAddSpecFlowConfigFile(ProjectSettings projectSettings)
+        {
+        }
+
+        public void MonitorCommandRenameStepExecuted(RenameStepCommandContext ctx)
+        {
+        }
+
+        public void MonitorSpecFlowDiscovery(bool isFailed, string errorMessage, int stepDefinitionCount,
+            ProjectSettings projectSettings)
+        {
+        }
+
+        public void MonitorSpecFlowGeneration(bool isFailed, ProjectSettings projectSettings)
+        {
+        }
+
+        public void MonitorError(Exception exception, bool? isFatal = null)
+        {
+        }
+
+        public void MonitorProjectTemplateWizardStarted()
+        {
+        }
+
+        public void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework,
+            bool addFluentAssertions)
+        {
+        }
+
+        public void MonitorNotificationShown(NotificationData notification)
+        {
+        }
+
+        public void MonitorNotificationDismissed(NotificationData notification)
+        {
+        }
+
+        public void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null)
+        {
+        }
+
+        public void MonitorUpgradeDialogDismissed(Dictionary<string, object> additionalProps)
+        {
         }
     }
 }

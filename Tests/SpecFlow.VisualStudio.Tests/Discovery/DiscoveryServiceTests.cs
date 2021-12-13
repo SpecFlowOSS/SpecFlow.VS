@@ -1,19 +1,16 @@
-﻿using System.Collections.Concurrent;
-using SpecFlow.VisualStudio.Annotations;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
+﻿#nullable enable
 
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
 public class DiscoveryServiceTests
 {
-    private ITestOutputHelper _testOutputHelper;
+    private readonly ITestOutputHelper _testOutputHelper;
 
     public DiscoveryServiceTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
     }
-
-
+    
     [Fact]
     public async Task ParallelUpdate()
     {
@@ -31,15 +28,15 @@ public class DiscoveryServiceTests
         var discoveryResultProvider = new Mock<IDiscoveryResultProvider>(MockBehavior.Strict);
         var projectSettings = new ProjectSettings(
             DeveroomProjectKind.SpecFlowTestProject,
-            default, 
-            TargetFrameworkMoniker.CreateFromShortName(string.Empty), 
-            default, 
-            default, 
-            default, 
-            default, 
-            default, 
-            string.Empty, 
-            default, 
+            default,
+            TargetFrameworkMoniker.CreateFromShortName(string.Empty),
+            default,
+            default,
+            default,
+            default,
+            default,
+            string.Empty,
+            default,
             string.Empty
         );
 
@@ -64,9 +61,10 @@ public class DiscoveryServiceTests
 
         discoveryResultProvider
             .Setup(p => p.RunDiscovery(string.Empty, string.Empty, projectSettings))
-            .Returns(new DiscoveryResult{StepDefinitions = Array.Empty<StepDefinition>()});
+            .Returns(new DiscoveryResult {StepDefinitions = Array.Empty<StepDefinition>()});
 
-        var discoveryService = new DiscoveryService(projectScope.Object, discoveryResultProvider.Object, new ProjectBindingRegistryCache(ideScope.Object));
+        var discoveryService = new DiscoveryService(projectScope.Object, discoveryResultProvider.Object,
+            new ProjectBindingRegistryCache(ideScope.Object));
 
         var oldVersions = new ConcurrentQueue<int>();
         var initialRegistry = new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(), 123456);
@@ -82,11 +80,13 @@ public class DiscoveryServiceTests
             {
                 var tasks = new Task[10];
                 for (int i = 0; i < tasks.Length; ++i)
-                {
                     tasks[i] = RunInThread(async () =>
                     {
                         for (int j = 0; j < 5 + DateTimeOffset.UtcNow.Ticks % 10; ++j)
-                            if ((i + j) % 7 == 6) await discoveryService.BindingRegistryCache.GetLatest();
+                            if ((i + j) % 7 == 6)
+                            {
+                                await discoveryService.BindingRegistryCache.GetLatest();
+                            }
 
                             else
                             {
@@ -94,11 +94,11 @@ public class DiscoveryServiceTests
                                 await discoveryService.BindingRegistryCache.Update(old =>
                                 {
                                     oldVersions.Enqueue(old.Version);
-                                return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(), i*1000+j);
+                                    return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(),
+                                        i * 1000 + j);
                                 });
                             }
                     }, cts.Token);
-                }
 
                 await Task.WhenAll(tasks);
                 retried = stubLogger.Logs.Any(log => log.Message.Contains("in 2 iteration"));
@@ -109,6 +109,7 @@ public class DiscoveryServiceTests
         {
             return;
         }
+
         if (cts.IsCancellationRequested) return;
 
         //assert

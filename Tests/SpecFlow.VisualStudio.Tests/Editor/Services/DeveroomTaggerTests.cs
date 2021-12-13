@@ -34,7 +34,8 @@ public class DeveroomTaggerTests
             ));
         ideScope.SetupGet(s => s.DeveroomErrorListServices).Returns(Mock.Of<IDeveroomErrorListServices>);
         ideScope.SetupGet(s => s.IsSolutionLoaded).Returns(true);
-        ideScope.Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(), It.IsAny<string>()))
+        ideScope.Setup(s =>
+                s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(), It.IsAny<string>()))
             .Returns((Func<Task> t, Action<Exception> e, string cn) => t());
 
         projectScope.SetupGet(s => s.Properties).Returns(propertyCollection);
@@ -143,6 +144,44 @@ public class DeveroomTaggerTests
         sut.AssertNoErrorLogged();
     }
 
+    [Theory]
+    [InlineData(3, Skip = "Needs work")]
+    [InlineData(4, Skip = "Needs work")]
+    [InlineData(5, Skip = "Needs work")]
+    [InlineData(6, Skip = "Needs work")]
+    [InlineData(7, Skip = "Needs work")]
+    public async Task Parallel(int threads)
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.BuildTagger();
+
+        var reCalculationInProgress = new ManualResetEvent(false);
+        var cev = new CountdownEvent(threads - 1);
+        sut.TextSnapshot.SetupGet(s => s.Version).Returns(() =>
+        {
+            cev.Signal();
+            reCalculationInProgress.WaitOne();
+            return sut.TextSnapShotVersion.Object;
+            //s.WaitOne()
+        });
+
+        var tasks = new Task[threads];
+        for (int i = 0; i < threads; i++)
+            tasks[i] = Task.Run(() => sut.TriggerAction());
+
+        //act
+        cev.Wait(TimeSpan.FromMilliseconds(100));
+        cev.CurrentCount.Should().Be(0);
+        cev.Reset((threads - 1) * 2);
+        reCalculationInProgress.Set();
+        await Task.WhenAll(tasks);
+
+        ////assert
+        sut.TextSnapshot.Verify(s => s.GetText(), Times.Exactly(2));
+        sut.AssertNoErrorLogged();
+    }
+
     protected record Sut(
         Mock<IIdeScope> IdeScope,
         Mock<ITextBuffer> TextBuffer,
@@ -178,10 +217,7 @@ public class DeveroomTaggerTests
             _tagsChangedEvents.Add(e);
         }
 
-        public StubWpfTextView BuildTextView()
-        {
-            return new(TextBuffer.Object);
-        }
+        public StubWpfTextView BuildTextView() => new StubWpfTextView(TextBuffer.Object);
 
         public Sut SetAction(Action action)
         {
@@ -193,43 +229,5 @@ public class DeveroomTaggerTests
         {
             LoggerErrorMessages.Should().BeEmpty();
         }
-    }
-
-    [Theory]
-    [InlineData(3, Skip = "Needs work")]
-    [InlineData(4, Skip = "Needs work")]
-    [InlineData(5, Skip = "Needs work")]
-    [InlineData(6, Skip = "Needs work")]
-    [InlineData(7, Skip = "Needs work")]
-    public async Task Parallel(int threads)
-    {
-        //arrange
-        var sut = ArrangeSut();
-        sut.BuildTagger();
-
-        var reCalculationInProgress = new ManualResetEvent(false);
-        var cev = new CountdownEvent(threads-1);
-        sut.TextSnapshot.SetupGet(s => s.Version).Returns(() =>
-        {
-            cev.Signal();
-            reCalculationInProgress.WaitOne();
-            return sut.TextSnapShotVersion.Object;
-            //s.WaitOne()
-        });
-
-        var tasks = new Task[threads];
-        for (int i = 0; i < threads; i++)
-            tasks[i] = Task.Run(() => sut.TriggerAction());
-
-        //act
-        cev.Wait(TimeSpan.FromMilliseconds(100));
-        cev.CurrentCount.Should().Be(0);
-        cev.Reset((threads-1)*2);
-        reCalculationInProgress.Set();
-        await Task.WhenAll(tasks);
-
-        ////assert
-        sut.TextSnapshot.Verify(s => s.GetText(), Times.Exactly(2));
-        sut.AssertNoErrorLogged();
     }
 }

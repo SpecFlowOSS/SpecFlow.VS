@@ -1,177 +1,149 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Abstractions;
-using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.Monitoring;
-using SpecFlow.VisualStudio.ProjectSystem;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using Moq;
-using SpecFlow.VisualStudio.Editor.Services;
-using Xunit.Abstractions;
+﻿#nullable enable
 
-namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
+namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
+
+public class StubIdeScope : IIdeScope
 {
-    public class StubIdeScope : IIdeScope
+    public StubIdeScope(ITestOutputHelper testOutputHelper)
     {
-        public StubAnalyticsTransmitter AnalyticsTransmitter { get; }
-        public IDictionary<string, StubWpfTextView> OpenViews { get; } = new Dictionary<string, StubWpfTextView>();
-        public StubLogger StubLogger { get; } = new StubLogger();
-        public DeveroomCompositeLogger CompositeLogger { get; } = new DeveroomCompositeLogger
-        {
-            new DeveroomDebugLogger(TraceLevel.Verbose)
-        };
+        AnalyticsTransmitter = new StubAnalyticsTransmitter(Logger);
+        MonitoringService =
+            new MonitoringService(
+                AnalyticsTransmitter,
+                new Mock<IWelcomeService>().Object,
+                new Mock<ITelemetryConfigurationHolder>().Object);
 
-        public bool IsSolutionLoaded { get; } = true;
+        CompositeLogger.Add(new DeveroomXUnitLogger(testOutputHelper));
+        CompositeLogger.Add(StubLogger);
+        Actions = new StubIdeActions(this);
+        VsxStubObjects.Initialize();
+    }
 
-        public IProjectScope GetProject(ITextBuffer textBuffer)
+    public StubAnalyticsTransmitter AnalyticsTransmitter { get; }
+    public IDictionary<string, StubWpfTextView> OpenViews { get; } = new Dictionary<string, StubWpfTextView>();
+    public StubLogger StubLogger { get; } = new();
+
+    public DeveroomCompositeLogger CompositeLogger { get; } = new()
+    {
+        new DeveroomDebugLogger()
+    };
+
+    public StubWindowManager StubWindowManager { get; } = new();
+    public List<IProjectScope> ProjectScopes { get; } = new();
+    public IWpfTextView CurrentTextView { get; internal set; }
+
+    public bool IsSolutionLoaded { get; } = true;
+
+    public IProjectScope GetProject(ITextBuffer textBuffer) =>
+        textBuffer.Properties.GetProperty<IProjectScope>(typeof(IProjectScope));
+
+    public IDeveroomLogger Logger => CompositeLogger;
+    public IIdeActions Actions { get; set; }
+    public IDeveroomWindowManager WindowManager => StubWindowManager;
+    public IFileSystem FileSystem { get; private set; } = new MockFileSystem();
+    public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; } = null;
+    public IDeveroomErrorListServices DeveroomErrorListServices { get; } = new StubErrorListServices();
+    public IMonitoringService MonitoringService { get; }
+
+    public event EventHandler<EventArgs> WeakProjectsBuilt;
+    public event EventHandler<EventArgs> WeakProjectOutputsUpdated;
+
+    public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
+    {
+    }
+
+    public bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer)
+    {
+        if (OpenViews.TryGetValue(sourceLocation.SourceFile, out var view))
         {
-            return textBuffer.Properties.GetProperty<IProjectScope>(typeof(IProjectScope));
+            textBuffer = view.TextBuffer;
+            return true;
         }
 
-        public IDeveroomLogger Logger => CompositeLogger;
-        public IIdeActions Actions { get; set; }
-        public IDeveroomWindowManager WindowManager => StubWindowManager;
-        public IFileSystem FileSystem { get; private set; } = new MockFileSystem();
-        public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; } = null;
-        public IDeveroomErrorListServices DeveroomErrorListServices { get; } = new StubErrorListServices();
-        public StubWindowManager StubWindowManager { get; } = new StubWindowManager();
-        public List<IProjectScope> ProjectScopes { get; } = new List<IProjectScope>();
-        public IMonitoringService MonitoringService { get; }
-        public IWpfTextView CurrentTextView { get; internal set; }
+        textBuffer = default;
+        return false;
+    }
 
-        public event EventHandler<EventArgs> WeakProjectsBuilt;
-        public event EventHandler<EventArgs> WeakProjectOutputsUpdated;
+    public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
+    {
+        var fileContent = textBuffer.CurrentSnapshot.GetText();
+        return CSharpSyntaxTree.ParseText(fileContent);
+    }
 
-        public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
+    public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException,
+        [CallerMemberName] string callerName = "???")
+    {
+        StackTrace stackTraceSnapshot = new StackTrace();
+        return Task.Run(async () =>
         {
-        }
-
-        public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null, string contentType = VsContentTypes.FeatureFile, string filePath = null)
-        {
-            if (filePath != null && !Path.IsPathRooted(filePath) && projectScope != null)
-                filePath = Path.Combine(projectScope.ProjectFolder, filePath);
-
-            if (projectScope == null && filePath != null)
+            try
             {
-                projectScope = ProjectScopes.FirstOrDefault(p =>
-                    (p as InMemoryStubProjectScope)?.FilesAdded.Any(f => f.Key == filePath) ?? false);
+                await action();
             }
-
-            var textView = StubWpfTextView.CreateTextView(this, inputText, newLine, projectScope, contentType, filePath);
-            if (filePath != null)
-                OpenViews[filePath] = textView;
-
-            CurrentTextView = textView;
-
-            return textView;
-        }
-
-        public bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer)
-        {
-            if (OpenViews.TryGetValue(sourceLocation.SourceFile, out var view))
+            catch (Exception e)
             {
-                textBuffer =view.TextBuffer;
-                return true;
+                Logger.LogException(MonitoringService, e, $"Called from {callerName}. {stackTraceSnapshot}");
+                onException(e);
             }
+        });
+    }
 
-            textBuffer = default;
-            return false;
-        }
+    public Task RunOnUiThread(Action action)
+    {
+        action();
+        return Task.CompletedTask;
+    }
 
-        public IWpfTextView EnsureOpenTextView(SourceLocation sourceLocation)
-        {
-            if (OpenViews.TryGetValue(sourceLocation.SourceFile, out var view))
-                return view;
+    public void OpenIfNotOpened(string path)
+    {
+        if (OpenViews.TryGetValue(path, out _))
+            return;
 
-            var lines = FileSystem.File.ReadAllLines(sourceLocation.SourceFile);
-            var textView = CreateTextView(new TestText(lines), filePath: sourceLocation.SourceFile);
-            return textView;
-        }
+        var lines = FileSystem.File.ReadAllLines(path);
+        CreateTextView(new TestText(lines), filePath: path);
+    }
 
-        public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer)
-        {
-            var fileContent = textBuffer.CurrentSnapshot.GetText();
-            return CSharpSyntaxTree.ParseText(fileContent);
-        }
+    public IProjectScope[] GetProjectsWithFeatureFiles() => ProjectScopes.ToArray();
 
-        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???")
-        {
-            StackTrace stackTraceSnapshot = new StackTrace();
-            return Task.Run(async () =>
-            {
-                try
-                {
-                    await action();
-                }
-                catch (Exception e)
-                {
-                    Logger.LogException(MonitoringService, e, $"Called from {callerName}. {stackTraceSnapshot}");
-                    onException(e);
-                }
-            });
-        }
+    public IDisposable CreateUndoContext(string undoLabel) => null;
 
-        public Task RunOnUiThread(Action action)
-        {
-            action();
-            return Task.CompletedTask;
-        }
+    public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null,
+        string contentType = VsContentTypes.FeatureFile, string filePath = null)
+    {
+        if (filePath != null && !Path.IsPathRooted(filePath) && projectScope != null)
+            filePath = Path.Combine(projectScope.ProjectFolder, filePath);
 
-        public void OpenIfNotOpened(string path)
-        {
-            if (OpenViews.TryGetValue(path, out _))
-                return;
+        if (projectScope == null && filePath != null)
+            projectScope = ProjectScopes.FirstOrDefault(p =>
+                (p as InMemoryStubProjectScope)?.FilesAdded.Any(f => f.Key == filePath) ?? false);
 
-            var lines = FileSystem.File.ReadAllLines(path);
-            CreateTextView(new TestText(lines), filePath: path);
-        }
+        var textView = StubWpfTextView.CreateTextView(this, inputText, newLine, projectScope, contentType, filePath);
+        if (filePath != null)
+            OpenViews[filePath] = textView;
 
-        public IProjectScope[] GetProjectsWithFeatureFiles()
-        {
-            return ProjectScopes.ToArray();
-        }
+        CurrentTextView = textView;
 
-        public IDisposable CreateUndoContext(string undoLabel)
-        {
-            return null;
-        }
+        return textView;
+    }
 
-        public StubIdeScope(ITestOutputHelper testOutputHelper)
-        {
-            AnalyticsTransmitter = new StubAnalyticsTransmitter(Logger);
-            MonitoringService = 
-                new MonitoringService(
-                    AnalyticsTransmitter, 
-                    new Mock<IWelcomeService>().Object, 
-                    new Mock<ITelemetryConfigurationHolder>().Object);
+    public IWpfTextView EnsureOpenTextView(SourceLocation sourceLocation)
+    {
+        if (OpenViews.TryGetValue(sourceLocation.SourceFile, out var view))
+            return view;
 
-            CompositeLogger.Add(new DeveroomXUnitLogger(testOutputHelper));
-            CompositeLogger.Add(StubLogger);
-            Actions = new StubIdeActions(this);
-            VsxStubObjects.Initialize();
-        }
+        var lines = FileSystem.File.ReadAllLines(sourceLocation.SourceFile);
+        var textView = CreateTextView(new TestText(lines), filePath: sourceLocation.SourceFile);
+        return textView;
+    }
 
-        public void TriggerProjectsBuilt()
-        {
-            WeakProjectsBuilt?.Invoke(this, EventArgs.Empty);
-            WeakProjectOutputsUpdated?.Invoke(this, EventArgs.Empty);
-        }
+    public void TriggerProjectsBuilt()
+    {
+        WeakProjectsBuilt?.Invoke(this, EventArgs.Empty);
+        WeakProjectOutputsUpdated?.Invoke(this, EventArgs.Empty);
+    }
 
-        public void UsePhysicalFileSystem()
-        {
-            FileSystem = new FileSystem();
-        }
-
+    public void UsePhysicalFileSystem()
+    {
+        FileSystem = new FileSystem();
     }
 }

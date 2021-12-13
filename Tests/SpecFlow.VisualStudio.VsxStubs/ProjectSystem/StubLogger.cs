@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
+﻿#nullable enable
+
+namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
 public record LogMessage(TraceLevel Level, string Message, int Order, TimeSpan TimeStamp);
 
@@ -54,6 +56,6 @@ public class StubLogger : IDeveroomLogger
 
     public void Clear()
     {
-        Logs = new();
+        Logs = new ConcurrentBag<LogMessage>();
     }
 }

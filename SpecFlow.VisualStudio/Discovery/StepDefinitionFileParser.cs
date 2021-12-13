@@ -43,7 +43,7 @@ public class StepDefinitionFileParser
 
             foreach (var (attribute, token) in attributes)
             {
-                var stepDefinitionType = (ScenarioBlock)Enum.Parse(typeof(ScenarioBlock), attribute.Name.ToString());
+                var stepDefinitionType = (ScenarioBlock) Enum.Parse(typeof(ScenarioBlock), attribute.Name.ToString());
                 var regex = new Regex($"^{token.ValueText}$");
 
                 var stepDefinitionBinding = new ProjectStepDefinitionBinding(stepDefinitionType, regex, scope,

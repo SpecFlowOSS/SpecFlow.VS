@@ -1,5 +1,6 @@
-﻿using System;
-using EnvDTE;
+﻿#nullable enable
+using IServiceProvider = System.IServiceProvider;
+using Project = EnvDTE.Project;
 
 namespace SpecFlow.VisualStudio.ProjectSystem
 {

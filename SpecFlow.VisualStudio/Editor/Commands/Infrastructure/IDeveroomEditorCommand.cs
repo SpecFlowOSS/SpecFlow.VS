@@ -1,22 +1,20 @@
-using System;
-using Microsoft.VisualStudio.Text.Editor;
+#nullable enable
 
-namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
+namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
+
+public interface IDeveroomEditorCommand
 {
-    public interface IDeveroomEditorCommand
-    {
-        DeveroomEditorCommandTargetKey[] Targets { get; }
+    DeveroomEditorCommandTargetKey[] Targets { get; }
 
-        DeveroomEditorCommandStatus QueryStatus(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey);
-        bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs);
-        bool PostExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs);
-    }
+    DeveroomEditorCommandStatus QueryStatus(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey);
+    bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs);
+    bool PostExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey, IntPtr inArgs);
+}
 
-    public interface IDeveroomFeatureEditorCommand : IDeveroomEditorCommand
-    {
-    }
+public interface IDeveroomFeatureEditorCommand : IDeveroomEditorCommand
+{
+}
 
-    public interface IDeveroomCodeEditorCommand : IDeveroomEditorCommand
-    {
-    }
+public interface IDeveroomCodeEditorCommand : IDeveroomEditorCommand
+{
 }

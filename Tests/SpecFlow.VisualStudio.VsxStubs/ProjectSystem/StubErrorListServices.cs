@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
+﻿#nullable enable
+
+namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
 public class StubErrorListServices : IDeveroomErrorListServices
 {
