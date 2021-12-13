@@ -3,7 +3,6 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Services;
 
 public class DeveroomTaggerTests
 {
-
     public DeveroomTaggerTests(ITestOutputHelper testOutputHelper)
     {
     }
