@@ -43,7 +43,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public IDeveroomWindowManager WindowManager => StubWindowManager;
         public IFileSystem FileSystem { get; private set; } = new MockFileSystem();
         public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; } = null;
-        public IDeveroomErrorListServices DeveroomErrorListServices { get; } = null;
+        public IDeveroomErrorListServices DeveroomErrorListServices { get; } = new StubErrorListServices();
         public StubWindowManager StubWindowManager { get; } = new StubWindowManager();
         public List<IProjectScope> ProjectScopes { get; } = new List<IProjectScope>();
         public IMonitoringService MonitoringService { get; }

@@ -43,7 +43,7 @@ public class ErrorAnonymizerTests
         const string stackTrace = @"
    at System.Reflection.RuntimeMethodInfo.InvokeAndWaitAnalyticsEvent(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
-   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath)
+   at SpecFlow.VisualStudio.SpecFlowConnector.SuccessDiscovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath)
 ";
 
         var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, false);
@@ -58,7 +58,7 @@ public class ErrorAnonymizerTests
         const string stackTrace = @"
    at System.Reflection.RuntimeMethodInfo.InvokeAndWaitAnalyticsEvent(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\ReflectionExtensions.cs:line 17
-   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\Discovery\ReflectionSpecFlowDiscoverer.cs:line 25
+   at SpecFlow.VisualStudio.SpecFlowConnector.SuccessDiscovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\SuccessDiscovery\ReflectionSpecFlowDiscoverer.cs:line 25
 ";
 
         var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, true);
@@ -73,10 +73,10 @@ public class ErrorAnonymizerTests
    at System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options) 
    at TechTalk.SpecFlow.Bindings.RegexFactory.Create(String regexString) 
    at TechTalk.SpecFlow.Bindings.BindingFactory.CreateStepBinding(StepDefinitionType type, String regexString, IBindingMethod bindingMethod, BindingScope bindingScope) 
-   at TechTalk.SpecFlow.Bindings.Discovery.BindingSourceProcessor.ProcessStepDefinitionAttribute(BindingSourceMethod bindingSourceMethod, BindingSourceAttribute stepDefinitionAttribute, BindingScope scope) 
-   at TechTalk.SpecFlow.Bindings.Discovery.BindingSourceProcessor.ProcessStepDefinitions(BindingSourceMethod bindingSourceMethod, BindingScope[] methodScopes) 
-   at TechTalk.SpecFlow.Bindings.Discovery.BindingSourceProcessor.ProcessMethod(BindingSourceMethod bindingSourceMethod) 
-   at TechTalk.SpecFlow.Bindings.Discovery.RuntimeBindingRegistryBuilder.BuildBindingsFromType(Type type) 
+   at TechTalk.SpecFlow.Bindings.SuccessDiscovery.BindingSourceProcessor.ProcessStepDefinitionAttribute(BindingSourceMethod bindingSourceMethod, BindingSourceAttribute stepDefinitionAttribute, BindingScope scope) 
+   at TechTalk.SpecFlow.Bindings.SuccessDiscovery.BindingSourceProcessor.ProcessStepDefinitions(BindingSourceMethod bindingSourceMethod, BindingScope[] methodScopes) 
+   at TechTalk.SpecFlow.Bindings.SuccessDiscovery.BindingSourceProcessor.ProcessMethod(BindingSourceMethod bindingSourceMethod) 
+   at TechTalk.SpecFlow.Bindings.SuccessDiscovery.RuntimeBindingRegistryBuilder.BuildBindingsFromType(Type type) 
    at System.Reflection.RuntimeMethodInfo.InvokeAndWaitAnalyticsEvent(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
    at SpecFlow.VisualStudio.SpecFlowConnector.ReflectionExtensions.ReflectionCallMethod[T](Object obj, String methodName, Type[] parameterTypes, Object[] args)
 ";
@@ -99,25 +99,25 @@ Server stack trace:
    at System.Text.RegularExpressions.Regex..ctor(String pattern, RegexOptions options) 
    at TechTalk.SpecFlow.Bindings.RegexFactory.Create(String regexString) 
    at TechTalk.SpecFlow.Bindings.BindingFactory.CreateStepBinding(StepDefinitionType type, String regexString, IBindingMethod bindingMethod, BindingScope bindingScope) 
-   at TechTalk.SpecFlow.Bindings.Discovery.BindingSourceProcessor.ProcessStepDefinitionAttribute(BindingSourceMethod bindingSourceMethod, BindingSourceAttribute stepDefinitionAttribute, BindingScope scope) 
-   at TechTalk.SpecFlow.Bindings.Discovery.BindingSourceProcessor.ProcessStepDefinitions(BindingSourceMethod bindingSourceMethod, BindingScope[] methodScopes) 
-   at TechTalk.SpecFlow.Bindings.Discovery.BindingSourceProcessor.ProcessMethod(BindingSourceMethod bindingSourceMethod) 
-   at TechTalk.SpecFlow.Bindings.Discovery.RuntimeBindingRegistryBuilder.BuildBindingsFromType(Type type) 
-   at TechTalk.SpecFlow.Bindings.Discovery.RuntimeBindingRegistryBuilder.BuildBindingsFromAssembly(Assembly assembly) 
+   at TechTalk.SpecFlow.Bindings.SuccessDiscovery.BindingSourceProcessor.ProcessStepDefinitionAttribute(BindingSourceMethod bindingSourceMethod, BindingSourceAttribute stepDefinitionAttribute, BindingScope scope) 
+   at TechTalk.SpecFlow.Bindings.SuccessDiscovery.BindingSourceProcessor.ProcessStepDefinitions(BindingSourceMethod bindingSourceMethod, BindingScope[] methodScopes) 
+   at TechTalk.SpecFlow.Bindings.SuccessDiscovery.BindingSourceProcessor.ProcessMethod(BindingSourceMethod bindingSourceMethod) 
+   at TechTalk.SpecFlow.Bindings.SuccessDiscovery.RuntimeBindingRegistryBuilder.BuildBindingsFromType(Type type) 
+   at TechTalk.SpecFlow.Bindings.SuccessDiscovery.RuntimeBindingRegistryBuilder.BuildBindingsFromAssembly(Assembly assembly) 
    at TechTalk.SpecFlow.TestRunnerManager.BuildBindingRegistry(IEnumerable`1 bindingAssemblies) 
    at TechTalk.SpecFlow.TestRunnerManager.InitializeBindingRegistry(ITestRunner testRunner) 
    at TechTalk.SpecFlow.TestRunnerManager.CreateTestRunner(Int32 threadId) 
-   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V2020.SpecFlowV2020Discoverer.Cache(Assembly testAssembly, String configFilePath) 
-   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.BaseDiscoverer.DiscoverInternal(String testAssemblyPath, String configFilePath) 
-   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.BaseDiscoverer.Discover(String testAssemblyPath, String configFilePath) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.SuccessDiscovery.V2020.SpecFlowV2020Discoverer.Cache(Assembly testAssembly, String configFilePath) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.SuccessDiscovery.BaseDiscoverer.DiscoverInternal(String testAssemblyPath, String configFilePath) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.SuccessDiscovery.BaseDiscoverer.Discover(String testAssemblyPath, String configFilePath) 
    at System.Runtime.Remoting.Messaging.StackBuilderSink._PrivateProcessMessage(IntPtr md, Object[] args, Object server, Object[]& outArgs) 
    at System.Runtime.Remoting.Messaging.StackBuilderSink.SyncProcessMessage(IMessage msg) 
  
 Exception rethrown at [0]:  
    at System.Runtime.Remoting.Proxies.RealProxy.HandleReturnMessage(IMessage reqMsg, IMessage retMsg) 
    at System.Runtime.Remoting.Proxies.RealProxy.PrivateInvoke(MessageData& msgData, Int32 type) 
-   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ISpecFlowDiscoverer.Discover(String testAssembly, String configFilePath) 
-   at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.DiscoveryProcessor.Process() 
+   at SpecFlow.VisualStudio.SpecFlowConnector.SuccessDiscovery.ISpecFlowDiscoverer.Discover(String testAssembly, String configFilePath) 
+   at SpecFlow.VisualStudio.SpecFlowConnector.SuccessDiscovery.DiscoveryProcessor.Process() 
    at SpecFlow.VisualStudio.SpecFlowConnector.ConsoleRunner.EntryPoint(String[] args) 
 ";
 

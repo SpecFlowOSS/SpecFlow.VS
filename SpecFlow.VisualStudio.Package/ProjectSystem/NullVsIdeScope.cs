@@ -190,7 +190,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             Actions = new NullIdeActions(this);
             Dte = null;
             DeveroomOutputPaneServices = null;
-            DeveroomErrorListServices = null;
+            DeveroomErrorListServices = new NullDeveroomErrorListServices();
         }
 
         public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
