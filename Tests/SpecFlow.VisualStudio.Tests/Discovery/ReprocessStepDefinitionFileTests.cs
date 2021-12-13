@@ -1,4 +1,6 @@
-﻿using SpecFlow.VisualStudio.Common;
+﻿using Microsoft.VisualStudio.Shell.Interop;
+using SpecFlow.VisualStudio.Common;
+using SpecFlow.VisualStudio.Editor.Services.Parser;
 
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
@@ -37,7 +39,7 @@ public class ReprocessStepDefinitionFileTests
             .FromPath($"C:\\Full path to\\{testName}")
             .WithCSharpContent(content);
 
-        var stepDefinitionParser = new StepDefinitionFileParser(_projectScope.IdeScope.Logger);
+        var stepDefinitionParser = new StepDefinitionFileParser();
 
         //act
         var projectStepDefinitionBindings = await stepDefinitionParser.Parse(stepDefinitionFile);
@@ -60,50 +62,55 @@ public class ReprocessStepDefinitionFileTests
         }
     }
 
-//    [Theory]
-//    [InlineData("IPressAdd.cs")]
-//    public async Task OutdatedStepDefinitionsAreRemovedFromBindingRegistry(string testName)
-//    {
-//        var stepDefinitionFilePath = $"C:\\<Full path to>\\{testName}";
-//        var otherStepDefinitionFilePath = $"C:\\<Full path to>\\Other{testName}";
-//        var stepDefinitionFile = new CSharpStepDefinitionFile(stepDefinitionFilePath, @"{
-//[Binding]
-//public class Foo{
-//    [When(""expression"")]
-//    public void Method(){}
-//}
-//}");
-//        var initialStepDefinitions = new[]
-//        {
-//            new StepDefinition
-//                {Method = "Method", Regex = "^outdated expression", SourceLocation = stepDefinitionFilePath},
-//            new StepDefinition
-//                {Method = "MethodInOtherFile", Regex = "^expression$", SourceLocation = otherStepDefinitionFilePath}
-//        };
+    [Theory]
+    [InlineData("IPressAdd.cs")]
+    public async Task OutdatedStepDefinitionsAreRemovedFromBindingRegistry(string testName)
+    {
+        var stepDefinitionFilePath = $"C:\\Full path to\\{testName}";
+        var otherStepDefinitionFilePath = $"C:\\Full path to\\Other{testName}";
 
-//        var stepDefinitionParser = new StepDefinitionFileParser(_projectScope.IdeScope.Logger);
+        var stepDefinitionFile = CSharpStepDefinitionFile
+            .FromPath(stepDefinitionFilePath)
+            .WithCSharpContent(@"{
+[Binding]
+public class Foo{
+    [When(""expression"")]
+    public void Method(){}
+}
+}");
 
-//        //act
-//        await discoveryService.ProcessAsync(stepDefinitionFile);
+        ProjectBindingRegistry bindingRegistry = ProjectBindingRegistry.Empty
+            .WithStepDefinitions(new[]
+            {
+                BuildProjectStepDefinitionBinding("^outdated expression$", "Method", stepDefinitionFilePath),
+                BuildProjectStepDefinitionBinding("^expression$", "MethodInOtherFile", otherStepDefinitionFilePath)
+            });
 
-//        //assert
-//        ProjectBindingRegistry bindingRegistry = await discoveryService.GetLatest();
-//        Dump(bindingRegistry);
+        //act
+        bindingRegistry = await bindingRegistry.ReplaceStepDefinitions(stepDefinitionFile);
 
-//        _projectScope.StubIdeScope.StubLogger.Logs.Should()
-//            .NotContain(m => m.Level == TraceLevel.Error || m.Level == TraceLevel.Warning);
+        //assert
+        Dump(bindingRegistry);
 
-//        bindingRegistry.StepDefinitions
-//            .Should()
-//            .ContainSingle(binding => binding.Implementation.SourceLocation.SourceFile == stepDefinitionFilePath,
-//                "the outdated stepDefinition is removed")
-//            .Which.Regex.ToString().Should().Be("^expression$");
+        _projectScope.StubIdeScope.StubLogger.Logs.Should()
+            .NotContain(m => m.Level == TraceLevel.Error || m.Level == TraceLevel.Warning);
 
-//        bindingRegistry.StepDefinitions
-//            .Should()
-//            .ContainSingle(binding => binding.Implementation.SourceLocation.SourceFile == otherStepDefinitionFilePath,
-//                "the outdated stepDefinition is removed");
-//    }
+        bindingRegistry.StepDefinitions
+            .Should()
+            .ContainSingle(binding => binding.Implementation.SourceLocation.SourceFile == stepDefinitionFilePath,
+                "the outdated stepDefinition is removed")
+            .Which.Regex.ToString().Should().Be("^expression$");
+
+        bindingRegistry.StepDefinitions
+            .Should()
+            .ContainSingle(binding => binding.Implementation.SourceLocation.SourceFile == otherStepDefinitionFilePath,
+                "the outdated stepDefinition is removed");
+    }
+
+    private static ProjectStepDefinitionBinding BuildProjectStepDefinitionBinding(string regex, string method, string otherStepDefinitionFilePath) =>
+        new(ScenarioBlock.Given, new Regex(regex), null,  
+            new ProjectStepDefinitionImplementation(method, Array.Empty<string>(),
+                new SourceLocation(otherStepDefinitionFilePath, 0,0)));
 
     private async Task<MockableDiscoveryService> CreateSut(StepDefinition[] initialStepDefinitions)
     {

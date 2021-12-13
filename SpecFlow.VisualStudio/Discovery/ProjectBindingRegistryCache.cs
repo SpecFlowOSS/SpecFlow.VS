@@ -22,12 +22,17 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 
     public event EventHandler<EventArgs> Changed;
 
-    public async Task Update(Func<ProjectBindingRegistry, ProjectBindingRegistry> updateFunc)
+    public Task Update(Func<ProjectBindingRegistry, ProjectBindingRegistry> updateFunc)
+    {
+        return Update(registry => Task.FromResult(updateFunc(registry)));
+    }
+
+    public async Task Update(Func<ProjectBindingRegistry, Task<ProjectBindingRegistry>> updateFunc)
     {
         (TaskCompletionSource<ProjectBindingRegistry> newRegistrySource, ProjectBindingRegistry originalRegistry) =
             await GetThreadSafeRegistry();
 
-        var updatedRegistry = InvokeUpdateFunc(updateFunc, originalRegistry, newRegistrySource);
+        var updatedRegistry = await InvokeUpdateFunc(updateFunc, originalRegistry, newRegistrySource);
         if (updatedRegistry.Version == originalRegistry.Version)
             return;
 
@@ -41,10 +46,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         DisposeSourceLocationTrackingPositions(originalRegistry);
     }
 
-    public Task<ProjectBindingRegistry> GetLatest()
-    {
-        return WaitForCompletion(_upToDateBindingRegistrySource.Task);
-    }
+    public Task<ProjectBindingRegistry> GetLatest() => WaitForCompletion(_upToDateBindingRegistrySource.Task);
 
     private async
         Task<(TaskCompletionSource<ProjectBindingRegistry> newRegistrySource, ProjectBindingRegistry originalRegistry)>
@@ -72,11 +74,12 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         return (newRegistrySource, originalRegistry);
     }
 
-    private ProjectBindingRegistry InvokeUpdateFunc(Func<ProjectBindingRegistry, ProjectBindingRegistry> update,
+    private async Task<ProjectBindingRegistry> InvokeUpdateFunc(
+        Func<ProjectBindingRegistry, Task<ProjectBindingRegistry>> update,
         ProjectBindingRegistry originalRegistry,
         TaskCompletionSource<ProjectBindingRegistry> newRegistrySource)
     {
-        var updatedRegistry = update(originalRegistry);
+        var updatedRegistry = await update(originalRegistry);
 
         if (updatedRegistry.Version == originalRegistry.Version)
         {
@@ -94,6 +97,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         return updatedRegistry;
     }
 
+#pragma warning disable VSTHRD003
     private async Task<ProjectBindingRegistry> WaitForCompletion(Task<ProjectBindingRegistry> task)
     {
         CancellationTokenSource cts = Debugger.IsAttached
@@ -107,6 +111,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 
         return await task;
     }
+#pragma warning restore
 
     private void CalculateSourceLocationTrackingPositions(ProjectBindingRegistry bindingRegistry)
     {

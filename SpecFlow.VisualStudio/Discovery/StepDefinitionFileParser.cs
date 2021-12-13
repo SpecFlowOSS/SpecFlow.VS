@@ -2,13 +2,6 @@
 
 public class StepDefinitionFileParser
 {
-    private readonly IDeveroomLogger _logger;
-
-    public StepDefinitionFileParser(IDeveroomLogger logger)
-    {
-        _logger = logger;
-    }
-
     public async Task<List<ProjectStepDefinitionBinding>> Parse(CSharpStepDefinitionFile stepDefinitionFile)
     {
         var rootNode = await stepDefinitionFile.Content.GetRootAsync();
@@ -53,7 +46,6 @@ public class StepDefinitionFileParser
             }
         }
 
-        _logger.LogVerbose($"Parse found {projectStepDefinitionBindings.Count} stepdefs");
         return projectStepDefinitionBindings;
     }
 

@@ -200,4 +200,12 @@ public record ProjectBindingRegistry
     {
         return new ProjectBindingRegistry(StepDefinitions.Where(predicate));
     }
+
+    public async Task<ProjectBindingRegistry> ReplaceStepDefinitions(CSharpStepDefinitionFile stepDefinitionFile)
+    {
+        var stepDefinitionParser = new StepDefinitionFileParser();
+        var projectStepDefinitionBindings = await stepDefinitionParser.Parse(stepDefinitionFile);
+        return Where(binding => binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.FullName)
+            .WithStepDefinitions(projectStepDefinitionBindings);
+    }
 }
