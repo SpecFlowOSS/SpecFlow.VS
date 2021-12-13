@@ -6,18 +6,6 @@ public interface IGherkinDocumentContext
     object Node { get; }
 }
 
-public sealed record GherkinDocumentRoot : IGherkinDocumentContext
-{
-    private GherkinDocumentRoot()
-    {
-    }
-
-    public static GherkinDocumentRoot Instance { get; } = new();
-
-    public IGherkinDocumentContext Parent => this;
-    public object Node => 0;
-}
-
 public static class GherkinDocumentContextExtensions
 {
     public static IEnumerable<object> GetNodes(this IGherkinDocumentContext context)
@@ -49,17 +37,17 @@ public static class GherkinDocumentContextExtensions
 
     public static IGherkinDocumentContext GetParentOf<T>(this IGherkinDocumentContext context)
     {
-        while (context.Parent != null && !(context.Parent.Node is T)) context = context.Parent;
+        while (context.Parent is {Node: not T}) context = context.Parent;
         return context.Parent;
     }
 
     public static T AncestorOrSelfNode<T>(this IGherkinDocumentContext context)
         where T : class
     {
-        if (context.Node is T)
-            return context.Node as T;
+        if (context.Node is T node)
+            return node;
 
-        while (context.Parent != null && !(context.Parent.Node is T)) context = context.Parent;
-        return context.Parent?.Node as T;
+        var parentOf = GetParentOf<T>(context);
+        return context?.Node as T;
     }
 }

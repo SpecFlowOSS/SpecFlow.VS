@@ -20,7 +20,7 @@ public class ProjectBindingRegistryUndefinedTests : ProjectBindingRegistryTestsB
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("not used step"));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my undefined step"), GherkinDocumentRoot.Instance);
+        var result = sut.MatchStep(CreateStep(text: "my undefined step"), StubGherkinDocument.Instance);
         result.HasUndefined.Should().BeTrue();
     }
 
@@ -33,7 +33,7 @@ public class ProjectBindingRegistryUndefinedTests : ProjectBindingRegistryTestsB
         var sut = CreateSut();
 
         var result = sut.MatchStep(CreateStep(text: "my step", stepKeyword: StepKeyword.When),
-            GherkinDocumentRoot.Instance);
+            StubGherkinDocument.Instance);
         result.HasUndefined.Should().BeTrue();
     }
 
@@ -45,7 +45,7 @@ public class ProjectBindingRegistryUndefinedTests : ProjectBindingRegistryTestsB
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step", scope: CreateTagScope("mytag")));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my step"), GherkinDocumentRoot.Instance);
+        var result = sut.MatchStep(CreateStep(text: "my step"), StubGherkinDocument.Instance);
         result.HasUndefined.Should().BeTrue();
     }
 
