@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -104,8 +105,9 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             return CSharpSyntaxTree.ParseText(fileContent);
         }
 
-        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???")
         {
+            StackTrace stackTraceSnapshot = new StackTrace();
             return Task.Run(async () =>
             {
                 try
@@ -114,7 +116,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
                 }
                 catch (Exception e)
                 {
-                    Logger.LogException(MonitoringService, e);
+                    Logger.LogException(MonitoringService, e, $"Called from {callerName}. {stackTraceSnapshot}");
                     onException(e);
                 }
             });

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Abstractions;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using SpecFlow.VisualStudio.Diagnostics;
@@ -218,7 +219,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return null;
         }
 
-        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???")
         {
             return Task.CompletedTask;
         }

@@ -111,8 +111,11 @@ namespace SpecFlow.VisualStudio.Diagnostics
             return Path.Combine(Environment.GetFolderPath(
                     Environment.SpecialFolder.LocalApplicationData),
                 "SpecFlow",
+#if DEBUG
+                "specflow-vs-debug.log");
+#else
                 $"specflow-vs-{DateTime.Now:yyyyMMdd}.log");
+#endif
         }
-        
     }
 }

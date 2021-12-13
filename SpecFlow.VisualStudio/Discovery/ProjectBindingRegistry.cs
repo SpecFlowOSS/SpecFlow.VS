@@ -5,7 +5,7 @@ public record ProjectBindingRegistry
 {
     private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
     private const string DocStringDefaultTypeName = TypeShortcuts.StringType;
-    public static ProjectBindingRegistry Empty = new(ImmutableArray<ProjectStepDefinitionBinding>.Empty);
+    public static ProjectBindingRegistry Empty = new (ImmutableArray<ProjectStepDefinitionBinding>.Empty);
 
     private static int _versionCounter;
 

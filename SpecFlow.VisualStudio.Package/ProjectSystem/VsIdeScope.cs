@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.ComponentModel.Composition;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using SpecFlow.VisualStudio.Common;
@@ -203,7 +204,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return null;
         }
 
-        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???")
         {
             return ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
@@ -213,7 +214,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                 }
                 catch (Exception e)
                 {
-                    Logger.LogException(MonitoringService, e);
+                    Logger.LogException(MonitoringService, e, $"Called from {callerName}");
                     onException(e);
                 }
             }).Task;

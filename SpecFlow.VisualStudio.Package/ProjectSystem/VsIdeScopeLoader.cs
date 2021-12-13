@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using SpecFlow.VisualStudio.Diagnostics;
@@ -137,7 +138,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
             return VsIdeScope.GetSyntaxTree(textBuffer);
         }
 
-        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException)
+        public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???")
         {
             return VsIdeScope.RunOnBackgroundThread(action, onException);
         }

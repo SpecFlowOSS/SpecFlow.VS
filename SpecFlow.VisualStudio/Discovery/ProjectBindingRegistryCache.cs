@@ -29,10 +29,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 
         var updatedRegistry = InvokeUpdateFunc(updateFunc, originalRegistry, newRegistrySource);
         if (updatedRegistry.Version == originalRegistry.Version)
-        {
-            newRegistrySource.SetResult(originalRegistry);
             return;
-        }
 
         CalculateSourceLocationTrackingPositions(updatedRegistry);
 

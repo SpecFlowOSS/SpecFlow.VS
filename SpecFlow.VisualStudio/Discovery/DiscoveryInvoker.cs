@@ -145,7 +145,7 @@ internal class DiscoveryInvoker
             _projectSettings = projectSettings;
             if (projectSettings.IsUninitialized)
             {
-                _logger.LogVerbose("Uninitialized project settings}");
+                _logger.LogVerbose("Uninitialized project settings");
                 return new FailedDiscovery();
             }
 
