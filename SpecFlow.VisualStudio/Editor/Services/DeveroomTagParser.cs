@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Location = Gherkin.Ast.Location;
+﻿using Location = Gherkin.Ast.Location;
 
 namespace SpecFlow.VisualStudio.Editor.Services;
 

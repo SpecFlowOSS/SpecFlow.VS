@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.Editor.Services;
+﻿namespace SpecFlow.VisualStudio.Editor.Services;
 
 public class StepDefinitionUsage
 {

@@ -1,5 +1,4 @@
-﻿#nullable enable
-using Microsoft.VisualStudio.OLE.Interop;
+﻿using Microsoft.VisualStudio.OLE.Interop;
 
 namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 

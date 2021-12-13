@@ -91,11 +91,10 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         return updatedRegistry;
     }
 
-    private async Task<ProjectBindingRegistry> WaitForCompletion(Task<ProjectBindingRegistry> task)
+#pragma warning disable VSTHRD003
+    private static async Task<ProjectBindingRegistry> WaitForCompletion(Task<ProjectBindingRegistry> task)
     {
-        CancellationTokenSource cts = Debugger.IsAttached
-            ? new CancellationTokenSource(TimeSpan.FromSeconds(60))
-            : new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        CancellationTokenSource cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(15));
 
         var timeoutTask = Task.Delay(-1, cts.Token);
         var result = await Task.WhenAny(task, timeoutTask);
@@ -104,6 +103,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 
         return await task;
     }
+#pragma warning restore
 
     private void CalculateSourceLocationTrackingPositions(ProjectBindingRegistry bindingRegistry)
     {

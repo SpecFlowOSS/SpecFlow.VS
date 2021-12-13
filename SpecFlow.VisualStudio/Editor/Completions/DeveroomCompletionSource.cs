@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.Editor.Completions;
+﻿namespace SpecFlow.VisualStudio.Editor.Completions;
 
 public class DeveroomCompletionSource : DeveroomCompletionSourceBase
 {
@@ -100,54 +98,54 @@ public class DeveroomCompletionSource : DeveroomCompletionSourceBase
             switch (expectedToken)
             {
                 case TokenType.FeatureLine:
-                    AddCompletions(completions, dialect.FeatureKeywords, ": ",
-                        "Introduces the feature being described");
+                    AddCompletions(completions, dialect.FeatureKeywords,
+                        "Introduces the feature being described", ": ");
                     break;
                 case TokenType.RuleLine:
-                    AddCompletions(completions, dialect.RuleKeywords, ": ",
-                        "Describes a business rule illustrated by the subsequent scenarios");
+                    AddCompletions(completions, dialect.RuleKeywords,
+                        "Describes a business rule illustrated by the subsequent scenarios", ": ");
                     break;
                 case TokenType.BackgroundLine:
-                    AddCompletions(completions, dialect.BackgroundKeywords, ": ",
-                        "Describes context common to all scenarios in this feature file");
+                    AddCompletions(completions, dialect.BackgroundKeywords,
+                        "Describes context common to all scenarios in this feature file", ": ");
                     break;
                 case TokenType.ScenarioLine:
-                    AddCompletions(completions, dialect.ScenarioKeywords, ": ",
-                        "Illustrates a single system behaviour");
-                    AddCompletions(completions, dialect.ScenarioOutlineKeywords, ": ",
-                        "A template for generating several, similar scenarios");
+                    AddCompletions(completions, dialect.ScenarioKeywords,
+                        "Illustrates a single system behaviour", ": ");
+                    AddCompletions(completions, dialect.ScenarioOutlineKeywords,
+                        "A template for generating several, similar scenarios", ": ");
                     break;
                 case TokenType.ExamplesLine:
-                    AddCompletions(completions, dialect.ExamplesKeywords, ": ",
-                        "A table of data used in conjunction with a scenario outline");
+                    AddCompletions(completions, dialect.ExamplesKeywords,
+                        "A table of data used in conjunction with a scenario outline", ": ");
                     break;
                 case TokenType.StepLine:
                     AddCompletions(completions, RemoveBulletKeyword(dialect.GivenStepKeywords),
-                        description: "Describes the context for the behaviour");
+                        "Describes the context for the behaviour");
                     AddCompletions(completions, RemoveBulletKeyword(dialect.WhenStepKeywords),
-                        description: "Describes the action that initiates the behaviour");
+                        "Describes the action that initiates the behaviour");
                     AddCompletions(completions, RemoveBulletKeyword(dialect.ThenStepKeywords),
-                        description: "Describes the expected outcome");
+                        "Describes the expected outcome");
                     AddCompletions(completions, dialect.AndStepKeywords,
-                        description: "Used to combine steps in a readable format");
+                        "Used to combine steps in a readable format");
                     AddCompletions(completions, RemoveBulletKeyword(dialect.ButStepKeywords),
-                        description: "Used to combine steps in a readable format");
+                        "Used to combine steps in a readable format");
                     break;
                 case TokenType.DocStringSeparator:
                     AddCompletions(completions, new[] {"\"\"\"", "```"},
-                        description: "Doc-string separator: Provides multi-line text parameter for the step");
+                        "Doc-string separator: Provides multi-line text parameter for the step");
                     break;
                 case TokenType.TableRow:
                     AddCompletions(completions, new[] {"| "},
-                        description: "Data table and examples table cell separator");
+                        "Data table and examples table cell separator");
                     break;
                 case TokenType.Language:
                     AddCompletions(completions, new[] {"#language: "},
-                        description: "Specifies the language of the feature file");
+                        "Specifies the language of the feature file");
                     break;
                 case TokenType.TagLine:
                     AddCompletions(completions, new[] {"@tag1 "},
-                        description: "Labels a scenario, a feature or an examples block");
+                        "Labels a scenario, a feature or an examples block");
                     break;
             }
     }
@@ -157,14 +155,15 @@ public class DeveroomCompletionSource : DeveroomCompletionSourceBase
         return keywords.Where(k => !k.StartsWith("*"));
     }
 
-    private void AddCompletions(List<Completion> completions, IEnumerable<string> keywords, string postfix = "",
-        string description = null)
+    private void AddCompletions(List<Completion> completions, IEnumerable<string> keywords,
+        string description, string postfix = "")
     {
         completions.AddRange(keywords.Select(keyword =>
         {
-            var completion = new Completion(keyword + postfix);
-            if (description != null)
-                completion.Description = description;
+            var completion = new Completion(keyword + postfix)
+            {
+                Description = description
+            };
             return completion;
         }));
     }

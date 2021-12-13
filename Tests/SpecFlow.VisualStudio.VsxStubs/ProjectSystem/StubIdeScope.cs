@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
+﻿namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
 public class StubIdeScope : IIdeScope
 {

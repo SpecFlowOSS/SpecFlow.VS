@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace SpecFlow.VisualStudio.Tests.Discovery;
+﻿namespace SpecFlow.VisualStudio.Tests.Discovery;
 
 public abstract class ProjectBindingRegistryTestsBase
 {

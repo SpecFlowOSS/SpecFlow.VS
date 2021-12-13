@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Project = EnvDTE.Project;
 
-#nullable enable
 namespace SpecFlow.VisualStudio.ProjectSystem;
 
 public class NullVsIdeScope : IVsIdeScope

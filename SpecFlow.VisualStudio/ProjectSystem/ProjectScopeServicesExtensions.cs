@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.ProjectSystem;
+﻿namespace SpecFlow.VisualStudio.ProjectSystem;
 
 public static class ProjectScopeServicesExtensions
 {

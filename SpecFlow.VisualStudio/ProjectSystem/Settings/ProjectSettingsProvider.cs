@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.ProjectSystem.Settings;
+﻿namespace SpecFlow.VisualStudio.ProjectSystem.Settings;
 
 public class ProjectSettingsProvider : IDisposable, IProjectSettingsProvider
 {

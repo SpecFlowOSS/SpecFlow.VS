@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.Tests.Editor;
+﻿namespace SpecFlow.VisualStudio.Tests.Editor;
 
 public abstract class EditorTestBase
 {

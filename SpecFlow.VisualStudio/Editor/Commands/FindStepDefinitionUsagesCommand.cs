@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Editor.Commands;
 
 [Export(typeof(IDeveroomCodeEditorCommand))]
 public class FindStepDefinitionUsagesCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorCommand

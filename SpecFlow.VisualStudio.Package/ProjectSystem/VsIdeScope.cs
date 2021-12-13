@@ -2,7 +2,6 @@
 using Document = Microsoft.CodeAnalysis.Document;
 using Project = EnvDTE.Project;
 
-#nullable enable
 namespace SpecFlow.VisualStudio.ProjectSystem;
 
 [Export(typeof(VsIdeScope))]

@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.VsEvents;
+﻿namespace SpecFlow.VisualStudio.VsEvents;
 
 public class UpdateSolutionEventsListener : IVsUpdateSolutionEvents, IDisposable
 {

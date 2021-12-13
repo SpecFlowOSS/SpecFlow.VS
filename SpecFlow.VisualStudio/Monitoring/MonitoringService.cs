@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.Monitoring;
+﻿namespace SpecFlow.VisualStudio.Monitoring;
 
 [Export(typeof(IMonitoringService))]
 public class MonitoringService : IMonitoringService
