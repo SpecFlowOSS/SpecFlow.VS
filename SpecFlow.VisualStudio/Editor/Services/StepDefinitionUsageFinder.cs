@@ -113,7 +113,7 @@ public class StepDefinitionUsageFinder
     }
 
     private SourceLocation GetSourceLocation(Step step, string featureFilePath) =>
-        new SourceLocation(featureFilePath, step.Location.Line, step.Location.Column);
+        new(featureFilePath, step.Location.Line, step.Location.Column);
 
     private class UsageFinderContext : IGherkinDocumentContext
     {

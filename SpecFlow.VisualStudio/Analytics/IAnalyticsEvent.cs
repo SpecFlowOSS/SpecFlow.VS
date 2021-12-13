@@ -1,5 +1,3 @@
-﻿#nullable enable
-
 namespace SpecFlow.VisualStudio.Analytics;
 
 public interface IAnalyticsEvent

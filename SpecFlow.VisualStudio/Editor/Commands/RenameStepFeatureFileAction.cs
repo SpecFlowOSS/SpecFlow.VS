@@ -1,115 +1,102 @@
 ﻿#nullable enable
-using System;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.Text;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.Editor.Services;
-using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
-using SpecFlow.VisualStudio.ProjectSystem;
-using SpecFlow.VisualStudio.ProjectSystem.Configuration;
+namespace SpecFlow.VisualStudio.Editor.Commands;
 
-namespace SpecFlow.VisualStudio.Editor.Commands
+internal class RenameStepFeatureFileAction : RenameStepAction
 {
-    internal class RenameStepFeatureFileAction : RenameStepAction
+    public override async Task PerformRenameStep(RenameStepCommandContext ctx)
     {
-        public override async Task PerformRenameStep(RenameStepCommandContext ctx)
+        IIdeScope ideScope = ctx.ProjectOfStepDefinitionClass.IdeScope;
+        var stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope);
+        string[]? featureFiles = ctx.ProjectOfStepDefinitionClass.GetProjectFiles(".feature");
+        var configuration = ctx.ProjectOfStepDefinitionClass.GetDeveroomConfiguration();
+
+        StepDefinitionUsage[] projectUsages = stepDefinitionUsageFinder
+            .FindUsages(new[] {ctx.StepDefinitionBinding}, featureFiles, configuration).ToArray();
+        foreach (var fileUsage in projectUsages.GroupBy(u => u.SourceLocation.SourceFile))
         {
-            IIdeScope ideScope = ctx.ProjectOfStepDefinitionClass.IdeScope;
-            var stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope);
-            string[]? featureFiles = ctx.ProjectOfStepDefinitionClass.GetProjectFiles(".feature");
-            var configuration = ctx.ProjectOfStepDefinitionClass.GetDeveroomConfiguration();
-      
-            StepDefinitionUsage[] projectUsages = stepDefinitionUsageFinder.FindUsages(new[] { ctx.StepDefinitionBinding }, featureFiles, configuration).ToArray();
-            foreach (var fileUsage in projectUsages.GroupBy(u => u.SourceLocation.SourceFile))
-            {
-                var firstPosition = fileUsage.First().SourceLocation;
-                EnsureFeatureFileOpen(firstPosition, ideScope);
-                ideScope.GetTextBuffer(firstPosition, out var textBufferOfFeatureFile);
-                await EditTextBuffer(textBufferOfFeatureFile, ctx.IdeScope, fileUsage,
-                    usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
-                    usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression, fileUsage.Key, ctx));
-            }
+            var firstPosition = fileUsage.First().SourceLocation;
+            EnsureFeatureFileOpen(firstPosition, ideScope);
+            ideScope.GetTextBuffer(firstPosition, out var textBufferOfFeatureFile);
+            await EditTextBuffer(textBufferOfFeatureFile, ctx.IdeScope, fileUsage,
+                usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
+                usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression,
+                    fileUsage.Key, ctx));
+        }
+    }
+
+    private string CalculateReplacementText((ITextBuffer textBufferOfFeatureFile, StepDefinitionUsage usage) from,
+        AnalyzedStepDefinitionExpression updatedExpression, string filePath,
+        RenameStepCommandContext renameStepCommandContext)
+    {
+        ParameterMatch parameterMatch = FindParameterMatch(from, filePath, renameStepCommandContext);
+
+        if (parameterMatch == ParameterMatch.NotMatch) return @from.usage.Step.Text;
+
+        var resultText = new StringBuilder();
+        var text = from.usage.Step.Text;
+        for (int i = 0; i < parameterMatch.StepTextParameters.Length; i++)
+        {
+            resultText.Append(GetUnescapedText(updatedExpression.Parts[i * 2]));
+            resultText.Append(text.Substring(parameterMatch.StepTextParameters[i].Index,
+                parameterMatch.StepTextParameters[i].Length));
         }
 
-        private string CalculateReplacementText((ITextBuffer textBufferOfFeatureFile, StepDefinitionUsage usage) @from,
-            AnalyzedStepDefinitionExpression updatedExpression, string filePath,
-            RenameStepCommandContext renameStepCommandContext)
+        resultText.Append(GetUnescapedText(updatedExpression.Parts.Last()));
+
+        return resultText.ToString();
+    }
+
+    private static ParameterMatch FindParameterMatch(
+        (ITextBuffer textBufferOfFeatureFile, StepDefinitionUsage usage) from,
+        string filePath, RenameStepCommandContext ctx)
+    {
+        var snapshotSpan = new SnapshotSpan(from.textBufferOfFeatureFile.CurrentSnapshot, CalculateReplaceSpan(from));
+        DeveroomTagger? tagger = DeveroomTaggerProvider.GetDeveroomTagger(from.textBufferOfFeatureFile);
+        tagger.InvalidateCache();
+        var deveroomTagsForSpan = tagger.GetDeveroomTagsForSpan(snapshotSpan).ToList();
+        DeveroomTag matchedStepTag =
+            deveroomTagsForSpan
+                .DefaultIfEmpty(new DeveroomTag(DeveroomTagTypes.DefinedStep, new SnapshotSpan()))
+                .Single(t => t.Type == DeveroomTagTypes.DefinedStep);
+
+        if (matchedStepTag.Data is not MatchResult matchResult)
+            return ParameterMatch.NotMatch;
+
+        ParameterMatch parameterMatch = matchResult.Items.Single().ParameterMatch;
+
+        if (HasScenarioOutlinePlaceholder(matchedStepTag))
         {
-            ParameterMatch parameterMatch = FindParameterMatch(@from, filePath, renameStepCommandContext);
+            ctx.AddNotificationProblem(
+                $"{filePath}({from.usage.SourceLocation.SourceFileLine},{from.usage.SourceLocation.SourceFileColumn}): " +
+                $"Could not rename scenario outline step with placeholders: {from.usage.Step.Text}");
 
-            if (parameterMatch == ParameterMatch.NotMatch)
-            {
-                return from.usage.Step.Text;
-            }
-
-            var resultText = new StringBuilder();
-            var text = from.usage.Step.Text;
-            for (int i = 0; i < parameterMatch.StepTextParameters.Length; i++)
-            {
-                resultText.Append(GetUnescapedText(updatedExpression.Parts[i * 2]));
-                resultText.Append(text.Substring(parameterMatch.StepTextParameters[i].Index, parameterMatch.StepTextParameters[i].Length));
-            }
-            resultText.Append(GetUnescapedText(updatedExpression.Parts.Last()));
-
-            return resultText.ToString();
+            return ParameterMatch.NotMatch;
         }
 
-        private static ParameterMatch FindParameterMatch(
-            (ITextBuffer textBufferOfFeatureFile, StepDefinitionUsage usage) @from,
-            string filePath, RenameStepCommandContext ctx)
-        {
-            var snapshotSpan = new SnapshotSpan(@from.textBufferOfFeatureFile.CurrentSnapshot, CalculateReplaceSpan(@from));
-            DeveroomTagger? tagger = DeveroomTaggerProvider.GetDeveroomTagger(@from.textBufferOfFeatureFile);
-            tagger.InvalidateCache();
-            var deveroomTagsForSpan = tagger.GetDeveroomTagsForSpan(snapshotSpan).ToList();
-            DeveroomTag matchedStepTag =
-                deveroomTagsForSpan
-                    .DefaultIfEmpty(new DeveroomTag(DeveroomTagTypes.DefinedStep, new SnapshotSpan()))
-                    .Single(t => t.Type == DeveroomTagTypes.DefinedStep);
+        return parameterMatch;
+    }
 
-            if (matchedStepTag.Data is not MatchResult matchResult)
-                return ParameterMatch.NotMatch;
-            
-            ParameterMatch parameterMatch = matchResult.Items.Single().ParameterMatch;
+    private static bool HasScenarioOutlinePlaceholder(DeveroomTag matchedStepTag) => matchedStepTag.ParentTag
+        .GetDescendantsOfType(DeveroomTagTypes.ScenarioOutlinePlaceholder).Any();
 
-            if (HasScenarioOutlinePlaceholder(matchedStepTag))
-            {
-                ctx.AddNotificationProblem(
-                    $"{filePath}({@from.usage.SourceLocation.SourceFileLine},{@from.usage.SourceLocation.SourceFileColumn}): " +
-                    $"Could not rename scenario outline step with placeholders: {@from.usage.Step.Text}");
+    private string GetUnescapedText(AnalyzedStepDefinitionExpressionPart part)
+    {
+        if (part is AnalyzedStepDefinitionExpressionSimpleTextPart simpleTextPart)
+            return simpleTextPart.UnescapedText;
+        return part.ExpressionText;
+    }
 
-                return ParameterMatch.NotMatch;
-            }
+    protected void EnsureFeatureFileOpen(SourceLocation sourceLocation, IIdeScope ideScope)
+    {
+        ideScope.OpenIfNotOpened(sourceLocation.SourceLocationSpan?.FilePath ?? sourceLocation.SourceFile);
+    }
 
-            return parameterMatch;
-        }
-
-        private static bool HasScenarioOutlinePlaceholder(DeveroomTag matchedStepTag)
-        {
-            return matchedStepTag.ParentTag.GetDescendantsOfType(DeveroomTagTypes.ScenarioOutlinePlaceholder).Any();
-        }
-
-        private string GetUnescapedText(AnalyzedStepDefinitionExpressionPart part)
-        {
-            if (part is AnalyzedStepDefinitionExpressionSimpleTextPart simpleTextPart)
-                return simpleTextPart.UnescapedText;
-            return part.ExpressionText;
-        }
-
-        protected void EnsureFeatureFileOpen(SourceLocation sourceLocation, IIdeScope ideScope)
-        {
-            ideScope.OpenIfNotOpened(sourceLocation.SourceLocationSpan?.FilePath ?? sourceLocation.SourceFile);
-        }
-
-        private static Span CalculateReplaceSpan((ITextBuffer textBuffer, StepDefinitionUsage usage) from)
-        {
-            var line = from.textBuffer.CurrentSnapshot.GetLineFromLineNumber(from.usage.SourceLocation.SourceFileLine - 1);
-            var indentPlusKeywordLength = (from.usage.SourceLocation.SourceFileColumn - 1) + from.usage.Step.Keyword.Length;
-            var startPosition = line.Start.Position + indentPlusKeywordLength;
-            var replaceSpan = new Span(startPosition, line.End.Position - startPosition);
-            return replaceSpan;
-        }
+    private static Span CalculateReplaceSpan((ITextBuffer textBuffer, StepDefinitionUsage usage) from)
+    {
+        var line = from.textBuffer.CurrentSnapshot.GetLineFromLineNumber(from.usage.SourceLocation.SourceFileLine - 1);
+        var indentPlusKeywordLength = @from.usage.SourceLocation.SourceFileColumn - 1 + from.usage.Step.Keyword.Length;
+        var startPosition = line.Start.Position + indentPlusKeywordLength;
+        var replaceSpan = new Span(startPosition, line.End.Position - startPosition);
+        return replaceSpan;
     }
 }

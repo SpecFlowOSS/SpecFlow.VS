@@ -1,79 +1,75 @@
-﻿using SpecFlow.VisualStudio.Editor.Services.Parser;
-using FluentAssertions;
-using Xunit;
+﻿namespace SpecFlow.VisualStudio.Tests.Discovery;
+/*
 
-namespace SpecFlow.VisualStudio.Tests.Discovery
+Undefined
+=========
+* No candidating step definitions => undef
+* OUT: Some match, but with different type => error (now: undef)
+* OUT: Some match, but with different scope => error (now: undef)
+* SO, but all (incl. empty) undefined => undef
+
+*/
+
+public class ProjectBindingRegistryUndefinedTests : ProjectBindingRegistryTestsBase
 {
-    /*
+    // No candidating step definitions => undef
 
-    Undefined
-    =========
-	* No candidating step definitions => undef
-	* OUT: Some match, but with different type => error (now: undef)
-	* OUT: Some match, but with different scope => error (now: undef)
-    * SO, but all (incl. empty) undefined => undef
-
-    */
-
-
-    public class ProjectBindingRegistryUndefinedTests : ProjectBindingRegistryTestsBase
+    [Fact]
+    public void Matches_undefined()
     {
-        // No candidating step definitions => undef
+        _stepDefinitionBindings.Add(CreateStepDefinitionBinding("not used step"));
+        var sut = CreateSut();
 
-        [Fact]
-        public void Matches_undefined()
-        {
-            _stepDefinitionBindings.Add(CreateStepDefinitionBinding("not used step"));
-            var sut = CreateSut();
+        var result = sut.MatchStep(CreateStep(text: "my undefined step"), GherkinDocumentRoot.Instance);
+        result.HasUndefined.Should().BeTrue();
+    }
 
-            var result = sut.MatchStep(CreateStep(text: "my undefined step"));
-            result.HasUndefined.Should().BeTrue();
-        }
+    //OUT: Some match, but with different type => error (now: undef)
 
-        //OUT: Some match, but with different type => error (now: undef)
+    [Fact]
+    public void Does_not_match_step_definition_of_a_different_type()
+    {
+        _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step"));
+        var sut = CreateSut();
 
-        [Fact]
-        public void Does_not_match_step_definition_of_a_different_type()
-        {
-            _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step", ScenarioBlock.Given));
-            var sut = CreateSut();
+        var result = sut.MatchStep(CreateStep(text: "my step", stepKeyword: StepKeyword.When),
+            GherkinDocumentRoot.Instance);
+        result.HasUndefined.Should().BeTrue();
+    }
 
-            var result = sut.MatchStep(CreateStep(text: "my step", stepKeyword: StepKeyword.When));
-            result.HasUndefined.Should().BeTrue();
-        }
+    //OUT: Some match, but with different scope => error (now: undef)
 
-        //OUT: Some match, but with different scope => error (now: undef)
+    [Fact]
+    public void Does_not_match_tag_scoped_step_definition_if_not_tagged()
+    {
+        _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step", scope: CreateTagScope("mytag")));
+        var sut = CreateSut();
 
-        [Fact]
-        public void Does_not_match_tag_scoped_step_definition_if_not_tagged()
-        {
-            _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step", scope: CreateTagScope("mytag")));
-            var sut = CreateSut();
+        var result = sut.MatchStep(CreateStep(text: "my step"), GherkinDocumentRoot.Instance);
+        result.HasUndefined.Should().BeTrue();
+    }
 
-            var result = sut.MatchStep(CreateStep(text: "my step"));
-            result.HasUndefined.Should().BeTrue();
-        }
+    //SO, but all (incl. empty) undefined => undef
 
-        //SO, but all (incl. empty) undefined => undef
+    [Fact]
+    public void All_SO_examples_are_undefined()
+    {
+        _stepDefinitionBindings.Add(CreateStepDefinitionBinding("not used step"));
+        var sut = CreateSut();
 
-        [Fact]
-        public void All_SO_examples_are_undefined()
-        {
-            _stepDefinitionBindings.Add(CreateStepDefinitionBinding("not used step"));
-            var sut = CreateSut();
+        var result = sut.MatchStep(CreateStep(text: "my <what> step"),
+            CreateScenarioOutlineContext(null, null, "what", new[] {"cool", "other"}));
+        result.HasUndefined.Should().BeTrue();
+    }
 
-            var result = sut.MatchStep(CreateStep(text: "my <what> step"), CreateScenarioOutlineContext(null, null, "what", new[] { "cool", "other" }));
-            result.HasUndefined.Should().BeTrue();
-        }
+    [Fact]
+    public void Empty_SO_Examples()
+    {
+        _stepDefinitionBindings.Add(CreateStepDefinitionBinding("not used step"));
+        var sut = CreateSut();
 
-        [Fact]
-        public void Empty_SO_Examples()
-        {
-            _stepDefinitionBindings.Add(CreateStepDefinitionBinding("not used step"));
-            var sut = CreateSut();
-
-            var result = sut.MatchStep(CreateStep(text: "my <what> step"), CreateScenarioOutlineContext(null, null, "what", new string[0]));
-            result.HasUndefined.Should().BeTrue();
-        }
+        var result = sut.MatchStep(CreateStep(text: "my <what> step"),
+            CreateScenarioOutlineContext(null, null, "what", new string[0]));
+        result.HasUndefined.Should().BeTrue();
     }
 }

@@ -6,7 +6,7 @@ public record ProjectBindingRegistry
 {
     private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
     private const string DocStringDefaultTypeName = TypeShortcuts.StringType;
-    public static ProjectBindingRegistry Empty = new (ImmutableArray<ProjectStepDefinitionBinding>.Empty);
+    public static ProjectBindingRegistry Empty = new(ImmutableArray<ProjectStepDefinitionBinding>.Empty);
 
     private static int _versionCounter;
 
@@ -15,7 +15,7 @@ public record ProjectBindingRegistry
         StepDefinitions = stepDefinitions.ToImmutableArray();
     }
 
-    public ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions, int projectHash) 
+    public ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions, int projectHash)
         : this(stepDefinitions)
     {
         ProjectHash = projectHash;
@@ -25,15 +25,12 @@ public record ProjectBindingRegistry
     public int? ProjectHash { get; }
     public bool IsPatched => !ProjectHash.HasValue && this != Empty;
 
-    public override string ToString()
-    {
-        return $"ProjectBindingRegistry_V{Version}_H{ProjectHash}";
-    }
-
     public ImmutableArray<ProjectStepDefinitionBinding> StepDefinitions { get; }
 
+    public override string ToString() => $"ProjectBindingRegistry_V{Version}_H{ProjectHash}";
 
-    public MatchResult MatchStep(Step step, IGherkinDocumentContext context = null)
+
+    public MatchResult MatchStep(Step step, IGherkinDocumentContext context)
     {
         var stepText = step.Text;
         if (context.IsScenarioOutline() && stepText.Contains("<"))
@@ -48,8 +45,11 @@ public record ProjectBindingRegistry
             return MatchMultiScope(step, stepsWithScopes);
         }
 
-        return MatchResult.CreateMultiMatch(MatchSingleContextResult(step, context));
+        return MatchStep(step, context, stepText);
     }
+
+    private MatchResult MatchStep(Step step, IGherkinDocumentContext context, string stepText) =>
+        MatchResult.CreateMultiMatch(MatchSingleContextResult(step, context, stepText));
 
     private MatchResult MatchMultiScope(Step step,
         IEnumerable<KeyValuePair<string, IGherkinDocumentContext>> stepsWithScopes)
@@ -86,10 +86,8 @@ public record ProjectBindingRegistry
             yield return implGroup.FirstOrDefault(mri => mri.HasErrors) ?? implGroup.First();
     }
 
-    private MatchResultItem[] MatchSingleContextResult(Step step, IGherkinDocumentContext context,
-        string stepText = null)
+    private MatchResultItem[] MatchSingleContextResult(Step step, IGherkinDocumentContext context, string stepText)
     {
-        stepText = stepText ?? step.Text;
         var sdMatches = StepDefinitions.Select(sd => sd.Match(step, context, stepText)).Where(m => m != null).ToArray();
         if (!sdMatches.Any())
             return new[] {MatchResultItem.CreateUndefined(step, stepText)};
@@ -197,8 +195,6 @@ public record ProjectBindingRegistry
         return new ProjectBindingRegistry(StepDefinitions.Select(sd => sd == original ? replacement : sd));
     }
 
-    public ProjectBindingRegistry Where(Func<ProjectStepDefinitionBinding, bool> predicate)
-    {
-        return new ProjectBindingRegistry(StepDefinitions.Where(predicate));
-    }
+    public ProjectBindingRegistry Where(Func<ProjectStepDefinitionBinding, bool> predicate) =>
+        new ProjectBindingRegistry(StepDefinitions.Where(predicate));
 }
