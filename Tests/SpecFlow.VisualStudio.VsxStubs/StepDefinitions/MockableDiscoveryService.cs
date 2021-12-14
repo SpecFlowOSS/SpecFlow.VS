@@ -49,6 +49,6 @@ public class MockableDiscoveryService : DiscoveryService
         var initialized = new ManualResetEvent(false);
         discoveryService.BindingRegistryCache.Changed += (_, _) => initialized.Set();
         discoveryService.InitializeBindingRegistry();
-        initialized.WaitOne(TimeSpan.FromSeconds(1)).Should().BeTrue("initialization have to be done quickly in a mock");
+        initialized.WaitOne(TimeSpan.FromSeconds(5)).Should().BeTrue("initialization have to be done quickly in a mock");
     }
 }
