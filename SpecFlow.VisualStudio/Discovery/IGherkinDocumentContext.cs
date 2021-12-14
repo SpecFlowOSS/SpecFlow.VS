@@ -48,6 +48,6 @@ public static class GherkinDocumentContextExtensions
             return node;
 
         var parentOf = GetParentOf<T>(context);
-        return context?.Node as T;
+        return parentOf?.Node as T;
     }
 }
