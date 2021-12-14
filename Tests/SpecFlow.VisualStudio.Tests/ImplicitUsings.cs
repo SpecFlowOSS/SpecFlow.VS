@@ -22,6 +22,7 @@ global using SpecFlow.VisualStudio.UI.ViewModels;
 global using SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 global using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
 global using SpecFlow.VisualStudio.VsxStubs;
+global using System.Collections.Concurrent;
 global using System.Collections.Immutable;
 global using System.Diagnostics;
 global using System.IO.Abstractions.TestingHelpers;

@@ -51,17 +51,6 @@ public class ReprocessStepDefinitionFileTests
         Approvals.Verify(dumped);
     }
 
-    [Fact]
-    public async Task ManyOfMultipleStepDefinitionsApproval()
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            StubIdeScope ideScope = new StubIdeScope(_testOutputHelper);
-            _projectScope = new InMemoryStubProjectScope(ideScope);
-            await Approval("MultipleStepDefinitions.cs");
-        }
-    }
-
     [Theory]
     [InlineData("IPressAdd.cs")]
     public async Task OutdatedStepDefinitionsAreRemovedFromBindingRegistry(string testName)
