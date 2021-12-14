@@ -1,5 +1,6 @@
 ﻿namespace SpecFlow.VisualStudio.Discovery;
 
+[DebuggerDisplay("{Value} {_upToDateBindingRegistrySource.Task.Status}")]
 public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 {
     private readonly IIdeScope _ideScope;

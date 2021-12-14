@@ -221,7 +221,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             discoveryService.BindingRegistryCache.Changed += (_, _) => initialized.Set();
             if (discoveryService.BindingRegistryCache.Value != ProjectBindingRegistry.Empty) initialized.Set();
 
-            initialized.WaitOne(TimeSpan.FromSeconds(3))
+            initialized.WaitOne(TimeSpan.FromSeconds(5))
                 .Should()
                 .BeTrue("the bindingService should be initialized");
 

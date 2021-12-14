@@ -5,7 +5,7 @@ public class DiscoveryService : IDiscoveryService
     private readonly IDeveroomLogger _logger;
     private readonly IProjectScope _projectScope;
     private readonly IProjectSettingsProvider _projectSettingsProvider;
-    private readonly DiscoveryInvoker _discoveryInvoker;
+    private protected readonly DiscoveryInvoker _discoveryInvoker;
 
     public DiscoveryService(IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider,
         IProjectBindingRegistryCache bindingRegistryCacheCache)
