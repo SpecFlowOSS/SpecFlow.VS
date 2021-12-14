@@ -36,12 +36,19 @@ public class MockableDiscoveryService : DiscoveryService
                 return discoveryService.LastDiscoveryResult;
             });
 
+        Initialize(discoveryService, projectScope.GetProjectSettings());
+
+        projectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService);
+        return discoveryService;
+    }
+
+    private static void Initialize(MockableDiscoveryService discoveryService, ProjectSettings projectSettings)
+    {
+        if (!projectSettings.IsSpecFlowTestProject) return;
+
         var initialized = new ManualResetEvent(false);
         discoveryService.BindingRegistryCache.Changed += (_, _) => initialized.Set();
         discoveryService.InitializeBindingRegistry();
-        projectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService);
-        initialized.WaitOne(TimeSpan.FromSeconds(10));
-
-        return discoveryService;
+        initialized.WaitOne(TimeSpan.FromSeconds(1)).Should().BeTrue("initialization have to be done quickly in a mock");
     }
 }

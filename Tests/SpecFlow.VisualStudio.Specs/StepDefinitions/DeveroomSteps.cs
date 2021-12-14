@@ -203,14 +203,7 @@ public class DeveroomSteps : Steps
         discoveryService.BindingRegistryCache.Changed += (_, _) => initialized.Set();
         if (discoveryService.BindingRegistryCache.Value != ProjectBindingRegistry.Empty) initialized.Set();
 
-        var sw = Stopwatch.StartNew();
-        do
-        {
-        } while (!initialized.WaitOne(TimeSpan.FromMilliseconds(100)) && sw.Elapsed < TimeSpan.FromSeconds(20));
-
-        sw.Elapsed.Should().BeLessThan(TimeSpan.FromSeconds(3));
-
-        initialized.WaitOne(TimeSpan.FromSeconds(2))
+        initialized.WaitOne(TimeSpan.FromSeconds(5))
             .Should()
             .BeTrue("the bindingService should be initialized");
 
