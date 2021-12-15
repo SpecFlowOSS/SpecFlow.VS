@@ -1,6 +1,4 @@
-﻿using SpecFlow.VisualStudio.ProjectSystem.Settings;
-
-#pragma warning disable xUnit1026 // Theory methods should use all of their parameters. Allow to use _ as identifier
+﻿#pragma warning disable xUnit1026 // Theory methods should use all of their parameters. Allow to use _ as identifier
 
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
@@ -12,6 +10,16 @@ public class DiscoveryTests
     {
         _testOutputHelper = testOutputHelper;
     }
+
+    public static Dictionary<string, Action<Sut>> EventInvokers => new()
+    {
+        ["WeakSettingsInitialized"] = sut =>
+            sut.ProjectScope.StubProjectSettingsProvider.InvokeWeakSettingsInitializedEvent(),
+        ["ProjectsBuilt"] = sut => sut.ProjectScope.StubIdeScope.TriggerProjectsBuilt()
+    };
+
+    public static IEnumerable<object[]> TriggersCacheUpdateOnEventsData =>
+        EventInvokers.Select(ei => new object[] {ei.Key, ei.Value});
 
     private Sut ArrangeSut()
     {
@@ -38,15 +46,8 @@ public class DiscoveryTests
         sut.BindingRegistryCache.Value.Version.Should().NotBe(1);
     }
 
-    public static Dictionary<string, Action<Sut>> EventInvokers => new()
-        {
-            ["WeakSettingsInitialized"] = sut=>sut.ProjectScope.StubProjectSettingsProvider.InvokeWeakSettingsInitializedEvent(),
-            ["ProjectsBuilt"] = sut => sut.ProjectScope.StubIdeScope.TriggerProjectsBuilt()
-        };
-
-    public static IEnumerable<object[]> TriggersCacheUpdateOnEventsData => EventInvokers.Select(ei => new object[] {ei.Key, ei.Value});
-
-    [Theory, MemberData(nameof(TriggersCacheUpdateOnEventsData))]
+    [Theory]
+    [MemberData(nameof(TriggersCacheUpdateOnEventsData))]
     public void TriggersCacheUpdateOnEvents(string _, Action<Sut> invokeEvent)
     {
         //arrange
@@ -62,13 +63,14 @@ public class DiscoveryTests
         sut.BindingRegistryCache.Value.Version.Should().NotBe(1);
     }
 
-    [Theory, MemberData(nameof(TriggersCacheUpdateOnEventsData))]
+    [Theory]
+    [MemberData(nameof(TriggersCacheUpdateOnEventsData))]
     public void DoNotTriggersCacheUpdateOnEventsForTheSameProject(string _, Action<Sut> invokeEvent)
     {
         //arrange
         var sut = ArrangeSut();
         sut.BuildDiscoveryService();
-        
+
         //act
         invokeEvent(sut);
         var bindingRegistry = sut.BindingRegistryCache.Value;
@@ -76,9 +78,10 @@ public class DiscoveryTests
 
         //assert
         sut.BindingRegistryCache.Verify(c =>
-            c.Update(It.IsAny<Func<ProjectBindingRegistry, Task<ProjectBindingRegistry>>>()), Times.Once, "the cache update have to be called only once when the project haven't changed");
+                c.Update(It.IsAny<Func<ProjectBindingRegistry, Task<ProjectBindingRegistry>>>()), Times.Once,
+            "the cache update have to be called only once when the project haven't changed");
         sut.BindingRegistryCache.Value.Should().BeSameAs(bindingRegistry, "the cache must not be modified");
-        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Where(m=>m == "Projects built or settings initialized")
+        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Where(m => m == "Projects built or settings initialized")
             .Should().HaveCount(2, "the event is fired twice");
     }
 
@@ -99,6 +102,22 @@ public class DiscoveryTests
     }
 
     [Fact]
+    public void DoNotDiscoverWhenProjectIsNotSpecFlowTestProject()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.ProjectScope.StubProjectSettingsProvider.Kind = DeveroomProjectKind.SpecFlowLibProject;
+        DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
+
+        //act
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+
+        //assert
+        discovered.Version.Should().Be(1);
+        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Should().Contain("Non-SpecFlow test project");
+    }
+
+    [Fact]
     public void DoNotDiscoverWhenConfigSourceIsInvalid()
     {
         //arrange
@@ -111,15 +130,71 @@ public class DiscoveryTests
 
         //assert
         discovered.Version.Should().Be(1);
-        var expected = "Test assembly not found. Please build the project to enable the SpecFlow Visual Studio Extension features.";
+        var expected =
+            "Test assembly not found. Please build the project to enable the SpecFlow Visual Studio Extension features.";
         sut.ProjectScope.StubIdeScope.StubLogger.Messages.Should().Contain(expected);
         sut.ProjectScope.StubIdeScope.StubErrorListServices.Errors.Should().Contain(e => e.Message == expected);
+    }
+
+    [Fact]
+    public void DoNotDiscoverWhenDiscoveryFails()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.DiscoveryResultProvider.DiscoveryResult = new DiscoveryResult
+        {
+            StepDefinitions = new StepDefinition[]
+            {
+                new TestStepDefinition
+                {
+                    Error = nameof(DoNotDiscoverWhenDiscoveryFails),
+                    TestSourceLocation = new SourceLocation(string.Empty, 0, 0),
+                    Method = "Foo"
+                }
+            }
+        };
+        DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
+
+        //act
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+
+        //assert
+        discovered.Version.Should().NotBe(1);
+        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Should()
+            .Contain(m => m.Contains("Invalid step definitions found"));
+        sut.ProjectScope.StubIdeScope.StubErrorListServices.Errors.Should()
+            .Contain(e => e.Message.Contains(nameof(DoNotDiscoverWhenDiscoveryFails)));
+    }
+
+    [Fact]
+    public void InvalidStepDefinitionsAreReported()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.DiscoveryResultProvider.DiscoveryResult = new DiscoveryResult
+        {
+            ErrorMessage = nameof(DoNotDiscoverWhenDiscoveryFails)
+        };
+        DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
+
+        //act
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+
+        //assert
+        discovered.Version.Should().Be(1);
+        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Should()
+            .Contain(sut.DiscoveryResultProvider.DiscoveryResult.ErrorMessage);
+        var expected = "The project bindings (e.g. step definitions) could not be discovered.";
+        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Should().Contain(m => m.Contains(expected));
+        sut.ProjectScope.StubIdeScope.StubErrorListServices.Errors.Should().Contain(e => e.Message.Contains(expected));
     }
 
     public record Sut(StubProjectBindingRegistryCache BindingRegistryCache, InMemoryStubProjectScope ProjectScope,
         StubDiscoveryResultProvider DiscoveryResultProvider)
     {
-        public DiscoveryService BuildDiscoveryService() => new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
+        public DiscoveryService BuildDiscoveryService() =>
+            new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
+
         internal DiscoveryInvoker BuildDiscoveryInvoker() => new(ProjectScope, DiscoveryResultProvider);
     }
 }

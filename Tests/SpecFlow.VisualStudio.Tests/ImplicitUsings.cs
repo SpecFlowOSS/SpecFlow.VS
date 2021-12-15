@@ -16,7 +16,9 @@ global using SpecFlow.VisualStudio.Editor.Commands;
 global using SpecFlow.VisualStudio.Editor.Services;
 global using SpecFlow.VisualStudio.Monitoring;
 global using SpecFlow.VisualStudio.ProjectSystem;
+global using SpecFlow.VisualStudio.ProjectSystem.Settings;
 global using SpecFlow.VisualStudio.SpecFlowConnector.Models;
+global using SpecFlow.VisualStudio.Tests.Editor;
 global using SpecFlow.VisualStudio.Tests.Editor.Commands;
 global using SpecFlow.VisualStudio.UI.ViewModels;
 global using SpecFlow.VisualStudio.VsxStubs;
@@ -32,3 +34,4 @@ global using System.Text.RegularExpressions;
 global using System.Text;
 global using Xunit.Abstractions;
 global using Xunit;
+
