@@ -22,7 +22,7 @@ using Xunit.Abstractions;
 
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 {
-    public class StubIdeScope : IIdeScope
+    public class StubIdeScope : Mock<IIdeScope>, IIdeScope
     {
         public StubAnalyticsTransmitter AnalyticsTransmitter { get; }
         public IDictionary<string, StubWpfTextView> OpenViews { get; } = new Dictionary<string, StubWpfTextView>();
@@ -106,20 +106,46 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         }
 
         public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???")
+            => Object.RunOnBackgroundThread(action, onException, callerName);
+
+        public void SynchronizeRunOnBackgroundThread()
         {
-            StackTrace stackTraceSnapshot = new StackTrace();
-            return Task.Run(async () =>
-            {
-                try
+            Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
+                    It.IsAny<string>()))
+                .Returns(async (Func<Task> action, Action<Exception> onException, string callerName) =>
                 {
-                    await action();
-                }
-                catch (Exception e)
+                    try
+                    {
+                        await action();
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogException(MonitoringService, e);
+                        onException(e);
+                    }
+                });
+        }
+
+        public void UnSynchronizeRunOnBackgroundThread()
+        {
+            Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
+                    It.IsAny<string>()))
+                .Returns((Func<Task> action, Action<Exception> onException, string callerName) =>
                 {
-                    Logger.LogException(MonitoringService, e, $"Called from {callerName}. {stackTraceSnapshot}");
-                    onException(e);
-                }
-            });
+                    StackTrace stackTraceSnapshot = new StackTrace();
+                    return Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await action();
+                        }
+                        catch (Exception e)
+                        {
+                            Logger.LogException(MonitoringService, e, $"Called from {callerName}. {stackTraceSnapshot}");
+                            onException(e);
+                        }
+                    });
+                });
         }
 
         public Task RunOnUiThread(Action action)
@@ -160,6 +186,8 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             CompositeLogger.Add(StubLogger);
             Actions = new StubIdeActions(this);
             VsxStubObjects.Initialize();
+
+            UnSynchronizeRunOnBackgroundThread();
         }
 
         public void TriggerProjectsBuilt()

@@ -5,7 +5,7 @@ public class DiscoveryService : IDiscoveryService
     private readonly IDeveroomLogger _logger;
     private readonly IProjectScope _projectScope;
     private readonly IProjectSettingsProvider _projectSettingsProvider;
-    private protected readonly DiscoveryInvoker _discoveryInvoker;
+    private protected readonly DiscoveryInvoker DiscoveryInvoker;
 
     public DiscoveryService(IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider,
         IProjectBindingRegistryCache bindingRegistryCacheCache)
@@ -16,7 +16,7 @@ public class DiscoveryService : IDiscoveryService
         _projectSettingsProvider.WeakSettingsInitialized += ProjectSystemOnProjectsBuilt;
         _projectScope.IdeScope.WeakProjectOutputsUpdated += ProjectSystemOnProjectsBuilt;
         BindingRegistryCache = bindingRegistryCacheCache;
-        _discoveryInvoker = new DiscoveryInvoker(
+        DiscoveryInvoker = new DiscoveryInvoker(
             _logger,
             _projectScope.IdeScope.DeveroomErrorListServices, 
             _projectScope,
@@ -65,7 +65,11 @@ public class DiscoveryService : IDiscoveryService
     private void ProjectSystemOnProjectsBuilt(object sender, EventArgs eventArgs)
     {
         _logger.LogVerbose("Projects built or settings initialized");
-        CheckBindingRegistry();
+
+        if (IsCacheUpToDate())
+            return;
+
+        TriggerDiscovery();
     }
 
     private bool IsCacheUpToDate()
@@ -84,8 +88,8 @@ public class DiscoveryService : IDiscoveryService
 
     private void TriggerDiscovery()
     {
-        _projectScope.IdeScope.RunOnBackgroundThread(
-            () => BindingRegistryCache.Update(_discoveryInvoker.InvokeDiscoveryWithTimer),
+        var t = _projectScope.IdeScope.RunOnBackgroundThread(
+            () => BindingRegistryCache.Update(DiscoveryInvoker.InvokeDiscoveryWithTimer),
             _ => { });
     }
 }

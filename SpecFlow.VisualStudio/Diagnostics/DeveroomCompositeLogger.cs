@@ -18,9 +18,10 @@ namespace SpecFlow.VisualStudio.Diagnostics
             }
         }
 
-        public void Add(IDeveroomLogger logger)
+        public DeveroomCompositeLogger Add(IDeveroomLogger logger)
         {
             _loggers = _loggers.Concat(new[] {logger}).ToArray();
+            return this;
         }
 
         public IEnumerator<IDeveroomLogger> GetEnumerator() => _loggers.AsEnumerable().GetEnumerator();
