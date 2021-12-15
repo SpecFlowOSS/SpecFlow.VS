@@ -100,6 +100,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
                 // Pre-process
                 foreach (var editorCommand in commands)
                 {
+                    editorCommand.Prepare();
                     handled = editorCommand.PreExec(TextView, commandKey, pvaIn);
                     if (handled)
                         break;

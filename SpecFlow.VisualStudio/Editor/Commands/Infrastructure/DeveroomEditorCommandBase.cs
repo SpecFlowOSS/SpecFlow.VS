@@ -29,6 +29,11 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
         return DeveroomEditorCommandStatus.Supported;
     }
 
+    public void Prepare()
+    {
+        Finished.Reset();
+    }
+
     public virtual bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey,
         IntPtr inArgs = default)
     {
