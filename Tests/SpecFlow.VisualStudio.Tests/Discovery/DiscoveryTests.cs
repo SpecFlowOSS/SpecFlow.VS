@@ -2,11 +2,11 @@
 
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
-public class DiscoveryServiceTests
+public class DiscoveryTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
 
-    public DiscoveryServiceTests(ITestOutputHelper testOutputHelper)
+    public DiscoveryTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
     }
@@ -25,7 +25,7 @@ public class DiscoveryServiceTests
     {
         //arrange
         var sut = ArrangeSut();
-        var discoveryService = sut.Build();
+        var discoveryService = sut.BuildDiscoveryService();
 
         //act
         discoveryService.InitializeBindingRegistry();
@@ -49,7 +49,7 @@ public class DiscoveryServiceTests
     {
         //arrange
         var sut = ArrangeSut();
-        sut.Build();
+        sut.BuildDiscoveryService();
 
         //act
         invokeEvent(sut);
@@ -65,7 +65,7 @@ public class DiscoveryServiceTests
     {
         //arrange
         var sut = ArrangeSut();
-        sut.Build();
+        sut.BuildDiscoveryService();
         
         //act
         invokeEvent(sut);
@@ -83,6 +83,7 @@ public class DiscoveryServiceTests
     public record Sut(StubProjectBindingRegistryCache BindingRegistryCache, InMemoryStubProjectScope ProjectScope,
         StubDiscoveryResultProvider DiscoveryResultProvider)
     {
-        public DiscoveryService Build() => new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
+        public DiscoveryService BuildDiscoveryService() => new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
+      //  public DiscoveryInvoker BuildDiscoveryInvoker() => new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
     }
 }

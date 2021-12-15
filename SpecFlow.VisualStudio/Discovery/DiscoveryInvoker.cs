@@ -2,56 +2,68 @@
 
 internal class DiscoveryInvoker
 {
-    private readonly IDeveroomLogger _logger;
-    private readonly IDeveroomErrorListServices _errorListServices;
-    private readonly IProjectScope _projectScope;
     private readonly IDiscoveryResultProvider _discoveryResultProvider;
+    private readonly IDeveroomErrorListServices _errorListServices;
+    private readonly IFileSystem _fileSystem;
+    private readonly IDeveroomLogger _logger;
     private readonly IMonitoringService _monitoringService;
-    private readonly Func<ProjectSettings, ConfigSource> _getTestAssemblySource;
+    private readonly IProjectScope _projectScope;
 
-    public DiscoveryInvoker(IDeveroomLogger logger, IDeveroomErrorListServices errorListServices, IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider, IMonitoringService monitoringService, Func<ProjectSettings, ConfigSource> getTestAssemblySource)
+    public DiscoveryInvoker(IProjectScope projectScope, IDiscoveryResultProvider discoveryResultProvider)
     {
-        _logger = logger;
-        _errorListServices = errorListServices;
         _projectScope = projectScope;
+        _logger = _projectScope.IdeScope.Logger;
+        _errorListServices = _projectScope.IdeScope.DeveroomErrorListServices;
         _discoveryResultProvider = discoveryResultProvider;
-        _monitoringService = monitoringService;
-        _getTestAssemblySource = getTestAssemblySource;
+        _monitoringService = _projectScope.IdeScope.MonitoringService;
+        _fileSystem = _projectScope.IdeScope.FileSystem;
     }
 
-    public static int CreateProjectHash(ProjectSettings projectSetting, ConfigSource configSource) =>
-        projectSetting.GetHashCode() ^ configSource.GetHashCode();
+    public int CreateProjectHash(ProjectSettings projectSettings)
+    {
+        var testAssemblySource = GetTestAssemblySource(projectSettings);
+        return projectSettings.GetHashCode() ^ testAssemblySource.GetHashCode();
+    }
+
+    public ConfigSource GetTestAssemblySource(ProjectSettings projectSettings) =>
+        projectSettings.IsSpecFlowTestProject
+            ? ConfigSource.TryGetConfigSource(projectSettings.OutputAssemblyPath, _fileSystem, _logger)
+            : ConfigSource.Invalid;
 
     public ProjectBindingRegistry InvokeDiscoveryWithTimer(ProjectBindingRegistry _)
     {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
-        var bindingRegistry = new SuccessDiscovery(_logger, _errorListServices)
+        var bindingRegistry = new SuccessDiscovery(_logger, _errorListServices, this)
             .WhenProjectSettingsIsInitialized(_projectScope.GetProjectSettings())
             .AndProjectIsSpecFlowProject()
-            .AndConfigSourceIsValid(_getTestAssemblySource)
+            .AndConfigSourceIsValid()
             .AndDiscoveryProviderSucceed(_discoveryResultProvider)
             .ThenImportStepDefinitions(_projectScope.ProjectName)
             .AndCreateBindingRegistry(_monitoringService);
         stopwatch.Stop();
 
-        _logger.LogVerbose($"{bindingRegistry.StepDefinitions.Length} step definitions discovered in {stopwatch.Elapsed}");
+        _logger.LogVerbose(
+            $"{bindingRegistry.StepDefinitions.Length} step definitions discovered in {stopwatch.Elapsed}");
         return bindingRegistry;
     }
 
     private class SuccessDiscovery : IDiscovery
     {
         private readonly IDeveroomErrorListServices _errorListServices;
+        private readonly DiscoveryInvoker _invoker;
         private readonly IDeveroomLogger _logger;
         private DiscoveryResult _discoveryResult;
         private ProjectSettings _projectSettings;
         private ImmutableArray<ProjectStepDefinitionBinding> _stepDefinitions;
         private ConfigSource _testAssemblySource;
 
-        public SuccessDiscovery(IDeveroomLogger logger, IDeveroomErrorListServices errorListServices)
+        public SuccessDiscovery(IDeveroomLogger logger, IDeveroomErrorListServices errorListServices,
+            DiscoveryInvoker invoker)
         {
             _logger = logger;
             _errorListServices = errorListServices;
+            _invoker = invoker;
             _errorListServices.ClearErrors(DeveroomUserErrorCategory.Discovery);
         }
 
@@ -64,9 +76,9 @@ internal class DiscoveryInvoker
             return new FailedDiscovery();
         }
 
-        public IDiscovery AndConfigSourceIsValid(Func<ProjectSettings, ConfigSource> getTestAssemblySource)
+        public IDiscovery AndConfigSourceIsValid()
         {
-            _testAssemblySource = getTestAssemblySource(_projectSettings);
+            _testAssemblySource = _invoker.GetTestAssemblySource(_projectSettings);
             if (_testAssemblySource != ConfigSource.Invalid)
                 return this;
 
@@ -135,8 +147,10 @@ internal class DiscoveryInvoker
             monitoringService.MonitorSpecFlowDiscovery(_stepDefinitions.IsEmpty, _discoveryResult.ErrorMessage,
                 _stepDefinitions.Length, _projectSettings);
 
+            var projectHash = _invoker.CreateProjectHash(_projectSettings);
+
             var bindingRegistry =
-                new ProjectBindingRegistry(_stepDefinitions, CreateProjectHash(_projectSettings, _testAssemblySource));
+                new ProjectBindingRegistry(_stepDefinitions, projectHash);
             return bindingRegistry;
         }
 
@@ -179,7 +193,7 @@ internal class DiscoveryInvoker
     private class FailedDiscovery : IDiscovery
     {
         public IDiscovery AndProjectIsSpecFlowProject() => this;
-        public IDiscovery AndConfigSourceIsValid(Func<ProjectSettings, ConfigSource> getTestAssemblySource) => this;
+        public IDiscovery AndConfigSourceIsValid() => this;
         public IDiscovery AndDiscoveryProviderSucceed(IDiscoveryResultProvider discoveryResultProvider) => this;
         public IDiscovery ThenImportStepDefinitions(string projectName) => this;
 
@@ -190,7 +204,7 @@ internal class DiscoveryInvoker
     private interface IDiscovery
     {
         IDiscovery AndProjectIsSpecFlowProject();
-        IDiscovery AndConfigSourceIsValid(Func<ProjectSettings, ConfigSource> getTestAssemblySource);
+        IDiscovery AndConfigSourceIsValid();
         IDiscovery AndDiscoveryProviderSucceed(IDiscoveryResultProvider discoveryResultProvider);
         IDiscovery ThenImportStepDefinitions(string projectName);
         ProjectBindingRegistry AndCreateBindingRegistry(IMonitoringService monitoringService);

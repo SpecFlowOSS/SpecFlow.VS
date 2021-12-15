@@ -16,15 +16,10 @@ public class DiscoveryService : IDiscoveryService
         _projectSettingsProvider.WeakSettingsInitialized += ProjectSystemOnProjectsBuilt;
         _projectScope.IdeScope.WeakProjectOutputsUpdated += ProjectSystemOnProjectsBuilt;
         BindingRegistryCache = bindingRegistryCacheCache;
-        DiscoveryInvoker = new DiscoveryInvoker(
-            _logger,
-            _projectScope.IdeScope.DeveroomErrorListServices, 
-            _projectScope,
-            discoveryResultProvider,
-            _projectScope.IdeScope.MonitoringService, GetTestAssemblySource);
+        DiscoveryInvoker = new DiscoveryInvoker(_projectScope,
+            discoveryResultProvider);
     }
 
-    private IFileSystem FileSystem => _projectScope.IdeScope.FileSystem;
     public IProjectBindingRegistryCache BindingRegistryCache { get; }
 
     public event EventHandler<EventArgs> WeakBindingRegistryChanged
@@ -75,20 +70,14 @@ public class DiscoveryService : IDiscoveryService
     private bool IsCacheUpToDate()
     {
         var projectSettings = _projectScope.GetProjectSettings();
-        var testAssemblySource = GetTestAssemblySource(projectSettings);
-        var currentHash = DiscoveryInvoker.CreateProjectHash(projectSettings, testAssemblySource);
+        var currentHash = DiscoveryInvoker.CreateProjectHash(projectSettings);
 
         return BindingRegistryCache.Value.ProjectHash == currentHash;
     }
 
-    protected virtual ConfigSource GetTestAssemblySource(ProjectSettings projectSettings) =>
-        projectSettings.IsSpecFlowTestProject
-            ? ConfigSource.TryGetConfigSource(projectSettings.OutputAssemblyPath, FileSystem, _logger)
-            : ConfigSource.Invalid;
-
     private void TriggerDiscovery()
     {
-        var t = _projectScope.IdeScope.RunOnBackgroundThread(
+        _projectScope.IdeScope.RunOnBackgroundThread(
             () => BindingRegistryCache.Update(DiscoveryInvoker.InvokeDiscoveryWithTimer),
             _ => { });
     }

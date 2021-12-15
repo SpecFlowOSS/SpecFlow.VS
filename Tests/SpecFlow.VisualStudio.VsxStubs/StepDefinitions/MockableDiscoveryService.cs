@@ -10,9 +10,6 @@ public class MockableDiscoveryService : DiscoveryService
 
     public DiscoveryResult LastDiscoveryResult { get; set; } = new() {StepDefinitions = Array.Empty<StepDefinition>()};
 
-    //protected override ConfigSource GetTestAssemblySource(ProjectSettings projectSettings) =>
-    //    new("MyAssembly.dll", DateTimeOffset.Parse("2020.12.07")); // fake a valid existing test assembly
-
     public static MockableDiscoveryService Setup(IProjectScope projectScope, TimeSpan discoveryDelay) =>
         SetupWithInitialStepDefinitions(projectScope, Array.Empty<StepDefinition>(), discoveryDelay);
 
