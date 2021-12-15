@@ -20,8 +20,7 @@ public class StubAnalyticsTransmitter : IAnalyticsTransmitter, IEnumerable<IAnal
     }
 
     public void TransmitExceptionEvent(Exception exception, Dictionary<string, object> additionalProps = null,
-        bool? isFatal = null,
-        bool anonymize = true)
+        bool? isFatal = null)
     {
         //nop
     }

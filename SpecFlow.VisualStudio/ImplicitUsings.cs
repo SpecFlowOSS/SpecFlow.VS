@@ -16,6 +16,7 @@ global using Microsoft.VisualStudio.TextManager.Interop;
 global using Microsoft.VisualStudio.Threading;
 global using Microsoft.VisualStudio;
 global using SpecFlow.VisualStudio.Annotations;
+global using SpecFlow.VisualStudio.Common;
 global using SpecFlow.VisualStudio.Configuration;
 global using SpecFlow.VisualStudio.Diagnostics;
 global using SpecFlow.VisualStudio.Discovery;
