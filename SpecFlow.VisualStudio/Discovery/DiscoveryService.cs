@@ -70,7 +70,8 @@ public class DiscoveryService : IDiscoveryService
     private bool IsCacheUpToDate()
     {
         var projectSettings = _projectScope.GetProjectSettings();
-        var currentHash = DiscoveryInvoker.CreateProjectHash(projectSettings);
+        var configSource = DiscoveryInvoker.GetTestAssemblySource(projectSettings);
+        var currentHash = DiscoveryInvoker.CreateProjectHash(projectSettings, configSource);
 
         return BindingRegistryCache.Value.ProjectHash == currentHash;
     }

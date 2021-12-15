@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using SpecFlow.VisualStudio.Common;
 using SpecFlow.VisualStudio.Configuration;
@@ -39,9 +40,7 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
             Properties.AddProperty(typeof(IDeveroomConfigurationProvider), new StubDeveroomConfigurationProvider(DeveroomConfiguration));
             StubIdeScope.ProjectScopes.Add(this);
 
-            FileInfo fi = new FileInfo(OutputAssemblyPath);
-            StubIdeScope.FileSystem.Directory.CreateDirectory(fi.DirectoryName);
-            StubIdeScope.FileSystem.File.WriteAllText(fi.FullName, string.Empty);
+            Build();
         }
 
         public InMemoryStubProjectScope(ITestOutputHelper testOutputHelper)
@@ -77,6 +76,18 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public void Dispose()
         {
+        }
+
+        public void Build()
+        {
+            FileInfo fi = new FileInfo(OutputAssemblyPath);
+            StubIdeScope.FileSystem.Directory.CreateDirectory(fi.DirectoryName);
+
+            StubIdeScope.FileSystem.File.WriteAllText(fi.FullName, string.Empty);
+            var file = new MockFile(StubIdeScope.FileSystem as MockFileSystem);
+            file.SetLastWriteTimeUtc(fi.FullName, DateTime.UtcNow);
+
+            StubIdeScope.TriggerProjectsBuilt();
         }
     }
 }

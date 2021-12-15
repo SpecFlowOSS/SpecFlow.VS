@@ -19,9 +19,8 @@ internal class DiscoveryInvoker
         _fileSystem = _projectScope.IdeScope.FileSystem;
     }
 
-    public int CreateProjectHash(ProjectSettings projectSettings)
+    public int CreateProjectHash(ProjectSettings projectSettings, ConfigSource testAssemblySource)
     {
-        var testAssemblySource = GetTestAssemblySource(projectSettings);
         return projectSettings.GetHashCode() ^ testAssemblySource.GetHashCode();
     }
 
@@ -147,7 +146,7 @@ internal class DiscoveryInvoker
             monitoringService.MonitorSpecFlowDiscovery(_stepDefinitions.IsEmpty, _discoveryResult.ErrorMessage,
                 _stepDefinitions.Length, _projectSettings);
 
-            var projectHash = _invoker.CreateProjectHash(_projectSettings);
+            var projectHash = _invoker.CreateProjectHash(_projectSettings, _testAssemblySource);
 
             var bindingRegistry =
                 new ProjectBindingRegistry(_stepDefinitions, projectHash);

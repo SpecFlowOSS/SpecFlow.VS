@@ -209,7 +209,7 @@ public class ProjectSystemSteps : Steps
     [When(@"the project is built")]
     public void WhenTheProjectIsBuilt()
     {
-        _ideScope.TriggerProjectsBuilt();
+        _projectScope.Build();
     }
 
     [When("the project is built and the initial binding discovery is performed")]
@@ -597,7 +597,7 @@ public class ProjectSystemSteps : Steps
     public void ThenAShowProblemDialogShouldBeOpenedWith(string expectedDialog, string expectedMessage)
     {
         _ideScope.StubLogger.Logs.Should()
-            .Contain(m => m.Message.Contains(expectedDialog) && m.Message.Contains(expectedMessage));
+            .Contain(m => m.CallerMethod.Contains(expectedDialog) && m.Message.Contains(expectedMessage));
     }
 
     [Given(@"the ""(.*)"" command is being invoked")]
