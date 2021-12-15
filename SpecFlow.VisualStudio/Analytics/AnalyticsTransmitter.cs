@@ -25,11 +25,11 @@ public class AnalyticsTransmitter : IAnalyticsTransmitter
         }
         catch (Exception ex)
         {
-            TransmitExceptionEvent(ex, new Dictionary<string, object>());
+            TransmitExceptionEvent(ex, ImmutableDictionary<string,object>.Empty);
         }
     }
 
-    public void TransmitExceptionEvent(Exception exception, Dictionary<string, object> additionalProps)
+    public void TransmitExceptionEvent(Exception exception, IEnumerable<KeyValuePair<string, object>> additionalProps)
     {
         var isNormalError = IsNormalError(exception);
         if (isNormalError)
@@ -40,14 +40,14 @@ public class AnalyticsTransmitter : IAnalyticsTransmitter
 
     public void TransmitFatalExceptionEvent(Exception exception, bool isFatal)
     {
-        var additionalProps = new Dictionary<string, object>();
+        var additionalProps = ImmutableDictionary.CreateBuilder<string, object>();
         if (isFatal)
             additionalProps.Add("IsFatal", isFatal.ToString());
 
-        TransmitException(exception, additionalProps);
+        TransmitException(exception, additionalProps.ToImmutable());
     }
 
-    private void TransmitException(Exception exception, Dictionary<string, object> additionalProps)
+    private void TransmitException(Exception exception, IEnumerable<KeyValuePair<string, object>> additionalProps)
     {
         try
         {

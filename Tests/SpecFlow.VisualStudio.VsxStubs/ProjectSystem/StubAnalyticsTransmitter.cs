@@ -23,7 +23,7 @@ public class StubAnalyticsTransmitter : IAnalyticsTransmitter, IEnumerable<IAnal
         //nop
     }
 
-    public void TransmitExceptionEvent(Exception exception, Dictionary<string, object> additionalProps)
+    public void TransmitExceptionEvent(Exception exception, IEnumerable<KeyValuePair<string, object>> additionalProps)
     {
         //nop
     }
