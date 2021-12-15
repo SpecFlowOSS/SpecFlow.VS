@@ -271,7 +271,7 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
         var chosenItem = ideActions.LastShowContextMenuItems[chosenOption];
         chosenItem.Command(chosenItem);
 
-        await WaitForCommandToComplete();
+        await WaitForCommandToComplete(command);
 
         var testText = Dump(textView, "Step definition class after rename");
         testText.Lines[6].Should().Be(expectedLines[0]);

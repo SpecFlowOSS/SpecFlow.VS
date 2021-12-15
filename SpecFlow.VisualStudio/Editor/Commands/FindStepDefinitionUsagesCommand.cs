@@ -124,6 +124,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             else
                 Logger.LogInfo($"Found {summary.UsagesFound} usages in {summary.ScannedFeatureFiles} feature files");
             asyncContextMenu.Complete();
+            Finished.Set();
         }
 
         private async Task FindUsagesInternalAsync(IProjectScope[] specFlowTestProjects, string fileName, SnapshotPoint triggerPoint, IAsyncContextMenu asyncContextMenu, CancellationToken cancellationToken, FindUsagesSummary summary)

@@ -193,6 +193,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             if (!ctx.Issues.Any())
             {
                 MonitoringService.MonitorCommandRenameStepExecuted(ctx);
+                Finished.Set();
                 return Task.CompletedTask;
             }
 
@@ -213,6 +214,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             IdeScope.Actions.ShowProblem(
                 $"The following problems occurred:{Environment.NewLine}{problems}", "Rename Step");
             MonitoringService.MonitorCommandRenameStepExecuted(ctx);
+            Finished.Set();
         }
 
         private void ValidateProjectsWithFeatureFiles(RenameStepCommandContext ctx)

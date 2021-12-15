@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-
 namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 
 public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
@@ -8,6 +5,7 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
     protected readonly IBufferTagAggregatorFactoryService AggregatorFactory;
     protected readonly IIdeScope IdeScope;
     protected readonly IMonitoringService MonitoringService;
+    public AsyncManualResetEvent Finished { get; } = new();
 
     protected DeveroomEditorCommandBase(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
         IMonitoringService monitoringService)
@@ -29,6 +27,11 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
         DeveroomEditorCommandTargetKey commandKey)
     {
         return DeveroomEditorCommandStatus.Supported;
+    }
+
+    public void Prepare()
+    {
+        Finished.Reset();
     }
 
     public virtual bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey,

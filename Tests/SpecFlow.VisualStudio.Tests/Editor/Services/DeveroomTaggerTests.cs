@@ -28,7 +28,7 @@ public class DeveroomTaggerTests
         ideScope.SetupGet(s => s.FileSystem).Returns(new MockFileSystem());
         ideScope.SetupGet(s => s.MonitoringService).Returns(
             new MonitoringService(
-                new StubAnalyticsTransmitter(),
+                new StubAnalyticsTransmitter(logger),
                 Mock.Of<IWelcomeService>(),
                 Mock.Of<ITelemetryConfigurationHolder>()
             ));

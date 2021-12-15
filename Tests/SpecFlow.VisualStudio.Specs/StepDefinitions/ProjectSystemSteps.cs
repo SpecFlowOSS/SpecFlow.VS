@@ -12,6 +12,7 @@ public class ProjectSystemSteps : Steps
     private InMemoryStubProjectScope _projectScope;
     private ProjectStepDefinitionBinding _stepDefinitionBinding;
     private StubWpfTextView _wpfTextView;
+    private DeveroomEditorCommandBase _invokedCommand;
 
     public ProjectSystemSteps(StubIdeScope stubIdeScope)
     {
@@ -240,7 +241,6 @@ public class ProjectSystemSteps : Steps
         _wpfTextView = _ideScope.CreateTextView(new TestText(featureFileContent), projectScope: _projectScope,
             filePath: filePath);
         GivenTheFollowingFeatureFile(fileName, _wpfTextView.TextBuffer.CurrentSnapshot.GetText());
-        //WhenTheProjectIsBuilt();
     }
 
     [Given(@"the initial binding discovery is performed")]
@@ -272,82 +272,82 @@ public class ProjectSystemSteps : Steps
         {
             case "Go To Definition":
             {
-                var command = new GoToStepDefinitionCommand(_ideScope,
+                _invokedCommand = new GoToStepDefinitionCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
-                command.PreExec(_wpfTextView, command.Targets.First());
+                _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 break;
             }
             case "Find Step Definition Usages":
             {
-                var command = new FindStepDefinitionUsagesCommand(_ideScope,
+                _invokedCommand = new FindStepDefinitionUsagesCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
-                command.PreExec(_wpfTextView, command.Targets.First());
+                _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 Wait.For(() => ActionsMock.IsComplete.Should().BeTrue());
                 break;
             }
             case "Comment":
             {
-                var command = new CommentCommand(_ideScope,
+                _invokedCommand = new CommentCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
-                command.PreExec(_wpfTextView, command.Targets.First());
+                _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 break;
             }
             case "Uncomment":
             {
-                var command = new UncommentCommand(_ideScope,
+                _invokedCommand = new UncommentCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
-                command.PreExec(_wpfTextView, command.Targets.First());
+                _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 break;
             }
             case "Auto Format Document":
             {
-                var command = new AutoFormatDocumentCommand(_ideScope,
+                _invokedCommand = new AutoFormatDocumentCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
                     new GherkinDocumentFormatter());
-                command.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatDocumentKey);
+                _invokedCommand.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatDocumentKey);
                 break;
             }
             case "Auto Format Selection":
             {
-                var command = new AutoFormatDocumentCommand(_ideScope,
+                _invokedCommand = new AutoFormatDocumentCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
                     new GherkinDocumentFormatter());
-                command.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatSelectionKey);
+                _invokedCommand.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatSelectionKey);
                 break;
             }
             case "Auto Format Table":
             {
-                var command = new AutoFormatTableCommand(_ideScope,
+                _invokedCommand = new AutoFormatTableCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
                     new GherkinDocumentFormatter());
-                _wpfTextView.SimulateType(command, parameter?[0] ?? '|');
+                _wpfTextView.SimulateType((AutoFormatTableCommand) _invokedCommand, parameter?[0] ?? '|');
                 break;
             }
             case "Define Steps":
             {
-                var command = new DefineStepsCommand(_ideScope,
+                _invokedCommand = new DefineStepsCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
-                command.PreExec(_wpfTextView, command.Targets.First());
+                _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 break;
             }
             case "Complete":
             case "Filter Completion":
             {
                 EnsureStubCompletionBroker();
-                var command = new CompleteCommand(_ideScope,
+                _invokedCommand = new CompleteCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope),
                     _completionBroker, _ideScope.MonitoringService);
                 if (parameter == null)
-                    command.PreExec(_wpfTextView, commandTargetKey ?? command.Targets.First());
+                    _invokedCommand.PreExec(_wpfTextView, commandTargetKey ?? _invokedCommand.Targets.First());
                 else
-                    _wpfTextView.SimulateTypeText(command, parameter);
+                    _wpfTextView.SimulateTypeText((CompleteCommand) _invokedCommand, parameter);
                 break;
             }
             case "Rename Step":
             {
-                var command = new RenameStepCommand(_ideScope,
+                _invokedCommand = new RenameStepCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
-                command.PreExec(_wpfTextView, command.Targets.First());
+                _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
 
                 break;
             }
@@ -367,6 +367,13 @@ public class ProjectSystemSteps : Steps
             new StubBufferTagAggregatorFactoryService(_ideScope).CreateTagAggregator<DeveroomTag>(textBuffer),
             _ideScope);
         _completionBroker = new StubCompletionBroker(completionSource);
+    }
+
+    [When(@"when the command is finished")]
+    private async Task WhenTheCommandIsFinished()
+    {
+        var cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
+        await _invokedCommand.Finished.WaitAsync(cts.Token);
     }
 
     [When(@"commit the ""([^""]*)"" completion item")]
@@ -618,7 +625,7 @@ public class ProjectSystemSteps : Steps
     }
 
     [When(@"close the define steps dialog with ""(.*)""")]
-    public void WhenCloseTheDefineStepsDialogWith(string button)
+    public async Task WhenCloseTheDefineStepsDialogWith(string button)
     {
         _ideScope.StubWindowManager.RegisterWindowAction<CreateStepDefinitionsDialogViewModel>(
             viewModel =>
@@ -634,6 +641,11 @@ public class ProjectSystemSteps : Steps
                 }
             });
         WhenIInvokeTheCommand(_commandToInvokeDeferred);
+        await WhenTheCommandIsFinished();
+
+        _projectScope.StubIdeScope.AnalyticsTransmitter
+            .Should()
+            .Contain(e=>e.EventName== "DefineSteps command executed", "the command is finished");
     }
 
     [When("I specify {string} as renamed step")]
@@ -642,9 +654,11 @@ public class ProjectSystemSteps : Steps
         _ideScope.StubWindowManager.RegisterWindowAction<RenameStepViewModel>(
             viewModel => { viewModel.StepText = renamedStep; });
         WhenIInvokeTheCommand(_commandToInvokeDeferred);
+        await WhenTheCommandIsFinished();
 
-        await _projectScope.StubIdeScope.AnalyticsTransmitter
-            .WaitForEventAsync("Rename step command executed");
+        _projectScope.StubIdeScope.AnalyticsTransmitter
+            .Should()
+            .Contain(e => e.EventName == "Rename step command executed", "the command is finished");
     }
 
     [Then("invoking the first item from the jump list renames the {string} {string} step definition")]
@@ -661,9 +675,7 @@ public class ProjectSystemSteps : Steps
             });
 
         InvokeFirstContextMenuItem();
-
-        await _projectScope.StubIdeScope.AnalyticsTransmitter
-            .WaitForEventAsync("Rename step command executed");
+        await WhenTheCommandIsFinished();
 
         string fileContent = _wpfTextView.TextSnapshot.GetText();
         var parsedSnippets = ParseSnippetsFromFile(fileContent);

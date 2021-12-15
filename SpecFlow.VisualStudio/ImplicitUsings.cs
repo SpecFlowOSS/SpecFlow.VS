@@ -13,6 +13,7 @@ global using Microsoft.VisualStudio.Text.Editor;
 global using Microsoft.VisualStudio.Text.Tagging;
 global using Microsoft.VisualStudio.Text;
 global using Microsoft.VisualStudio.TextManager.Interop;
+global using Microsoft.VisualStudio.Threading;
 global using Microsoft.VisualStudio;
 global using SpecFlow.VisualStudio.Annotations;
 global using SpecFlow.VisualStudio.Configuration;
