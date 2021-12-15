@@ -88,14 +88,32 @@ public class DiscoveryTests
         //arrange
         var sut = ArrangeSut();
         sut.ProjectScope.StubProjectSettingsProvider.Kind = DeveroomProjectKind.Uninitialized;
-        var discoveryInvoker = sut.BuildDiscoveryInvoker();
+        DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
 
         //act
-        var discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
 
         //assert
         discovered.Version.Should().Be(1);
         sut.ProjectScope.StubIdeScope.StubLogger.Messages.Should().Contain("Uninitialized project settings");
+    }
+
+    [Fact]
+    public void DoNotDiscoverWhenConfigSourceIsInvalid()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.ProjectScope.StubIdeScope.FileSystem.File.Delete(sut.ProjectScope.OutputAssemblyPath);
+        DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
+
+        //act
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+
+        //assert
+        discovered.Version.Should().Be(1);
+        var expected = "Test assembly not found. Please build the project to enable the SpecFlow Visual Studio Extension features.";
+        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Should().Contain(expected);
+        sut.ProjectScope.StubIdeScope.StubErrorListServices.Errors.Should().Contain(e => e.Message == expected);
     }
 
     public record Sut(StubProjectBindingRegistryCache BindingRegistryCache, InMemoryStubProjectScope ProjectScope,
