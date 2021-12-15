@@ -1,5 +1,4 @@
 ﻿#nullable enable
-
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
 public class StubAnalyticsTransmitter : IAnalyticsTransmitter, IEnumerable<IAnalyticsEvent>
@@ -19,8 +18,12 @@ public class StubAnalyticsTransmitter : IAnalyticsTransmitter, IEnumerable<IAnal
         _logger.LogVerbose(runtimeEvent.EventName);
     }
 
-    public void TransmitExceptionEvent(Exception exception, Dictionary<string, object> additionalProps = null,
-        bool? isFatal = null)
+    public void TransmitFatalExceptionEvent(Exception exception, bool isFatal)
+    {
+        //nop
+    }
+
+    public void TransmitExceptionEvent(Exception exception, Dictionary<string, object> additionalProps)
     {
         //nop
     }
