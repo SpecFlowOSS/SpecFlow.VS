@@ -1,4 +1,6 @@
-﻿#pragma warning disable xUnit1026 // Theory methods should use all of their parameters. Allow to use _ as identifier
+﻿using SpecFlow.VisualStudio.ProjectSystem.Settings;
+
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters. Allow to use _ as identifier
 
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
@@ -76,14 +78,30 @@ public class DiscoveryTests
         sut.BindingRegistryCache.Verify(c =>
             c.Update(It.IsAny<Func<ProjectBindingRegistry, Task<ProjectBindingRegistry>>>()), Times.Once, "the cache update have to be called only once when the project haven't changed");
         sut.BindingRegistryCache.Value.Should().BeSameAs(bindingRegistry, "the cache must not be modified");
-        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Where(m=>m == "ProjectSystemOnProjectsBuilt: Projects built or settings initialized")
+        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Where(m=>m == "Projects built or settings initialized")
             .Should().HaveCount(2, "the event is fired twice");
+    }
+
+    [Fact]
+    public void DoNotDiscoverWhenProjectIsNotInitialized()
+    {
+        //arrange
+        var sut = ArrangeSut();
+        sut.ProjectScope.StubProjectSettingsProvider.Kind = DeveroomProjectKind.Uninitialized;
+        var discoveryInvoker = sut.BuildDiscoveryInvoker();
+
+        //act
+        var discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+
+        //assert
+        discovered.Version.Should().Be(1);
+        sut.ProjectScope.StubIdeScope.StubLogger.Messages.Should().Contain("Uninitialized project settings");
     }
 
     public record Sut(StubProjectBindingRegistryCache BindingRegistryCache, InMemoryStubProjectScope ProjectScope,
         StubDiscoveryResultProvider DiscoveryResultProvider)
     {
         public DiscoveryService BuildDiscoveryService() => new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
-      //  public DiscoveryInvoker BuildDiscoveryInvoker() => new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
+        internal DiscoveryInvoker BuildDiscoveryInvoker() => new(ProjectScope, DiscoveryResultProvider);
     }
 }

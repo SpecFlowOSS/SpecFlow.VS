@@ -1,6 +1,6 @@
 ﻿namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
-public record LogMessage(TraceLevel Level, string Message, int Order, TimeSpan TimeStamp);
+public record LogMessage(TraceLevel Level, string Message, int Order, TimeSpan TimeStamp, string CallerMethod);
 
 public class StubLogger : IDeveroomLogger
 {
@@ -25,7 +25,9 @@ public class StubLogger : IDeveroomLogger
 
     public void Log(TraceLevel messageLevel, string message)
     {
-        Logs.Add(new LogMessage(messageLevel, message, Interlocked.Increment(ref _order), _stopwatch.Elapsed));
+        var callerMethodAndMessage = message.Split(new[] {':'}, 2);
+        Logs.Add(new LogMessage(messageLevel, callerMethodAndMessage[1].Trim(), Interlocked.Increment(ref _order),
+            _stopwatch.Elapsed, callerMethodAndMessage[0]));
     }
 
     public StubLogger Errors()
@@ -49,11 +51,11 @@ public class StubLogger : IDeveroomLogger
         return new StubLogger(
             _stopwatch,
             Logs.Select(m =>
-                new LogMessage(m.Level, m.Message.Replace(warningHeader, string.Empty), m.Order, m.TimeStamp)));
+                new LogMessage(m.Level, m.Message.Replace(warningHeader, string.Empty), m.Order, m.TimeStamp, m.CallerMethod)));
     }
 
     public void Clear()
     {
-        Logs = new();
+        Logs = new ConcurrentBag<LogMessage>();
     }
 }
