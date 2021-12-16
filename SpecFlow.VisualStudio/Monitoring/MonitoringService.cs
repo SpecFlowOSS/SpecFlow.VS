@@ -189,12 +189,16 @@ namespace SpecFlow.VisualStudio.Monitoring
                     })));
         }
 
-
         //ERROR
 
         public void MonitorError(Exception exception, bool? isFatal = null)
         {
-            _analyticsTransmitter.TransmitExceptionEvent(exception, isFatal: isFatal);
+            if (isFatal.HasValue)
+                _analyticsTransmitter.TransmitFatalExceptionEvent(exception, isFatal.Value);
+            else
+            {
+                _analyticsTransmitter.TransmitExceptionEvent(exception, ImmutableDictionary<string,object>.Empty);
+            }
         }
 
 
@@ -245,27 +249,30 @@ namespace SpecFlow.VisualStudio.Monitoring
         }
 
 
-        private Dictionary<string, object> GetProjectSettingsProps(ProjectSettings settings, Dictionary<string, object> additionalSettings = null)
+        private ImmutableDictionary<string, object> GetProjectSettingsProps(ProjectSettings settings)
         {
-            Dictionary<string, object> props = null;
-            if (settings != null)
-            {
-                props = new Dictionary<string, object>
-                {
-                    { "SpecFlowVersion", settings.GetSpecFlowVersionLabel() },
-                    { "ProjectTargetFramework", settings.TargetFrameworkMonikers },
-                    { "SingleFileGeneratorUsed", settings.DesignTimeFeatureFileGenerationEnabled },
-                    { "ProgrammingLanguage", settings.ProgrammingLanguage },
-                };
-            }
-            if (additionalSettings != null && additionalSettings.Any())
-            {
-                props ??= new Dictionary<string, object>();
-                foreach (var additionalSetting in additionalSettings)
-                {
-                    props.Add(additionalSetting.Key, additionalSetting.Value);
-                }
-            }
+            var props = GetProps(settings);
+            return props.ToImmutable();
+        }
+
+        private ImmutableDictionary<string, object> GetProjectSettingsProps(ProjectSettings settings, IEnumerable<KeyValuePair<string, object>> additionalSettings)
+        {
+            var props = GetProps(settings);
+            props.AddRange(additionalSettings);
+            return props.ToImmutable();
+        }
+
+        private static ImmutableDictionary<string, object>.Builder GetProps(ProjectSettings settings)
+        {
+            var props = ImmutableDictionary.CreateBuilder<string, object>();
+
+            if (settings == null) return props;
+
+            props.Add("SpecFlowVersion", settings.GetSpecFlowVersionLabel());
+            props.Add("ProjectTargetFramework", settings.TargetFrameworkMonikers);
+            props.Add("SingleFileGeneratorUsed", settings.DesignTimeFeatureFileGenerationEnabled);
+            props.Add("ProgrammingLanguage", settings.ProgrammingLanguage);
+
             return props;
         }
 
