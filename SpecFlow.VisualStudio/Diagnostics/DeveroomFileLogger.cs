@@ -112,7 +112,7 @@ namespace SpecFlow.VisualStudio.Diagnostics
                     Environment.SpecialFolder.LocalApplicationData),
                 "SpecFlow",
 #if DEBUG
-                "specflow-vs-debug-{DateTime.Now:yyyyMMdd}.log");
+                $"specflow-vs-debug-{DateTime.Now:yyyyMMdd}.log");
 #else
                 $"specflow-vs-{DateTime.Now:yyyyMMdd}.log");
 #endif
