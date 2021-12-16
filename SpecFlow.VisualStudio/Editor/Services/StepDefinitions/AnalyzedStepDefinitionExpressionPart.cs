@@ -1,7 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
+﻿namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
+
+public abstract record AnalyzedStepDefinitionExpressionPart
 {
-    public abstract record AnalyzedStepDefinitionExpressionPart
-    {
-        public abstract string ExpressionText { get; }
-    }
+    public abstract string ExpressionText { get; }
 }

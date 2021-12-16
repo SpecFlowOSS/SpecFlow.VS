@@ -1,14 +1,13 @@
-﻿namespace SpecFlow.VisualStudio.Analytics
+﻿namespace SpecFlow.VisualStudio.Analytics;
+
+public enum GuidanceNotification
 {
-    public enum GuidanceNotification
-    {
-        AfterInstall = 1,
-        Upgrade = 2,
-        TwoDayUsage = 10,
-        FiveDayUsage = 50,
-        TenDayUsage = 75,
-        TwentyDayUsage = 100,
-        HundredDayUsage = 200,
-        TwoHundredDayUsage = 300
-    }
+    AfterInstall = 1,
+    Upgrade = 2,
+    TwoDayUsage = 10,
+    FiveDayUsage = 50,
+    TenDayUsage = 75,
+    TwentyDayUsage = 100,
+    HundredDayUsage = 200,
+    TwoHundredDayUsage = 300
 }

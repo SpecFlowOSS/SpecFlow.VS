@@ -1,8 +1,7 @@
-﻿namespace SpecFlow.VisualStudio.UI.ViewModels
+﻿namespace SpecFlow.VisualStudio.UI.ViewModels;
+
+public class StepDefinitionSnippetItemViewModel
 {
-    public class StepDefinitionSnippetItemViewModel
-    {
-        public bool IsSelected { get; set; } = true;
-        public string Snippet { get; set; }
-    }
+    public bool IsSelected { get; set; } = true;
+    public string Snippet { get; set; }
 }

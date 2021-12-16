@@ -1,27 +1,23 @@
 ﻿using System;
-using BoDi;
-using TechTalk.SpecFlow.Bindings;
-using TechTalk.SpecFlow.Infrastructure;
-using TechTalk.SpecFlow.Tracing;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+
+public class NoInvokeDependencyProvider : DefaultDependencyProvider
 {
-    public class NoInvokeDependencyProvider : DefaultDependencyProvider
+    public override void RegisterGlobalContainerDefaults(ObjectContainer container)
     {
-        // ReSharper disable once ClassNeverInstantiated.Local
-        public class NullBindingInvoker : IBindingInvoker
-        {
-            public object InvokeBinding(IBinding binding, IContextManager contextManager, object[] arguments, ITestTracer testTracer, out TimeSpan duration)
-            {
-                duration = TimeSpan.Zero;
-                return null;
-            }
-        }
+        base.RegisterGlobalContainerDefaults(container);
+        container.ReflectionRegisterTypeAs<NullBindingInvoker, IBindingInvoker>();
+    }
 
-        public override void RegisterGlobalContainerDefaults(ObjectContainer container)
+    // ReSharper disable once ClassNeverInstantiated.Local
+    public class NullBindingInvoker : IBindingInvoker
+    {
+        public object InvokeBinding(IBinding binding, IContextManager contextManager, object[] arguments,
+            ITestTracer testTracer, out TimeSpan duration)
         {
-            base.RegisterGlobalContainerDefaults(container);
-            container.ReflectionRegisterTypeAs<NullBindingInvoker, IBindingInvoker>();
+            duration = TimeSpan.Zero;
+            return null;
         }
     }
 }

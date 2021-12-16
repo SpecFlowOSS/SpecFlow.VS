@@ -65,7 +65,7 @@ public class ProjectBindingRegistryCacheTests
         cache.Value.Should().BeSameAs(bindingRegistry);
     }
 
-    [Fact(Skip="Sporadically fails on Azure")]
+    [Fact(Skip = "Sporadically fails on Azure")]
     public async Task ParallelUpdate()
     {
         //arrange

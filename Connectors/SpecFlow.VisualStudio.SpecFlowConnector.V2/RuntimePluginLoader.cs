@@ -51,8 +51,5 @@ public abstract class RuntimePluginLoader_Patch : IRuntimePluginLoader
         return plugin;
     }
 
-    protected virtual Assembly LoadAssembly(string pluginAssemblyName)
-    {
-        return Assembly.LoadFrom(pluginAssemblyName);
-    }
+    protected virtual Assembly LoadAssembly(string pluginAssemblyName) => Assembly.LoadFrom(pluginAssemblyName);
 }

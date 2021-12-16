@@ -67,11 +67,9 @@ internal class DeveroomGherkinAstBuilder : AstBuilder<DeveroomGherkinDocument>, 
     }
 
     protected override GherkinDocument CreateGherkinDocument(Feature feature, Comment[] gherkinDocumentComments,
-        AstNode node)
-    {
-        return new DeveroomGherkinDocument(feature, gherkinDocumentComments, _sourceFilePath,
+        AstNode node) =>
+        new DeveroomGherkinDocument(feature, gherkinDocumentComments, _sourceFilePath,
             _documentDialectProvider(), _statesForLines);
-    }
 
     protected override Scenario CreateScenario(Tag[] tags, Location location, string keyword, string name,
         string description, Step[] steps, Examples[] examples, AstNode node)

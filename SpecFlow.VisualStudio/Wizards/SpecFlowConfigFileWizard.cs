@@ -1,22 +1,18 @@
 ﻿using System;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using SpecFlow.VisualStudio.Wizards.Infrastructure;
 
-namespace SpecFlow.VisualStudio.Wizards
+namespace SpecFlow.VisualStudio.Wizards;
+
+public class SpecFlowConfigFileWizard : IDeveroomWizard
 {
-    public class SpecFlowConfigFileWizard : IDeveroomWizard
+    public bool RunStarted(WizardRunParameters wizardRunParameters)
     {
-        public bool RunStarted(WizardRunParameters wizardRunParameters)
-        {
-            var projectSettings = wizardRunParameters.ProjectScope.GetProjectSettings();
+        var projectSettings = wizardRunParameters.ProjectScope.GetProjectSettings();
 
-            wizardRunParameters.MonitoringService.MonitorCommandAddSpecFlowConfigFile(projectSettings);
+        wizardRunParameters.MonitoringService.MonitorCommandAddSpecFlowConfigFile(projectSettings);
 
-            if (projectSettings.IsSpecFlowProject && projectSettings.SpecFlowVersion.Version < new Version(3, 6, 23))
-            {
-                wizardRunParameters.ReplacementsDictionary[WizardRunParameters.CopyToOutputDirectoryKey] = "PreserveNewest";
-            }
-            return true;
-        }
+        if (projectSettings.IsSpecFlowProject && projectSettings.SpecFlowVersion.Version < new Version(3, 6, 23))
+            wizardRunParameters.ReplacementsDictionary[WizardRunParameters.CopyToOutputDirectoryKey] = "PreserveNewest";
+        return true;
     }
 }

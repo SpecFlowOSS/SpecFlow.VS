@@ -1,119 +1,124 @@
 using System;
-using System.IO;
-using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Security;
 using System.Security.Permissions;
 
 // source: xUnit project
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.AppDomainHelper
+namespace SpecFlow.VisualStudio.SpecFlowConnector.AppDomainHelper;
+
+internal class AppDomainManager : IDisposable
 {
-    class AppDomainManager : IDisposable
+    public AppDomainManager(string assemblyFileName, string configFileName, bool shadowCopy, string shadowCopyFolder)
     {
-        public AppDomainManager(string assemblyFileName, string configFileName, bool shadowCopy, string shadowCopyFolder)
+        if (string.IsNullOrEmpty(assemblyFileName))
+            throw new ArgumentException(nameof(assemblyFileName));
+
+        assemblyFileName = Path.GetFullPath(assemblyFileName);
+
+        if (configFileName == null)
+            configFileName = GetDefaultConfigFile(assemblyFileName);
+
+        if (configFileName != null)
+            configFileName = Path.GetFullPath(configFileName);
+
+        AssemblyFileName = assemblyFileName;
+        ConfigFileName = configFileName;
+        AppDomain = CreateAppDomain(assemblyFileName, configFileName, shadowCopy, shadowCopyFolder);
+    }
+
+    public AppDomain AppDomain { get; }
+
+    public string AssemblyFileName { get; }
+
+    public string ConfigFileName { get; }
+
+    public virtual void Dispose()
+    {
+        if (AppDomain != null)
         {
-            if (string.IsNullOrEmpty(assemblyFileName))
-                throw new ArgumentException(nameof(assemblyFileName));
+            string cachePath = AppDomain.SetupInformation.CachePath;
 
-            assemblyFileName = Path.GetFullPath(assemblyFileName);
-
-            if (configFileName == null)
-                configFileName = GetDefaultConfigFile(assemblyFileName);
-
-            if (configFileName != null)
-                configFileName = Path.GetFullPath(configFileName);
-
-            AssemblyFileName = assemblyFileName;
-            ConfigFileName = configFileName;
-            AppDomain = CreateAppDomain(assemblyFileName, configFileName, shadowCopy, shadowCopyFolder);
-        }
-
-        public AppDomain AppDomain { get; private set; }
-
-        public string AssemblyFileName { get; private set; }
-
-        public string ConfigFileName { get; private set; }
-
-        static AppDomain CreateAppDomain(string assemblyFilename, string configFilename, bool shadowCopy, string shadowCopyFolder)
-        {
-            var setup = new AppDomainSetup();
-            setup.ApplicationBase = Path.GetDirectoryName(assemblyFilename);
-            setup.ApplicationName = Guid.NewGuid().ToString();
-
-            if (shadowCopy)
-            {
-                setup.ShadowCopyFiles = "true";
-                setup.ShadowCopyDirectories = setup.ApplicationBase;
-                setup.CachePath = shadowCopyFolder ?? Path.Combine(Path.GetTempPath(), setup.ApplicationName);
-            }
-
-            setup.ConfigurationFile = configFilename;
-
-            return AppDomain.CreateDomain(Path.GetFileNameWithoutExtension(assemblyFilename), System.AppDomain.CurrentDomain.Evidence, setup, new PermissionSet(PermissionState.Unrestricted));
-        }
-
-        public TObject CreateObjectFrom<TObject>(string assemblyLocation, string typeName, params object[] args)
-        {
             try
             {
+                AppDomain.Unload(AppDomain);
+
+                if (cachePath != null)
+                    Directory.Delete(cachePath, true);
+            }
+            catch
+            {
+            }
+        }
+    }
+
+    private static AppDomain CreateAppDomain(string assemblyFilename, string configFilename, bool shadowCopy,
+        string shadowCopyFolder)
+    {
+        var setup = new AppDomainSetup();
+        setup.ApplicationBase = Path.GetDirectoryName(assemblyFilename);
+        setup.ApplicationName = Guid.NewGuid().ToString();
+
+        if (shadowCopy)
+        {
+            setup.ShadowCopyFiles = "true";
+            setup.ShadowCopyDirectories = setup.ApplicationBase;
+            setup.CachePath = shadowCopyFolder ?? Path.Combine(Path.GetTempPath(), setup.ApplicationName);
+        }
+
+        setup.ConfigurationFile = configFilename;
+
+        return AppDomain.CreateDomain(Path.GetFileNameWithoutExtension(assemblyFilename),
+            AppDomain.CurrentDomain.Evidence, setup, new PermissionSet(PermissionState.Unrestricted));
+    }
+
+    public TObject CreateObjectFrom<TObject>(string assemblyLocation, string typeName, params object[] args)
+    {
+        try
+        {
 #pragma warning disable CS0618
-                var unwrappedObject = AppDomain.CreateInstanceFromAndUnwrap(assemblyLocation, typeName, false, 0, null, args, null, null, null);
+            var unwrappedObject =
+                AppDomain.CreateInstanceFromAndUnwrap(assemblyLocation, typeName, false, 0, null, args, null, null,
+                    null);
 #pragma warning restore CS0618
-                return (TObject)unwrappedObject;
-            }
-            catch (TargetInvocationException ex)
-            {
-                RethrowExceptionWithNoStackTraceLoss(ex.InnerException);
-                return default(TObject);
-            }
+            return (TObject) unwrappedObject;
         }
-
-        public TObject CreateObject<TObject>(AssemblyName assemblyName, string typeName, params object[] args)
+        catch (TargetInvocationException ex)
         {
-            try
-            {
+            RethrowExceptionWithNoStackTraceLoss(ex.InnerException);
+            return default;
+        }
+    }
+
+    public TObject CreateObject<TObject>(AssemblyName assemblyName, string typeName, params object[] args)
+    {
+        try
+        {
 #pragma warning disable CS0618
-                var unwrappedObject = AppDomain.CreateInstanceAndUnwrap(assemblyName.FullName, typeName, false, 0, null, args, null, null, null);
+            var unwrappedObject = AppDomain.CreateInstanceAndUnwrap(assemblyName.FullName, typeName, false, 0, null,
+                args, null, null, null);
 #pragma warning restore CS0618
-                return (TObject)unwrappedObject;
-            }
-            catch (TargetInvocationException ex)
-            {
-                RethrowExceptionWithNoStackTraceLoss(ex.InnerException);
-                return default(TObject);
-            }
+            return (TObject) unwrappedObject;
         }
-
-        public static void RethrowExceptionWithNoStackTraceLoss(Exception ex)
+        catch (TargetInvocationException ex)
         {
-            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+            RethrowExceptionWithNoStackTraceLoss(ex.InnerException);
+            return default;
         }
+    }
 
-        public virtual void Dispose()
-        {
-            if (AppDomain != null)
-            {
-                string cachePath = AppDomain.SetupInformation.CachePath;
+    public static void RethrowExceptionWithNoStackTraceLoss(Exception ex)
+    {
+        ExceptionDispatchInfo.Capture(ex).Throw();
+    }
 
-                try
-                {
-                    System.AppDomain.Unload(AppDomain);
+    private static string GetDefaultConfigFile(string assemblyFile)
+    {
+        string configFilename = assemblyFile + ".config";
 
-                    if (cachePath != null)
-                        Directory.Delete(cachePath, true);
-                }
-                catch { }
-            }
-        }
+        if (File.Exists(configFilename))
+            return configFilename;
 
-        static string GetDefaultConfigFile(string assemblyFile)
-        {
-            string configFilename = assemblyFile + ".config";
-
-            if (File.Exists(configFilename))
-                return configFilename;
-
-            return null;
-        }
+        return null;
     }
 }

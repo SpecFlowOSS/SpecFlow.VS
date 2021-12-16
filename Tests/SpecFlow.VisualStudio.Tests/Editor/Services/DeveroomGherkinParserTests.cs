@@ -1,83 +1,75 @@
 ﻿using System;
 using System.Linq;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Editor.Services.Parser;
-using SpecFlow.VisualStudio.Monitoring;
-using FluentAssertions;
-using Moq;
-using Xunit;
 
-namespace SpecFlow.VisualStudio.Tests.Editor.Services
+namespace SpecFlow.VisualStudio.Tests.Editor.Services;
+
+public class DeveroomGherkinParserTests
 {
-    public class DeveroomGherkinParserTests
+    [Fact]
+    public void Should_provide_parse_result_when_unexpected_end_of_file()
     {
-        [Fact]
-        public void Should_provide_parse_result_when_unexpected_end_of_file()
-        {
-            var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
-                new Mock<IMonitoringService>().Object);
+        var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
+            new Mock<IMonitoringService>().Object);
 
-            var result = sut.ParseAndCollectErrors(@"
+        var result = sut.ParseAndCollectErrors(@"
 Feature: Addition
 @tag
-", 
-                new DeveroomNullLogger(), out var gherkinDocument, out var errors);
-            gherkinDocument.Should().NotBeNull();
-            result.Should().BeFalse();
-        }
+",
+            new DeveroomNullLogger(), out var gherkinDocument, out var errors);
+        gherkinDocument.Should().NotBeNull();
+        result.Should().BeFalse();
+    }
 
-        [Fact]
-        public void Should_tolerate_backslash_at_end_of_line_in_DataTable()
-        {
-            var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
-                new Mock<IMonitoringService>().Object);
+    [Fact]
+    public void Should_tolerate_backslash_at_end_of_line_in_DataTable()
+    {
+        var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
+            new Mock<IMonitoringService>().Object);
 
-            var result = sut.ParseAndCollectErrors(@"
+        var result = sut.ParseAndCollectErrors(@"
 Feature: Addition
 Scenario: Add two numbers
 	When I press
 		| foo |
 		| bar \
 ",
-                new DeveroomNullLogger(), out var gherkinDocument, out var errors);
-            gherkinDocument.Should().NotBeNull();
-            result.Should().BeFalse();
-        }
+            new DeveroomNullLogger(), out var gherkinDocument, out var errors);
+        gherkinDocument.Should().NotBeNull();
+        result.Should().BeFalse();
+    }
 
-        [Fact]
-        public void Should_tolerate_unfinished_DataTable()
-        {
-            var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
-                new Mock<IMonitoringService>().Object);
+    [Fact]
+    public void Should_tolerate_unfinished_DataTable()
+    {
+        var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
+            new Mock<IMonitoringService>().Object);
 
-            var result = sut.ParseAndCollectErrors(@"
+        var result = sut.ParseAndCollectErrors(@"
 Feature: Addition
 Scenario: Add two numbers
 	When I press
 		| foo |
 		| bar
 ",
-                new DeveroomNullLogger(), out var gherkinDocument, out var errors);
-            gherkinDocument.Should().NotBeNull();
-            result.Should().BeFalse();
-        }
+            new DeveroomNullLogger(), out var gherkinDocument, out var errors);
+        gherkinDocument.Should().NotBeNull();
+        result.Should().BeFalse();
+    }
 
-        [Fact]
-        public void Should_provide_parse_result_when_file_ends_with_open_docstring()
-        {
-            var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
-                new Mock<IMonitoringService>().Object);
+    [Fact]
+    public void Should_provide_parse_result_when_file_ends_with_open_docstring()
+    {
+        var sut = new DeveroomGherkinParser(new SpecFlowGherkinDialectProvider("en-US"),
+            new Mock<IMonitoringService>().Object);
 
-            var result = sut.ParseAndCollectErrors(@"
+        var result = sut.ParseAndCollectErrors(@"
 Feature: Addition
 Scenario: Add two numbers
   Given I have added
     ```
 ",
-                new DeveroomNullLogger(), out var gherkinDocument, out var errors);
-            gherkinDocument.Should().NotBeNull();
-            result.Should().BeFalse();
-        }
-
+            new DeveroomNullLogger(), out var gherkinDocument, out var errors);
+        gherkinDocument.Should().NotBeNull();
+        result.Should().BeFalse();
     }
 }

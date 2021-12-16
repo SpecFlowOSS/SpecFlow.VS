@@ -1,7 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.Wizards.Infrastructure
+﻿namespace SpecFlow.VisualStudio.Wizards.Infrastructure;
+
+public interface IDeveroomWizard
 {
-    public interface IDeveroomWizard
-    {
-        bool RunStarted(WizardRunParameters wizardRunParameters);
-    }
+    bool RunStarted(WizardRunParameters wizardRunParameters);
 }

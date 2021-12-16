@@ -6,7 +6,8 @@ public class StubProjectSettingsProvider : Mock<IProjectSettingsProvider>, IProj
     {
         OutputAssemblyPath = inMemoryStubProjectScope.OutputAssemblyPath;
         Setup(p => p.GetProjectSettings())
-            .Returns(()=>new ProjectSettings(Kind, OutputAssemblyPath, TargetFrameworkMoniker, TargetFrameworkMonikers,
+            .Returns(() => new ProjectSettings(Kind, OutputAssemblyPath, TargetFrameworkMoniker,
+                TargetFrameworkMonikers,
                 PlatformTarget, DefaultNamespace, SpecFlowVersion, SpecFlowGeneratorFolder, SpecFlowConfigFilePath,
                 SpecFlowProjectTraits, ProjectFullName));
     }

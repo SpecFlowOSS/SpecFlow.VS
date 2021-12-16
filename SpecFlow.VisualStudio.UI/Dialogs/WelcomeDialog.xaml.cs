@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Linq;
-using SpecFlow.VisualStudio.UI.ViewModels;
-using SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs;
 using Microsoft.VisualStudio.Shell.Interop;
+using SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs;
 
-namespace SpecFlow.VisualStudio.UI.Dialogs
+namespace SpecFlow.VisualStudio.UI.Dialogs;
+
+public partial class WelcomeDialog
 {
-    public partial class WelcomeDialog
+    public WelcomeDialog()
     {
-        public WizardViewModel ViewModel { get; }
-
-        public WelcomeDialog()
-        {
-            InitializeComponent();
-        }
-
-        public WelcomeDialog(WizardViewModel viewModel, IVsUIShell vsUiShell = null) : base(vsUiShell)
-        {
-            ViewModel = viewModel;
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
+
+    public WelcomeDialog(WizardViewModel viewModel, IVsUIShell vsUiShell = null) : base(vsUiShell)
+    {
+        ViewModel = viewModel;
+        InitializeComponent();
+    }
+
+    public WizardViewModel ViewModel { get; }
 }

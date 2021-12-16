@@ -1,36 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector
+namespace SpecFlow.VisualStudio.SpecFlowConnector;
+
+public class ConnectorOptions
 {
-    public class ConnectorOptions
+    public string Command { get; set; }
+    public bool DebugMode { get; set; }
+
+    public static ConnectorOptions Parse(string[] args, out string[] commandArgs)
     {
-        public string Command { get; set; }
-        public bool DebugMode { get; set; }
+        if (args == null || args.Length == 0)
+            throw new ArgumentException("Command is missing!");
 
-        public static ConnectorOptions Parse(string[] args, out string[] commandArgs)
+        var options = new ConnectorOptions
         {
-            if (args == null || args.Length == 0)
-                throw new ArgumentException("Command is missing!");
+            Command = args[0]
+        };
 
-            var options = new ConnectorOptions
-            {
-                Command = args[0]
-            };
-
-            var commandArgsList = args.Skip(1).ToList();
-            int debugArgIndex = commandArgsList.IndexOf("--debug");
-            if (debugArgIndex >= 0)
-            {
-                options.DebugMode = true;
-                commandArgsList.RemoveAt(debugArgIndex);
-            }
-
-            commandArgs = commandArgsList.ToArray();
-            return options;
+        var commandArgsList = args.Skip(1).ToList();
+        int debugArgIndex = commandArgsList.IndexOf("--debug");
+        if (debugArgIndex >= 0)
+        {
+            options.DebugMode = true;
+            commandArgsList.RemoveAt(debugArgIndex);
         }
+
+        commandArgs = commandArgsList.ToArray();
+        return options;
     }
 }

@@ -3,27 +3,21 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace SpecFlow.VisualStudio.UI
+namespace SpecFlow.VisualStudio.UI;
+
+public class UiResourceProvider : IUiResourceProvider
 {
-    public class UiResourceProvider : IUiResourceProvider
+    public static UiResourceProvider Instance = new();
+
+    private readonly Lazy<ResourceDictionary> _iconResources = new(() =>
     {
-        public static UiResourceProvider Instance = new UiResourceProvider();
+        var dictionary = new ResourceDictionary();
+        dictionary.Source = new Uri("pack://application:,,,/SpecFlow.VisualStudio.UI;Component/Icons.xaml",
+            UriKind.Absolute);
+        return dictionary;
+    });
 
-        private readonly Lazy<ResourceDictionary> _iconResources = new Lazy<ResourceDictionary>(() =>
-        {
-            var dictionary = new ResourceDictionary();
-            dictionary.Source = new Uri("pack://application:,,,/SpecFlow.VisualStudio.UI;Component/Icons.xaml", UriKind.Absolute);
-            return dictionary;
-        });
+    public Image GetIcon(string iconName) => new() {Source = new DrawingImage(GetIconDrawing(iconName))};
 
-        public Drawing GetIconDrawing(string key)
-        {
-            return (Drawing)_iconResources.Value[key];
-        }
-
-        public Image GetIcon(string iconName)
-        {
-            return new Image { Source = new DrawingImage(GetIconDrawing(iconName)) };
-        }
-    }
+    public Drawing GetIconDrawing(string key) => (Drawing) _iconResources.Value[key];
 }

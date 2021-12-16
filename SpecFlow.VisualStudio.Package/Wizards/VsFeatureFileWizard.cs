@@ -1,13 +1,9 @@
-﻿using SpecFlow.VisualStudio.Wizards.Infrastructure;
-using EnvDTE;
+﻿using EnvDTE;
+using SpecFlow.VisualStudio.Wizards.Infrastructure;
 
-namespace SpecFlow.VisualStudio.Wizards
+namespace SpecFlow.VisualStudio.Wizards;
+
+public class VsFeatureFileWizard : VsSimulatedItemAddProjectScopeWizard<FeatureFileWizard>
 {
-    public class VsFeatureFileWizard : VsSimulatedItemAddProjectScopeWizard<FeatureFileWizard>
-    {
-        protected override FeatureFileWizard ResolveWizard(DTE dte)
-        {
-            return new FeatureFileWizard();
-        }
-    }
+    protected override FeatureFileWizard ResolveWizard(DTE dte) => new();
 }

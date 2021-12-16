@@ -1,18 +1,17 @@
-﻿namespace SpecFlow.VisualStudio.Analytics
+﻿namespace SpecFlow.VisualStudio.Analytics;
+
+public class GuidanceStep
 {
-    public class GuidanceStep
+    public GuidanceStep(GuidanceNotification userLevel, int? usageDays, string url)
     {
-        public GuidanceNotification UserLevel { get; }
-
-        public int? UsageDays { get; }
-
-        public string Url { get; }
-
-        public GuidanceStep(GuidanceNotification userLevel, int? usageDays, string url)
-        {
-            UserLevel = userLevel;
-            UsageDays = usageDays;
-            Url = url;
-        }
+        UserLevel = userLevel;
+        UsageDays = usageDays;
+        Url = url;
     }
+
+    public GuidanceNotification UserLevel { get; }
+
+    public int? UsageDays { get; }
+
+    public string Url { get; }
 }

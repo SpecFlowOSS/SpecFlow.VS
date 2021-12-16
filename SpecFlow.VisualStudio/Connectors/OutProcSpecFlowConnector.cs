@@ -157,10 +157,7 @@ public class OutProcSpecFlowConnector
         return GetDotNetCommand();
     }
 
-    private string GetDotNetCommand()
-    {
-        return Path.Combine(GetDotNetInstallLocation(), "dotnet.exe");
-    }
+    private string GetDotNetCommand() => Path.Combine(GetDotNetInstallLocation(), "dotnet.exe");
 
     private string GetConnectorsFolder()
     {

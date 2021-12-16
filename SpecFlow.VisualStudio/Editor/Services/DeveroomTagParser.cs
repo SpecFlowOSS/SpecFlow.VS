@@ -247,16 +247,11 @@ public class DeveroomTagParser : IDeveroomTagParser
         return blockTag;
     }
 
-    private int CountLines(string text)
-    {
-        return NewLineRe.Matches(text).Count + 1;
-    }
+    private int CountLines(string text) => NewLineRe.Matches(text).Count + 1;
 
-    private DeveroomTag CreateDefinitionLineKeyword(ITextSnapshot fileSnapshot, IHasDescription hasDescription)
-    {
-        return new(DeveroomTagTypes.DefinitionLineKeyword,
+    private DeveroomTag CreateDefinitionLineKeyword(ITextSnapshot fileSnapshot, IHasDescription hasDescription) =>
+        new(DeveroomTagTypes.DefinitionLineKeyword,
             GetTextSpan(fileSnapshot, ((IHasLocation) hasDescription).Location, hasDescription.Keyword, 1));
-    }
 
     private IEnumerable<DeveroomTag> GetAllTags(DeveroomTag tag)
     {
@@ -317,10 +312,8 @@ public class DeveroomTagParser : IDeveroomTagParser
     }
 
     private SnapshotSpan GetTextSpan(ITextSnapshot snapshot, Location location, string text, int extraLength = 0,
-        int offset = 0)
-    {
-        return GetSpan(snapshot, location, text.Length + extraLength, offset);
-    }
+        int offset = 0) =>
+        GetSpan(snapshot, location, text.Length + extraLength, offset);
 
     private SnapshotSpan GetSpan(ITextSnapshot snapshot, Location location, int length, int offset = 0)
     {
@@ -331,34 +324,24 @@ public class DeveroomTagParser : IDeveroomTagParser
         return new SnapshotSpan(startPoint, length);
     }
 
-    private int GetSnapshotLineNumber(Location location, ITextSnapshot snapshot)
-    {
-        return GetSnapshotLineNumber(location.Line, snapshot);
-    }
+    private int GetSnapshotLineNumber(Location location, ITextSnapshot snapshot) =>
+        GetSnapshotLineNumber(location.Line, snapshot);
 
-    private int GetSnapshotLineNumber(int locationLine, ITextSnapshot snapshot)
-    {
-        return locationLine == 0
+    private int GetSnapshotLineNumber(int locationLine, ITextSnapshot snapshot) =>
+        locationLine == 0
             ? 0 // global error
             : locationLine - 1 >= snapshot.LineCount
                 ? snapshot.LineCount - 1 // unexpected end of file
                 : locationLine - 1;
-    }
 
-    private int GetSnapshotColumn(Location location)
-    {
-        return location.Column == 0
+    private int GetSnapshotColumn(Location location) =>
+        location.Column == 0
             ? 0 // whole line error
             : location.Column - 1;
-    }
 
-    private SnapshotPoint GetColumnPoint(ITextSnapshotLine line, Location location)
-    {
-        return line.Start.Add(GetSnapshotColumn(location));
-    }
+    private SnapshotPoint GetColumnPoint(ITextSnapshotLine line, Location location) =>
+        line.Start.Add(GetSnapshotColumn(location));
 
-    private ITextSnapshotLine GetSnapshotLine(Location location, ITextSnapshot snapshot)
-    {
-        return snapshot.GetLineFromLineNumber(GetSnapshotLineNumber(location, snapshot));
-    }
+    private ITextSnapshotLine GetSnapshotLine(Location location, ITextSnapshot snapshot) =>
+        snapshot.GetLineFromLineNumber(GetSnapshotLineNumber(location, snapshot));
 }

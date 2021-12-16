@@ -1,51 +1,39 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Linq;
 using System.Reflection;
+using System.Linq;
 using Microsoft.VisualStudio.Shell;
 
-namespace SpecFlow.VisualStudio
+namespace SpecFlow.VisualStudio;
+
+[Export(typeof(IVersionProvider))]
+public class VersionProvider : IVersionProvider
 {
-    [Export(typeof(IVersionProvider))]
-    public class VersionProvider : IVersionProvider
+    private readonly Lazy<string> _lazyExtensionVersion;
+
+    private readonly Lazy<string> _lazyVsVersion;
+    private readonly IServiceProvider _serviceProvider;
+
+    [ImportingConstructor]
+    public VersionProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
     {
-        private readonly IServiceProvider _serviceProvider;
+        _serviceProvider = serviceProvider;
+        _lazyVsVersion = new Lazy<string>(GetVsProductDisplayVersion);
+        _lazyExtensionVersion = new Lazy<string>(ReadExtensionVersion);
+    }
 
-        private readonly Lazy<string> _lazyVsVersion;
-        private readonly Lazy<string> _lazyExtensionVersion;
+    public string GetVsVersion() => _lazyVsVersion.Value;
 
-        [ImportingConstructor]
-        public VersionProvider([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-            _lazyVsVersion = new Lazy<string>(GetVsProductDisplayVersion);
-            _lazyExtensionVersion = new Lazy<string>(ReadExtensionVersion);
-        }
+    public string GetExtensionVersion() => _lazyExtensionVersion.Value;
 
-        public string GetVsVersion()
-        {
-            return _lazyVsVersion.Value;
-        }
+    private string GetVsProductDisplayVersion() => VsUtils.GetVsProductDisplayVersionSafe(_serviceProvider);
 
-        private string GetVsProductDisplayVersion()
-        {
-            return VsUtils.GetVsProductDisplayVersionSafe(_serviceProvider);
-        }
-
-        public string GetExtensionVersion()
-        {
-            return _lazyExtensionVersion.Value;
-        }
-
-        private string ReadExtensionVersion()
-        {
-            var assembly = Assembly.GetAssembly(typeof(VersionProvider));
-            var versionAttr = assembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute)).OfType<AssemblyInformationalVersionAttribute>().FirstOrDefault();
-            if (versionAttr != null)
-            {
-                return versionAttr.InformationalVersion.Split('+', '-')[0];
-            }
-            return assembly.GetName().Version.ToString(3);
-        }
+    private string ReadExtensionVersion()
+    {
+        var assembly = Assembly.GetAssembly(typeof(VersionProvider));
+        var versionAttr = assembly.GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute))
+            .OfType<AssemblyInformationalVersionAttribute>().FirstOrDefault();
+        if (versionAttr != null) return versionAttr.InformationalVersion.Split('+', '-')[0];
+        return assembly.GetName().Version.ToString(3);
     }
 }

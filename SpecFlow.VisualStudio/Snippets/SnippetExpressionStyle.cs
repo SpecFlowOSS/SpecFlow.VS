@@ -1,8 +1,7 @@
-﻿namespace SpecFlow.VisualStudio.Snippets
+﻿namespace SpecFlow.VisualStudio.Snippets;
+
+public enum SnippetExpressionStyle
 {
-    public enum SnippetExpressionStyle
-    {
-        RegularExpression,
-        CucumberExpression
-    }
+    RegularExpression,
+    CucumberExpression
 }

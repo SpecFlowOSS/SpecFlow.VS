@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Configuration;
-using System.IO;
 using System.Xml;
-using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Configuration.AppConfig;
 using TechTalk.SpecFlow.Configuration.JsonConfig;
-using TechTalk.SpecFlow.Tracing;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
@@ -47,14 +43,8 @@ public class SpecFlowConfigurationLoader : IConfigurationLoader
                 return loader.LoadJson(specFlowConfiguration, configFileContent);
             }
         }
+
         throw new ConfigurationErrorsException($"Invalid config type: {_configFilePath}");
-    }
-
-    protected virtual string ConvertToJsonSpecFlow3Style(string configFileContent) => configFileContent;
-
-    private static SpecFlowConfiguration LoadDefaultConfiguration(SpecFlowConfiguration specFlowConfiguration)
-    {
-        return specFlowConfiguration ?? ConfigurationLoader.GetDefault();
     }
 
     public void TraceConfigSource(ITraceListener traceListener, SpecFlowConfiguration specFlowConfiguration)
@@ -62,14 +52,14 @@ public class SpecFlowConfigurationLoader : IConfigurationLoader
         traceListener.WriteToolOutput($"Using config from: {_configFilePath ?? "<default>"}");
     }
 
-    public SpecFlowConfiguration Load(SpecFlowConfiguration specFlowConfiguration, ISpecFlowConfigurationHolder specFlowConfigurationHolder)
-    {
-        throw new NotSupportedException();
-    }
+    public SpecFlowConfiguration Load(SpecFlowConfiguration specFlowConfiguration,
+        ISpecFlowConfigurationHolder specFlowConfigurationHolder) => throw new NotSupportedException();
 
-    public SpecFlowConfiguration Update(SpecFlowConfiguration specFlowConfiguration, ConfigurationSectionHandler specFlowConfigSection)
-    {
-        throw new NotSupportedException();
-    }
+    public SpecFlowConfiguration Update(SpecFlowConfiguration specFlowConfiguration,
+        ConfigurationSectionHandler specFlowConfigSection) => throw new NotSupportedException();
 
+    protected virtual string ConvertToJsonSpecFlow3Style(string configFileContent) => configFileContent;
+
+    private static SpecFlowConfiguration LoadDefaultConfiguration(SpecFlowConfiguration specFlowConfiguration) =>
+        specFlowConfiguration ?? ConfigurationLoader.GetDefault();
 }

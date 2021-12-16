@@ -2,31 +2,30 @@
 using System.Windows.Threading;
 using Microsoft.VisualStudio.Shell;
 
-namespace SpecFlow.VisualStudio.ProjectSystem
+namespace SpecFlow.VisualStudio.ProjectSystem;
+
+public abstract class VsServiceBase
 {
-    public abstract class VsServiceBase
+    private readonly Dispatcher _dispatcher;
+    protected readonly IVsIdeScope _vsIdeScope;
+
+    protected VsServiceBase(IVsIdeScope vsIdeScope)
     {
-        protected readonly IVsIdeScope _vsIdeScope;
-        private readonly Dispatcher _dispatcher;
+        _vsIdeScope = vsIdeScope;
+        _dispatcher = Dispatcher.CurrentDispatcher;
+    }
 
-        protected VsServiceBase(IVsIdeScope vsIdeScope)
+    protected void RunOnUiThread(Action action)
+    {
+        if (ThreadHelper.CheckAccess())
         {
-            _vsIdeScope = vsIdeScope;
-            _dispatcher = Dispatcher.CurrentDispatcher;
+            action();
         }
-
-        protected void RunOnUiThread(Action action)
+        else
         {
-            if (ThreadHelper.CheckAccess())
-            {
-                action();
-            }
-            else
-            {
 #pragma warning disable VSTHRD001 // Avoid legacy thread switching APIs
-                _dispatcher.BeginInvoke(action, DispatcherPriority.ContextIdle);
+            _dispatcher.BeginInvoke(action, DispatcherPriority.ContextIdle);
 #pragma warning restore VSTHRD001 // Avoid legacy thread switching APIs
-            }
         }
     }
 }

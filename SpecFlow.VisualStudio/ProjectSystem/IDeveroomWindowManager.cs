@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
 
-namespace SpecFlow.VisualStudio.ProjectSystem
+namespace SpecFlow.VisualStudio.ProjectSystem;
+
+public interface IDeveroomWindowManager
 {
-    public interface IDeveroomWindowManager
-    {
-        bool? ShowDialog<TViewModel>(TViewModel viewModel);
-    }
+    bool? ShowDialog<TViewModel>(TViewModel viewModel);
 }

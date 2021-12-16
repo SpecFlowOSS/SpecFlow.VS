@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Linq;
 
-namespace SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs
-{
-    public class MarkDownWizardPageViewModel : WizardPageViewModel
-    {
-        public string Text { get; set; }
+namespace SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs;
 
-        public MarkDownWizardPageViewModel(string name) : base(name)
-        {
-        }
+public class MarkDownWizardPageViewModel : WizardPageViewModel
+{
+    public MarkDownWizardPageViewModel(string name) : base(name)
+    {
     }
+
+    public string Text { get; set; }
 }

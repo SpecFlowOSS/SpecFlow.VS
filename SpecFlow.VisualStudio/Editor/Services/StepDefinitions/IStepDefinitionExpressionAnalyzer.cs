@@ -1,9 +1,6 @@
-﻿using SpecFlow.VisualStudio.Discovery;
+﻿namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
 
-namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
+public interface IStepDefinitionExpressionAnalyzer
 {
-    public interface IStepDefinitionExpressionAnalyzer
-    {
-        AnalyzedStepDefinitionExpression Parse(string expression);
-    }
+    AnalyzedStepDefinitionExpression Parse(string expression);
 }

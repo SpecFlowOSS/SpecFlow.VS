@@ -1,10 +1,9 @@
-﻿namespace SpecFlow.VisualStudio.Discovery
+﻿namespace SpecFlow.VisualStudio.Discovery;
+
+public enum MatchResultType
 {
-    public enum MatchResultType
-    {
-        Unknown,
-        Undefined,
-        Defined,
-        Ambiguous
-    }
+    Unknown,
+    Undefined,
+    Defined,
+    Ambiguous
 }

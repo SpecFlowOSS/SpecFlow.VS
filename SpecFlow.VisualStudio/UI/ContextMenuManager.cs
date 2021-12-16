@@ -1,91 +1,86 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
+﻿using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
 using Microsoft.VisualStudio.PlatformUI;
 
-namespace SpecFlow.VisualStudio.UI
+namespace SpecFlow.VisualStudio.UI;
+
+public class ContextMenuManager
 {
-    public class ContextMenuManager
+    private readonly IUiResourceProvider _uiResourceProvider;
+
+    public ContextMenuManager(IUiResourceProvider uiResourceProvider)
     {
-        private readonly IUiResourceProvider _uiResourceProvider;
+        _uiResourceProvider = uiResourceProvider;
+    }
 
-        public ContextMenuManager(IUiResourceProvider uiResourceProvider)
+    public ContextMenu CreateContextMenu(string header, params ContextMenuItem[] contextMenuItems)
+    {
+        var contextMenu = new ContextMenu();
+        var headerMenuItem = new MenuItem
         {
-            _uiResourceProvider = uiResourceProvider;
-        }
+            Header = header,
+            FontWeight = FontWeights.Bold,
+            IsEnabled = false
+        };
+        SetMenuItemIcon(headerMenuItem, "SpecFlow");
+        contextMenu.Items.Add(headerMenuItem);
+        AddSeparator(contextMenu);
 
-        public ContextMenu CreateContextMenu(string header, params ContextMenuItem[] contextMenuItems)
+        foreach (var contextMenuItem in contextMenuItems) AddMenuItem(contextMenu, contextMenuItem);
+        return contextMenu;
+    }
+
+    public void SetMenuItemIcon(MenuItem menuItem, string iconName)
+    {
+        menuItem.Icon = iconName == null
+            ? null
+            : _uiResourceProvider.GetIcon(iconName);
+    }
+
+    public void AddSeparator(ContextMenu contextMenu, int? position = null)
+    {
+        var separator = new Separator();
+        if (position == null)
+            contextMenu.Items.Add(separator);
+        else
+            contextMenu.Items.Insert(position.Value + 2, separator);
+    }
+
+    public void AddMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem, int? position = null)
+    {
+        var menuItem = new MenuItem
         {
-            var contextMenu = new ContextMenu();
-            var headerMenuItem = new MenuItem()
-            {
-                Header = header,
-                FontWeight = FontWeights.Bold,
-                IsEnabled = false
-            };
-            SetMenuItemIcon(headerMenuItem, "SpecFlow");
-            contextMenu.Items.Add(headerMenuItem);
-            AddSeparator(contextMenu);
-
-            foreach (var contextMenuItem in contextMenuItems)
-            {
-                AddMenuItem(contextMenu, contextMenuItem);
-            }
-            return contextMenu;
-        }
-
-        public void SetMenuItemIcon(MenuItem menuItem, string iconName)
-        {
-            menuItem.Icon = iconName == null
+            Header = contextMenuItem.Label,
+            Command = contextMenuItem.Command == null
                 ? null
-                : _uiResourceProvider.GetIcon(iconName);
-        }
+                : new DelegateCommand(_ => contextMenuItem.Command(contextMenuItem)),
+            IsEnabled = contextMenuItem.Command != null,
+            FontStyle = contextMenuItem.Command != null ? FontStyles.Normal : FontStyles.Italic,
+            Tag = contextMenuItem
+        };
+        SetMenuItemIcon(menuItem, contextMenuItem.Icon);
+        if (position == null)
+            contextMenu.Items.Add(menuItem);
+        else
+            contextMenu.Items.Insert(position.Value + 2, menuItem);
+    }
 
-        public void AddSeparator(ContextMenu contextMenu, int? position = null)
-        {
-            var separator = new Separator();
-            if (position == null)
-                contextMenu.Items.Add(separator);
-            else
-                contextMenu.Items.Insert(position.Value + 2, separator);
-        }
+    public IEnumerable<ContextMenuItem> GetContextMenuItems(ContextMenu contextMenu)
+    {
+        return contextMenu.Items.OfType<MenuItem>().Select(mi => mi.Tag).OfType<ContextMenuItem>();
+    }
 
-        public void AddMenuItem(ContextMenu contextMenu, ContextMenuItem contextMenuItem, int? position = null)
-        {
-            var menuItem = new MenuItem
-            {
-                Header = contextMenuItem.Label,
-                Command = contextMenuItem.Command == null ? null : new DelegateCommand(_ => contextMenuItem.Command(contextMenuItem)),
-                IsEnabled = contextMenuItem.Command != null,
-                FontStyle = contextMenuItem.Command != null ? FontStyles.Normal : FontStyles.Italic,
-                Tag = contextMenuItem
-            };
-            SetMenuItemIcon(menuItem, contextMenuItem.Icon);
-            if (position == null)
-                contextMenu.Items.Add(menuItem);
-            else
-                contextMenu.Items.Insert(position.Value + 2, menuItem);
-        }
+    public void ShowContextMenu(ContextMenu contextMenu)
+    {
+        contextMenu.IsOpen = true;
+    }
 
-        public IEnumerable<ContextMenuItem> GetContextMenuItems(ContextMenu contextMenu)
-        {
-            return contextMenu.Items.OfType<MenuItem>().Select(mi => mi.Tag).OfType<ContextMenuItem>();
-        }
-
-        public void ShowContextMenu(ContextMenu contextMenu)
-        {
-            contextMenu.IsOpen = true;
-        }
-
-        public void ShowContextMenu(ContextMenu contextMenu, Point position)
-        {
-            contextMenu.Placement = PlacementMode.Absolute;
-            contextMenu.HorizontalOffset = position.X;
-            contextMenu.VerticalOffset = position.Y;
-            contextMenu.IsOpen = true;
-        }
+    public void ShowContextMenu(ContextMenu contextMenu, Point position)
+    {
+        contextMenu.Placement = PlacementMode.Absolute;
+        contextMenu.HorizontalOffset = position.X;
+        contextMenu.VerticalOffset = position.Y;
+        contextMenu.IsOpen = true;
     }
 }

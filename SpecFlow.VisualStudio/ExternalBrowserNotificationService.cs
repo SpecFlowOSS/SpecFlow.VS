@@ -1,38 +1,35 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.ProjectSystem;
+using System.Net.NetworkInformation;
 
-namespace SpecFlow.VisualStudio
+namespace SpecFlow.VisualStudio;
+
+public class ExternalBrowserNotificationService
 {
-    public class ExternalBrowserNotificationService
-    {
-        private readonly IIdeScope _ideScope;
+    private readonly IIdeScope _ideScope;
 
-        public ExternalBrowserNotificationService(IIdeScope ideScope)
+    public ExternalBrowserNotificationService(IIdeScope ideScope)
+    {
+        _ideScope = ideScope;
+    }
+
+    public bool ShowPage(string url)
+    {
+        if (!NetworkInterface.GetIsNetworkAvailable())
         {
-            _ideScope = ideScope;
+            _ideScope.Logger.LogWarning($"Showing page for '{url}' skipped, because the machine is offline");
+            return false;
         }
 
-        public bool ShowPage(string url)
+        try
         {
-            if (!System.Net.NetworkInformation.NetworkInterface.GetIsNetworkAvailable())
-            {
-                _ideScope.Logger.LogWarning($"Showing page for '{url}' skipped, because the machine is offline");
-                return false;
-            }
-
-            try
-            {
-                Process.Start(url);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _ideScope.Logger.LogException(_ideScope.MonitoringService, ex, $"Browser start error: {ex}");
-                return false;
-            }
+            Process.Start(url);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _ideScope.Logger.LogException(_ideScope.MonitoringService, ex, $"Browser start error: {ex}");
+            return false;
         }
     }
 }

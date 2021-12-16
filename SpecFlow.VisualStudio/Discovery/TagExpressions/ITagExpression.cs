@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace SpecFlow.VisualStudio.Discovery.TagExpressions;
 
-namespace SpecFlow.VisualStudio.Discovery.TagExpressions
+public interface ITagExpression
 {
-    public interface ITagExpression
-    {
-        bool Evaluate(IEnumerable<string> variables);
-    }
+    bool Evaluate(IEnumerable<string> variables);
 }

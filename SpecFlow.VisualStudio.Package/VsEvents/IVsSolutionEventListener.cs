@@ -1,24 +1,23 @@
 ﻿using System;
 using Microsoft.VisualStudio.Shell.Events;
 
-namespace SpecFlow.VisualStudio.VsEvents
+namespace SpecFlow.VisualStudio.VsEvents;
+
+public interface IVsSolutionEventListener
 {
-    public interface IVsSolutionEventListener
-    {
-        event EventHandler<HostOpenedEventArgs> Opened;
+    event EventHandler<HostOpenedEventArgs> Opened;
 
-        event EventHandler Closing;
+    event EventHandler Closing;
 
-        event EventHandler Closed;
+    event EventHandler Closed;
 
-        event EventHandler Loaded;
+    event EventHandler Loaded;
 
-        event EventHandler<OpenProjectEventArgs> AfterOpenProject;
+    event EventHandler<OpenProjectEventArgs> AfterOpenProject;
 
-        event EventHandler<LoadProjectEventArgs> AfterLoadProject;
+    event EventHandler<LoadProjectEventArgs> AfterLoadProject;
 
-        event EventHandler<HierarchyEventArgs> ProjectRenamed;
+    event EventHandler<HierarchyEventArgs> ProjectRenamed;
 
-        event EventHandler<CloseProjectEventArgs> BeforeCloseProject;
-    }
+    event EventHandler<CloseProjectEventArgs> BeforeCloseProject;
 }

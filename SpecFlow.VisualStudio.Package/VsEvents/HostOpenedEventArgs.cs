@@ -1,14 +1,13 @@
 ﻿using System;
 
-namespace SpecFlow.VisualStudio.VsEvents
-{
-    public class HostOpenedEventArgs : EventArgs
-    {
-        public string FileName { get; private set; }
+namespace SpecFlow.VisualStudio.VsEvents;
 
-        public HostOpenedEventArgs(string fileName)
-        {
-            this.FileName = fileName;
-        }
+public class HostOpenedEventArgs : EventArgs
+{
+    public HostOpenedEventArgs(string fileName)
+    {
+        FileName = fileName;
     }
+
+    public string FileName { get; }
 }

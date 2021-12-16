@@ -1,57 +1,53 @@
-﻿using BoDi;
-using System.Reflection;
-using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.Bindings;
-using TechTalk.SpecFlow.Configuration;
-using TechTalk.SpecFlow.Infrastructure;
+﻿using TechTalk.SpecFlow;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+
+public class SpecFlowVLatestDiscoverer : RemotingBaseDiscoverer
 {
-    public class SpecFlowVLatestDiscoverer : RemotingBaseDiscoverer
+    protected override object CreateGlobalContainer(Assembly testAssembly, string configFilePath)
     {
-        protected override object CreateGlobalContainer(Assembly testAssembly, string configFilePath)
-        {
-            IRuntimeConfigurationProvider configurationProvider = CreateConfigurationProvider(configFilePath);
-            return CreateGlobalContainer(testAssembly, configurationProvider);
-        }
+        IRuntimeConfigurationProvider configurationProvider = CreateConfigurationProvider(configFilePath);
+        return CreateGlobalContainer(testAssembly, configurationProvider);
+    }
 
-        private object CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider configurationProvider)
-        {
-            var containerBuilder = new ContainerBuilder(new NoInvokeDependencyProvider());
-            return CreateGlobalContainer(testAssembly, configurationProvider, containerBuilder);
-        }
-        protected virtual object CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider configurationProvider, IContainerBuilder containerBuilder)
-        {
-            var globalContainer = containerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
-            return globalContainer;
-        }
+    private object CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider configurationProvider)
+    {
+        var containerBuilder = new ContainerBuilder(new NoInvokeDependencyProvider());
+        return CreateGlobalContainer(testAssembly, configurationProvider, containerBuilder);
+    }
 
-        protected virtual IRuntimeConfigurationProvider CreateConfigurationProvider(string configFilePath)
-        {
-            IConfigurationLoader configurationLoader = new SpecFlow21ConfigurationLoader(configFilePath);
-            return new DefaultRuntimeConfigurationProvider(configurationLoader);
-        }
+    protected virtual object CreateGlobalContainer(Assembly testAssembly,
+        IRuntimeConfigurationProvider configurationProvider, IContainerBuilder containerBuilder)
+    {
+        var globalContainer = containerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
+        return globalContainer;
+    }
 
-        protected override void RegisterTypeAs<TType, TInterface>(object globalContainer)
-        {
-            var objectContainer = (IObjectContainer)globalContainer;
-            objectContainer.RegisterTypeAs<TType, TInterface>();
-        }
+    protected virtual IRuntimeConfigurationProvider CreateConfigurationProvider(string configFilePath)
+    {
+        IConfigurationLoader configurationLoader = new SpecFlow21ConfigurationLoader(configFilePath);
+        return new DefaultRuntimeConfigurationProvider(configurationLoader);
+    }
 
-        protected override T Resolve<T>(object globalContainer)
-        {
-            var objectContainer = (IObjectContainer)globalContainer;
-            return objectContainer.Resolve<T>();
-        }
+    protected override void RegisterTypeAs<TType, TInterface>(object globalContainer)
+    {
+        var objectContainer = (IObjectContainer) globalContainer;
+        objectContainer.RegisterTypeAs<TType, TInterface>();
+    }
 
-        protected override IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, object globalContainer)
-        {
-            var testRunnerManager = (TestRunnerManager)Resolve<ITestRunnerManager>(globalContainer);
+    protected override T Resolve<T>(object globalContainer)
+    {
+        var objectContainer = (IObjectContainer) globalContainer;
+        return objectContainer.Resolve<T>();
+    }
 
-            testRunnerManager.Initialize(testAssembly);
-            testRunnerManager.CreateTestRunner(0);
+    protected override IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, object globalContainer)
+    {
+        var testRunnerManager = (TestRunnerManager) Resolve<ITestRunnerManager>(globalContainer);
 
-            return Resolve<IBindingRegistry>(globalContainer);
-        }
+        testRunnerManager.Initialize(testAssembly);
+        testRunnerManager.CreateTestRunner(0);
+
+        return Resolve<IBindingRegistry>(globalContainer);
     }
 }

@@ -1,9 +1,8 @@
-﻿namespace SpecFlow.VisualStudio.ProjectSystem
+﻿namespace SpecFlow.VisualStudio.ProjectSystem;
+
+public interface IDeveroomOutputPaneServices
 {
-    public interface IDeveroomOutputPaneServices
-    {
-        void WriteLine(string text);
-        void SendWriteLine(string text);
-        void Activate();
-    }
+    void WriteLine(string text);
+    void SendWriteLine(string text);
+    void Activate();
 }

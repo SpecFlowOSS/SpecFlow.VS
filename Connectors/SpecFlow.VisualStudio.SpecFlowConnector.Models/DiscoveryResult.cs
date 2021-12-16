@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Models
+public class DiscoveryResult : ConnectorResult
 {
-    public class DiscoveryResult : ConnectorResult
-    {
-        public StepDefinition[] StepDefinitions { get; set; }
-        public Dictionary<string, string> SourceFiles { get; set; }
-        public Dictionary<string, string> TypeNames { get; set; }
-    }
+    public StepDefinition[] StepDefinitions { get; set; }
+    public Dictionary<string, string> SourceFiles { get; set; }
+    public Dictionary<string, string> TypeNames { get; set; }
 }

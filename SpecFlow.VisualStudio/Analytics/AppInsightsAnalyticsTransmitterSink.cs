@@ -65,9 +65,8 @@ public class AppInsightsAnalyticsTransmitterSink : IAnalyticsTransmitterSink
         _telemetryClient.Value.Flush();
     }
 
-    private TelemetryClient GetTelemetryClient(string userUniqueId)
-    {
-        return new TelemetryClient
+    private TelemetryClient GetTelemetryClient(string userUniqueId) =>
+        new()
         {
             Context =
             {
@@ -78,5 +77,4 @@ public class AppInsightsAnalyticsTransmitterSink : IAnalyticsTransmitterSink
                 }
             }
         };
-    }
 }

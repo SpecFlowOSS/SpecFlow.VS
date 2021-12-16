@@ -1,10 +1,9 @@
-﻿namespace SpecFlow.VisualStudio.ProjectSystem.Settings
+﻿namespace SpecFlow.VisualStudio.ProjectSystem.Settings;
+
+public enum ProjectPlatformTarget
 {
-    public enum ProjectPlatformTarget
-    {
-        Unknown,
-        AnyCpu,
-        x86,
-        x64
-    }
+    Unknown,
+    AnyCpu,
+    x86,
+    x64
 }

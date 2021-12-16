@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Text;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector
+namespace SpecFlow.VisualStudio.SpecFlowConnector;
+
+internal class Program
 {
-    class Program
+    private static int Main(string[] args)
     {
-        static int Main(string[] args)
-        {
-            Console.OutputEncoding = Encoding.UTF8;
-            return new ConsoleRunner().EntryPoint(args);
-        }
+        Console.OutputEncoding = Encoding.UTF8;
+        return new ConsoleRunner().EntryPoint(args);
     }
 }

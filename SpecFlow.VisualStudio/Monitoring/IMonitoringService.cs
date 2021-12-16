@@ -1,47 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using SpecFlow.VisualStudio.Editor.Commands;
 using SpecFlow.VisualStudio.Notifications;
-using SpecFlow.VisualStudio.ProjectSystem;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
-using SpecFlow.VisualStudio.UI.ViewModels;
 
-namespace SpecFlow.VisualStudio.Monitoring
+namespace SpecFlow.VisualStudio.Monitoring;
+
+public interface IMonitoringService
 {
-    public interface IMonitoringService
-    {
-        void MonitorLoadProjectSystem();
-        void MonitorOpenProjectSystem(IIdeScope ideScope);
-        void MonitorOpenProject(ProjectSettings settings, int? featureFileCount);
-        void MonitorOpenFeatureFile(ProjectSettings projectSettings);
-        void MonitorParserParse(ProjectSettings settings, Dictionary<string, object> additionalProps);
-        
-        void MonitorExtensionInstalled();
-        void MonitorExtensionUpgraded(string oldExtensionVersion);
-        void MonitorExtensionDaysOfUsage(int usageDays);
+    void MonitorLoadProjectSystem();
+    void MonitorOpenProjectSystem(IIdeScope ideScope);
+    void MonitorOpenProject(ProjectSettings settings, int? featureFileCount);
+    void MonitorOpenFeatureFile(ProjectSettings projectSettings);
+    void MonitorParserParse(ProjectSettings settings, Dictionary<string, object> additionalProps);
 
-        void MonitorCommandCommentUncomment();
-        void MonitorCommandDefineSteps(CreateStepDefinitionsDialogResult action, int snippetCount);
-        void MonitorCommandFindStepDefinitionUsages(int usagesCount, bool isCancelled);
-        void MonitorCommandGoToStepDefinition(bool generateSnippet);
-        void MonitorCommandAutoFormatTable();
-        void MonitorCommandAutoFormatDocument(bool isSelectionFormatting);
-        void MonitorCommandAddFeatureFile(ProjectSettings projectSettings);
-        void MonitorCommandAddSpecFlowConfigFile(ProjectSettings projectSettings);
-        void MonitorCommandRenameStepExecuted(RenameStepCommandContext ctx);
+    void MonitorExtensionInstalled();
+    void MonitorExtensionUpgraded(string oldExtensionVersion);
+    void MonitorExtensionDaysOfUsage(int usageDays);
 
-        void MonitorSpecFlowDiscovery(bool isFailed, string errorMessage, int stepDefinitionCount, ProjectSettings projectSettings);
-        void MonitorSpecFlowGeneration(bool isFailed, ProjectSettings projectSettings);
+    void MonitorCommandCommentUncomment();
+    void MonitorCommandDefineSteps(CreateStepDefinitionsDialogResult action, int snippetCount);
+    void MonitorCommandFindStepDefinitionUsages(int usagesCount, bool isCancelled);
+    void MonitorCommandGoToStepDefinition(bool generateSnippet);
+    void MonitorCommandAutoFormatTable();
+    void MonitorCommandAutoFormatDocument(bool isSelectionFormatting);
+    void MonitorCommandAddFeatureFile(ProjectSettings projectSettings);
+    void MonitorCommandAddSpecFlowConfigFile(ProjectSettings projectSettings);
+    void MonitorCommandRenameStepExecuted(RenameStepCommandContext ctx);
 
-        void MonitorError(Exception exception, bool? isFatal = null);
+    void MonitorSpecFlowDiscovery(bool isFailed, string errorMessage, int stepDefinitionCount,
+        ProjectSettings projectSettings);
 
-        void MonitorProjectTemplateWizardStarted();
-        void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework, bool addFluentAssertions);
+    void MonitorSpecFlowGeneration(bool isFailed, ProjectSettings projectSettings);
 
-        void MonitorNotificationShown(NotificationData notification);
-        void MonitorNotificationDismissed(NotificationData notification);
-        void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null);
+    void MonitorError(Exception exception, bool? isFatal = null);
 
-        void MonitorUpgradeDialogDismissed(Dictionary<string, object> additionalProps);
-    }
+    void MonitorProjectTemplateWizardStarted();
+
+    void MonitorProjectTemplateWizardCompleted(string dotNetFramework, string unitTestFramework,
+        bool addFluentAssertions);
+
+    void MonitorNotificationShown(NotificationData notification);
+    void MonitorNotificationDismissed(NotificationData notification);
+    void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null);
+
+    void MonitorUpgradeDialogDismissed(Dictionary<string, object> additionalProps);
 }

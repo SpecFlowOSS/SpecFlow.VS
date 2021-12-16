@@ -1,7 +1,7 @@
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation;
+
+public interface ISpecFlowGenerator
 {
-    public interface ISpecFlowGenerator
-    {
-        string Generate(string projectFolder, string configFilePath, string targetExtension, string featureFilePath, string targetNamespace, string projectDefaultNamespace, bool saveResultToFile);
-    }
+    string Generate(string projectFolder, string configFilePath, string targetExtension, string featureFilePath,
+        string targetNamespace, string projectDefaultNamespace, bool saveResultToFile);
 }

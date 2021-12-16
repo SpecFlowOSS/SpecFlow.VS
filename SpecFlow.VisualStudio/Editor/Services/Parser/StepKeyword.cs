@@ -1,11 +1,10 @@
-﻿namespace SpecFlow.VisualStudio.Editor.Services.Parser
+﻿namespace SpecFlow.VisualStudio.Editor.Services.Parser;
+
+public enum StepKeyword
 {
-    public enum StepKeyword
-    {
-        Given = 1,
-        When = 2,
-        Then = 3,
-        And = 4,
-        But = 5
-    }
+    Given = 1,
+    When = 2,
+    Then = 3,
+    And = 4,
+    But = 5
 }

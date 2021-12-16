@@ -1,11 +1,9 @@
 ﻿using System;
-using SpecFlow.VisualStudio.Configuration;
 
-namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
+namespace SpecFlow.VisualStudio.ProjectSystem.Configuration;
+
+public interface IDeveroomConfigurationProvider
 {
-    public interface IDeveroomConfigurationProvider
-    {
-        event EventHandler<EventArgs> WeakConfigurationChanged;
-        DeveroomConfiguration GetConfiguration();
-    }
+    event EventHandler<EventArgs> WeakConfigurationChanged;
+    DeveroomConfiguration GetConfiguration();
 }

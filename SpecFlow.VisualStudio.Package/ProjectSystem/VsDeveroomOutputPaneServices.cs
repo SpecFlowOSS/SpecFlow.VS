@@ -5,93 +5,88 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace SpecFlow.VisualStudio.ProjectSystem
+namespace SpecFlow.VisualStudio.ProjectSystem;
+
+public class VsDeveroomOutputPaneServices : VsServiceBase, IDeveroomOutputPaneServices
 {
-    public class VsDeveroomOutputPaneServices : VsServiceBase, IDeveroomOutputPaneServices
+    private const string PaneName = "SpecFlow";
+    private static Guid _outputPaneGuid = Guid.NewGuid();
+
+    private readonly Lazy<IVsOutputWindowPane> _outputWindowPane;
+
+    public VsDeveroomOutputPaneServices(IVsIdeScope vsIdeScope) : base(vsIdeScope)
     {
-        private static Guid _outputPaneGuid = Guid.NewGuid();
-        private const string PaneName = "SpecFlow";
+        _outputWindowPane = new Lazy<IVsOutputWindowPane>(CreateOutputWindowPane);
+    }
 
-        private readonly Lazy<IVsOutputWindowPane> _outputWindowPane;
+    public void WriteLine(string text)
+    {
+        if (!text.EndsWith(Environment.NewLine))
+            text += Environment.NewLine;
 
-        public VsDeveroomOutputPaneServices(IVsIdeScope vsIdeScope) : base(vsIdeScope)
+        SafeWrite(text);
+    }
+
+    public void SendWriteLine(string text)
+    {
+        RunOnUiThread(() => WriteLine(text));
+    }
+
+    public void Activate()
+    {
+        RunOnUiThread(ActivateInternal);
+    }
+
+    private IVsOutputWindowPane CreateOutputWindowPane()
+    {
+        try
         {
-            _outputWindowPane = new Lazy<IVsOutputWindowPane>(CreateOutputWindowPane);
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var vsOutputWindow = _vsIdeScope.ServiceProvider.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+            if (vsOutputWindow == null)
+                return null;
+            if (ErrorHandler.Failed(vsOutputWindow.CreatePane(ref _outputPaneGuid, PaneName, 1, 1)))
+                return null;
+            if (ErrorHandler.Failed(vsOutputWindow.GetPane(ref _outputPaneGuid, out var pane)))
+                return null;
+            return pane;
         }
-
-        private IVsOutputWindowPane CreateOutputWindowPane()
+        catch (Exception ex)
         {
+            Debug.WriteLine(ex, "Create SpecFlow Pane Error");
+            return null;
+        }
+    }
+
+    private void ActivateInternal()
+    {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        var pane = _outputWindowPane.Value;
+        if (pane != null)
             try
             {
-                ThreadHelper.ThrowIfNotOnUIThread();
-
-                var vsOutputWindow = _vsIdeScope.ServiceProvider.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
-                if (vsOutputWindow == null)
-                    return null;
-                if (ErrorHandler.Failed(vsOutputWindow.CreatePane(ref _outputPaneGuid, PaneName, 1, 1)))
-                    return null;
-                if (ErrorHandler.Failed(vsOutputWindow.GetPane(ref _outputPaneGuid, out var pane)))
-                    return null;
-                return pane;
+                pane.Activate();
+                ((DTE2) _vsIdeScope.Dte).ToolWindows.OutputWindow.Parent.Activate();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex, "Create SpecFlow Pane Error");
-                return null;
+                Debug.WriteLine(ex);
             }
-        }
+    }
 
-        public void WriteLine(string text)
-        {
-            if (!text.EndsWith(Environment.NewLine))
-                text += Environment.NewLine;
-
-            SafeWrite(text);
-        }
-
-        public void SendWriteLine(string text)
-        {
-            RunOnUiThread(() => WriteLine(text));
-        }
-
-        public void Activate()
-        {
-            RunOnUiThread(ActivateInternal);
-        }
-
-        private void ActivateInternal()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            var pane = _outputWindowPane.Value;
-            if (pane != null)
+    private void SafeWrite(string text)
+    {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        var pane = _outputWindowPane.Value;
+        if (pane != null)
+            try
             {
-                try
-                {
-                    pane.Activate();
-                    ((DTE2) _vsIdeScope.Dte).ToolWindows.OutputWindow.Parent.Activate();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                }
+                pane.OutputStringThreadSafe(text);
             }
-        }
-
-        private void SafeWrite(string text)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            var pane = _outputWindowPane.Value;
-            if (pane != null)
+            catch (Exception ex)
             {
-                try
-                {
-                    pane.OutputStringThreadSafe(text);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                }
+                Debug.WriteLine(ex);
             }
-        }
     }
 }

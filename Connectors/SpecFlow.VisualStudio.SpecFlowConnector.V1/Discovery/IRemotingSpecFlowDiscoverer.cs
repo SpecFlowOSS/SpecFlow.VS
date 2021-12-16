@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+
+internal interface IRemotingSpecFlowDiscoverer : IDisposable
 {
-    interface IRemotingSpecFlowDiscoverer : IDisposable
-    {
-        string Discover(string testAssembly, string configFilePath);
-    }
+    string Discover(string testAssembly, string configFilePath);
 }

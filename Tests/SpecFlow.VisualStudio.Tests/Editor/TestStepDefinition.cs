@@ -2,11 +2,11 @@
 
 public class TestStepDefinition : StepDefinition
 {
-    public static TestStepDefinition Void = new TestStepDefinition{IsVoid = true};
-    private SourceLocation _testSourceLocation;
+    public static TestStepDefinition Void = new() {IsVoid = true};
     private SyntaxToken _testExpression;
+    private SourceLocation _testSourceLocation;
 
-    public bool IsVoid {  get; private set; }
+    public bool IsVoid { get; private set; }
 
     public string AttributeName { get; set; }
 
@@ -17,7 +17,7 @@ public class TestStepDefinition : StepDefinition
         {
             _testExpression = value;
             Regex = value.Text == string.Empty
-                ? "^(?i)I[^\\w\\p{Sc}]*(?!(?<=-)\\d)Press[^\\w\\p{Sc}]*(?!(?<=-)\\d)Add[^\\w\\p{Sc}]*(?!(?<=-)\\d)$" 
+                ? "^(?i)I[^\\w\\p{Sc}]*(?!(?<=-)\\d)Press[^\\w\\p{Sc}]*(?!(?<=-)\\d)Add[^\\w\\p{Sc}]*(?!(?<=-)\\d)$"
                 : $"^{_testExpression.ValueText}$";
         }
     }

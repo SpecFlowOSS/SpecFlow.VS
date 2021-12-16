@@ -1,13 +1,9 @@
-﻿using SpecFlow.VisualStudio.Wizards.Infrastructure;
-using EnvDTE;
+﻿using EnvDTE;
+using SpecFlow.VisualStudio.Wizards.Infrastructure;
 
-namespace SpecFlow.VisualStudio.Wizards
+namespace SpecFlow.VisualStudio.Wizards;
+
+public class VsSpecFlowConfigFileWizard : VsProjectScopeWizard<SpecFlowConfigFileWizard>
 {
-    public class VsSpecFlowConfigFileWizard : VsProjectScopeWizard<SpecFlowConfigFileWizard>
-    {
-        protected override SpecFlowConfigFileWizard ResolveWizard(DTE dte)
-        {
-            return new SpecFlowConfigFileWizard();
-        }
-    }
+    protected override SpecFlowConfigFileWizard ResolveWizard(DTE dte) => new();
 }

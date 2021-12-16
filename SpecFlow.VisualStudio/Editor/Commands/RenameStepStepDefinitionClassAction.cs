@@ -115,8 +115,5 @@ internal class RenameStepStepDefinitionClassAction : RenameStepAction
         return replaceSpan;
     }
 
-    private static bool IsVerbatim(SyntaxToken token)
-    {
-        return token.Text.StartsWith("@");
-    }
+    private static bool IsVerbatim(SyntaxToken token) => token.Text.StartsWith("@");
 }

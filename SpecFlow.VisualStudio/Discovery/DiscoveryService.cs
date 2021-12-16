@@ -39,6 +39,15 @@ public class DiscoveryService : IDiscoveryService
         _projectSettingsProvider.SettingsInitialized -= ProjectSystemOnProjectsBuilt;
     }
 
+    public void TriggerDiscovery([CallerMemberName] string callerMemberName = "?")
+    {
+        _logger.LogVerbose($"Discovery triggered from {callerMemberName}");
+
+        _projectScope.IdeScope.RunOnBackgroundThread(
+            () => BindingRegistryCache.Update(_ => DiscoveryInvoker.InvokeDiscoveryWithTimer()),
+            _ => { });
+    }
+
     private void ProjectSystemOnProjectsBuilt(object sender, EventArgs eventArgs)
     {
         _logger.LogVerbose("Projects built or settings initialized");
@@ -56,14 +65,5 @@ public class DiscoveryService : IDiscoveryService
         var currentHash = DiscoveryInvoker.CreateProjectHash(projectSettings, configSource);
 
         return BindingRegistryCache.Value.ProjectHash == currentHash;
-    }
-
-    public void TriggerDiscovery([CallerMemberName] string callerMemberName = "?")
-    {
-        _logger.LogVerbose($"Discovery triggered from {callerMemberName}");
-
-        _projectScope.IdeScope.RunOnBackgroundThread(
-            () => BindingRegistryCache.Update(_ => DiscoveryInvoker.InvokeDiscoveryWithTimer()),
-            _ => { });
     }
 }

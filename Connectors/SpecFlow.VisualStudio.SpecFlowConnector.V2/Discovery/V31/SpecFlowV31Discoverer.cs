@@ -6,10 +6,8 @@ public class SpecFlowV31Discoverer : SpecFlowV3BaseDiscoverer
     {
     }
 
-    protected override DefaultDependencyProvider CreateDefaultDependencyProvider()
-    {
-        return new SpecFlowV31DependencyProvider(_loadContext);
-    }
+    protected override DefaultDependencyProvider CreateDefaultDependencyProvider() =>
+        new SpecFlowV31DependencyProvider(_loadContext);
 
     private class SpecFlowV31DependencyProvider : NoInvokeDependencyProvider
     {

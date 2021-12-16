@@ -82,10 +82,7 @@ public class DeveroomGherkinParser
         return gherkinDocument;
     }
 
-    public DeveroomGherkinDocument GetResult()
-    {
-        return _astBuilder.GetResult();
-    }
+    public DeveroomGherkinDocument GetResult() => _astBuilder.GetResult();
 
     private class InternalParser : Parser<DeveroomGherkinDocument>
     {
@@ -100,16 +97,14 @@ public class DeveroomGherkinParser
             _monitoringService = monitoringService;
         }
 
-        public int NullMatchToken(int state, Token token)
-        {
-            return MatchToken(state, token, new ParserContext
+        public int NullMatchToken(int state, Token token) =>
+            MatchToken(state, token, new ParserContext
             {
                 Errors = new List<ParserException>(),
                 TokenMatcher = new AllFalseTokenMatcher(),
                 TokenQueue = new Queue<Token>(),
                 TokenScanner = new NullTokenScanner()
             });
-        }
 
         protected override int MatchToken(int state, Token token, ParserContext context)
         {
@@ -224,10 +219,7 @@ public class DeveroomGherkinParser
         {
         }
 
-        public DeveroomGherkinDocument GetResult()
-        {
-            return null;
-        }
+        public DeveroomGherkinDocument GetResult() => null;
 
         public void Reset()
         {
@@ -236,75 +228,33 @@ public class DeveroomGherkinParser
 
     private class AllFalseTokenMatcher : ITokenMatcher
     {
-        public bool Match_EOF(Token token)
-        {
-            return false;
-        }
+        public bool Match_EOF(Token token) => false;
 
-        public bool Match_Empty(Token token)
-        {
-            return false;
-        }
+        public bool Match_Empty(Token token) => false;
 
-        public bool Match_Comment(Token token)
-        {
-            return false;
-        }
+        public bool Match_Comment(Token token) => false;
 
-        public bool Match_TagLine(Token token)
-        {
-            return false;
-        }
+        public bool Match_TagLine(Token token) => false;
 
-        public bool Match_FeatureLine(Token token)
-        {
-            return false;
-        }
+        public bool Match_FeatureLine(Token token) => false;
 
-        public bool Match_RuleLine(Token token)
-        {
-            return false;
-        }
+        public bool Match_RuleLine(Token token) => false;
 
-        public bool Match_BackgroundLine(Token token)
-        {
-            return false;
-        }
+        public bool Match_BackgroundLine(Token token) => false;
 
-        public bool Match_ScenarioLine(Token token)
-        {
-            return false;
-        }
+        public bool Match_ScenarioLine(Token token) => false;
 
-        public bool Match_ExamplesLine(Token token)
-        {
-            return false;
-        }
+        public bool Match_ExamplesLine(Token token) => false;
 
-        public bool Match_StepLine(Token token)
-        {
-            return false;
-        }
+        public bool Match_StepLine(Token token) => false;
 
-        public bool Match_DocStringSeparator(Token token)
-        {
-            return false;
-        }
+        public bool Match_DocStringSeparator(Token token) => false;
 
-        public bool Match_TableRow(Token token)
-        {
-            return false;
-        }
+        public bool Match_TableRow(Token token) => false;
 
-        public bool Match_Language(Token token)
-        {
-            return false;
-        }
+        public bool Match_Language(Token token) => false;
 
-        public bool Match_Other(Token token)
-        {
-            return false;
-        }
+        public bool Match_Other(Token token) => false;
 
         public void Reset()
         {
@@ -313,10 +263,7 @@ public class DeveroomGherkinParser
 
     private class NullTokenScanner : ITokenScanner
     {
-        public Token Read()
-        {
-            return new Token(null, new Location());
-        }
+        public Token Read() => new(null, new Location());
     }
 
     public static TokenType[] GetExpectedTokens(int state, IMonitoringService monitoringService)

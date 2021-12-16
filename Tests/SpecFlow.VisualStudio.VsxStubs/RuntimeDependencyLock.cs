@@ -1,28 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.VisualStudio.Platform.VSEditor;
+using Microsoft.VisualStudio.Text.Internal.Language;
 
-namespace SpecFlow.VisualStudio.VsxStubs
+namespace SpecFlow.VisualStudio.VsxStubs;
+
+public class RuntimeDependencyLock
 {
-    public class RuntimeDependencyLock
+    internal class MicrosoftVisualStudioPlatformVsEditor
     {
-        internal class MicrosoftVisualStudioPlatformVsEditor
+        private static void Dummy()
         {
-            private static void Dummy()
-            {
-                Noop(typeof(Microsoft.VisualStudio.Platform.VSEditor.SnapshotSpanEventArgsHelper));
-            }
-            private static void Noop(Type _) { }
+            Noop(typeof(SnapshotSpanEventArgsHelper));
         }
-        internal class MicrosoftVisualStudioTextInternal
+
+        private static void Noop(Type _)
         {
-            private static void Dummy()
-            {
-                Noop(typeof(Microsoft.VisualStudio.Text.Internal.Language.CompletionPresenterStylePrivate));
-            }
-            private static void Noop(Type _) { }
+        }
+    }
+
+    internal class MicrosoftVisualStudioTextInternal
+    {
+        private static void Dummy()
+        {
+            Noop(typeof(CompletionPresenterStylePrivate));
+        }
+
+        private static void Noop(Type _)
+        {
         }
     }
 }

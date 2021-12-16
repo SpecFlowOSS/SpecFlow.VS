@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace SpecFlow.SampleProjectGenerator
+namespace SpecFlow.SampleProjectGenerator;
+
+public class LoremIpsum
 {
-    public class LoremIpsum
-    {
-        public static Random Rnd = new Random(2009);
-
-        private const string content =
-                @"Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse sit amet pulvinar nulla. Aliquam mi felis, elementum eu lacinia eu, aliquet in neque. Integer aliquet risus libero, in mollis augue scelerisque non. Curabitur ut sem porta, tempor justo id, tincidunt diam. Quisque euismod pharetra hendrerit. Nulla nec lectus at nulla fermentum pretium vitae blandit ipsum. Nam molestie ligula vitae volutpat eleifend. Duis sagittis risus a venenatis vulputate. Sed vestibulum cursus dictum. Mauris fermentum suscipit augue, nec ullamcorper eros suscipit nec. Aliquam commodo libero vitae sapien sodales, eget efficitur augue condimentum.
+    private const string content =
+        @"Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Suspendisse sit amet pulvinar nulla. Aliquam mi felis, elementum eu lacinia eu, aliquet in neque. Integer aliquet risus libero, in mollis augue scelerisque non. Curabitur ut sem porta, tempor justo id, tincidunt diam. Quisque euismod pharetra hendrerit. Nulla nec lectus at nulla fermentum pretium vitae blandit ipsum. Nam molestie ligula vitae volutpat eleifend. Duis sagittis risus a venenatis vulputate. Sed vestibulum cursus dictum. Mauris fermentum suscipit augue, nec ullamcorper eros suscipit nec. Aliquam commodo libero vitae sapien sodales, eget efficitur augue condimentum.
 
 Quisque pellentesque a orci eu accumsan. Donec nec scelerisque tortor. Fusce sit amet risus et odio blandit laoreet. Aliquam nec risus et ante porttitor euismod. Donec dapibus eu metus nec commodo. Nunc eu tincidunt purus. Nulla a egestas augue. Curabitur molestie imperdiet ex sit amet aliquet. Phasellus ac dui vestibulum, blandit ligula id, pulvinar massa. Proin gravida tortor ipsum, in pretium eros consequat non. Morbi vel tristique neque. In in congue urna.
 
@@ -22,50 +18,46 @@ Phasellus nec egestas nunc. Integer tempor tempor mi in sodales. Nulla eleifend 
 
 In eu feugiat lorem. Phasellus vitae eros pulvinar, dictum mi sed, dapibus tellus. Ut at diam viverra quam bibendum vulputate. Duis dapibus tortor ut lacus dapibus semper. Sed lacinia eleifend sapien, in cursus urna.";
 
-        private static string[] words;
+    public static Random Rnd = new(2009);
 
-        static LoremIpsum()
+    private static readonly string[] words;
+
+    static LoremIpsum()
+    {
+        words = content.Split(new[] {' ', '\n', '\r', ',', '.'}, StringSplitOptions.RemoveEmptyEntries);
+    }
+
+    public static string GetWord() => words[Rnd.Next(words.Length)];
+
+    public static string[] GetUniqueWords(int wordCount = 4, string wordPrefix = "")
+    {
+        var w = GetWords(wordCount, wordPrefix).Distinct(StringComparer.InvariantCultureIgnoreCase).ToArray();
+        while (w.Length < wordCount)
+            w = w.Concat(GetWords(wordCount - w.Length, wordPrefix)).Distinct(StringComparer.InvariantCultureIgnoreCase)
+                .ToArray();
+        return w;
+    }
+
+    public static string[] GetWords(int wordCount = 4, string wordPrefix = "")
+    {
+        return Enumerable.Range(0, wordCount).Select(i => wordPrefix + GetWord()).ToArray();
+    }
+
+    public static string GetShortText(int wordCount = 4, string wordPrefix = "") =>
+        string.Join(" ", GetWords(wordCount, wordPrefix));
+
+    public static T[] Randomize<T>(IEnumerable<T> input)
+    {
+        var result = new List<T>(input).ToArray();
+        for (int i = 0; i < result.Length * 3; i++)
         {
-            words = content.Split(new[] {' ', '\n', '\r', ',', '.'}, StringSplitOptions.RemoveEmptyEntries);
+            var i1 = Rnd.Next(result.Length);
+            var i2 = Rnd.Next(result.Length);
+            var v = result[i1];
+            result[i1] = result[i2];
+            result[i2] = v;
         }
 
-        public static string GetWord()
-        {
-            return words[Rnd.Next(words.Length)];
-        }
-
-        public static string[] GetUniqueWords(int wordCount = 4, string wordPrefix = "")
-        {
-            var w = GetWords(wordCount, wordPrefix).Distinct(StringComparer.InvariantCultureIgnoreCase).ToArray();
-            while (w.Length < wordCount)
-            {
-                w = w.Concat(GetWords(wordCount - w.Length, wordPrefix)).Distinct(StringComparer.InvariantCultureIgnoreCase).ToArray();
-            }
-            return w;
-        }
-
-        public static string[] GetWords(int wordCount = 4, string wordPrefix = "")
-        {
-            return Enumerable.Range(0, wordCount).Select(i => wordPrefix + GetWord()).ToArray();
-        }
-
-        public static string GetShortText(int wordCount = 4, string wordPrefix = "")
-        {
-            return string.Join(" ", GetWords(wordCount, wordPrefix));
-        }
-
-        public static T[] Randomize<T>(IEnumerable<T> input)
-        {
-            var result = new List<T>(input).ToArray();
-            for (int i = 0; i < result.Length * 3; i++)
-            {
-                var i1 = Rnd.Next(result.Length);
-                var i2 = Rnd.Next(result.Length);
-                var v = result[i1];
-                result[i1] = result[i2];
-                result[i2] = v;
-            }
-            return result;
-        }
+        return result;
     }
 }

@@ -1,20 +1,16 @@
-﻿namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions
+﻿namespace SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
+
+public record AnalyzedStepDefinitionExpressionSimpleTextPart : AnalyzedStepDefinitionExpressionPart
 {
-    public record AnalyzedStepDefinitionExpressionSimpleTextPart : AnalyzedStepDefinitionExpressionPart
+    public AnalyzedStepDefinitionExpressionSimpleTextPart(string text, string unescapedText)
     {
-        public string Text { get; }
-        public string UnescapedText { get; }
-        public override string ExpressionText => Text;
-
-        public AnalyzedStepDefinitionExpressionSimpleTextPart(string text, string unescapedText)
-        {
-            Text = text;
-            UnescapedText = unescapedText ?? text;
-        }
-
-        public override string ToString()
-        {
-            return $"simple text:`{ExpressionText}`";
-        }
+        Text = text;
+        UnescapedText = unescapedText ?? text;
     }
+
+    public string Text { get; }
+    public string UnescapedText { get; }
+    public override string ExpressionText => Text;
+
+    public override string ToString() => $"simple text:`{ExpressionText}`";
 }

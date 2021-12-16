@@ -34,7 +34,8 @@ public class DeveroomTaggerTests
             ));
         ideScope.SetupGet(s => s.DeveroomErrorListServices).Returns(Mock.Of<IDeveroomErrorListServices>);
         ideScope.SetupGet(s => s.IsSolutionLoaded).Returns(true);
-        ideScope.Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(), It.IsAny<string>()))
+        ideScope.Setup(s =>
+                s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(), It.IsAny<string>()))
             .Returns((Func<Task> t, Action<Exception> e, string cn) => t());
 
         projectScope.SetupGet(s => s.Properties).Returns(propertyCollection);
@@ -162,10 +163,7 @@ public class DeveroomTaggerTests
             _tagsChangedEvents.Add(e);
         }
 
-        public StubWpfTextView BuildTextView()
-        {
-            return new(TextBuffer.Object);
-        }
+        public StubWpfTextView BuildTextView() => new(TextBuffer.Object);
 
         public Sut SetAction(Action action)
         {

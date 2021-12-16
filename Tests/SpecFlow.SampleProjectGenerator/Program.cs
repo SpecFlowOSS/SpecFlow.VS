@@ -1,41 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Threading;
 using CommandLine;
 using CommandLineParser = CommandLine.Parser;
 
-namespace SpecFlow.SampleProjectGenerator
+namespace SpecFlow.SampleProjectGenerator;
+
+internal class Program
 {
-    class Program
+    private static int Main(string[] args)
     {
-        static int Main(string[] args)
+        try
         {
-            try
-            {
-                CommandLineParser.Default.ParseArguments<GeneratorOptions>(args)
-                    .WithParsed(RunOptionsAndReturnExitCode)
-                    .WithNotParsed(HandleParseError);
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return 1; 
-            }
+            CommandLineParser.Default.ParseArguments<GeneratorOptions>(args)
+                .WithParsed(RunOptionsAndReturnExitCode)
+                .WithNotParsed(HandleParseError);
+            return 0;
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return 1;
+        }
+    }
 
-        private static void RunOptionsAndReturnExitCode(GeneratorOptions opts)
-        {
-            var generator = opts.CreateProjectGenerator(Console.WriteLine);
-            generator.Generate();
-        }
+    private static void RunOptionsAndReturnExitCode(GeneratorOptions opts)
+    {
+        var generator = opts.CreateProjectGenerator(Console.WriteLine);
+        generator.Generate();
+    }
 
-        private static void HandleParseError(IEnumerable<Error> errs)
-        {
-            Console.WriteLine("Errors");
-            Console.WriteLine(string.Join(Environment.NewLine, errs));
-        }
+    private static void HandleParseError(IEnumerable<Error> errs)
+    {
+        Console.WriteLine("Errors");
+        Console.WriteLine(string.Join(Environment.NewLine, errs));
     }
 }

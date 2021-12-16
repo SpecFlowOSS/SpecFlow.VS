@@ -1,38 +1,36 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
 using Microsoft.CodeAnalysis.Options;
 
-namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig
+namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig;
+
+public class EditorConfigOptions : IEditorConfigOptions
 {
-    public class EditorConfigOptions : IEditorConfigOptions
+    private readonly DocumentOptionSet _options;
+
+    public EditorConfigOptions(DocumentOptionSet options)
     {
-        private readonly DocumentOptionSet _options;
+        _options = options;
+    }
 
-        public EditorConfigOptions(DocumentOptionSet options)
-        {
-            _options = options;
-        }
+    public TResult GetOption<TResult>(string editorConfigKey, TResult defaultValue)
+    {
+        var storageLocation = CreateStorageLocation<TResult>(editorConfigKey);
+        if (storageLocation == null)
+            return defaultValue;
+        return _options.GetOption(new Option<TResult>("specflow.vs", editorConfigKey, defaultValue, storageLocation));
+    }
 
-        public TResult GetOption<TResult>(string editorConfigKey, TResult defaultValue)
-        {
-            var storageLocation = CreateStorageLocation<TResult>(editorConfigKey);
-            if (storageLocation == null)
-                return defaultValue;
-            return _options.GetOption(new Option<TResult>("specflow.vs", editorConfigKey, defaultValue, storageLocation));
-        }
-
-        private OptionStorageLocation CreateStorageLocation<TResult>(string editorConfigKey)
-        {
-            var supportedTypes = new[] { typeof(bool), typeof(string), typeof(int) };
-            if (!supportedTypes.Contains(typeof(TResult)))
-                throw new NotSupportedException($"Editor config setting type {typeof(TResult).Name} is not supported.");
-            var typeName = typeof(TResult) == typeof(bool) ? "Bool" : typeof(TResult).Name;
-            return
-                typeof(OptionSet).Assembly.GetType("Microsoft.CodeAnalysis.Options.EditorConfigStorageLocation", false)?
-                        .GetMethod($"For{typeName}Option", BindingFlags.Public | BindingFlags.Static)?
-                        .Invoke(null, new object[] { editorConfigKey })
-                    as OptionStorageLocation;
-        }
+    private OptionStorageLocation CreateStorageLocation<TResult>(string editorConfigKey)
+    {
+        var supportedTypes = new[] {typeof(bool), typeof(string), typeof(int)};
+        if (!supportedTypes.Contains(typeof(TResult)))
+            throw new NotSupportedException($"Editor config setting type {typeof(TResult).Name} is not supported.");
+        var typeName = typeof(TResult) == typeof(bool) ? "Bool" : typeof(TResult).Name;
+        return
+            typeof(OptionSet).Assembly.GetType("Microsoft.CodeAnalysis.Options.EditorConfigStorageLocation", false)?
+                    .GetMethod($"For{typeName}Option", BindingFlags.Public | BindingFlags.Static)?
+                    .Invoke(null, new object[] {editorConfigKey})
+                as OptionStorageLocation;
     }
 }

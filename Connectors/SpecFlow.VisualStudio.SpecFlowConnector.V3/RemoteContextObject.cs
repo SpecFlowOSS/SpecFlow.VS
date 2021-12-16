@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector
+namespace SpecFlow.VisualStudio.SpecFlowConnector;
+
+public class RemoteContextObject
 {
-    public class RemoteContextObject
-    {
-    }
 }

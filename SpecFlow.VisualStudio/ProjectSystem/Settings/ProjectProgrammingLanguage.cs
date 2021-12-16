@@ -1,10 +1,9 @@
-﻿namespace SpecFlow.VisualStudio.ProjectSystem.Settings
+﻿namespace SpecFlow.VisualStudio.ProjectSystem.Settings;
+
+public enum ProjectProgrammingLanguage
 {
-    public enum ProjectProgrammingLanguage
-    {
-        Other,
-        CSharp,
-        VB,
-        FSharp,
-    }
+    Other,
+    CSharp,
+    VB,
+    FSharp
 }

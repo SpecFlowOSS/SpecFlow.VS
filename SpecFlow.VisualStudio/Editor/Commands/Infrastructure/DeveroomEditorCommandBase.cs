@@ -5,7 +5,6 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
     protected readonly IBufferTagAggregatorFactoryService AggregatorFactory;
     protected readonly IIdeScope IdeScope;
     protected readonly IMonitoringService MonitoringService;
-    public AsyncManualResetEvent Finished { get; } = new();
 
     protected DeveroomEditorCommandBase(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
         IMonitoringService monitoringService)
@@ -14,6 +13,8 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
         AggregatorFactory = aggregatorFactory;
         MonitoringService = monitoringService;
     }
+
+    public AsyncManualResetEvent Finished { get; } = new();
 
     public virtual DeveroomEditorCommandTargetKey Target
         => throw new NotImplementedException();
@@ -24,10 +25,8 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
         => new[] {Target};
 
     public virtual DeveroomEditorCommandStatus QueryStatus(IWpfTextView textView,
-        DeveroomEditorCommandTargetKey commandKey)
-    {
-        return DeveroomEditorCommandStatus.Supported;
-    }
+        DeveroomEditorCommandTargetKey commandKey) =>
+        DeveroomEditorCommandStatus.Supported;
 
     public void Prepare()
     {
@@ -35,16 +34,12 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
     }
 
     public virtual bool PreExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey,
-        IntPtr inArgs = default)
-    {
-        return false;
-    }
+        IntPtr inArgs = default) =>
+        false;
 
     public virtual bool PostExec(IWpfTextView textView, DeveroomEditorCommandTargetKey commandKey,
-        IntPtr inArgs = default)
-    {
-        return false;
-    }
+        IntPtr inArgs = default) =>
+        false;
 
     protected DeveroomTag GetDeveroomTagForCaret(IWpfTextView textView, params string[] tagTypes)
     {
@@ -110,10 +105,8 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
         textView.Caret.MoveTo(selectionEndPosition);
     }
 
-    protected SnapshotSpan GetSelectionSpan(IWpfTextView textView)
-    {
-        return new SnapshotSpan(textView.Selection.Start.Position, textView.Selection.End.Position);
-    }
+    protected SnapshotSpan GetSelectionSpan(IWpfTextView textView) =>
+        new(textView.Selection.Start.Position, textView.Selection.End.Position);
 
     protected IEnumerable<ITextSnapshotLine> GetSpanFullLines(SnapshotSpan span)
     {

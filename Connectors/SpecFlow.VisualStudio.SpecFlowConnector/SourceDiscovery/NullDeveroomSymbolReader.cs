@@ -1,15 +1,11 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.SourceDiscovery
-{
-    class NullDeveroomSymbolReader : IDeveroomSymbolReader
-    {
-        public void Dispose()
-        {
-            //nop
-        }
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.SourceDiscovery;
 
-        public MethodSymbol ReadMethodSymbol(int token)
-        {
-            return null;
-        }
+internal class NullDeveroomSymbolReader : IDeveroomSymbolReader
+{
+    public void Dispose()
+    {
+        //nop
     }
+
+    public MethodSymbol ReadMethodSymbol(int token) => null;
 }

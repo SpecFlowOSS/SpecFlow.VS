@@ -1,34 +1,29 @@
 ﻿using System;
 using System.Diagnostics;
-using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.ProjectSystem;
 
-namespace SpecFlow.VisualStudio.Diagnostics
+namespace SpecFlow.VisualStudio.Diagnostics;
+
+public class OutputWindowPaneLogger : IDeveroomLogger
 {
-    public class OutputWindowPaneLogger : IDeveroomLogger
+    private readonly IDeveroomOutputPaneServices _outputPaneServices;
+
+    public OutputWindowPaneLogger(IDeveroomOutputPaneServices outputPaneServices)
     {
-        private readonly IDeveroomOutputPaneServices _outputPaneServices;
+        _outputPaneServices = outputPaneServices;
+    }
 
-        public OutputWindowPaneLogger(IDeveroomOutputPaneServices outputPaneServices)
-        {
-            _outputPaneServices = outputPaneServices;
-        }
+    public TraceLevel Level { get; set; } = TraceLevel.Info;
 
-        public TraceLevel Level { get; set; } = TraceLevel.Info;
+    public void Log(TraceLevel messageLevel, string message)
+    {
+        if (messageLevel <= Level) WriteToOutputPane(messageLevel, message);
+    }
 
-        public void Log(TraceLevel messageLevel, string message)
-        {
-            if (messageLevel <= Level)
-            {
-                WriteToOutputPane(messageLevel, message);
-            }
-        }
-
-        private void WriteToOutputPane(TraceLevel messageLevel, string message)
-        {
-            _outputPaneServices.SendWriteLine($"{messageLevel}: {message}");
-            if (messageLevel <= TraceLevel.Warning)
-                _outputPaneServices.Activate();
-        }
+    private void WriteToOutputPane(TraceLevel messageLevel, string message)
+    {
+        _outputPaneServices.SendWriteLine($"{messageLevel}: {message}");
+        if (messageLevel <= TraceLevel.Warning)
+            _outputPaneServices.Activate();
     }
 }

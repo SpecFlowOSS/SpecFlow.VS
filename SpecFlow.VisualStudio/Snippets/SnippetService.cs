@@ -1,49 +1,46 @@
 ﻿using System;
 using System.Linq;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.ProjectSystem;
-using SpecFlow.VisualStudio.ProjectSystem.Configuration;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
-using SpecFlow.VisualStudio.Snippets.Fallback;
 
-namespace SpecFlow.VisualStudio.Snippets
+namespace SpecFlow.VisualStudio.Snippets;
+
+public class SnippetService
 {
-    public class SnippetService
+    private readonly IDeveroomLogger _logger;
+    private readonly IProjectScope _projectScope;
+
+    public SnippetService(IProjectScope projectScope)
     {
-        private readonly IProjectScope _projectScope;
-        private readonly IDeveroomLogger _logger;
+        _projectScope = projectScope;
+        _logger = projectScope.IdeScope.Logger;
+    }
 
-        public SnippetService(IProjectScope projectScope)
+    public SnippetExpressionStyle DefaultExpressionStyle =>
+        _projectScope.GetProjectSettings().SpecFlowProjectTraits.HasFlag(SpecFlowProjectTraits.CucumberExpression)
+            ? SnippetExpressionStyle.CucumberExpression
+            : SnippetExpressionStyle.RegularExpression;
+
+    public string GetStepDefinitionSkeletonSnippet(UndefinedStepDescriptor undefinedStep,
+        SnippetExpressionStyle expressionStyle, string indent = "    ", string newLine = null)
+    {
+        try
         {
-            _projectScope = projectScope;
-            _logger = projectScope.IdeScope.Logger;
+            var skeletonProvider = expressionStyle == SnippetExpressionStyle.CucumberExpression
+                ? (DeveroomStepDefinitionSkeletonProvider) new CucumberExpressionSkeletonProvider()
+                : new RegexStepDefinitionSkeletonProvider();
+
+            var configuration = _projectScope.GetDeveroomConfiguration();
+            newLine = newLine ?? Environment.NewLine;
+            var result =
+                skeletonProvider.GetStepDefinitionSkeletonSnippet(undefinedStep, indent, newLine,
+                    configuration.BindingCulture);
+            _logger.LogInfo(
+                $"Step definition snippet generated for step '{undefinedStep.StepText}': {Environment.NewLine}{result}");
+            return result;
         }
-
-        public SnippetExpressionStyle DefaultExpressionStyle =>
-            _projectScope.GetProjectSettings().SpecFlowProjectTraits.HasFlag(SpecFlowProjectTraits.CucumberExpression)
-                ? SnippetExpressionStyle.CucumberExpression
-                : SnippetExpressionStyle.RegularExpression;
-
-        public string GetStepDefinitionSkeletonSnippet(UndefinedStepDescriptor undefinedStep, SnippetExpressionStyle expressionStyle, string indent = "    ", string newLine = null)
+        catch (Exception e)
         {
-            try
-            {
-                var skeletonProvider = expressionStyle == SnippetExpressionStyle.CucumberExpression
-                    ? (DeveroomStepDefinitionSkeletonProvider)new CucumberExpressionSkeletonProvider()
-                    : new RegexStepDefinitionSkeletonProvider();
-
-                var configuration = _projectScope.GetDeveroomConfiguration();
-                newLine = newLine ?? Environment.NewLine;
-                var result = skeletonProvider.GetStepDefinitionSkeletonSnippet(undefinedStep, indent, newLine, configuration.BindingCulture);
-                _logger.LogInfo($"Step definition snippet generated for step '{undefinedStep.StepText}': {Environment.NewLine}{result}");
-                return result;
-            }
-            catch(Exception e)
-            {
-                _projectScope.IdeScope.Actions.ShowError("Could not generate step definition snippet.", e);
-                return "???";
-            }
+            _projectScope.IdeScope.Actions.ShowError("Could not generate step definition snippet.", e);
+            return "???";
         }
     }
 }

@@ -1,12 +1,11 @@
-﻿namespace SpecFlow.VisualStudio.ProjectSystem.Settings
+﻿namespace SpecFlow.VisualStudio.ProjectSystem.Settings;
+
+public enum DeveroomProjectKind
 {
-    public enum DeveroomProjectKind
-    {
-        Unknown,
-        Uninitialized,
-        SpecFlowTestProject,
-        SpecFlowLibProject,
-        FeatureFileContainerProject,
-        OtherProject
-    }
+    Unknown,
+    Uninitialized,
+    SpecFlowTestProject,
+    SpecFlowLibProject,
+    FeatureFileContainerProject,
+    OtherProject
 }

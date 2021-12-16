@@ -1,36 +1,35 @@
 ﻿using System;
-using SpecFlow.VisualStudio.Diagnostics;
 using EnvDTE;
+using SpecFlow.VisualStudio.Diagnostics;
 
-namespace SpecFlow.VisualStudio.VsEvents
+namespace SpecFlow.VisualStudio.VsEvents;
+
+public class DocumentEventsListener : IDisposable
 {
-    public class DocumentEventsListener : IDisposable
+    private readonly IDeveroomLogger _logger;
+    private DocumentEvents _documentEvents;
+
+    public DocumentEventsListener(IDeveroomLogger logger, DTE dte)
     {
-        private readonly IDeveroomLogger _logger;
-        private DocumentEvents _documentEvents;
+        _logger = logger;
+        _documentEvents = dte.Events.DocumentEvents;
+        _documentEvents.DocumentOpened += DocumentEventsOnDocumentOpened;
+    }
 
-        public event Action<Document> DocumentOpened;
-
-        public DocumentEventsListener(IDeveroomLogger logger, DTE dte)
+    public void Dispose()
+    {
+        if (_documentEvents != null)
         {
-            _logger = logger;
-            _documentEvents = dte.Events.DocumentEvents;
-            _documentEvents.DocumentOpened += DocumentEventsOnDocumentOpened;
+            _documentEvents.DocumentOpened -= DocumentEventsOnDocumentOpened;
+            _documentEvents = null;
         }
+    }
 
-        private void DocumentEventsOnDocumentOpened(Document document)
-        {
-            _logger.LogVerbose($"{document.FullName}, {document.Type}");
-            DocumentOpened?.Invoke(document);
-        }
+    public event Action<Document> DocumentOpened;
 
-        public void Dispose()
-        {
-            if (_documentEvents != null)
-            {
-                _documentEvents.DocumentOpened -= DocumentEventsOnDocumentOpened;
-                _documentEvents = null;
-            }
-        }
+    private void DocumentEventsOnDocumentOpened(Document document)
+    {
+        _logger.LogVerbose($"{document.FullName}, {document.Type}");
+        DocumentOpened?.Invoke(document);
     }
 }

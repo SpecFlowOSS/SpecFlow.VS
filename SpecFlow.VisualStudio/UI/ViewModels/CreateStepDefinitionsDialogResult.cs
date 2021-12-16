@@ -1,9 +1,8 @@
-﻿namespace SpecFlow.VisualStudio.UI.ViewModels
+﻿namespace SpecFlow.VisualStudio.UI.ViewModels;
+
+public enum CreateStepDefinitionsDialogResult
 {
-    public enum CreateStepDefinitionsDialogResult
-    {
-        Cancel,
-        Create,
-        CopyToClipboard
-    }
+    Cancel,
+    Create,
+    CopyToClipboard
 }

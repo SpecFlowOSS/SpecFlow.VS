@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Text;
 using SpecFlow.VisualStudio.SpecFlowConnector.AppDomainHelper;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector
+namespace SpecFlow.VisualStudio.SpecFlowConnector;
+
+internal class Program
 {
-    class Program
+    [STAThread]
+    private static int Main(string[] args)
     {
-        [STAThread]
-        static int Main(string[] args)
+        Console.OutputEncoding = Encoding.UTF8;
+        using (AssemblyHelper.SubscribeResolveForAssembly(typeof(Program)))
         {
-            Console.OutputEncoding = Encoding.UTF8;
-            using (AssemblyHelper.SubscribeResolveForAssembly(typeof(Program)))
-                return new ConsoleRunner().EntryPoint(args);
+            return new ConsoleRunner().EntryPoint(args);
         }
     }
 }

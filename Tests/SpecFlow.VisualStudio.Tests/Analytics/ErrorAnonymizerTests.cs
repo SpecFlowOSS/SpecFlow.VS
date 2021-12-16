@@ -61,7 +61,7 @@ public class ErrorAnonymizerTests
    at SpecFlow.VisualStudio.SpecFlowConnector.Discovery.ReflectionSpecFlowDiscoverer.Discover(Assembly testAssembly, String testAssemblyPath, String configFilePath) in W:\SpecF\SpecFlow.VisualStudio\SpecFlow.VisualStudio.SpecFlowConnector.V2\Discovery\ReflectionSpecFlowDiscoverer.cs:line 25
 ";
 
-        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, true);
+        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace);
 
         result.Should().Be("RE.RCM[T](,,,)L17-RSFD.D(,,)L25");
     }
@@ -121,7 +121,7 @@ Exception rethrown at [0]:
    at SpecFlow.VisualStudio.SpecFlowConnector.ConsoleRunner.EntryPoint(String[] args) 
 ";
 
-        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace, true);
+        var result = ErrorAnonymizer.SimplifyStackTrace(stackTrace);
 
         result.Should()
             .Be(

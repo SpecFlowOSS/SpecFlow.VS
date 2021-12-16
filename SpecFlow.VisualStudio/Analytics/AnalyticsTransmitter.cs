@@ -25,7 +25,7 @@ public class AnalyticsTransmitter : IAnalyticsTransmitter
         }
         catch (Exception ex)
         {
-            TransmitExceptionEvent(ex, ImmutableDictionary<string,object>.Empty);
+            TransmitExceptionEvent(ex, ImmutableDictionary<string, object>.Empty);
         }
     }
 

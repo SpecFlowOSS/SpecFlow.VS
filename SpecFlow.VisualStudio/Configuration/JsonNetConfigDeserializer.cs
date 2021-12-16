@@ -1,39 +1,39 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
-namespace SpecFlow.VisualStudio.Configuration
+namespace SpecFlow.VisualStudio.Configuration;
+
+internal interface IConfigDeserializer<in TConfiguration>
 {
-    internal interface IConfigDeserializer<in TConfiguration>
+    void Populate(string jsonString, TConfiguration config);
+}
+
+internal class JsonNetConfigDeserializer<TConfiguration> : IConfigDeserializer<TConfiguration>
+{
+    public void Populate(string jsonString, TConfiguration config)
     {
-        void Populate(string jsonString, TConfiguration config);
+        JsonConvert.PopulateObject(jsonString, config, GetJsonSerializerSettings(true));
     }
 
-    internal class JsonNetConfigDeserializer<TConfiguration> : IConfigDeserializer<TConfiguration>
+    public static JsonSerializerSettings GetJsonSerializerSettings(bool indented)
     {
-        public void Populate(string jsonString, TConfiguration config)
+        var serializerSettings = new JsonSerializerSettings();
+        var contractResolver = new CamelCasePropertyNamesContractResolver();
+        contractResolver.NamingStrategy.ProcessDictionaryKeys = false;
+        serializerSettings.ContractResolver = contractResolver;
+        serializerSettings.Converters = new List<JsonConverter>
         {
-            JsonConvert.PopulateObject(jsonString, config, GetJsonSerializerSettings(true));
-        }
-
-        public static JsonSerializerSettings GetJsonSerializerSettings(bool indented)
-        {
-            var serializerSettings = new JsonSerializerSettings();
-            var contractResolver = new CamelCasePropertyNamesContractResolver();
-            contractResolver.NamingStrategy.ProcessDictionaryKeys = false;
-            serializerSettings.ContractResolver = contractResolver;
-            serializerSettings.Converters = new List<JsonConverter> { new StringEnumConverter
+            new StringEnumConverter
             {
 #if OLD_JSONNET_API
                 CamelCaseText = true
 #else
                 NamingStrategy = new CamelCaseNamingStrategy()
 #endif
-            } };
-            serializerSettings.Formatting = indented ? Formatting.Indented : Formatting.None;
-            serializerSettings.NullValueHandling = NullValueHandling.Ignore;
-            return serializerSettings;
-        }
+            }
+        };
+        serializerSettings.Formatting = indented ? Formatting.Indented : Formatting.None;
+        serializerSettings.NullValueHandling = NullValueHandling.Ignore;
+        return serializerSettings;
     }
 }

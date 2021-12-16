@@ -1,87 +1,81 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.ProjectSystem;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
 
-namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
+namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
+
+public class StubIdeActions : IIdeActions, IAsyncContextMenu
 {
-    public class StubIdeActions : IIdeActions, IAsyncContextMenu
+    private readonly StubIdeScope _ideScope;
+
+    public SourceLocation LastNavigateToSourceLocation;
+    public string LastShowContextMenuHeader;
+    public List<ContextMenuItem> LastShowContextMenuItems;
+
+    public StubIdeActions(IIdeScope ideScope)
     {
-        private readonly StubIdeScope _ideScope;
+        _ideScope = (StubIdeScope) ideScope;
+    }
 
-        public SourceLocation LastNavigateToSourceLocation;
-        public string LastShowContextMenuHeader;
-        public List<ContextMenuItem> LastShowContextMenuItems;
-        public QuestionDescription LastShowQuestion { get; set; }
-        public string ClipboardText { get; private set; }
+    public QuestionDescription LastShowQuestion { get; set; }
+    public string ClipboardText { get; private set; }
 
-        public StubIdeActions(IIdeScope ideScope)
-        {
-            _ideScope = (StubIdeScope)ideScope;
-        }
+    public CancellationToken CancellationToken { get; } = new();
+    public bool IsComplete { get; private set; }
 
-        public bool NavigateTo(SourceLocation sourceLocation)
-        {
-            _ideScope.Logger.LogInfo("IDE Action performed");
-            LastNavigateToSourceLocation = sourceLocation;
+    public void AddItems(params ContextMenuItem[] items)
+    {
+        LastShowContextMenuItems.AddRange(items);
+    }
 
-            var view = _ideScope.EnsureOpenTextView(sourceLocation);
-            _ideScope.CurrentTextView = view;
-            return true;
-        }
+    public void Complete()
+    {
+        IsComplete = true;
+    }
 
-        public void ShowError(string description, Exception exception)
-        {
-            _ideScope.Logger.LogException(_ideScope.MonitoringService, exception, description);
-        }
+    public bool NavigateTo(SourceLocation sourceLocation)
+    {
+        _ideScope.Logger.LogInfo("IDE Action performed");
+        LastNavigateToSourceLocation = sourceLocation;
 
-        public void ShowProblem(string description, string title = null)
-        {
-            _ideScope.Logger.LogWarning($"User Notification: {description}");
-        }
+        var view = _ideScope.EnsureOpenTextView(sourceLocation);
+        _ideScope.CurrentTextView = view;
+        return true;
+    }
 
-        public void ShowQuestion(QuestionDescription questionDescription)
-        {
-            _ideScope.Logger.LogInfo($"User question: {questionDescription.Description}");
-            LastShowQuestion = questionDescription;
-        }
+    public void ShowError(string description, Exception exception)
+    {
+        _ideScope.Logger.LogException(_ideScope.MonitoringService, exception, description);
+    }
 
-        public IAsyncContextMenu ShowContextMenu(string header, bool async, params ContextMenuItem[] contextMenuItems)
-        {
-            _ideScope.Logger.LogInfo("IDE Action performed");
-            LastShowContextMenuHeader = header;
-            LastShowContextMenuItems = contextMenuItems.ToList();
-            IsComplete = !async;
-            return this;
-        }
+    public void ShowProblem(string description, string title = null)
+    {
+        _ideScope.Logger.LogWarning($"User Notification: {description}");
+    }
 
-        public void SetClipboardText(string text)
-        {
-            ClipboardText = text;
-        }
+    public void ShowQuestion(QuestionDescription questionDescription)
+    {
+        _ideScope.Logger.LogInfo($"User question: {questionDescription.Description}");
+        LastShowQuestion = questionDescription;
+    }
 
-        public void ResetMock()
-        {
-            LastNavigateToSourceLocation = null;
-            LastShowContextMenuHeader = null;
-            LastShowContextMenuItems = null;
-        }
+    public IAsyncContextMenu ShowContextMenu(string header, bool async, params ContextMenuItem[] contextMenuItems)
+    {
+        _ideScope.Logger.LogInfo("IDE Action performed");
+        LastShowContextMenuHeader = header;
+        LastShowContextMenuItems = contextMenuItems.ToList();
+        IsComplete = !async;
+        return this;
+    }
 
-        public CancellationToken CancellationToken { get; } = new CancellationToken();
-        public bool IsComplete { get; private set; }
+    public void SetClipboardText(string text)
+    {
+        ClipboardText = text;
+    }
 
-        public void AddItems(params ContextMenuItem[] items)
-        {
-            LastShowContextMenuItems.AddRange(items);
-        }
-
-        public void Complete()
-        {
-            IsComplete = true;
-        }
+    public void ResetMock()
+    {
+        LastNavigateToSourceLocation = null;
+        LastShowContextMenuHeader = null;
+        LastShowContextMenuItems = null;
     }
 }

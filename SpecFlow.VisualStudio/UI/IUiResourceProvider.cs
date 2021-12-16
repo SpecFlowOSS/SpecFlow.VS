@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Windows.Controls;
 
-namespace SpecFlow.VisualStudio.UI
+namespace SpecFlow.VisualStudio.UI;
+
+public interface IUiResourceProvider
 {
-    public interface IUiResourceProvider
-    {
-        Image GetIcon(string name);
-    }
+    Image GetIcon(string name);
 }

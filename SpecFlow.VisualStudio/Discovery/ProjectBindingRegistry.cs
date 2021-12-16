@@ -5,7 +5,7 @@ public record ProjectBindingRegistry
 {
     private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
     private const string DocStringDefaultTypeName = TypeShortcuts.StringType;
-    public static ProjectBindingRegistry Invalid = new (ImmutableArray<ProjectStepDefinitionBinding>.Empty);
+    public static ProjectBindingRegistry Invalid = new(ImmutableArray<ProjectStepDefinitionBinding>.Empty);
 
     private static int _versionCounter;
 
@@ -14,7 +14,7 @@ public record ProjectBindingRegistry
         StepDefinitions = stepDefinitions.ToImmutableArray();
     }
 
-    public ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions, int projectHash) 
+    public ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions, int projectHash)
         : this(stepDefinitions)
     {
         ProjectHash = projectHash;
@@ -24,12 +24,9 @@ public record ProjectBindingRegistry
     public int? ProjectHash { get; }
     public bool IsPatched => !ProjectHash.HasValue && this != Invalid;
 
-    public override string ToString()
-    {
-        return $"ProjectBindingRegistry_V{Version}_H{ProjectHash}";
-    }
-
     public ImmutableArray<ProjectStepDefinitionBinding> StepDefinitions { get; }
+
+    public override string ToString() => $"ProjectBindingRegistry_V{Version}_H{ProjectHash}";
 
 
     public MatchResult MatchStep(Step step, IGherkinDocumentContext context = null)
@@ -183,10 +180,7 @@ public record ProjectBindingRegistry
     }
 
     public static ProjectBindingRegistry FromStepDefinitions(
-        IEnumerable<ProjectStepDefinitionBinding> projectStepDefinitionBindings)
-    {
-        return new ProjectBindingRegistry(projectStepDefinitionBindings);
-    }
+        IEnumerable<ProjectStepDefinitionBinding> projectStepDefinitionBindings) => new(projectStepDefinitionBindings);
 
     public ProjectBindingRegistry WithStepDefinitions(
         IEnumerable<ProjectStepDefinitionBinding> projectStepDefinitionBindings)
@@ -202,10 +196,8 @@ public record ProjectBindingRegistry
         return new ProjectBindingRegistry(StepDefinitions.Select(sd => sd == original ? replacement : sd));
     }
 
-    public ProjectBindingRegistry Where(Func<ProjectStepDefinitionBinding, bool> predicate)
-    {
-        return new ProjectBindingRegistry(StepDefinitions.Where(predicate));
-    }
+    public ProjectBindingRegistry Where(Func<ProjectStepDefinitionBinding, bool> predicate) =>
+        new(StepDefinitions.Where(predicate));
 
     public async Task<ProjectBindingRegistry> ReplaceStepDefinitions(CSharpStepDefinitionFile stepDefinitionFile)
     {

@@ -1,58 +1,53 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using SpecFlow.VisualStudio.ProjectSystem;
-using SpecFlow.VisualStudio.UI.ViewModels;
 
-namespace SpecFlow.VisualStudio.Diagnostics
+namespace SpecFlow.VisualStudio.Diagnostics;
+
+public static class ReportErrorServices
 {
-    public static class ReportErrorServices
+    private static readonly List<string> HiddenErrors = new();
+
+    public static void ReportInitError(IIdeScope ideScope, Exception exception)
     {
-        private static readonly List<string> HiddenErrors = new List<string>();
+        ideScope.Logger.LogException(ideScope.MonitoringService, exception, "Initialization error");
+        ReportError(ideScope, ReportErrorDialogViewModel.INIT_ERROR, exception.ToString());
+    }
 
-        public static void ReportInitError(IIdeScope ideScope, Exception exception)
+    public static void ReportGeneralError(IIdeScope ideScope, string message, Exception exception)
+    {
+        ideScope.Logger.LogException(ideScope.MonitoringService, exception, message);
+        var errorMessage = $"**{message}**{ReportErrorDialogViewModel.GENERAL_ERROR_SUFFIX}";
+        ReportError(ideScope, errorMessage, exception.ToString());
+    }
+
+    private static void ReportError(this IIdeScope ideScope, string message, string errorDetails)
+    {
+        var hash = Math.Abs(errorDetails.GetHashCode()).ToString();
+        if (HiddenErrors.Contains(hash))
         {
-            ideScope.Logger.LogException(ideScope.MonitoringService, exception, "Initialization error");
-            ReportError(ideScope, ReportErrorDialogViewModel.INIT_ERROR, exception.ToString());
+            ideScope.Logger.LogVerbose($"Error hidden: {hash}");
+            return;
         }
 
-        public static void ReportGeneralError(IIdeScope ideScope, string message, Exception exception)
-        {
-            ideScope.Logger.LogException(ideScope.MonitoringService, exception, message);
-            var errorMessage = $"**{message}**{ReportErrorDialogViewModel.GENERAL_ERROR_SUFFIX}";
-            ReportError(ideScope, errorMessage, exception.ToString());
-        }
+        message = message +
+                  ReportErrorDialogViewModel.ERROR_SUFFIX_TEMPLATE.Replace("{logFilePath}",
+                      DeveroomFileLogger.GetLogFile());
 
-        private static void ReportError(this IIdeScope ideScope, string message, string errorDetails)
+        var errorInfo = $"Error hash: {hash}{Environment.NewLine}{errorDetails}";
+
+        var viewModel = new ReportErrorDialogViewModel
         {
-            var hash = Math.Abs(errorDetails.GetHashCode()).ToString();
-            if (HiddenErrors.Contains(hash))
+            Message = message,
+            ErrorInfo = errorInfo,
+            CopyErrorToClipboardCommand = vm =>
             {
-                ideScope.Logger.LogVerbose($"Error hidden: {hash}");
-                return;
+                ideScope.Logger.LogVerbose($"Copy to clipboard: {vm.ErrorInfo}");
+                ideScope.Actions.SetClipboardText(vm.ErrorInfo);
             }
+        };
 
-            message = message + ReportErrorDialogViewModel.ERROR_SUFFIX_TEMPLATE.Replace("{logFilePath}", DeveroomFileLogger.GetLogFile());
+        ideScope.WindowManager.ShowDialog(viewModel);
 
-            var errorInfo = $"Error hash: {hash}{Environment.NewLine}{errorDetails}";
-
-            var viewModel = new ReportErrorDialogViewModel
-            {
-                Message = message,
-                ErrorInfo = errorInfo,
-                CopyErrorToClipboardCommand = vm =>
-                {
-                    ideScope.Logger.LogVerbose($"Copy to clipboard: {vm.ErrorInfo}");
-                    ideScope.Actions.SetClipboardText(vm.ErrorInfo);
-                }
-            };
-
-            ideScope.WindowManager.ShowDialog(viewModel);
-
-            if (viewModel.DoNotShowThisErrorAgain)
-            {
-                HiddenErrors.Add(hash);
-            }
-        }
+        if (viewModel.DoNotShowThisErrorAgain) HiddenErrors.Add(hash);
     }
 }

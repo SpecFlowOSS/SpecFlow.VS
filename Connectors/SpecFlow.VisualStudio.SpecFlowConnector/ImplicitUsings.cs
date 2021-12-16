@@ -8,3 +8,5 @@ global using TechTalk.SpecFlow.Generator.Interfaces;
 global using TechTalk.SpecFlow.Infrastructure;
 global using TechTalk.SpecFlow.Plugins;
 global using TechTalk.SpecFlow.Tracing;
+global using System.Runtime.InteropServices;
+global using TechTalk.SpecFlow;

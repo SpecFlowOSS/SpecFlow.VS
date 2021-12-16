@@ -1,12 +1,11 @@
 ﻿using System;
 using EnvDTE;
 
-namespace SpecFlow.VisualStudio.ProjectSystem
+namespace SpecFlow.VisualStudio.ProjectSystem;
+
+public interface IVsIdeScope : IIdeScope, IDisposable
 {
-    public interface IVsIdeScope : IIdeScope, IDisposable
-    {
-        IServiceProvider ServiceProvider { get; }
-        DTE Dte { get; }
-        IProjectScope GetProjectScope(Project project);
-    }
+    IServiceProvider ServiceProvider { get; }
+    DTE Dte { get; }
+    IProjectScope GetProjectScope(Project project);
 }

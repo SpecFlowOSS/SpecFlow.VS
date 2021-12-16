@@ -84,7 +84,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
     {
         var updatedRegistry = await update(originalRegistry);
 
-        if (updatedRegistry.Version >= originalRegistry.Version) 
+        if (updatedRegistry.Version >= originalRegistry.Version)
             return updatedRegistry;
 
         if (updatedRegistry == ProjectBindingRegistry.Invalid)
@@ -122,7 +122,8 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         var sourceLocations = bindingRegistry.StepDefinitions
             .Where(sd => sd.IsValid)
             .Select(sd => sd.Implementation.SourceLocation)
-            .Where(sl => sl != null); //TODO: Handle step definitions without source locations better (https://app.asana.com/0/0/1201527573246078/f)
+            .Where(sl =>
+                sl != null); //TODO: Handle step definitions without source locations better (https://app.asana.com/0/0/1201527573246078/f)
         _ideScope.CalculateSourceLocationTrackingPositions(sourceLocations);
     }
 

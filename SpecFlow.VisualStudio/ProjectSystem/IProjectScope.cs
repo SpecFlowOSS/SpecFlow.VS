@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.Utilities;
 
-namespace SpecFlow.VisualStudio.ProjectSystem
+namespace SpecFlow.VisualStudio.ProjectSystem;
+
+public interface IProjectScope : IPropertyOwner, IDisposable
 {
-    public interface IProjectScope : IPropertyOwner, IDisposable
-    {
-        IIdeScope IdeScope { get; }
-        string ProjectName { get; }
-        string ProjectFullName { get; }
-        string ProjectFolder { get; }
+    IIdeScope IdeScope { get; }
+    string ProjectName { get; }
+    string ProjectFullName { get; }
+    string ProjectFolder { get; }
 
-        IEnumerable<NuGetPackageReference> PackageReferences { get; }
-        string OutputAssemblyPath { get; }
-        string TargetFrameworkMoniker { get; }
-        string TargetFrameworkMonikers { get; }
-        string PlatformTargetName { get; }
-        string DefaultNamespace { get; }
+    IEnumerable<NuGetPackageReference> PackageReferences { get; }
+    string OutputAssemblyPath { get; }
+    string TargetFrameworkMoniker { get; }
+    string TargetFrameworkMonikers { get; }
+    string PlatformTargetName { get; }
+    string DefaultNamespace { get; }
 
-        void AddFile(string targetFilePath, string template);
-        int? GetFeatureFileCount();
-        string[] GetProjectFiles(string extension);
-    }
+    void AddFile(string targetFilePath, string template);
+    int? GetFeatureFileCount();
+    string[] GetProjectFiles(string extension);
 }

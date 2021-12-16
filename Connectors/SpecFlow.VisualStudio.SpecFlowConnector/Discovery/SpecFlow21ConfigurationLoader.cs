@@ -1,25 +1,21 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
+public class SpecFlow21ConfigurationLoader : SpecFlowConfigurationLoader
 {
-    public class SpecFlow21ConfigurationLoader : SpecFlowConfigurationLoader
+    public SpecFlow21ConfigurationLoader(string configFilePath) : base(configFilePath)
     {
-        public SpecFlow21ConfigurationLoader(string configFilePath) : base(configFilePath)
-        {
-        }
+    }
 
-        protected override string ConvertToJsonSpecFlow3Style(string configFileContent)
-        {
-            var content = JsonConvert.DeserializeObject<JObject>(configFileContent);
-            
-            if (!content.TryGetValue("specFlow", out var specFlowObject))
-                return configFileContent;
+    protected override string ConvertToJsonSpecFlow3Style(string configFileContent)
+    {
+        var content = JsonConvert.DeserializeObject<JObject>(configFileContent);
 
-            var configObject = new JObject(specFlowObject.First);
+        if (!content.TryGetValue("specFlow", out var specFlowObject))
+            return configFileContent;
 
-            var modifiedContent = JsonConvert.SerializeObject(configObject, Formatting.Indented);
-            return modifiedContent;
-        }
+        var configObject = new JObject(specFlowObject.First);
+
+        var modifiedContent = JsonConvert.SerializeObject(configObject, Formatting.Indented);
+        return modifiedContent;
     }
 }

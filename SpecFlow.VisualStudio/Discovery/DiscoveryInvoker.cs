@@ -19,10 +19,8 @@ internal class DiscoveryInvoker
         _fileSystem = _projectScope.IdeScope.FileSystem;
     }
 
-    public int CreateProjectHash(ProjectSettings projectSettings, ConfigSource testAssemblySource)
-    {
-        return projectSettings.GetHashCode() ^ testAssemblySource.GetHashCode();
-    }
+    public int CreateProjectHash(ProjectSettings projectSettings, ConfigSource testAssemblySource) =>
+        projectSettings.GetHashCode() ^ testAssemblySource.GetHashCode();
 
     public ConfigSource GetTestAssemblySource(ProjectSettings projectSettings) =>
         projectSettings.IsSpecFlowTestProject

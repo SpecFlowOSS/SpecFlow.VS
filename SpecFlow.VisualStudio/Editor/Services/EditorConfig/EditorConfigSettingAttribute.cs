@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig
-{
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class EditorConfigSettingAttribute : Attribute
-    {
-        public string EditorConfigSettingName { get; }
+namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig;
 
-        public EditorConfigSettingAttribute(string editorConfigSettingName)
-        {
-            EditorConfigSettingName = editorConfigSettingName;
-        }
+[AttributeUsage(AttributeTargets.Property)]
+public class EditorConfigSettingAttribute : Attribute
+{
+    public EditorConfigSettingAttribute(string editorConfigSettingName)
+    {
+        EditorConfigSettingName = editorConfigSettingName;
     }
+
+    public string EditorConfigSettingName { get; }
 }

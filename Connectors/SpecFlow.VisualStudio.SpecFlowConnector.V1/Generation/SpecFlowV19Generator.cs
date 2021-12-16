@@ -1,14 +1,10 @@
-﻿using System.IO;
-using TechTalk.SpecFlow.Generator.Interfaces;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation
+public class SpecFlowV19Generator : SpecFlowV22Generator
 {
-    public class SpecFlowV19Generator : SpecFlowV22Generator
+    protected override SpecFlowConfigurationHolder CreateConfigHolder(string configFilePath)
     {
-        protected override SpecFlowConfigurationHolder CreateConfigHolder(string configFilePath)
-        {
-            var configFileContent = File.ReadAllText(configFilePath);
-            return GetXmlConfigurationHolder(configFileContent);
-        }
+        var configFileContent = File.ReadAllText(configFilePath);
+        return GetXmlConfigurationHolder(configFileContent);
     }
 }

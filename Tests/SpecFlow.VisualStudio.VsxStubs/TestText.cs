@@ -13,10 +13,7 @@ public class TestTextPosition
     public int Line { get; }
     public int Column { get; }
 
-    public override string ToString()
-    {
-        return $"({Line},{Column})";
-    }
+    public override string ToString() => $"({Line},{Column})";
 }
 
 public class TestTextSection
@@ -36,10 +33,7 @@ public class TestTextSection
     public TestTextPosition End { get; set; }
     public string Text => _testText.GetText(Start, End);
 
-    public override string ToString()
-    {
-        return $"{Label}{Start}-{End}:{Text}";
-    }
+    public override string ToString() => $"{Label}{Start}-{End}:{Text}";
 }
 
 public class TestText
@@ -128,15 +122,9 @@ public class TestText
         return start + Lines[lineNo].Length + (includingNl ? NewLineLenght : 0);
     }
 
-    public override string ToString()
-    {
-        return ToString(null);
-    }
+    public override string ToString() => ToString(null);
 
-    public string ToString(string newLine)
-    {
-        return string.Join(newLine ?? Environment.NewLine, Lines);
-    }
+    public string ToString(string newLine) => string.Join(newLine ?? Environment.NewLine, Lines);
 
     public void SetCaret(IWpfTextView textView)
     {

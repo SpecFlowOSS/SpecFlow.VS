@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Linq;
 
-namespace SpecFlow.VisualStudio.ProjectSystem.Settings
+namespace SpecFlow.VisualStudio.ProjectSystem.Settings;
+
+public class SpecFlowSettings
 {
-    public class SpecFlowSettings
+    public SpecFlowSettings()
     {
-        public NuGetVersion Version { get; set; }
-        public SpecFlowProjectTraits Traits { get; set; }
-        public string GeneratorFolder { get; set; }
-        public string ConfigFilePath { get; set; }
-
-        public SpecFlowSettings()
-        {
-            Traits = SpecFlowProjectTraits.None;
-        }
-
-        public SpecFlowSettings(NuGetVersion version, SpecFlowProjectTraits traits, string generatorFolder, string configFilePath)
-        {
-            Version = version;
-            Traits = traits;
-            GeneratorFolder = generatorFolder;
-            ConfigFilePath = configFilePath;
-        }
+        Traits = SpecFlowProjectTraits.None;
     }
+
+    public SpecFlowSettings(NuGetVersion version, SpecFlowProjectTraits traits, string generatorFolder,
+        string configFilePath)
+    {
+        Version = version;
+        Traits = traits;
+        GeneratorFolder = generatorFolder;
+        ConfigFilePath = configFilePath;
+    }
+
+    public NuGetVersion Version { get; set; }
+    public SpecFlowProjectTraits Traits { get; set; }
+    public string GeneratorFolder { get; set; }
+    public string ConfigFilePath { get; set; }
 }

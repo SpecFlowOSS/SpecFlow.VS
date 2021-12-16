@@ -1,48 +1,40 @@
 ﻿using System;
-using System.ComponentModel.Composition;
 using System.Globalization;
 using System.Linq;
-using SpecFlow.VisualStudio.Monitoring;
-using SpecFlow.VisualStudio.ProjectSystem;
-using SpecFlow.VisualStudio.UI.ViewModels;
 using SpecFlow.VisualStudio.Wizards.Infrastructure;
 
-namespace SpecFlow.VisualStudio.Wizards
+namespace SpecFlow.VisualStudio.Wizards;
+
+[Export(typeof(SpecFlowProjectWizard))]
+public class SpecFlowProjectWizard : IDeveroomWizard
 {
-    [Export(typeof(SpecFlowProjectWizard))]
-    public class SpecFlowProjectWizard : IDeveroomWizard
+    private readonly IDeveroomWindowManager _deveroomWindowManager;
+    private readonly IMonitoringService _monitoringService;
+
+    [ImportingConstructor]
+    public SpecFlowProjectWizard(IDeveroomWindowManager deveroomWindowManager, IMonitoringService monitoringService)
     {
-        private readonly IDeveroomWindowManager _deveroomWindowManager;
-        private readonly IMonitoringService _monitoringService;
+        _deveroomWindowManager = deveroomWindowManager;
+        _monitoringService = monitoringService;
+    }
 
-        [ImportingConstructor]
-        public SpecFlowProjectWizard(IDeveroomWindowManager deveroomWindowManager, IMonitoringService monitoringService)
-        {
-            _deveroomWindowManager = deveroomWindowManager;
-            _monitoringService = monitoringService;
-        }
+    public bool RunStarted(WizardRunParameters wizardRunParameters)
+    {
+        _monitoringService.MonitorProjectTemplateWizardStarted();
 
-        public bool RunStarted(WizardRunParameters wizardRunParameters)
-        {
-            _monitoringService.MonitorProjectTemplateWizardStarted();
+        var viewModel = new AddNewSpecFlowProjectViewModel();
+        var dialogResult = _deveroomWindowManager.ShowDialog(viewModel);
+        if (!dialogResult.HasValue || !dialogResult.Value) return false;
 
-            var viewModel = new AddNewSpecFlowProjectViewModel();
-            var dialogResult = _deveroomWindowManager.ShowDialog(viewModel);
-            if (!dialogResult.HasValue || !dialogResult.Value)
-            {
-                return false;
-            }
+        _monitoringService.MonitorProjectTemplateWizardCompleted(viewModel.DotNetFramework, viewModel.UnitTestFramework,
+            viewModel.FluentAssertionsIncluded);
 
-            _monitoringService.MonitorProjectTemplateWizardCompleted(viewModel.DotNetFramework, viewModel.UnitTestFramework, viewModel.FluentAssertionsIncluded);
+        // Add custom parameters.
+        wizardRunParameters.ReplacementsDictionary.Add("$dotnetframework$", viewModel.DotNetFramework);
+        wizardRunParameters.ReplacementsDictionary.Add("$unittestframework$", viewModel.UnitTestFramework);
+        wizardRunParameters.ReplacementsDictionary.Add("$fluentassertionsincluded$",
+            viewModel.FluentAssertionsIncluded.ToString(CultureInfo.InvariantCulture));
 
-            // Add custom parameters.
-            wizardRunParameters.ReplacementsDictionary.Add("$dotnetframework$", viewModel.DotNetFramework);
-            wizardRunParameters.ReplacementsDictionary.Add("$unittestframework$", viewModel.UnitTestFramework);
-            wizardRunParameters.ReplacementsDictionary.Add("$fluentassertionsincluded$",
-                viewModel.FluentAssertionsIncluded.ToString(CultureInfo.InvariantCulture));
-
-            return true;
-        }
-
+        return true;
     }
 }

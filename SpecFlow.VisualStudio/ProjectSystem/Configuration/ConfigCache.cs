@@ -1,16 +1,13 @@
-﻿using SpecFlow.VisualStudio.Configuration;
+﻿namespace SpecFlow.VisualStudio.ProjectSystem.Configuration;
 
-namespace SpecFlow.VisualStudio.ProjectSystem.Configuration
+internal class ConfigCache
 {
-    internal class ConfigCache
+    public ConfigCache(DeveroomConfiguration configuration, ConfigSource[] configSources)
     {
-        public DeveroomConfiguration Configuration { get;  }
-        public ConfigSource[] ConfigSources { get; }
-
-        public ConfigCache(DeveroomConfiguration configuration, ConfigSource[] configSources)
-        {
-            Configuration = configuration;
-            ConfigSources = configSources;
-        }
+        Configuration = configuration;
+        ConfigSources = configSources;
     }
+
+    public DeveroomConfiguration Configuration { get; }
+    public ConfigSource[] ConfigSources { get; }
 }

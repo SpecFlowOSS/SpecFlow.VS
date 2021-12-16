@@ -1,7 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Models
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Models;
+
+public class GenerationResult : ConnectorResult
 {
-    public class GenerationResult : ConnectorResult
-    {
-        public FeatureFileCodeBehind FeatureFileCodeBehind { get; set; }
-    }
+    public FeatureFileCodeBehind FeatureFileCodeBehind { get; set; }
 }

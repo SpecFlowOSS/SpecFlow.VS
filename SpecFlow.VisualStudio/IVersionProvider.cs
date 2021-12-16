@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 
-namespace SpecFlow.VisualStudio
+namespace SpecFlow.VisualStudio;
+
+public interface IVersionProvider
 {
-    public interface IVersionProvider
-    {
-        string GetVsVersion();
-        string GetExtensionVersion();
-    }
+    string GetVsVersion();
+    string GetExtensionVersion();
 }

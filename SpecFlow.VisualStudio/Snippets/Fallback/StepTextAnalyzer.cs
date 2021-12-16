@@ -1,33 +1,30 @@
 ﻿using System.Globalization;
 using System.Linq;
-using System.Collections.Generic;
 
-namespace SpecFlow.VisualStudio.Snippets.Fallback
+namespace SpecFlow.VisualStudio.Snippets.Fallback;
+// imported from SpecFlow v2.4
+
+public class AnalyzedStepText
 {
-    // imported from SpecFlow v2.4
+    public readonly List<AnalyzedStepParameter> Parameters = new();
+    public readonly List<string> TextParts = new();
+}
 
-    public class AnalyzedStepText
+public class AnalyzedStepParameter
+{
+    public readonly string Name;
+    public readonly string RegexPattern;
+    public readonly string Type;
+
+    public AnalyzedStepParameter(string type, string name, string regexPattern = null)
     {
-        public readonly List<string> TextParts = new List<string>();
-        public readonly List<AnalyzedStepParameter> Parameters = new List<AnalyzedStepParameter>();
+        Type = type;
+        Name = name;
+        RegexPattern = regexPattern;
     }
+}
 
-    public class AnalyzedStepParameter
-    {
-        public readonly string Type;
-        public readonly string Name;
-        public readonly string RegexPattern;
-
-        public AnalyzedStepParameter(string type, string name, string regexPattern = null)
-        {
-            this.Type = type;
-            this.Name = name;
-            this.RegexPattern = regexPattern;
-        }
-    }
-
-    public interface IStepTextAnalyzer
-    {
-        AnalyzedStepText Analyze(string stepText, CultureInfo bindingCulture);
-    }
+public interface IStepTextAnalyzer
+{
+    AnalyzedStepText Analyze(string stepText, CultureInfo bindingCulture);
 }

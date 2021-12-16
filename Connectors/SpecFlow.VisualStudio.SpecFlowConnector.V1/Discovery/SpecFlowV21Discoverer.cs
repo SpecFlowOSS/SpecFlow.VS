@@ -1,13 +1,9 @@
 ﻿using System;
-using TechTalk.SpecFlow.Configuration;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+
+public class SpecFlowV21Discoverer : SpecFlowV22Discoverer
 {
-    public class SpecFlowV21Discoverer : SpecFlowV22Discoverer
-    {
-        protected override IRuntimeConfigurationProvider CreateConfigurationProvider(string configFilePath)
-        {
-            return Activator.CreateInstance<DefaultRuntimeConfigurationProvider>();
-        }
-    }
+    protected override IRuntimeConfigurationProvider CreateConfigurationProvider(string configFilePath) =>
+        Activator.CreateInstance<DefaultRuntimeConfigurationProvider>();
 }

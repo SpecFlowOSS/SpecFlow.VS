@@ -1,18 +1,15 @@
-﻿using System.IO;
+﻿namespace SpecFlow.SampleProjectGenerator;
 
-namespace SpecFlow.SampleProjectGenerator
+public class NuGetPackageData
 {
-    public class NuGetPackageData
+    public NuGetPackageData(string packageName, string version, string installPath)
     {
-        public string PackageName { get; }
-        public string Version { get; }
-        public string InstallPath { get; }
-
-        public NuGetPackageData(string packageName, string version, string installPath)
-        {
-            PackageName = packageName;
-            Version = version;
-            InstallPath = installPath?.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-        }
+        PackageName = packageName;
+        Version = version;
+        InstallPath = installPath?.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
     }
+
+    public string PackageName { get; }
+    public string Version { get; }
+    public string InstallPath { get; }
 }

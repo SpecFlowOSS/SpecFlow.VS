@@ -136,7 +136,7 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
                        $"{indent}}}" + newLine +
                        "}" + newLine;
 
-        var targetFile = CSharpStepDefinitionFile
+        var targetFile = FileDetails
             .FromPath(targetFolder, className + ".cs")
             .WithCSharpContent(template);
 
@@ -154,7 +154,8 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
             () => RebuildBindingRegistry(discoveryService, targetFile), _ => { Finished.Set(); });
     }
 
-    private async Task RebuildBindingRegistry(IDiscoveryService discoveryService, CSharpStepDefinitionFile stepDefinitionFile)
+    private async Task RebuildBindingRegistry(IDiscoveryService discoveryService,
+        CSharpStepDefinitionFile stepDefinitionFile)
     {
         await discoveryService.BindingRegistryCache
             .Update(bindingRegistry => bindingRegistry.ReplaceStepDefinitions(stepDefinitionFile));

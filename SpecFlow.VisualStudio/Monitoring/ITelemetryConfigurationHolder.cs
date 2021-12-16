@@ -1,7 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.Monitoring
+﻿namespace SpecFlow.VisualStudio.Monitoring;
+
+public interface ITelemetryConfigurationHolder
 {
-    public interface ITelemetryConfigurationHolder
-    {
-        void ApplyConfiguration();
-    }
+    void ApplyConfiguration();
 }

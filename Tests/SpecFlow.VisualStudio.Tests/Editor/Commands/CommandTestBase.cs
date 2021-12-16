@@ -44,10 +44,8 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         return WaitForCommandToComplete(command);
     }
 
-    protected static bool Invoke(T command, StubWpfTextView textView)
-    {
-        return command.PreExec(textView, command.Targets.First());
-    }
+    protected static bool Invoke(T command, StubWpfTextView textView) =>
+        command.PreExec(textView, command.Targets.First());
 
     protected Task WaitForCommandToComplete(T command)
     {

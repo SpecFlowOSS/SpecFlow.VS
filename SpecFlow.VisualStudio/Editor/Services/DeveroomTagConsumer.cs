@@ -1,66 +1,64 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Tagging;
 
-namespace SpecFlow.VisualStudio.Editor.Services
+namespace SpecFlow.VisualStudio.Editor.Services;
+
+public abstract class DeveroomTagConsumer : IDisposable
 {
-    public abstract class DeveroomTagConsumer : IDisposable
+    protected readonly ITextBuffer Buffer;
+    protected readonly ITagAggregator<DeveroomTag> DeveroomTagAggregator;
+
+    protected DeveroomTagConsumer(ITextBuffer buffer, ITagAggregator<DeveroomTag> deveroomTagAggregator)
     {
-        protected readonly ITextBuffer Buffer;
-        protected readonly ITagAggregator<DeveroomTag> DeveroomTagAggregator;
+        Buffer = buffer;
+        DeveroomTagAggregator = deveroomTagAggregator;
 
-        protected DeveroomTagConsumer(ITextBuffer buffer, ITagAggregator<DeveroomTag> deveroomTagAggregator)
+        DeveroomTagAggregator.BatchedTagsChanged += DeveroomTagAggregatorOnBatchedTagsChanged;
+    }
+
+    public void Dispose()
+    {
+        DeveroomTagAggregator.BatchedTagsChanged -= DeveroomTagAggregatorOnBatchedTagsChanged;
+    }
+
+    private void DeveroomTagAggregatorOnBatchedTagsChanged(object sender,
+        BatchedTagsChangedEventArgs batchedTagsChangedEventArgs)
+    {
+        var snapshot = Buffer.CurrentSnapshot;
+        var spans = batchedTagsChangedEventArgs.Spans.SelectMany(mappingSpan => mappingSpan.GetSpans(snapshot),
+            (mappingSpan, mappedTagSpan) => mappedTagSpan);
+
+        var start = int.MaxValue;
+        var end = 0;
+        foreach (var sourceSpan in spans)
         {
-            this.Buffer = buffer;
-            this.DeveroomTagAggregator = deveroomTagAggregator;
-
-            this.DeveroomTagAggregator.BatchedTagsChanged += DeveroomTagAggregatorOnBatchedTagsChanged;
+            start = Math.Min(start, sourceSpan.Start.Position);
+            end = Math.Max(end, sourceSpan.End.Position);
         }
 
-        private void DeveroomTagAggregatorOnBatchedTagsChanged(object sender, BatchedTagsChangedEventArgs batchedTagsChangedEventArgs)
-        {
-            var snapshot = Buffer.CurrentSnapshot;
-            var spans = batchedTagsChangedEventArgs.Spans.SelectMany(mappingSpan => mappingSpan.GetSpans(snapshot), (mappingSpan, mappedTagSpan) => mappedTagSpan);
+        if (start == int.MaxValue || end <= start)
+            return;
 
-            var start = int.MaxValue;
-            var end = 0;
-            foreach (var sourceSpan in spans)
-            {
-                start = Math.Min(start, sourceSpan.Start.Position);
-                end = Math.Max(end, sourceSpan.End.Position);
-            }
+        var span = new SnapshotSpan(snapshot, start, end - start);
+        RaiseChanged(span);
+    }
 
-            if (start == int.MaxValue || end <= start)
-                return;
+    protected abstract void RaiseChanged(SnapshotSpan span);
 
-            var span = new SnapshotSpan(snapshot, start, end - start);
-            RaiseChanged(span);
-        }
+    protected IEnumerable<KeyValuePair<SnapshotSpan, DeveroomTag>> GetDeveroomTags(SnapshotSpan span,
+        Predicate<DeveroomTag> filter = null) => GetDeveroomTags(new NormalizedSnapshotSpanCollection(span), filter);
 
-        protected abstract void RaiseChanged(SnapshotSpan span);
+    protected IEnumerable<KeyValuePair<SnapshotSpan, DeveroomTag>> GetDeveroomTags(
+        NormalizedSnapshotSpanCollection spans, Predicate<DeveroomTag> filter = null)
+    {
+        var snapshot = spans[0].Snapshot;
+        var gherkinMappingTagSpans = DeveroomTagAggregator.GetTags(spans);
+        if (filter != null)
+            gherkinMappingTagSpans = gherkinMappingTagSpans.Where(t => filter(t.Tag));
 
-        public void Dispose()
-        {
-            this.DeveroomTagAggregator.BatchedTagsChanged -= DeveroomTagAggregatorOnBatchedTagsChanged;
-        }
-
-        protected IEnumerable<KeyValuePair<SnapshotSpan, DeveroomTag>> GetDeveroomTags(SnapshotSpan span, Predicate<DeveroomTag> filter = null)
-        {
-            return GetDeveroomTags(new NormalizedSnapshotSpanCollection(span), filter);
-        }
-
-        protected IEnumerable<KeyValuePair<SnapshotSpan, DeveroomTag>> GetDeveroomTags(NormalizedSnapshotSpanCollection spans, Predicate<DeveroomTag> filter = null)
-        {
-            var snapshot = spans[0].Snapshot;
-            var gherkinMappingTagSpans = DeveroomTagAggregator.GetTags(spans);
-            if (filter != null)
-                gherkinMappingTagSpans = gherkinMappingTagSpans.Where(t => filter(t.Tag));
-
-            return gherkinMappingTagSpans.SelectMany(
-                mappingTagSpan => mappingTagSpan.Span.GetSpans(snapshot),
-                (mappingTagSpan, mappedTagSpan) => new KeyValuePair<SnapshotSpan, DeveroomTag>(mappedTagSpan, mappingTagSpan.Tag));
-        }
+        return gherkinMappingTagSpans.SelectMany(
+            mappingTagSpan => mappingTagSpan.Span.GetSpans(snapshot),
+            (mappingTagSpan, mappedTagSpan) =>
+                new KeyValuePair<SnapshotSpan, DeveroomTag>(mappedTagSpan, mappingTagSpan.Tag));
     }
 }

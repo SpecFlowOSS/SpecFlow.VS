@@ -1,17 +1,16 @@
 ﻿using System;
 
-namespace SpecFlow.VisualStudio.VsEvents
+namespace SpecFlow.VisualStudio.VsEvents;
+
+public class TestContainersChangedEventArgs : EventArgs
 {
-    public class TestContainersChangedEventArgs : EventArgs
+    public TestContainersChangedEventArgs(bool testContainerUpdateSucceeded, bool testContainerUpdateCanceled)
     {
-        public bool Succeeded { get; private set; }
-
-        public bool Canceled { get; private set; }
-
-        public TestContainersChangedEventArgs(bool testContainerUpdateSucceeded, bool testContainerUpdateCanceled)
-        {
-            this.Succeeded = testContainerUpdateSucceeded;
-            this.Canceled = testContainerUpdateCanceled;
-        }
+        Succeeded = testContainerUpdateSucceeded;
+        Canceled = testContainerUpdateCanceled;
     }
+
+    public bool Succeeded { get; }
+
+    public bool Canceled { get; }
 }

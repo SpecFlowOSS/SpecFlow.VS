@@ -1,35 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SpecFlow.VisualStudio.Monitoring;
-using Gherkin;
-using Gherkin.Ast;
 
-namespace SpecFlow.VisualStudio.Editor.Services.Parser
+namespace SpecFlow.VisualStudio.Editor.Services.Parser;
+
+public class DeveroomGherkinDocument : GherkinDocument
 {
-    public class DeveroomGherkinDocument : GherkinDocument
+    private readonly List<int> _statesForLines;
+
+    public DeveroomGherkinDocument(Feature feature, Comment[] comments, string sourceFilePath,
+        GherkinDialect gherkinDialect, List<int> statesForLines) : base(feature, comments)
     {
-        private readonly List<int> _statesForLines;
-        public GherkinDialect GherkinDialect { get; }
+        _statesForLines = statesForLines;
+        GherkinDialect = gherkinDialect;
+    }
 
-        public DeveroomGherkinDocument(Feature feature, Comment[] comments, string sourceFilePath,
-            GherkinDialect gherkinDialect, List<int> statesForLines) : base(feature, comments)
-        {
-            _statesForLines = statesForLines;
-            GherkinDialect = gherkinDialect;
-        }
+    public GherkinDialect GherkinDialect { get; }
 
-        public TokenType[] GetExpectedTokens(int line, IMonitoringService monitoringService)
-        {
-            if (_statesForLines.Count <= line)
-                return new TokenType[0];
+    public TokenType[] GetExpectedTokens(int line, IMonitoringService monitoringService)
+    {
+        if (_statesForLines.Count <= line)
+            return new TokenType[0];
 
-            var state = _statesForLines[line];
-            if (state < 0)
-                return new TokenType[0];
-            return DeveroomGherkinParser.GetExpectedTokens(state, monitoringService);
-        }
+        var state = _statesForLines[line];
+        if (state < 0)
+            return new TokenType[0];
+        return DeveroomGherkinParser.GetExpectedTokens(state, monitoringService);
     }
 }

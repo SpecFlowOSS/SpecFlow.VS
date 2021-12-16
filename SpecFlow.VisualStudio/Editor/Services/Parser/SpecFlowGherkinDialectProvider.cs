@@ -37,9 +37,7 @@ internal class SpecFlowGherkinDialectProvider : GherkinDialectProvider
         return provider.DefaultDialect;
     }
 
-    public static GherkinDialectProvider Get(string defaultLanguage)
-    {
+    public static GherkinDialectProvider Get(string defaultLanguage) =>
         //TODO: cache!
-        return new SpecFlowGherkinDialectProvider(defaultLanguage);
-    }
+        new SpecFlowGherkinDialectProvider(defaultLanguage);
 }

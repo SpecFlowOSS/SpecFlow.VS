@@ -1,275 +1,265 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.Editor.Services.Parser;
-using FluentAssertions;
-using SpecFlow.VisualStudio.SpecFlowConnector.Models;
-using Xunit;
+﻿using System.Linq;
 
-namespace SpecFlow.VisualStudio.Tests.Discovery
+namespace SpecFlow.VisualStudio.Tests.Discovery;
+
+public class BindingImporterTests
 {
-    public class BindingImporterTests
+    private readonly Dictionary<string, string> _sourceFiles = new();
+    private readonly Dictionary<string, string> _typeNames = new();
+
+    private BindingImporter CreateSut() => new(_sourceFiles, _typeNames, new DeveroomNullLogger());
+
+    private StepDefinition CreateStepDefinition(string regex = null, string type = null, string sourceLocation = null,
+        StepScope scope = null, string paramTypes = null, string method = null, string expression = null,
+        string error = null) =>
+        new()
+        {
+            Method = method ?? "M1",
+            Type = type ?? "Given",
+            Regex = regex ?? "regex",
+            SourceLocation = sourceLocation,
+            Scope = scope,
+            ParamTypes = paramTypes,
+            Expression = expression,
+            Error = error
+        };
+
+    [Fact]
+    public void Parses_regex_with_full_match()
     {
-        private readonly Dictionary<string, string> _sourceFiles = new Dictionary<string, string>();
-        private readonly Dictionary<string, string> _typeNames = new Dictionary<string, string>();
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition("^my step$"));
 
-        private BindingImporter CreateSut()
-        {
-            return new BindingImporter(_sourceFiles, _typeNames, new DeveroomNullLogger());
-        }
+        result.Regex.Should().NotBeNull();
+        result.Regex.ToString().Should().Be("^my step$");
+    }
 
-        private StepDefinition CreateStepDefinition(string regex = null, string type = null, string sourceLocation = null, StepScope scope = null, string paramTypes = null, string method = null, string expression = null, string error = null)
-        {
-            return new StepDefinition
-            {
-                Method = method ?? "M1",
-                Type = type ?? "Given",
-                Regex = regex ?? "regex",
-                SourceLocation = sourceLocation,
-                Scope = scope,
-                ParamTypes = paramTypes,
-                Expression = expression,
-                Error = error
-            };
-        }
+    [Fact]
+    public void Parses_regex_with_partial_match()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition("my step"));
 
-        [Fact]
-        public void Parses_regex_with_full_match()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(regex: "^my step$"));
+        result.Regex.Should().NotBeNull();
+        result.Regex.ToString().Should().Be("my step");
+    }
 
-            result.Regex.Should().NotBeNull();
-            result.Regex.ToString().Should().Be("^my step$");
-        }
+    [Fact]
+    public void Parses_type()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(type: "When"));
 
-        [Fact]
-        public void Parses_regex_with_partial_match()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(regex: "my step"));
+        result.StepDefinitionType.Should().Be(ScenarioBlock.When);
+    }
 
-            result.Regex.Should().NotBeNull();
-            result.Regex.ToString().Should().Be("my step");
-        }
+    [Fact]
+    public void Parses_source_location_start_only()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "MyClass.cs|2|5"));
 
-        [Fact]
-        public void Parses_type()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(type: "When"));
+        result.Implementation.SourceLocation.Should().NotBeNull();
+        result.Implementation.SourceLocation.SourceFile.Should().Be("MyClass.cs");
+        result.Implementation.SourceLocation.SourceFileLine.Should().Be(2);
+        result.Implementation.SourceLocation.SourceFileColumn.Should().Be(5);
+        result.Implementation.SourceLocation.HasEndPosition.Should().BeFalse();
+    }
 
-            result.StepDefinitionType.Should().Be(ScenarioBlock.When);
-        }
+    [Fact]
+    public void Parses_source_location()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "MyClass.cs|2|5|4|7"));
 
-        [Fact]
-        public void Parses_source_location_start_only()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "MyClass.cs|2|5"));
+        result.Implementation.SourceLocation.Should().NotBeNull();
+        result.Implementation.SourceLocation.SourceFile.Should().Be("MyClass.cs");
+        result.Implementation.SourceLocation.SourceFileLine.Should().Be(2);
+        result.Implementation.SourceLocation.SourceFileColumn.Should().Be(5);
+        result.Implementation.SourceLocation.HasEndPosition.Should().BeTrue();
+        result.Implementation.SourceLocation.SourceFileEndLine.Should().Be(4);
+        result.Implementation.SourceLocation.SourceFileEndColumn.Should().Be(7);
+    }
 
-            result.Implementation.SourceLocation.Should().NotBeNull();
-            result.Implementation.SourceLocation.SourceFile.Should().Be("MyClass.cs");
-            result.Implementation.SourceLocation.SourceFileLine.Should().Be(2);
-            result.Implementation.SourceLocation.SourceFileColumn.Should().Be(5);
-            result.Implementation.SourceLocation.HasEndPosition.Should().BeFalse();
-        }
+    [Fact]
+    public void Parses_source_location_from_file_reference()
+    {
+        _sourceFiles.Add("1", "MyClass.cs");
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "#1|2|5"));
 
-        [Fact]
-        public void Parses_source_location()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "MyClass.cs|2|5|4|7"));
+        result.Implementation.SourceLocation.Should().NotBeNull();
+        result.Implementation.SourceLocation.SourceFile.Should().Be("MyClass.cs");
+    }
 
-            result.Implementation.SourceLocation.Should().NotBeNull();
-            result.Implementation.SourceLocation.SourceFile.Should().Be("MyClass.cs");
-            result.Implementation.SourceLocation.SourceFileLine.Should().Be(2);
-            result.Implementation.SourceLocation.SourceFileColumn.Should().Be(5);
-            result.Implementation.SourceLocation.HasEndPosition.Should().BeTrue();
-            result.Implementation.SourceLocation.SourceFileEndLine.Should().Be(4);
-            result.Implementation.SourceLocation.SourceFileEndColumn.Should().Be(7);
-        }
+    [Fact]
+    public void Parses_source_location_without_column()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "MyClass.cs|2"));
 
-        [Fact]
-        public void Parses_source_location_from_file_reference()
-        {
-            _sourceFiles.Add("1", "MyClass.cs");
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "#1|2|5"));
+        result.Implementation.SourceLocation.Should().NotBeNull();
+        result.Implementation.SourceLocation.SourceFileLine.Should().Be(2);
+        result.Implementation.SourceLocation.SourceFileColumn.Should().Be(1);
+    }
 
-            result.Implementation.SourceLocation.Should().NotBeNull();
-            result.Implementation.SourceLocation.SourceFile.Should().Be("MyClass.cs");
-        }
+    [Fact]
+    public void Parses_source_location_without_line_and_column()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "MyClass.cs"));
 
-        [Fact]
-        public void Parses_source_location_without_column()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "MyClass.cs|2"));
+        result.Implementation.SourceLocation.Should().NotBeNull();
+        result.Implementation.SourceLocation.SourceFileLine.Should().Be(1);
+        result.Implementation.SourceLocation.SourceFileColumn.Should().Be(1);
+    }
 
-            result.Implementation.SourceLocation.Should().NotBeNull();
-            result.Implementation.SourceLocation.SourceFileLine.Should().Be(2);
-            result.Implementation.SourceLocation.SourceFileColumn.Should().Be(1);
-        }
+    [Fact]
+    public void Parses_step_definition_without_scope()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(scope: null));
 
-        [Fact]
-        public void Parses_source_location_without_line_and_column()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(sourceLocation: "MyClass.cs"));
+        result.Scope.Should().BeNull();
+    }
 
-            result.Implementation.SourceLocation.Should().NotBeNull();
-            result.Implementation.SourceLocation.SourceFileLine.Should().Be(1);
-            result.Implementation.SourceLocation.SourceFileColumn.Should().Be(1);
-        }
+    [Fact]
+    public void Imports_to_valid_when_no_error()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition("^my step$"));
 
-        [Fact]
-        public void Parses_step_definition_without_scope()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(scope: null));
+        result.IsValid.Should().BeTrue();
+    }
 
-            result.Scope.Should().BeNull();
-        }
+    [Fact]
+    public void Imports_expression_and_error()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition("^my step$",
+            expression: "my step", error: "this is an error"));
 
-        [Fact]
-        public void Imports_to_valid_when_no_error()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(regex: "^my step$"));
+        result.SpecifiedExpression.Should().Be("my step");
+        result.Error.Should().Be("this is an error");
+        result.IsValid.Should().BeFalse();
+    }
 
-            result.IsValid.Should().BeTrue();
-        }
+    [Fact]
+    public void Imports_invalid_step_definition_with_null_regex()
+    {
+        var sut = CreateSut();
+        var stepDefinition = CreateStepDefinition(error: "this is an error");
+        stepDefinition.Regex = null;
+        var result = sut.ImportStepDefinition(stepDefinition);
 
-        [Fact]
-        public void Imports_expression_and_error()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(regex: "^my step$", 
-                expression: "my step", error: "this is an error"));
+        result.Regex.Should().BeNull();
+        result.Error.Should().Be("this is an error");
+        result.IsValid.Should().BeFalse();
+    }
 
-            result.SpecifiedExpression.Should().Be("my step");
-            result.Error.Should().Be("this is an error");
-            result.IsValid.Should().BeFalse();
-        }
+    [Fact]
+    public void Parses_step_definition_tag_scope()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(scope: new StepScope {Tag = "@mytag"}));
 
-        [Fact]
-        public void Imports_invalid_step_definition_with_null_regex()
-        {
-            var sut = CreateSut();
-            var stepDefinition = CreateStepDefinition(error: "this is an error");
-            stepDefinition.Regex = null;
-            var result = sut.ImportStepDefinition(stepDefinition);
+        result.Scope.Should().NotBeNull();
+        result.Scope.Tag.Should().NotBeNull();
+        result.Scope.Tag.ToString().Should().Be("@mytag");
+    }
 
-            result.Regex.Should().BeNull();
-            result.Error.Should().Be("this is an error");
-            result.IsValid.Should().BeFalse();
-        }
+    [Fact]
+    public void Parses_single_parameter_type()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: "MyNamespace.MyType"));
 
-        [Fact]
-        public void Parses_step_definition_tag_scope()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(scope: new StepScope { Tag = "@mytag" }));
+        result.Implementation.ParameterTypes.Should().NotBeNull();
+        result.Implementation.ParameterTypes.Should().HaveCount(1);
+        result.Implementation.ParameterTypes[0].Should().Be("MyNamespace.MyType");
+    }
 
-            result.Scope.Should().NotBeNull();
-            result.Scope.Tag.Should().NotBeNull();
-            result.Scope.Tag.ToString().Should().Be("@mytag");
-        }
+    [Fact]
+    public void Parses_type_name_with_assembly()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: "MyNamespace.MyType, MyAssembly"));
 
-        [Fact]
-        public void Parses_single_parameter_type()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: "MyNamespace.MyType"));
+        result.Implementation.ParameterTypes.Should().NotBeNull();
+        result.Implementation.ParameterTypes.Should().HaveCount(1);
+        result.Implementation.ParameterTypes[0].Should().Be("MyNamespace.MyType, MyAssembly");
+    }
 
-            result.Implementation.ParameterTypes.Should().NotBeNull();
-            result.Implementation.ParameterTypes.Should().HaveCount(1);
-            result.Implementation.ParameterTypes[0].Should().Be("MyNamespace.MyType");
-        }
+    [Fact]
+    public void Parses_parameter_shortcuts()
+    {
+        var sut = CreateSut();
+        var shortcuts = TypeShortcuts.FromShortcut.ToArray();
+        var result =
+            sut.ImportStepDefinition(CreateStepDefinition(paramTypes: string.Join("|", shortcuts.Select(s => s.Key))));
 
-        [Fact]
-        public void Parses_type_name_with_assembly()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: "MyNamespace.MyType, MyAssembly"));
+        result.Implementation.ParameterTypes.Should().NotBeNull();
+        result.Implementation.ParameterTypes.Should().Equal(shortcuts.Select(s => s.Value));
+    }
 
-            result.Implementation.ParameterTypes.Should().NotBeNull();
-            result.Implementation.ParameterTypes.Should().HaveCount(1);
-            result.Implementation.ParameterTypes[0].Should().Be("MyNamespace.MyType, MyAssembly");
-        }
+    [Theory]
+    [InlineData("s")]
+    [InlineData("i")]
+    [InlineData("s|s")]
+    [InlineData("st")]
+    public void Parse_usual_parameters_optimized(string paramTypes)
+    {
+        var sut = CreateSut();
+        var result1 = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: paramTypes));
+        var result2 = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: paramTypes));
 
-        [Fact]
-        public void Parses_parameter_shortcuts()
-        {
-            var sut = CreateSut();
-            var shortcuts = TypeShortcuts.FromShortcut.ToArray();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: string.Join("|", shortcuts.Select(s => s.Key))));
+        result2.Implementation.ParameterTypes.Should().BeSameAs(result1.Implementation.ParameterTypes);
+    }
 
-            result.Implementation.ParameterTypes.Should().NotBeNull();
-            result.Implementation.ParameterTypes.Should().Equal(shortcuts.Select(s => s.Value));
-        }
+    [Fact]
+    public void Parses_parameter_types()
+    {
+        var sut = CreateSut();
+        var result =
+            sut.ImportStepDefinition(CreateStepDefinition(paramTypes: "MyNamespace.MyType | MyNamespace.OtherType"));
 
-        [Theory, 
-            InlineData("s"),
-            InlineData("i"),
-            InlineData("s|s"),
-            InlineData("st"),
-        ]
-        public void Parse_usual_parameters_optimized(string paramTypes)
-        {
-            var sut = CreateSut();
-            var result1 = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: paramTypes));
-            var result2 = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: paramTypes));
+        result.Implementation.ParameterTypes.Should().NotBeNull();
+        result.Implementation.ParameterTypes.Should().HaveCount(2);
+        result.Implementation.ParameterTypes[0].Should().Be("MyNamespace.MyType");
+        result.Implementation.ParameterTypes[1].Should().Be("MyNamespace.OtherType");
+    }
 
-            result2.Implementation.ParameterTypes.Should().BeSameAs(result1.Implementation.ParameterTypes);
-        }
+    [Fact]
+    public void Parses_parameter_types_from_external_list()
+    {
+        _typeNames.Add("1", "MyNamespace.MyType");
+        _typeNames.Add("2", "MyNamespace.OtherType");
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: "#1 | #2"));
 
-        [Fact]
-        public void Parses_parameter_types()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: "MyNamespace.MyType | MyNamespace.OtherType"));
+        result.Implementation.ParameterTypes.Should().NotBeNull();
+        result.Implementation.ParameterTypes.Should().HaveCount(2);
+        result.Implementation.ParameterTypes[0].Should().Be("MyNamespace.MyType");
+        result.Implementation.ParameterTypes[1].Should().Be("MyNamespace.OtherType");
+    }
 
-            result.Implementation.ParameterTypes.Should().NotBeNull();
-            result.Implementation.ParameterTypes.Should().HaveCount(2);
-            result.Implementation.ParameterTypes[0].Should().Be("MyNamespace.MyType");
-            result.Implementation.ParameterTypes[1].Should().Be("MyNamespace.OtherType");
-        }
+    [Fact]
+    public void Parses_null_parameter_type_as_empty_array()
+    {
+        var sut = CreateSut();
+        var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: null));
 
-        [Fact]
-        public void Parses_parameter_types_from_external_list()
-        {
-            _typeNames.Add("1", "MyNamespace.MyType");
-            _typeNames.Add("2", "MyNamespace.OtherType");
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: "#1 | #2"));
+        result.Implementation.ParameterTypes.Should().NotBeNull();
+        result.Implementation.ParameterTypes.Should().HaveCount(0);
+    }
 
-            result.Implementation.ParameterTypes.Should().NotBeNull();
-            result.Implementation.ParameterTypes.Should().HaveCount(2);
-            result.Implementation.ParameterTypes[0].Should().Be("MyNamespace.MyType");
-            result.Implementation.ParameterTypes[1].Should().Be("MyNamespace.OtherType");
-        }
+    [Fact]
+    public void Merges_implementations()
+    {
+        var sut = CreateSut();
+        var result1 = sut.ImportStepDefinition(CreateStepDefinition(method: "MyMethod", regex: "R1"));
+        var result2 = sut.ImportStepDefinition(CreateStepDefinition(method: "MyMethod", regex: "R2"));
 
-        [Fact]
-        public void Parses_null_parameter_type_as_empty_array()
-        {
-            var sut = CreateSut();
-            var result = sut.ImportStepDefinition(CreateStepDefinition(paramTypes: null));
-
-            result.Implementation.ParameterTypes.Should().NotBeNull();
-            result.Implementation.ParameterTypes.Should().HaveCount(0);
-        }
-
-        [Fact]
-        public void Merges_implementations()
-        {
-            var sut = CreateSut();
-            var result1 = sut.ImportStepDefinition(CreateStepDefinition(method: "MyMethod", regex: "R1"));
-            var result2 = sut.ImportStepDefinition(CreateStepDefinition(method: "MyMethod", regex: "R2"));
-
-            result1.Implementation.Should().BeSameAs(result2.Implementation);
-        }
+        result1.Implementation.Should().BeSameAs(result2.Implementation);
     }
 }

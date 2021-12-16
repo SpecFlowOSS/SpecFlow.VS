@@ -1,36 +1,35 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using SpecFlow.VisualStudio.Annotations;
 
-namespace SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs
+namespace SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs;
+
+public class WizardPageViewModel : INotifyPropertyChanged
 {
-    public class WizardPageViewModel : INotifyPropertyChanged
+    private bool _isActive;
+
+    public WizardPageViewModel(string name)
     {
-        private bool _isActive;
-        public string Name { get; }
+        Name = name;
+    }
 
-        public bool IsActive
+    public string Name { get; }
+
+    public bool IsActive
+    {
+        get => _isActive;
+        set
         {
-            get => _isActive;
-            set
-            {
-                if (value == _isActive) return;
-                _isActive = value;
-                OnPropertyChanged();
-            }
+            if (value == _isActive) return;
+            _isActive = value;
+            OnPropertyChanged();
         }
+    }
 
-        public WizardPageViewModel(string name)
-        {
-            Name = name;
-        }
+    public event PropertyChangedEventHandler PropertyChanged;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

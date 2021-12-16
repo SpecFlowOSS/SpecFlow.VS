@@ -1,4 +1,4 @@
-﻿﻿global using Gherkin.Ast;
+﻿global using Gherkin.Ast;
 global using Gherkin;
 global using Microsoft.Win32;
 global using Newtonsoft.Json.Linq;

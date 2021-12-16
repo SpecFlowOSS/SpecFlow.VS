@@ -1,7 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig
+﻿namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig;
+
+public interface IEditorConfigOptions
 {
-    public interface IEditorConfigOptions
-    {
-        TResult GetOption<TResult>(string editorConfigKey, TResult defaultValue);
-    }
+    TResult GetOption<TResult>(string editorConfigKey, TResult defaultValue);
 }

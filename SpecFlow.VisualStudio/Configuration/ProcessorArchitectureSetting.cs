@@ -1,10 +1,9 @@
-﻿namespace SpecFlow.VisualStudio.Configuration
+﻿namespace SpecFlow.VisualStudio.Configuration;
+
+public enum ProcessorArchitectureSetting
 {
-    public enum ProcessorArchitectureSetting
-    {
-        AutoDetect,
-        UseSystem,
-        X86,
-        X64
-    }
+    AutoDetect,
+    UseSystem,
+    X86,
+    X64
 }

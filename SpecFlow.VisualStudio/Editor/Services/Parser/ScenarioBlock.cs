@@ -1,10 +1,9 @@
-﻿namespace SpecFlow.VisualStudio.Editor.Services.Parser
+﻿namespace SpecFlow.VisualStudio.Editor.Services.Parser;
+
+public enum ScenarioBlock
 {
-    public enum ScenarioBlock
-    {
-        Unknown = 0,
-        Given = 1,
-        When = 2,
-        Then = 3,
-    }
+    Unknown = 0,
+    Given = 1,
+    When = 2,
+    Then = 3
 }

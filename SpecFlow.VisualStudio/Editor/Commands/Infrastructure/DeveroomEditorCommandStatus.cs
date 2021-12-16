@@ -1,9 +1,8 @@
-namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure
+namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
+
+public enum DeveroomEditorCommandStatus
 {
-    public enum DeveroomEditorCommandStatus
-    {
-        NotSupported,
-        Supported,
-        Disabled
-    }
+    NotSupported,
+    Supported,
+    Disabled
 }

@@ -2,9 +2,8 @@
 using System.Linq;
 using SpecFlow.VisualStudio.Wizards.Infrastructure;
 
-namespace SpecFlow.VisualStudio.Wizards
+namespace SpecFlow.VisualStudio.Wizards;
+
+public class VsSpecFlowProjectWizard : VsProjectScopeWizard<SpecFlowProjectWizard>
 {
-    public class VsSpecFlowProjectWizard : VsProjectScopeWizard<SpecFlowProjectWizard>
-    {
-    }
 }

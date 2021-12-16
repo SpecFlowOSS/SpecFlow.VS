@@ -51,7 +51,8 @@ public class StubLogger : IDeveroomLogger
         return new StubLogger(
             _stopwatch,
             Logs.Select(m =>
-                new LogMessage(m.Level, m.Message.Replace(warningHeader, string.Empty), m.Order, m.TimeStamp, m.CallerMethod)));
+                new LogMessage(m.Level, m.Message.Replace(warningHeader, string.Empty), m.Order, m.TimeStamp,
+                    m.CallerMethod)));
     }
 
     public void Clear()
