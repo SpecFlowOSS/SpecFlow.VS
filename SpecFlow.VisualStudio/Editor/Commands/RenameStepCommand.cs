@@ -301,6 +301,9 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
             var bindingRegistry = discoveryService.BindingRegistryCache.Value;
+            if (bindingRegistry == ProjectBindingRegistry.Invalid)
+                Logger.LogWarning(
+                    $"Unable to get step definitions from project '{ctx.ProjectOfStepDefinitionClass.ProjectName}', usages will not be found for this project.");
             return bindingRegistry;
         }
 
@@ -309,7 +312,6 @@ namespace SpecFlow.VisualStudio.Editor.Commands
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
             return discoveryService.BindingRegistryCache.Update(bindingRegistry =>
                 bindingRegistry.ReplaceStepDefinition(ctx.StepDefinitionBinding, ctx.StepDefinitionBinding.WithSpecifiedExpression(ctx.UpdatedExpression)));
-
         }
     }
 }

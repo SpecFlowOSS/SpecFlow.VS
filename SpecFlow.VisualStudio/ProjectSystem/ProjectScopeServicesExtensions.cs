@@ -21,7 +21,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem
                 var discoveryResultProvider = new DiscoveryResultProvider(projectScope);
                 var bindingRegistryCache = new ProjectBindingRegistryCache(projectScope.IdeScope);
                 IDiscoveryService discoveryService = new DiscoveryService(projectScope, discoveryResultProvider, bindingRegistryCache);
-                discoveryService.TriggerDiscovery();
+                discoveryService.TriggerDiscovery("ProjectScopeServicesExtensions.GetDiscoveryService");
                 return discoveryService;
             });
         }

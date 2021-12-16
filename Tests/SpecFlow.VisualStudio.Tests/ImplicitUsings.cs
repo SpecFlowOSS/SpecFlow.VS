@@ -14,6 +14,7 @@ global using SpecFlow.VisualStudio.Discovery;
 global using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 global using SpecFlow.VisualStudio.Editor.Commands;
 global using SpecFlow.VisualStudio.Editor.Services;
+global using SpecFlow.VisualStudio.Editor.Services.Parser;
 global using SpecFlow.VisualStudio.Monitoring;
 global using SpecFlow.VisualStudio.ProjectSystem;
 global using SpecFlow.VisualStudio.ProjectSystem.Settings;

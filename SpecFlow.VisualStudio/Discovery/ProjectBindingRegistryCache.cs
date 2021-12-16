@@ -33,7 +33,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         (TaskCompletionSource<ProjectBindingRegistry> newRegistrySource, ProjectBindingRegistry originalRegistry) =
             await GetThreadSafeRegistry();
 
-        var updatedRegistry = await InvokeUpdateFunc(updateFunc, originalRegistry, newRegistrySource);
+        var updatedRegistry = await InvokeUpdateFunc(updateFunc, originalRegistry);
         if (updatedRegistry.Version == originalRegistry.Version)
         {
             newRegistrySource.SetResult(updatedRegistry);
@@ -50,7 +50,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         DisposeSourceLocationTrackingPositions(originalRegistry);
     }
 
-    public Task<ProjectBindingRegistry> GetLatest() => WaitForCompletion(_upToDateBindingRegistrySource.Task);
+    public Task<ProjectBindingRegistry> GetLatest() => WaitForCompletion(_upToDateBindingRegistrySource);
 
     private async
         Task<(TaskCompletionSource<ProjectBindingRegistry> newRegistrySource, ProjectBindingRegistry originalRegistry)>
@@ -70,7 +70,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
             originalSource =
                 Interlocked.CompareExchange(ref _upToDateBindingRegistrySource, newRegistrySource, comparandSource);
 
-            originalRegistry = await WaitForCompletion(originalSource.Task);
+            originalRegistry = await WaitForCompletion(originalSource);
         } while (!ReferenceEquals(originalSource, comparandSource));
 
         _logger.LogVerbose($"Got access to {originalRegistry} in {iteration} iteration(s)");
@@ -80,8 +80,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 
     private async Task<ProjectBindingRegistry> InvokeUpdateFunc(
         Func<ProjectBindingRegistry, Task<ProjectBindingRegistry>> update,
-        ProjectBindingRegistry originalRegistry,
-        TaskCompletionSource<ProjectBindingRegistry> newRegistrySource)
+        ProjectBindingRegistry originalRegistry)
     {
         var updatedRegistry = await update(originalRegistry);
 
@@ -100,18 +99,21 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
     }
 
 #pragma warning disable VSTHRD003
-    private async Task<ProjectBindingRegistry> WaitForCompletion(Task<ProjectBindingRegistry> task)
+    private async Task<ProjectBindingRegistry> WaitForCompletion(TaskCompletionSource<ProjectBindingRegistry> task)
     {
         CancellationTokenSource cts = Debugger.IsAttached
             ? new CancellationTokenSource(TimeSpan.FromSeconds(60))
             : new CancellationTokenSource(TimeSpan.FromSeconds(15));
 
         var timeoutTask = Task.Delay(-1, cts.Token);
-        var result = await Task.WhenAny(task, timeoutTask);
+        var result = await Task.WhenAny(task.Task, timeoutTask);
         if (ReferenceEquals(result, timeoutTask))
+        {
+            task.TrySetCanceled();
             throw new TimeoutException("Binding registry in not processed in time");
+        }
 
-        return await task;
+        return await task.Task;
     }
 #pragma warning restore
 

@@ -10,6 +10,62 @@ public class ProjectBindingRegistryCacheTests
     }
 
     [Fact]
+    public async Task CannotRevertToAnOlderVersionOfBindingRegistry()
+    {
+        //arrange
+        var ideScope = new StubIdeScope(_testOutputHelper);
+        var cache = new ProjectBindingRegistryCache(ideScope);
+        var olderRegistry = ProjectBindingRegistry.FromStepDefinitions(Array.Empty<ProjectStepDefinitionBinding>());
+        var newerRegistry = ProjectBindingRegistry.FromStepDefinitions(Array.Empty<ProjectStepDefinitionBinding>());
+
+        //act
+        await cache.Update(_ => newerRegistry);
+
+        Func<Task> secondUpdateWithOlderRegistry = () => cache.Update(_ => olderRegistry);
+
+        //assert
+        await secondUpdateWithOlderRegistry.Should().ThrowAsync<InvalidOperationException>();
+        cache.Value.Should().BeSameAs(newerRegistry);
+    }
+
+    [Fact]
+    public async Task DoNotRevertToAnInvalidBindingRegistry()
+    {
+        //arrange
+        var ideScope = new StubIdeScope(_testOutputHelper);
+        var cache = new ProjectBindingRegistryCache(ideScope);
+        var existingRegistry = ProjectBindingRegistry.FromStepDefinitions(Array.Empty<ProjectStepDefinitionBinding>());
+        var invalidRegistry = ProjectBindingRegistry.Invalid;
+
+        //act
+        await cache.Update(_ => existingRegistry);
+        await cache.Update(_ => invalidRegistry);
+
+        //assert
+        cache.Value.Should().BeSameAs(existingRegistry);
+        ideScope.StubLogger.Messages.Should().Contain("Got an invalid registry, ignoring...");
+    }
+
+    [Fact]
+    public async Task UpdatesBindingRegistry()
+    {
+        //arrange
+        var ideScope = new StubIdeScope(_testOutputHelper);
+        var cache = new ProjectBindingRegistryCache(ideScope);
+        var bindingRegistry = ProjectBindingRegistry.FromStepDefinitions(new ProjectStepDefinitionBinding[]
+        {
+            new TestProjectStepDefinitionBinding(),
+            new TestProjectStepDefinitionBinding("Error")
+        });
+
+        //act
+        await cache.Update(_ => bindingRegistry);
+
+        //assert
+        cache.Value.Should().BeSameAs(bindingRegistry);
+    }
+
+    [Fact]
     public async Task ParallelUpdate()
     {
         //arrange
@@ -30,7 +86,7 @@ public class ProjectBindingRegistryCacheTests
 
         //act
         var updateTaskCount = 0;
-        var timeout = TimeSpan.FromSeconds(10);
+        var timeout = TimeSpan.FromSeconds(20);
         var cts = new CancellationTokenSource(timeout);
         int fireGetLatestCounter = 0;
         try
@@ -102,7 +158,22 @@ public class ProjectBindingRegistryCacheTests
             }
         }, default);
         thread.Start();
-
         return taskCompletionSource.Task;
+    }
+
+    private class TestProjectStepDefinitionBinding : ProjectStepDefinitionBinding
+    {
+        public TestProjectStepDefinitionBinding()
+            : base(ScenarioBlock.Given, new Regex(string.Empty), new Scope(),
+                new ProjectStepDefinitionImplementation("M1", Array.Empty<string>(), new SourceLocation("file", 0, 0)))
+        {
+        }
+
+        public TestProjectStepDefinitionBinding(string error)
+            : base(ScenarioBlock.Given, new Regex(string.Empty), new Scope(),
+                new ProjectStepDefinitionImplementation("M1", Array.Empty<string>(), new SourceLocation("file", 0, 0)),
+                "", error)
+        {
+        }
     }
 }

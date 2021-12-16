@@ -39,6 +39,7 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     [Fact]
     public void Only_specflow_projects_are_supported()
     {
+        MockableDiscoveryService.Setup(ProjectScope, TimeSpan.Zero);
         var command = new RenameStepCommand(ProjectScope.IdeScope, null, ProjectScope.IdeScope.MonitoringService);
         var inputText = new TestText(string.Empty);
         var textView = CreateTextView(inputText, VsContentTypes.CSharp, "Steps.cs");
@@ -53,6 +54,7 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     [Fact]
     public void Specflow_projects_must_have_feature_files()
     {
+        MockableDiscoveryService.Setup(ProjectScope, TimeSpan.Zero);
         ProjectScope.AddSpecFlowPackage();
         var command = new RenameStepCommand(ProjectScope.IdeScope, null, ProjectScope.IdeScope.MonitoringService);
         var inputText = new TestText(string.Empty);

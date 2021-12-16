@@ -33,10 +33,10 @@ internal class DiscoveryInvoker
     {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
-        var bindingRegistry = new SuccessDiscovery(_logger, _errorListServices, this)
+        var bindingRegistry = new Discovery(_logger, _errorListServices, this)
             .WhenProjectSettingsIsInitialized(_projectScope.GetProjectSettings())
             .AndProjectIsSpecFlowProject()
-            .AndConfigSourceIsValid()
+            .AndBindingSourceIsValid()
             .AndDiscoveryProviderSucceed(_discoveryResultProvider)
             .ThenImportStepDefinitions(_projectScope.ProjectName)
             .AndCreateBindingRegistry(_monitoringService);
@@ -47,7 +47,7 @@ internal class DiscoveryInvoker
         return bindingRegistry;
     }
 
-    private class SuccessDiscovery : IDiscovery
+    private class Discovery : IDiscovery
     {
         private readonly IDeveroomErrorListServices _errorListServices;
         private readonly DiscoveryInvoker _invoker;
@@ -57,7 +57,7 @@ internal class DiscoveryInvoker
         private ImmutableArray<ProjectStepDefinitionBinding> _stepDefinitions;
         private ConfigSource _testAssemblySource;
 
-        public SuccessDiscovery(IDeveroomLogger logger, IDeveroomErrorListServices errorListServices,
+        public Discovery(IDeveroomLogger logger, IDeveroomErrorListServices errorListServices,
             DiscoveryInvoker invoker)
         {
             _logger = logger;
@@ -75,7 +75,7 @@ internal class DiscoveryInvoker
             return new FailedDiscovery();
         }
 
-        public IDiscovery AndConfigSourceIsValid()
+        public IDiscovery AndBindingSourceIsValid()
         {
             _testAssemblySource = _invoker.GetTestAssemblySource(_projectSettings);
             if (_testAssemblySource != ConfigSource.Invalid)
@@ -192,7 +192,7 @@ internal class DiscoveryInvoker
     private class FailedDiscovery : IDiscovery
     {
         public IDiscovery AndProjectIsSpecFlowProject() => this;
-        public IDiscovery AndConfigSourceIsValid() => this;
+        public IDiscovery AndBindingSourceIsValid() => this;
         public IDiscovery AndDiscoveryProviderSucceed(IDiscoveryResultProvider discoveryResultProvider) => this;
         public IDiscovery ThenImportStepDefinitions(string projectName) => this;
 
@@ -203,7 +203,7 @@ internal class DiscoveryInvoker
     private interface IDiscovery
     {
         IDiscovery AndProjectIsSpecFlowProject();
-        IDiscovery AndConfigSourceIsValid();
+        IDiscovery AndBindingSourceIsValid();
         IDiscovery AndDiscoveryProviderSucceed(IDiscoveryResultProvider discoveryResultProvider);
         IDiscovery ThenImportStepDefinitions(string projectName);
         ProjectBindingRegistry AndCreateBindingRegistry(IMonitoringService monitoringService);
