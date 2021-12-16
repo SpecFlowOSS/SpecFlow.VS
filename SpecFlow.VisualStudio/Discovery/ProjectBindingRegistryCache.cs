@@ -35,7 +35,10 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 
         var updatedRegistry = await InvokeUpdateFunc(updateFunc, originalRegistry, newRegistrySource);
         if (updatedRegistry.Version == originalRegistry.Version)
+        {
+            newRegistrySource.SetResult(updatedRegistry);
             return;
+        }
 
         CalculateSourceLocationTrackingPositions(updatedRegistry);
 
@@ -82,20 +85,12 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
     {
         var updatedRegistry = await update(originalRegistry);
 
-        if (updatedRegistry.Version == originalRegistry.Version)
-        {
-            newRegistrySource.SetResult(updatedRegistry);
+        if (updatedRegistry.Version >= originalRegistry.Version) 
             return updatedRegistry;
-        }
 
-        if (updatedRegistry.Version < originalRegistry.Version)
-        {
-            DisposeSourceLocationTrackingPositions(updatedRegistry);
-            throw new InvalidOperationException(
-                $"Cannot downgrade bindingRegistry from V{originalRegistry.Version} to V{updatedRegistry.Version}");
-        }
-
-        return updatedRegistry;
+        DisposeSourceLocationTrackingPositions(updatedRegistry);
+        throw new InvalidOperationException(
+            $"Cannot downgrade bindingRegistry from V{originalRegistry.Version} to V{updatedRegistry.Version}");
     }
 
 #pragma warning disable VSTHRD003

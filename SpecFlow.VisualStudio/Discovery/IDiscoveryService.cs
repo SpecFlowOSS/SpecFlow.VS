@@ -2,9 +2,7 @@
 
 public interface IDiscoveryService : IDisposable
 {
-    event EventHandler<EventArgs> WeakBindingRegistryChanged;
-    void CheckBindingRegistry();
-    void InitializeBindingRegistry();
-
     IProjectBindingRegistryCache BindingRegistryCache { get; }
+    event EventHandler<EventArgs> WeakBindingRegistryChanged;
+    void TriggerDiscovery(string callerMemberName = "?");
 }

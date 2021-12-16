@@ -89,7 +89,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
                 // this is the first feature file in the project
                 var updatedProjectSettings = _projectSettingsProvider.CheckProjectSettings();
                 if (updatedProjectSettings.IsSpecFlowTestProject)
-                    _discoveryService?.CheckBindingRegistry();
+                    _discoveryService?.TriggerDiscovery();
             }
 
             ideScope.Logger.LogVerbose($"Creating DeveroomTagger (project: {project}, SpecFlow: {projectSettings?.GetSpecFlowVersionLabel() ?? "n/a"})");

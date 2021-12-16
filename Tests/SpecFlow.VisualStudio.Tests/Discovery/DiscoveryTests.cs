@@ -31,14 +31,14 @@ public class DiscoveryTests
     }
 
     [Fact]
-    public void InitializeBindingRegistryTriggersCacheUpdate()
+    public void TriggerDiscoveryUpdatesTheCache()
     {
         //arrange
         var sut = ArrangeSut();
         var discoveryService = sut.BuildDiscoveryService();
 
         //act
-        discoveryService.InitializeBindingRegistry();
+        discoveryService.TriggerDiscovery();
 
         //assert
         sut.BindingRegistryCache.Verify(c =>
@@ -48,14 +48,14 @@ public class DiscoveryTests
 
     [Theory]
     [MemberData(nameof(TriggersCacheUpdateOnEventsData))]
-    public void TriggersCacheUpdateOnEvents(string _, Action<Sut> invokeEvent)
+    public void TriggersCacheUpdateOnEvents(string _, Action<Sut> triggerEvent)
     {
         //arrange
         var sut = ArrangeSut();
         sut.BuildDiscoveryService();
 
         //act
-        invokeEvent(sut);
+        triggerEvent(sut);
 
         //assert
         sut.BindingRegistryCache.Verify(c =>
@@ -65,16 +65,16 @@ public class DiscoveryTests
 
     [Theory]
     [MemberData(nameof(TriggersCacheUpdateOnEventsData))]
-    public void DoNotTriggersCacheUpdateOnEventsForTheSameProject(string _, Action<Sut> invokeEvent)
+    public void DoNotTriggersCacheUpdateOnEventsForTheSameProject(string _, Action<Sut> triggerEvent)
     {
         //arrange
         var sut = ArrangeSut();
         sut.BuildDiscoveryService();
 
         //act
-        invokeEvent(sut);
+        triggerEvent(sut);
         var bindingRegistry = sut.BindingRegistryCache.Value;
-        invokeEvent(sut);
+        triggerEvent(sut);
 
         //assert
         sut.BindingRegistryCache.Verify(c =>

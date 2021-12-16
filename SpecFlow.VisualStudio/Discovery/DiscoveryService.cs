@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.Discovery;
+﻿using System.Runtime.CompilerServices;
+
+namespace SpecFlow.VisualStudio.Discovery;
 
 public class DiscoveryService : IDiscoveryService
 {
@@ -31,26 +33,6 @@ public class DiscoveryService : IDiscoveryService
             value);
     }
 
-    public void InitializeBindingRegistry()
-    {
-        _logger.LogVerbose("Initial discovery triggered...");
-        TriggerDiscovery();
-    }
-
-    public void CheckBindingRegistry()
-    {
-        if (BindingRegistryCache.Processing)
-            return;
-
-        if (BindingRegistryCache.Value.IsPatched)
-            return;
-
-        if (IsCacheUpToDate())
-            return;
-
-        TriggerDiscovery();
-    }
-
     public void Dispose()
     {
         _projectScope.IdeScope.WeakProjectsBuilt -= ProjectSystemOnProjectsBuilt;
@@ -76,8 +58,10 @@ public class DiscoveryService : IDiscoveryService
         return BindingRegistryCache.Value.ProjectHash == currentHash;
     }
 
-    private void TriggerDiscovery()
+    public void TriggerDiscovery([CallerMemberName] string callerMemberName = "?")
     {
+        _logger.LogVerbose($"Discovery triggered from {callerMemberName}");
+
         _projectScope.IdeScope.RunOnBackgroundThread(
             () => BindingRegistryCache.Update(DiscoveryInvoker.InvokeDiscoveryWithTimer),
             _ => { });
