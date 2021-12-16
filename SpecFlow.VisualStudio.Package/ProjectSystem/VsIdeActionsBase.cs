@@ -1,7 +1,4 @@
-﻿using System;
-using System.Windows;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.ProjectSystem;
 

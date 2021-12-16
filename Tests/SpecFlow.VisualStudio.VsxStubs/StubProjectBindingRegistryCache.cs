@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.VsxStubs;
+﻿#nullable enable
+namespace SpecFlow.VisualStudio.VsxStubs;
 
 public class StubProjectBindingRegistryCache : Mock<IProjectBindingRegistryCache>, IProjectBindingRegistryCache
 {
@@ -13,7 +14,7 @@ public class StubProjectBindingRegistryCache : Mock<IProjectBindingRegistryCache
             });
     }
 
-    public event EventHandler<EventArgs> Changed;
+    public event EventHandler<EventArgs>? Changed;
 
     public Task Update(Func<ProjectBindingRegistry, ProjectBindingRegistry> updateFunc)
         => Update(registry => Task.FromResult(updateFunc(registry)));

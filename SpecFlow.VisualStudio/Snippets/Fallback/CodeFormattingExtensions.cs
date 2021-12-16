@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.Snippets.Fallback;
 // imported from SpecFlow v2.4

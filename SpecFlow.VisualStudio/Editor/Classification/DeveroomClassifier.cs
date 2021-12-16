@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable disable
 using Microsoft.VisualStudio.Text.Classification;
 
 namespace SpecFlow.VisualStudio.Editor.Classification;

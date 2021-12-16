@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using SpecFlow.SampleProjectGenerator;
-using SpecFlow.VisualStudio.Configuration;
+﻿#nullable disable
 using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace SpecFlow.VisualStudio.Specs.StepDefinitions;

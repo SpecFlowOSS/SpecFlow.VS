@@ -1,6 +1,4 @@
-﻿using System;
-using EnvDTE;
-using SpecFlow.VisualStudio.Diagnostics;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.VsEvents;
 

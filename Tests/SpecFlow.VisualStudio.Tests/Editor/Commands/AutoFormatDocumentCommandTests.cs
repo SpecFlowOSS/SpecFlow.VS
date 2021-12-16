@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+
 using SpecFlow.VisualStudio.Editor.Services.Formatting;
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands;

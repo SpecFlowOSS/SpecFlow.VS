@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
 using SpecFlow.VisualStudio.Editor.Services.EditorConfig;
 using SpecFlow.VisualStudio.Editor.Services.Formatting;
 

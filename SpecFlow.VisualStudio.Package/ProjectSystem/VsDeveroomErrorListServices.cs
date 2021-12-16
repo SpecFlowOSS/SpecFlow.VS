@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 
 namespace SpecFlow.VisualStudio.ProjectSystem;
 

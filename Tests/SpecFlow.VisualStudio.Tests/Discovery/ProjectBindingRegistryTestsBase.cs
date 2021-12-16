@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using Gherkin.Ast;
-using SpecFlow.VisualStudio.Discovery.TagExpressions;
-
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
 public abstract class ProjectBindingRegistryTestsBase

@@ -1,13 +1,12 @@
-﻿// Decompiled with JetBrains decompiler
+﻿#nullable disable
+// Decompiled with JetBrains decompiler
 // Type: Microsoft.VisualStudio.TestWindow.VsHost.BuildCommandIntercepter
 // Assembly: Microsoft.VisualStudio.TestWindow.Core, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a
 // MVID: 87C699D5-75FE-4153-9738-59513196DBB5
 // Assembly location: C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\IDE\CommonExtensions\Microsoft\TestWindow\Microsoft.VisualStudio.TestWindow.Core.dll
 
-using System;
-using Microsoft.VisualStudio;
+
 using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Shell.Interop;
 using IServiceProvider = System.IServiceProvider;
 
 namespace SpecFlow.VisualStudio.VsEvents;

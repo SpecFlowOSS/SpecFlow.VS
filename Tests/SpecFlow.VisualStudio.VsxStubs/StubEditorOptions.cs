@@ -56,5 +56,5 @@ public class StubEditorOptions : IEditorOptions
         set => throw new NotImplementedException();
     }
 
-    public event EventHandler<EditorOptionChangedEventArgs> OptionChanged;
+    public event EventHandler<EditorOptionChangedEventArgs>? OptionChanged;
 }

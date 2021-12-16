@@ -1,4 +1,5 @@
-﻿#pragma warning disable xUnit1026 // Theory methods should use all of their parameters. Allow to use _ as identifier
+﻿#nullable enable
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters. Allow to use _ as identifier
 
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 

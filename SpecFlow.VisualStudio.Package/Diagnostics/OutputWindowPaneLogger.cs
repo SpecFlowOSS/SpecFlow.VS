@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using SpecFlow.VisualStudio.ProjectSystem;
 
 namespace SpecFlow.VisualStudio.Diagnostics;
 

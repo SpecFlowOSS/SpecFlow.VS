@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Linq;
+#nullable enable
 
 namespace SpecFlow.VisualStudio.Diagnostics;
 

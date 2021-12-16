@@ -2,6 +2,7 @@
 global using ApprovalTests.Reporters;
 global using ApprovalTests;
 global using FluentAssertions;
+global using Gherkin.Ast;
 global using Microsoft.CodeAnalysis.CSharp;
 global using Microsoft.CodeAnalysis;
 global using Microsoft.VisualStudio.Text.Editor;
@@ -9,8 +10,10 @@ global using Microsoft.VisualStudio.Text;
 global using Microsoft.VisualStudio.Utilities;
 global using Moq;
 global using SpecFlow.VisualStudio.Analytics;
+global using SpecFlow.VisualStudio.Common;
 global using SpecFlow.VisualStudio.Diagnostics;
 global using SpecFlow.VisualStudio.Discovery;
+global using SpecFlow.VisualStudio.Discovery.TagExpressions;
 global using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 global using SpecFlow.VisualStudio.Editor.Commands;
 global using SpecFlow.VisualStudio.Editor.Services;

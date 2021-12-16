@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
 
 namespace SpecFlow.VisualStudio.Editor.Completions;
 

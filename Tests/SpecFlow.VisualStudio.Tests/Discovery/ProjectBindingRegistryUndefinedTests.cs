@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Tests.Discovery;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.Tests.Discovery;
 /*
 
 Undefined
@@ -20,7 +21,7 @@ public class ProjectBindingRegistryUndefinedTests : ProjectBindingRegistryTestsB
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("not used step"));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my undefined step"));
+        var result = sut.MatchStep(CreateStep(text: "my undefined step"), StubGherkinDocument.Instance);
         result.HasUndefined.Should().BeTrue();
     }
 
@@ -32,7 +33,8 @@ public class ProjectBindingRegistryUndefinedTests : ProjectBindingRegistryTestsB
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step"));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my step", stepKeyword: StepKeyword.When));
+        var result = sut.MatchStep(CreateStep(text: "my step", stepKeyword: StepKeyword.When),
+            StubGherkinDocument.Instance);
         result.HasUndefined.Should().BeTrue();
     }
 
@@ -44,7 +46,7 @@ public class ProjectBindingRegistryUndefinedTests : ProjectBindingRegistryTestsB
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step", scope: CreateTagScope("mytag")));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my step"));
+        var result = sut.MatchStep(CreateStep(text: "my step"), StubGherkinDocument.Instance);
         result.HasUndefined.Should().BeTrue();
     }
 

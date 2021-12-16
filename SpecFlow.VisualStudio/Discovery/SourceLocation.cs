@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.VisualStudio.Discovery;
+﻿#nullable disable
 
 public class SourceLocation
 {

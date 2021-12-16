@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
+
 using System.Windows;
 using System.Windows.Media;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -8,7 +8,6 @@ using Microsoft.VisualStudio.Text.Formatting;
 using Microsoft.VisualStudio.Text.Projection;
 using Microsoft.VisualStudio.TextManager.Interop;
 using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
-using SpecFlow.VisualStudio.Editor.Services;
 
 namespace SpecFlow.VisualStudio.VsxStubs;
 

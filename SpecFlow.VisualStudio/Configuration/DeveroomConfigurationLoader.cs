@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable disable
 using System.Linq.Expressions;
 
 namespace SpecFlow.VisualStudio.Configuration;

@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.SourceDiscovery;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.SpecFlowConnector.SourceDiscovery;
 
 internal class NullDeveroomSymbolReader : IDeveroomSymbolReader
 {

@@ -1,6 +1,4 @@
-﻿using System;
-using EnvDTE;
-
+﻿#nullable enable
 namespace SpecFlow.VisualStudio.ProjectSystem;
 
 public interface IVsIdeScope : IIdeScope, IDisposable

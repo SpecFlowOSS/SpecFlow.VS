@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using System.Text;
-using Microsoft.VisualStudio.Shell;
 using SpecFlow.VisualStudio.Generator.Infrastructure;
-using SpecFlow.VisualStudio.ProjectSystem;
 using VSLangProj80;
 
 namespace SpecFlow.VisualStudio.Generator;

@@ -1,6 +1,6 @@
-﻿using System;
+﻿#nullable disable
+
 using System.Diagnostics;
-using System.Linq;
 
 namespace SpecFlow.SampleProjectGenerator;
 

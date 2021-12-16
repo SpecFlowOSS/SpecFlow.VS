@@ -1,5 +1,4 @@
-﻿using EnvDTE;
-using SpecFlow.VisualStudio.Wizards.Infrastructure;
+﻿using SpecFlow.VisualStudio.Wizards.Infrastructure;
 
 namespace SpecFlow.VisualStudio.Wizards;
 

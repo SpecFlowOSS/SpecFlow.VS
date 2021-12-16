@@ -1,17 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using EnvDTE;
-using Microsoft.CodeAnalysis;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Text;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.Monitoring;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
+﻿using Microsoft.CodeAnalysis;
 using Project = EnvDTE.Project;
 
 namespace SpecFlow.VisualStudio.ProjectSystem;

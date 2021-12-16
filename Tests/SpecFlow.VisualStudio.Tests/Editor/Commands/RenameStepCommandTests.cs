@@ -1,21 +1,19 @@
-﻿using System;
-using System.Linq;
-
-#pragma warning disable xUnit1026 //Theory method 'xxx' does not use parameter '_'
+﻿#pragma warning disable xUnit1026 //Theory method 'xxx' does not use parameter '_'
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
 {
     public RenameStepCommandTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper,
-        ps => new RenameStepCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
+        ps => new RenameStepCommand(ps.IdeScope, new StubBufferTagAggregatorFactoryService(ps.StubIdeScope),
+            ps.IdeScope.MonitoringService),
         "User Notification: The following problems occurred:" + Environment.NewLine)
     {
     }
 
     private void ArrangePopup(string modelStepText)
     {
-        (ProjectScope.IdeScope.WindowManager as StubWindowManager)
+        (ProjectScope.IdeScope.WindowManager as StubWindowManager)!
             .RegisterWindowAction<RenameStepViewModel>(model => model.StepText = modelStepText);
     }
 
@@ -23,7 +21,8 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     public void There_is_a_project_in_ide()
     {
         var emptyIde = new StubIdeScope(TestOutputHelper);
-        var command = new RenameStepCommand(emptyIde, null, emptyIde.MonitoringService);
+        var command = new RenameStepCommand(emptyIde, new StubBufferTagAggregatorFactoryService(emptyIde),
+            emptyIde.MonitoringService);
         var inputText = new TestText(string.Empty);
         var textView = emptyIde.CreateTextView(inputText, contentType: VsContentTypes.CSharp);
 
@@ -40,7 +39,9 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     public void Only_specflow_projects_are_supported()
     {
         MockableDiscoveryService.Setup(ProjectScope, TimeSpan.Zero);
-        var command = new RenameStepCommand(ProjectScope.IdeScope, null, ProjectScope.IdeScope.MonitoringService);
+        var command = new RenameStepCommand(ProjectScope.IdeScope,
+            new StubBufferTagAggregatorFactoryService(ProjectScope.StubIdeScope),
+            ProjectScope.IdeScope.MonitoringService);
         var inputText = new TestText(string.Empty);
         var textView = CreateTextView(inputText, VsContentTypes.CSharp, "Steps.cs");
 
@@ -56,7 +57,9 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     {
         MockableDiscoveryService.Setup(ProjectScope, TimeSpan.Zero);
         ProjectScope.AddSpecFlowPackage();
-        var command = new RenameStepCommand(ProjectScope.IdeScope, null, ProjectScope.IdeScope.MonitoringService);
+        var command = new RenameStepCommand(ProjectScope.IdeScope,
+            new StubBufferTagAggregatorFactoryService(ProjectScope.StubIdeScope),
+            ProjectScope.IdeScope.MonitoringService);
         var inputText = new TestText(string.Empty);
 
         var textView = CreateTextView(inputText, VsContentTypes.CSharp, "Steps.cs");
@@ -79,7 +82,7 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     {
         var stepDefinition = ArrangeStepDefinition(string.Empty);
         stepDefinition.TestExpression = SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken);
-        stepDefinition.Regex = default;
+        stepDefinition.Regex = default!;
 
         await StepDefinitionMustHaveValidExpression(stepDefinition,
             "Unable to rename step, the step definition expression cannot be detected.");
@@ -233,7 +236,7 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
         command.PreExec(textView, command.Targets.First());
 
         var ideActions = ProjectScope.IdeScope.Actions as StubIdeActions;
-        ideActions.LastShowContextMenuHeader.Should().Be("Choose step definition to rename");
+        ideActions!.LastShowContextMenuHeader.Should().Be("Choose step definition to rename");
         ideActions.LastShowContextMenuItems.Select(item => item.Label)
             .Should().BeEquivalentTo(stepDefinitions.Select(sd => sd.PopupLabel));
         ThereWereNoWarnings();
@@ -269,7 +272,7 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
         command.PreExec(textView, command.Targets.First());
 
         var ideActions = ProjectScope.IdeScope.Actions as StubIdeActions;
-        var chosenItem = ideActions.LastShowContextMenuItems[chosenOption];
+        var chosenItem = ideActions!.LastShowContextMenuItems[chosenOption];
         chosenItem.Command(chosenItem);
 
         await WaitForCommandToComplete(command);
@@ -385,7 +388,7 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     {
         var stepDefinition = ArrangeStepDefinition(originalCSharpExpression);
         var featureFile = ArrangeOneFeatureFile(string.Empty);
-        RenameStepViewModel viewModel = null;
+        RenameStepViewModel? viewModel = null;
         (ProjectScope.IdeScope.WindowManager as StubWindowManager)?
             .RegisterWindowAction<RenameStepViewModel>(model => viewModel = model);
         var (textView, command) = await ArrangeSut(stepDefinition, featureFile);

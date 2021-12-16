@@ -1,9 +1,4 @@
-﻿using System;
-using System.ComponentModel.Composition;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Events;
-using Microsoft.VisualStudio.Shell.Interop;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.VsEvents;
 

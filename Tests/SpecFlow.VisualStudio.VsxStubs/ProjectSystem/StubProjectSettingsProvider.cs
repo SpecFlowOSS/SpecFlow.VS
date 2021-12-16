@@ -5,6 +5,9 @@ public class StubProjectSettingsProvider : Mock<IProjectSettingsProvider>, IProj
     public StubProjectSettingsProvider(InMemoryStubProjectScope inMemoryStubProjectScope) : base(MockBehavior.Strict)
     {
         OutputAssemblyPath = inMemoryStubProjectScope.OutputAssemblyPath;
+        SpecFlowVersion = new NuGetVersion("3.9.40", "3.9.40");
+        SpecFlowGeneratorFolder = string.Empty;
+        SpecFlowConfigFilePath = string.Empty;
         Setup(p => p.GetProjectSettings())
             .Returns(() => new ProjectSettings(Kind, OutputAssemblyPath, TargetFrameworkMoniker,
                 TargetFrameworkMonikers,
@@ -28,8 +31,8 @@ public class StubProjectSettingsProvider : Mock<IProjectSettingsProvider>, IProj
     public string SpecFlowConfigFilePath { get; set; }
     public SpecFlowProjectTraits SpecFlowProjectTraits { get; set; }
     public string ProjectFullName { get; set; } = "Test Project.csproj";
-    public event EventHandler<EventArgs> WeakSettingsInitialized;
-    public event EventHandler<EventArgs> SettingsInitialized;
+    public event EventHandler<EventArgs>? WeakSettingsInitialized;
+    public event EventHandler<EventArgs>? SettingsInitialized;
     public ProjectSettings GetProjectSettings() => Object.GetProjectSettings();
 
     public ProjectSettings CheckProjectSettings() => throw new NotImplementedException();

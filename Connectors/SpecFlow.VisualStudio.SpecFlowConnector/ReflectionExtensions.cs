@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.SpecFlowConnector;
 
 public static class ReflectionExtensions
 {

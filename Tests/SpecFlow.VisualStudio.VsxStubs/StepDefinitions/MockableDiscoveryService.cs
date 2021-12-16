@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
+﻿#nullable enable
+
+namespace SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
 
 public class MockableDiscoveryService : DiscoveryService
 {

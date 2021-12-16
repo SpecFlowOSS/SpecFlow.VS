@@ -1,11 +1,7 @@
-﻿using System;
-using System.Linq;
-using EnvDTE;
-using Microsoft.VisualStudio.TemplateWizard;
-using SpecFlow.VisualStudio.Annotations;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Monitoring;
-using SpecFlow.VisualStudio.ProjectSystem;
+﻿using Microsoft.VisualStudio.TemplateWizard;
+using Constants = EnvDTE.Constants;
+
+#nullable disable
 
 namespace SpecFlow.VisualStudio.Wizards.Infrastructure;
 

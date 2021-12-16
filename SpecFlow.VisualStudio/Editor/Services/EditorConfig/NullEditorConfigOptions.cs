@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig;
 
 internal class NullEditorConfigOptions : IEditorConfigOptions
 {

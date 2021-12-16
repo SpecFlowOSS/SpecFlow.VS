@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.VisualStudio.Text.Projection;
-using Microsoft.VisualStudio.Text.Tagging;
 
 namespace SpecFlow.VisualStudio.VsxStubs;
 
@@ -17,8 +16,8 @@ public class StubTagAggregator<T> : ITagAggregator<T> where T : ITag
 
     public IBufferGraph BufferGraph => throw new NotImplementedException();
 
-    public event EventHandler<TagsChangedEventArgs> TagsChanged;
-    public event EventHandler<BatchedTagsChangedEventArgs> BatchedTagsChanged;
+    public event EventHandler<TagsChangedEventArgs>? TagsChanged;
+    public event EventHandler<BatchedTagsChangedEventArgs>? BatchedTagsChanged;
 
     public void Dispose()
     {

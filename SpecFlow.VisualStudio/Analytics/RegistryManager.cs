@@ -1,3 +1,4 @@
+#nullable disable
 namespace SpecFlow.VisualStudio.Analytics;
 
 public interface IRegistryManager

@@ -32,7 +32,8 @@ Scenario: bar
         int? selectionEndLine, int? selectionEndColumn, string expectedTextValue)
     {
         Console.WriteLine($"running: {test}");
-        var command = new CommentCommand(_ideScope, null, _monitoringService);
+        var command = new CommentCommand(_ideScope, new StubBufferTagAggregatorFactoryService(_ideScope),
+            _monitoringService);
         var inputText = new TestText(
             "Feature: foo",
             "Scenario: bar",
@@ -68,7 +69,8 @@ Scenario: bar
         int? selectionEndLine, int? selectionEndColumn, string inputTextValue)
     {
         Console.WriteLine($"running: {test}");
-        var command = new UncommentCommand(_ideScope, null, _monitoringService);
+        var command = new UncommentCommand(_ideScope, new StubBufferTagAggregatorFactoryService(_ideScope),
+            _monitoringService);
         var inputText = new TestText(inputTextValue);
         var textView = CreateTextView(inputText, selectionStartLine, selectionStartColumn, selectionEndLine,
             selectionEndColumn);

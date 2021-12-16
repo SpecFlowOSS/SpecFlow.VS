@@ -103,7 +103,7 @@ public class StubTextCaret : ITextCaret
         set => throw new NotImplementedException();
     }
 
-    public event EventHandler<CaretPositionChangedEventArgs> PositionChanged;
+    public event EventHandler<CaretPositionChangedEventArgs>? PositionChanged;
 
     private void InternalMoveTo(VirtualSnapshotPoint bufferPosition, PositionAffinity caretAffinity,
         bool captureHorizontalPosition, bool captureVerticalPosition, bool raiseEvent)

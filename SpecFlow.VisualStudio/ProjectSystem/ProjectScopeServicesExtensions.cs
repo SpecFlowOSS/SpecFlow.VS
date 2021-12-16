@@ -1,6 +1,4 @@
-﻿using SpecFlow.VisualStudio.Generation;
-using SpecFlow.VisualStudio.Snippets;
-
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.ProjectSystem;
 
 public static class ProjectScopeServicesExtensions

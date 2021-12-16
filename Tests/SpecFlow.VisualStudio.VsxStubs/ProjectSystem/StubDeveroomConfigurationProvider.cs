@@ -1,5 +1,4 @@
 ﻿using System;
-using SpecFlow.VisualStudio.Configuration;
 
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 

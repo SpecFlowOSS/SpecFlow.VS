@@ -1,9 +1,5 @@
-﻿using System;
-using System.Diagnostics;
+﻿#nullable disable
 using EnvDTE80;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace SpecFlow.VisualStudio.ProjectSystem;
 

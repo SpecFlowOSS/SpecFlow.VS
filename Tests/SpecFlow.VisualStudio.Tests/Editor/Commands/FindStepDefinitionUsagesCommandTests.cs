@@ -6,7 +6,8 @@ public class FindStepDefinitionUsagesCommandTests : CommandTestBase<FindStepDefi
 {
     public FindStepDefinitionUsagesCommandTests(ITestOutputHelper testOutputHelper) :
         base(testOutputHelper,
-            ps => new FindStepDefinitionUsagesCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
+            ps => new FindStepDefinitionUsagesCommand(ps.IdeScope,
+                new StubBufferTagAggregatorFactoryService(ps.StubIdeScope), ps.IdeScope.MonitoringService),
             "???")
     {
     }
@@ -22,7 +23,7 @@ public class FindStepDefinitionUsagesCommandTests : CommandTestBase<FindStepDefi
         Dump(featureFile, "After modification");
         await InvokeAndWaitAnalyticsEvent(command, textView);
 
-        (ProjectScope.IdeScope.Actions as StubIdeActions).LastShowContextMenuItems.Should()
+        (ProjectScope.IdeScope.Actions as StubIdeActions)!.LastShowContextMenuItems.Should()
             .Contain(mi => mi.Label == "calculator.feature(3,8): When I choose add");
     }
 
@@ -35,7 +36,7 @@ public class FindStepDefinitionUsagesCommandTests : CommandTestBase<FindStepDefi
 
         await InvokeAndWaitAnalyticsEvent(command, textView);
 
-        (ProjectScope.IdeScope.Actions as StubIdeActions).LastShowContextMenuItems.Should()
+        (ProjectScope.IdeScope.Actions as StubIdeActions)!.LastShowContextMenuItems.Should()
             .Contain(mi => mi.Label == "Could not find any usage");
     }
 
@@ -51,7 +52,7 @@ public class FindStepDefinitionUsagesCommandTests : CommandTestBase<FindStepDefi
 
         await InvokeAndWaitAnalyticsEvent(command, textView);
 
-        (ProjectScope.IdeScope.Actions as StubIdeActions).LastShowContextMenuItems.Should()
+        (ProjectScope.IdeScope.Actions as StubIdeActions)!.LastShowContextMenuItems.Should()
             .Contain(mi => mi.Label == "calculator.feature(3,8): When I press add");
     }
 }

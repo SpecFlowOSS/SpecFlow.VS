@@ -1,5 +1,4 @@
-﻿using System.Linq;
-
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
 /*
@@ -36,7 +35,7 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my cool step", ScenarioBlock.When));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my cool step"));
+        var result = sut.MatchStep(CreateStep(text: "my cool step"), StubGherkinDocument.Instance);
         AssertSingleDefined(result);
     }
 
@@ -47,7 +46,7 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
             parameterTypes: GetParameterTypes("string")));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my cool step"));
+        var result = sut.MatchStep(CreateStep(text: "my cool step"), StubGherkinDocument.Instance);
         var matchItem = AssertSingleDefined(result);
         matchItem.ParameterMatch.StepTextParameters.Should().HaveCount(1);
         matchItem.ParameterMatch.StepTextParameters.First().Index.Should().Be(3);
@@ -62,7 +61,8 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step"));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: CreateDataTable()));
+        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: CreateDataTable()),
+            StubGherkinDocument.Instance);
         var matchItem = AssertSingleDefined(result);
         matchItem.ParameterMatch.MatchedDataTable.Should().BeTrue();
     }
@@ -75,7 +75,8 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step"));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: CreateDocString()));
+        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: CreateDocString()),
+            StubGherkinDocument.Instance);
         var matchItem = AssertSingleDefined(result);
         matchItem.ParameterMatch.MatchedDocString.Should().BeTrue();
     }
@@ -102,7 +103,8 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
             parameterTypes: GetParameterTypes("string")));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: CreateDataTable()));
+        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: CreateDataTable()),
+            StubGherkinDocument.Instance);
         var matchItem = AssertSingleDefined(result);
         matchItem.ParameterMatch.MatchedDataTable.Should().BeTrue();
     }
@@ -116,7 +118,8 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
             parameterTypes: GetParameterTypes("string")));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: CreateDocString()));
+        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: CreateDocString()),
+            StubGherkinDocument.Instance);
         var matchItem = AssertSingleDefined(result);
         matchItem.ParameterMatch.MatchedDocString.Should().BeTrue();
     }
@@ -131,7 +134,7 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step"));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: null));
+        var result = sut.MatchStep(CreateStep(text: "my step", stepArgument: null), StubGherkinDocument.Instance);
         AssertSingleDefined(result);
         result.HasErrors.Should().BeFalse();
     }
@@ -179,7 +182,7 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step", scope: CreateTagScope("@mytag")));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my step"));
+        var result = sut.MatchStep(CreateStep(text: "my step"), StubGherkinDocument.Instance);
         var matchItem = AssertSingleDefined(result);
         matchItem.MatchedStepDefinition.Scope.Should().BeNull();
     }
@@ -206,7 +209,7 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
             parameterTypes: GetParameterTypes("string")));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my invalid 50 with extras step"));
+        var result = sut.MatchStep(CreateStep(text: "my invalid 50 with extras step"), StubGherkinDocument.Instance);
         AssertSingleDefined(result);
         result.HasErrors.Should().BeTrue();
         result.Errors.Should().Contain(m => m.Contains("parameter"));
@@ -240,7 +243,7 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
         var sut = CreateSut();
         var modifiedSut = sut.ReplaceStepDefinition(original, replacement);
 
-        var result = modifiedSut.MatchStep(CreateStep(text: stepText));
+        var result = modifiedSut.MatchStep(CreateStep(text: stepText), StubGherkinDocument.Instance);
         var matchItem = AssertSingleDefined(result);
         matchItem.MatchedStepDefinition.Expression.Should().Be(expression);
         matchItem.MatchedStepDefinition.Regex.ToString().Should().Be($"^{expression}$");

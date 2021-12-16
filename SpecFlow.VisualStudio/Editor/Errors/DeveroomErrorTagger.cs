@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
 using Microsoft.VisualStudio.Text.Adornments;
 
 namespace SpecFlow.VisualStudio.Editor.Errors;

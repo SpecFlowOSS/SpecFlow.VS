@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
+﻿#nullable enable
 
 namespace SpecFlow.VisualStudio.ProjectSystem;
 

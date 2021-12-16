@@ -1,18 +1,5 @@
-﻿using System;
-using System.IO.Abstractions;
-using System.Runtime.CompilerServices;
-using EnvDTE;
+﻿#nullable disable
 using Microsoft.CodeAnalysis;
-using Microsoft.VisualStudio.Text;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.Editor.Commands;
-using SpecFlow.VisualStudio.Monitoring;
-using SpecFlow.VisualStudio.Notifications;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
-using SpecFlow.VisualStudio.UI;
-using SpecFlow.VisualStudio.UI.ViewModels;
 using Project = EnvDTE.Project;
 
 namespace SpecFlow.VisualStudio.ProjectSystem;
@@ -58,8 +45,6 @@ public class NullVsIdeScope : IVsIdeScope
     public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; }
     public IDeveroomErrorListServices DeveroomErrorListServices { get; }
 
-    public IProjectScope GetProjectScope(Project project) => throw new NotImplementedException();
-
     public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
     {
     }
@@ -91,6 +76,8 @@ public class NullVsIdeScope : IVsIdeScope
     {
         //nop
     }
+
+    public IProjectScope GetProjectScope(Project project) => throw new NotImplementedException();
 
     public static IMonitoringService GetNullMonitoringService() => new NullMonitoringService();
 

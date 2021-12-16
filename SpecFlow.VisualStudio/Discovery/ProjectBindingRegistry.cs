@@ -29,7 +29,7 @@ public record ProjectBindingRegistry
     public override string ToString() => $"ProjectBindingRegistry_V{Version}_H{ProjectHash}";
 
 
-    public MatchResult MatchStep(Step step, IGherkinDocumentContext context = null)
+    public MatchResult MatchStep(Step step, IGherkinDocumentContext context)
     {
         var stepText = step.Text;
         if (context.IsScenarioOutline() && stepText.Contains("<"))
@@ -44,8 +44,11 @@ public record ProjectBindingRegistry
             return MatchMultiScope(step, stepsWithScopes);
         }
 
-        return MatchResult.CreateMultiMatch(MatchSingleContextResult(step, context));
+        return MatchStep(step, context, stepText);
     }
+
+    private MatchResult MatchStep(Step step, IGherkinDocumentContext context, string stepText) =>
+        MatchResult.CreateMultiMatch(MatchSingleContextResult(step, context, stepText));
 
     private MatchResult MatchMultiScope(Step step,
         IEnumerable<KeyValuePair<string, IGherkinDocumentContext>> stepsWithScopes)
@@ -82,10 +85,8 @@ public record ProjectBindingRegistry
             yield return implGroup.FirstOrDefault(mri => mri.HasErrors) ?? implGroup.First();
     }
 
-    private MatchResultItem[] MatchSingleContextResult(Step step, IGherkinDocumentContext context,
-        string stepText = null)
+    private MatchResultItem[] MatchSingleContextResult(Step step, IGherkinDocumentContext context, string stepText)
     {
-        stepText = stepText ?? step.Text;
         var sdMatches = StepDefinitions.Select(sd => sd.Match(step, context, stepText)).Where(m => m != null).ToArray();
         if (!sdMatches.Any())
             return new[] {MatchResultItem.CreateUndefined(step, stepText)};

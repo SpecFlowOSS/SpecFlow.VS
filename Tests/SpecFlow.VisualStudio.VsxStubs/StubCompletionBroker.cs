@@ -1,6 +1,5 @@
-﻿using System;
+﻿#nullable disable
 using System.Collections.ObjectModel;
-using System.Linq;
 using Microsoft.VisualStudio.Language.Intellisense;
 
 namespace SpecFlow.VisualStudio.VsxStubs;

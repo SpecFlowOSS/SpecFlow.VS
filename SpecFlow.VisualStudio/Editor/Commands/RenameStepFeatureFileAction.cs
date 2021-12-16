@@ -1,8 +1,4 @@
 ﻿#nullable enable
-using System;
-using System.Linq;
-using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
-
 namespace SpecFlow.VisualStudio.Editor.Commands;
 
 internal class RenameStepFeatureFileAction : RenameStepAction

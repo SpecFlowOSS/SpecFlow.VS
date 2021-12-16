@@ -1,11 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
 using System.Windows.Controls;
-using EnvDTE;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
-using SpecFlow.VisualStudio.UI;
 
 namespace SpecFlow.VisualStudio.ProjectSystem;
 

@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿#nullable disable
 using TechTalk.SpecFlow;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;

@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable disable
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V38;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;

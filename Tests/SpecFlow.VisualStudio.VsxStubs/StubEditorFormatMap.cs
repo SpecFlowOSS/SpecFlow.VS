@@ -30,5 +30,5 @@ public class StubEditorFormatMap : IEditorFormatMap
 
     public bool IsInBatchUpdate => throw new NotImplementedException();
 
-    public event EventHandler<FormatItemsEventArgs> FormatMappingChanged;
+    public event EventHandler<FormatItemsEventArgs>? FormatMappingChanged;
 }

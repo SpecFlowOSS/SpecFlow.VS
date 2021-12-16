@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Models;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Models;
 
 public class StepScope
 {

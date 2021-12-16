@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.VisualStudio.Language.Intellisense;
 
 namespace SpecFlow.VisualStudio.Editor.Completions.Infrastructure;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
 using Microsoft.VisualStudio.LanguageServices;
 
 namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig;

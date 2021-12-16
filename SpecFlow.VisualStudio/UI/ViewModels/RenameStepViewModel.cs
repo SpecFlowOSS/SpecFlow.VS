@@ -1,7 +1,6 @@
-﻿using System;
+﻿#nullable disable
+
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
 
 namespace SpecFlow.VisualStudio.UI.ViewModels;
 

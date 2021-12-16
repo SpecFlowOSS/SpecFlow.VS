@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.VsxStubs;
+﻿#nullable enable
+namespace SpecFlow.VisualStudio.VsxStubs;
 
 public class StubDiscoveryResultProvider : IDiscoveryResultProvider
 {

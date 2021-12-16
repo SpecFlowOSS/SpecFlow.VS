@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
 internal class ReflectionSpecFlowDiscoverer : ISpecFlowDiscoverer

@@ -1,8 +1,8 @@
-﻿using System;
-using FluentAssertions;
-using System.Linq;
+﻿#nullable disable
+
 using System.Reflection;
 using System.Runtime.Loader;
+using FluentAssertions;
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow;

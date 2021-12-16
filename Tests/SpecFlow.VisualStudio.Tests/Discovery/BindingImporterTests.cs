@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿#nullable disable
+
+#nullable disable
 
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 

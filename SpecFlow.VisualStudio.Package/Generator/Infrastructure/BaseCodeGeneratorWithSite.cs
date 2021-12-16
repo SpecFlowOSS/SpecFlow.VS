@@ -1,3 +1,4 @@
+#nullable disable
 /***************************************************************************
 
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -11,13 +12,7 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 using System;
 using System.CodeDom.Compiler;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using EnvDTE;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Designer.Interfaces;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using VSLangProj;
 using VSOLE = Microsoft.VisualStudio.OLE.Interop;
 

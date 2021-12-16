@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.VisualStudio.Utilities;
 
 namespace SpecFlow.VisualStudio.Editor.Outlining;
 

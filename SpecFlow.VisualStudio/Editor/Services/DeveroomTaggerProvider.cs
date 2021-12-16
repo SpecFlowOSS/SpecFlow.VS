@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.Utilities;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.Editor.Services;
 

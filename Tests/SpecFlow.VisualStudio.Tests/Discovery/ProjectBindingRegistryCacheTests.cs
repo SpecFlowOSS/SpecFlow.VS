@@ -88,41 +88,45 @@ public class ProjectBindingRegistryCacheTests
         var updateTaskCount = 0;
         var timeout = TimeSpan.FromSeconds(20);
         var cts = new CancellationTokenSource(timeout);
-        int fireGetLatestCounter = 0;
+        int i = 0;
         try
         {
-            bool retried = false;
-            do
+            RunInThread(async () =>
             {
-                var tasks = new List<Task>();
-                for (int i = 0; i < 10 && !retried; ++i)
-                    tasks.Add(RunInThread(async () =>
+                var priorVer = 0;
+                while (!cts.IsCancellationRequested)
+                {
+                    var bindingRegistry = await projectBindingRegistryCache.GetLatest();
+                    priorVer.Should().BeLessOrEqualTo(bindingRegistry.Version);
+                    priorVer = bindingRegistry.Version;
+                    await Task.Delay(10, cts.Token);
+                }
+            }, cts.Token);
+
+            for (i = 0; i < 1000 && !cts.IsCancellationRequested; ++i)
+            {
+                RunInThread(async () =>
+                {
+                    while (!cts.IsCancellationRequested)
                     {
-                        for (int j = 0; j < 5 + DateTimeOffset.UtcNow.Ticks % 10 && !retried; ++j)
+                        Interlocked.Increment(ref updateTaskCount);
+                        await projectBindingRegistryCache.Update(async old =>
                         {
-                            if (Interlocked.Increment(ref fireGetLatestCounter) % 7 == 6)
-                            {
-                                await projectBindingRegistryCache.GetLatest();
-                            }
-                            else
-                            {
-                                Interlocked.Increment(ref updateTaskCount);
-                                await projectBindingRegistryCache.Update(async old =>
-                                {
-                                    await Task.Yield();
-                                    oldVersions.Enqueue(old.Version);
-                                    return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(),
-                                        Guid.NewGuid().GetHashCode());
-                                });
-                            }
+                            await Task.Yield();
+                            oldVersions.Enqueue(old.Version);
+                            return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(),
+                                Guid.NewGuid().GetHashCode());
+                        });
 
-                            retried |= stubLogger.Logs.Any(log => log.Message.Contains("in 2 iteration"));
-                        }
-                    }, cts.Token));
 
-                await Task.WhenAll(tasks);
-                stubLogger.Clear();
-            } while (!retried && !cts.IsCancellationRequested);
+                        await Task.Yield();
+
+                        if (stubLogger.Logs.Any(log => log.Message.Contains("in 2 iteration")))
+                            cts.Cancel();
+                    }
+                }, cts.Token);
+                await Task.Delay(i / 10, cts.Token);
+            }
         }
         catch (OperationCanceledException e)
         {
@@ -131,7 +135,7 @@ public class ProjectBindingRegistryCacheTests
 
         //assert
         var finish = DateTimeOffset.UtcNow;
-        cts.IsCancellationRequested.Should().BeFalse($"started at {start} and not finished until {finish}");
+        _testOutputHelper.WriteLine($"i:{i} cancelled:{cts.IsCancellationRequested}");
         (finish - start).Should().BeLessThan(timeout, $"started at {start} and not finished until {finish}");
         var registry = await projectBindingRegistryCache.GetLatest();
         registry.Should().BeSameAs(projectBindingRegistryCache.Value);
@@ -140,25 +144,22 @@ public class ProjectBindingRegistryCacheTests
         oldVersions.Should().BeInAscendingOrder();
     }
 
-    private Task RunInThread(Func<Task> action, CancellationToken ct)
+    private void RunInThread(Func<Task> action, CancellationToken ct)
     {
-        TaskCompletionSource<bool> taskCompletionSource = new TaskCompletionSource<bool>();
-
         var thread = new Thread(_ =>
         {
             try
             {
+#pragma warning disable VSTHRD002
                 action().Wait(ct);
-                taskCompletionSource.TrySetResult(true);
+#pragma warning restore
             }
             catch (Exception e)
             {
                 _testOutputHelper.WriteLine(e.ToString());
-                taskCompletionSource.TrySetException(e);
             }
-        }, default);
+        }) {IsBackground = true, Priority = ThreadPriority.Highest};
         thread.Start();
-        return taskCompletionSource.Task;
     }
 
     private class TestProjectStepDefinitionBinding : ProjectStepDefinitionBinding

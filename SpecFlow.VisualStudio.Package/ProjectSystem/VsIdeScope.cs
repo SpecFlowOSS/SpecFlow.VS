@@ -1,24 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.ComponentModel.Composition;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Windows;
-using EnvDTE;
+﻿#nullable disable
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
-using Microsoft.VisualStudio.Editor;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Events;
-using Microsoft.VisualStudio.Text;
-using Microsoft.VisualStudio.Text.Editor;
-using SpecFlow.VisualStudio.Common;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Discovery;
-using SpecFlow.VisualStudio.Monitoring;
-using SpecFlow.VisualStudio.ProjectSystem.Actions;
-using SpecFlow.VisualStudio.VsEvents;
 using Document = Microsoft.CodeAnalysis.Document;
 using Project = EnvDTE.Project;
 
@@ -205,17 +186,6 @@ public class VsIdeScope : IVsIdeScope
         return GetProjectScope(project);
     }
 
-    public IProjectScope GetProjectScope(Project project)
-    {
-        if (project == null ||
-            !VsUtils.IsSolutionProject(project))
-            return null;
-
-        var projectId = GetProjectId(project);
-        var projectScope = _projectScopes.GetOrAdd(projectId, id => CreateProjectScope(id, project));
-        return projectScope;
-    }
-
     public IProjectScope[] GetProjectsWithFeatureFiles()
     {
         try
@@ -242,6 +212,17 @@ public class VsIdeScope : IVsIdeScope
         _solutionEventListener.Closed -= SolutionEventListenerOnClosed;
         (_solutionEventListener as IDisposable)?.Dispose();
         _documentEventsListener?.Dispose();
+    }
+
+    public IProjectScope GetProjectScope(Project project)
+    {
+        if (project == null ||
+            !VsUtils.IsSolutionProject(project))
+            return null;
+
+        var projectId = GetProjectId(project);
+        var projectScope = _projectScopes.GetOrAdd(projectId, id => CreateProjectScope(id, project));
+        return projectScope;
     }
 
     public event EventHandler<EventArgs> ProjectsBuilt;

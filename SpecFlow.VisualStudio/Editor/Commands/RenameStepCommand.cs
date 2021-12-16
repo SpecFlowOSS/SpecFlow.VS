@@ -1,9 +1,4 @@
-﻿#nullable enable
-using System;
-using System.Linq;
-using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
-
-namespace SpecFlow.VisualStudio.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Editor.Commands;
 
 [Export(typeof(IDeveroomCodeEditorCommand))]
 [Export(typeof(IDeveroomFeatureEditorCommand))]

@@ -142,7 +142,7 @@ public class StubTextSelection : ITextSelection
         }
     }
 
-    public event EventHandler SelectionChanged;
+    public event EventHandler? SelectionChanged;
 
     private VirtualSnapshotPoint NormalizePoint(VirtualSnapshotPoint point) => point;
 

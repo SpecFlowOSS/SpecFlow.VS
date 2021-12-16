@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
+
 using SpecFlow.VisualStudio.Configuration;
 
 namespace SpecFlow.VisualStudio.Tests.Editor.Services;

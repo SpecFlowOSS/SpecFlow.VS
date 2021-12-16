@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
-using SpecFlow.VisualStudio.Common;
-using SpecFlow.VisualStudio.Configuration;
+﻿#nullable enable
 
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
@@ -46,7 +42,7 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
 
     public void AddFile(string targetFilePath, string template)
     {
-        if (targetFilePath != null && !Path.IsPathRooted(targetFilePath))
+        if (!Path.IsPathRooted(targetFilePath))
             targetFilePath = Path.Combine(ProjectFolder, targetFilePath);
 
         StubIdeScope.FileSystem.Directory.CreateDirectory(Path.GetDirectoryName(targetFilePath));

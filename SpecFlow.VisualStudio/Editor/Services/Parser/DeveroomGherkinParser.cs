@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
+
 using Location = Gherkin.Ast.Location;
 
 namespace SpecFlow.VisualStudio.Editor.Services.Parser;

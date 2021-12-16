@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Discovery;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.Discovery;
 
 [DebuggerDisplay("{Value} {_upToDateBindingRegistrySource.Task.Status}")]
 public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
@@ -99,11 +100,10 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
     }
 
 #pragma warning disable VSTHRD003
-    private async Task<ProjectBindingRegistry> WaitForCompletion(TaskCompletionSource<ProjectBindingRegistry> task)
+    private static async Task<ProjectBindingRegistry> WaitForCompletion(
+        TaskCompletionSource<ProjectBindingRegistry> task)
     {
-        CancellationTokenSource cts = Debugger.IsAttached
-            ? new CancellationTokenSource(TimeSpan.FromSeconds(60))
-            : new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        CancellationTokenSource cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(15));
 
         var timeoutTask = Task.Delay(-1, cts.Token);
         var result = await Task.WhenAny(task.Task, timeoutTask);

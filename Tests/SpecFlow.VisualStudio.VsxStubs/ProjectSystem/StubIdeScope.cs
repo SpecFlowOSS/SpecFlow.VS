@@ -1,15 +1,9 @@
-﻿using System;
-using System.IO.Abstractions.TestingHelpers;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using Microsoft.CodeAnalysis.CSharp;
-using SpecFlow.VisualStudio.Editor.Services;
-
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
 public class StubIdeScope : Mock<IIdeScope>, IIdeScope
 {
-    public StubIdeScope(ITestOutputHelper testOutputHelper)
+    public StubIdeScope(ITestOutputHelper testOutputHelper) : base(MockBehavior.Strict)
     {
         AnalyticsTransmitter = new StubAnalyticsTransmitter(Logger);
         MonitoringService =
@@ -23,7 +17,7 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
         Actions = new StubIdeActions(this);
         VsxStubObjects.Initialize();
 
-        UnSynchronizeRunOnBackgroundThread();
+        UseNonSynchronizedRunOnBackgroundThread();
     }
 
     public StubAnalyticsTransmitter AnalyticsTransmitter { get; }
@@ -35,10 +29,10 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
         new DeveroomDebugLogger()
     };
 
-    public StubErrorListServices StubErrorListServices { get; } = new();
     public StubWindowManager StubWindowManager { get; } = new();
     public List<IProjectScope> ProjectScopes { get; } = new();
     public IWpfTextView CurrentTextView { get; internal set; }
+    public StubErrorListServices StubErrorListServices { get; } = new();
 
     public bool IsSolutionLoaded { get; } = true;
 
@@ -101,6 +95,46 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
 
     public IDisposable CreateUndoContext(string undoLabel) => null;
 
+    public void SynchronizeRunOnBackgroundThread()
+    {
+        Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
+                It.IsAny<string>()))
+            .Returns(async (Func<Task> action, Action<Exception> onException, string callerName) =>
+            {
+                try
+                {
+                    await action();
+                }
+                catch (Exception e)
+                {
+                    Logger.LogException(MonitoringService, e);
+                    onException(e);
+                }
+            });
+    }
+
+    public void UseNonSynchronizedRunOnBackgroundThread()
+    {
+        Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
+                It.IsAny<string>()))
+            .Returns((Func<Task> action, Action<Exception> onException, string callerName) =>
+            {
+                StackTrace stackTraceSnapshot = new StackTrace();
+                return Task.Run(async () =>
+                {
+                    try
+                    {
+                        await action();
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.LogException(MonitoringService, e, $"Called from {callerName}. {stackTraceSnapshot}");
+                        onException(e);
+                    }
+                });
+            });
+    }
+
     public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null,
         string contentType = VsContentTypes.FeatureFile, string filePath = null)
     {
@@ -128,46 +162,6 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
         var lines = FileSystem.File.ReadAllLines(sourceLocation.SourceFile);
         var textView = CreateTextView(new TestText(lines), filePath: sourceLocation.SourceFile);
         return textView;
-    }
-
-    public void SynchronizeRunOnBackgroundThread()
-    {
-        Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
-                It.IsAny<string>()))
-            .Returns(async (Func<Task> action, Action<Exception> onException, string callerName) =>
-            {
-                try
-                {
-                    await action();
-                }
-                catch (Exception e)
-                {
-                    Logger.LogException(MonitoringService, e);
-                    onException(e);
-                }
-            });
-    }
-
-    public void UnSynchronizeRunOnBackgroundThread()
-    {
-        Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
-                It.IsAny<string>()))
-            .Returns((Func<Task> action, Action<Exception> onException, string callerName) =>
-            {
-                StackTrace stackTraceSnapshot = new StackTrace();
-                return Task.Run(async () =>
-                {
-                    try
-                    {
-                        await action();
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogException(MonitoringService, e, $"Called from {callerName}. {stackTraceSnapshot}");
-                        onException(e);
-                    }
-                });
-            });
     }
 
     public void TriggerProjectsBuilt()

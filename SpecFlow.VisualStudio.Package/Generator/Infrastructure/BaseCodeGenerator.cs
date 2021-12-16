@@ -1,3 +1,4 @@
+#nullable disable
 /***************************************************************************
 
 Copyright (c) Microsoft Corporation. All rights reserved.
@@ -10,10 +11,6 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 ***************************************************************************/
 
 using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace SpecFlow.VisualStudio.Generator.Infrastructure;
 

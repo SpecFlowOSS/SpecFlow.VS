@@ -1,13 +1,14 @@
-﻿namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
+﻿#nullable enable
+namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEditorCommandBase
 {
-    private readonly Func<IProjectScope, T> _commandFactory;
+    private readonly Func<InMemoryStubProjectScope, T> _commandFactory;
     protected readonly string WarningHeader;
 
     protected CommandTestBase(
         ITestOutputHelper testOutputHelper,
-        Func<IProjectScope, T> commandFactory,
+        Func<InMemoryStubProjectScope, T> commandFactory,
         string warningHeader) : base(testOutputHelper)
     {
         _commandFactory = commandFactory;

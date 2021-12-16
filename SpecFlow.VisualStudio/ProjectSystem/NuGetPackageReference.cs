@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.ProjectSystem;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.ProjectSystem;
 
 public record NuGetPackageReference
 {

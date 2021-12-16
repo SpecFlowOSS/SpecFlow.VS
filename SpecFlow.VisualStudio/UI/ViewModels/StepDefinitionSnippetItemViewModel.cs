@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.UI.ViewModels;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.UI.ViewModels;
 
 public class StepDefinitionSnippetItemViewModel
 {

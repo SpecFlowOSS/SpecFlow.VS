@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Windows.Threading;
-using SpecFlow.VisualStudio.Analytics;
-using SpecFlow.VisualStudio.Notifications;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.ProjectSystem;
 

@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.VisualStudio.Configuration;
+﻿#nullable disable
 
 public class SpecFlowConfigDeserializer : IConfigDeserializer<DeveroomConfiguration>
 {

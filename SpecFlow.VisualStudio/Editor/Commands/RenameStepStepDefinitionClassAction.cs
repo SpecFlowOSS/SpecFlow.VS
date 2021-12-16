@@ -1,5 +1,4 @@
-﻿#nullable enable
-using TextSpan = Microsoft.CodeAnalysis.Text.TextSpan;
+﻿using TextSpan = Microsoft.CodeAnalysis.Text.TextSpan;
 
 namespace SpecFlow.VisualStudio.Editor.Commands;
 

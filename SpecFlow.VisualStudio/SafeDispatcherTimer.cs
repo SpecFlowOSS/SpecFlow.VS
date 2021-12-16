@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Windows.Threading;
 
 namespace SpecFlow.VisualStudio;
 

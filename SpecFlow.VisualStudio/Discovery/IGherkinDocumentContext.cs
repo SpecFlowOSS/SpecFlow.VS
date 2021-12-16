@@ -1,5 +1,4 @@
-﻿using System.Linq;
-
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.Discovery;
 
 public interface IGherkinDocumentContext
@@ -10,8 +9,6 @@ public interface IGherkinDocumentContext
 
 public static class GherkinDocumentContextExtensions
 {
-    public static bool IsRoot(this IGherkinDocumentContext context) => context.Parent == null;
-
     public static IEnumerable<object> GetNodes(this IGherkinDocumentContext context)
     {
         while (context != null)
@@ -41,17 +38,17 @@ public static class GherkinDocumentContextExtensions
 
     public static IGherkinDocumentContext GetParentOf<T>(this IGherkinDocumentContext context)
     {
-        while (context.Parent != null && !(context.Parent.Node is T)) context = context.Parent;
+        while (context.Parent is {Node: not T}) context = context.Parent;
         return context.Parent;
     }
 
     public static T AncestorOrSelfNode<T>(this IGherkinDocumentContext context)
         where T : class
     {
-        if (context.Node is T)
-            return context.Node as T;
+        if (context.Node is T node)
+            return node;
 
-        while (context.Parent != null && !(context.Parent.Node is T)) context = context.Parent;
-        return context.Parent?.Node as T;
+        var parentOf = GetParentOf<T>(context);
+        return parentOf?.Node as T;
     }
 }

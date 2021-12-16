@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
+
 using System.Windows.Controls;
 
 namespace SpecFlow.VisualStudio.UI;

@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Tests.Editor;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.Tests.Editor;
 
 public class TestStepDefinition : StepDefinition
 {

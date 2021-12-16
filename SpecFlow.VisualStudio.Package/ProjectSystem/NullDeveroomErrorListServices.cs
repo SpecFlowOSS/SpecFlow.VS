@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.ProjectSystem;
+﻿#nullable enable
+namespace SpecFlow.VisualStudio.ProjectSystem;
 
 public class NullDeveroomErrorListServices : IDeveroomErrorListServices
 {

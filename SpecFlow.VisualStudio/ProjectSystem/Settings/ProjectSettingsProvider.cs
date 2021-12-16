@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Windows.Threading;
-
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.ProjectSystem.Settings;
 
 public class ProjectSettingsProvider : IDisposable, IProjectSettingsProvider
@@ -181,13 +178,4 @@ public class ProjectSettingsProvider : IDisposable, IProjectSettingsProvider
             ? DeveroomProjectKind.SpecFlowTestProject
             : DeveroomProjectKind.SpecFlowLibProject;
     }
-}
-
-public interface IProjectSettingsProvider
-{
-    event EventHandler<EventArgs> WeakSettingsInitialized;
-    event EventHandler<EventArgs> SettingsInitialized;
-
-    ProjectSettings GetProjectSettings();
-    ProjectSettings CheckProjectSettings();
 }

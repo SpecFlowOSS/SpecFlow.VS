@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
+
 using Microsoft.VisualStudio.Imaging;
 
 namespace SpecFlow.VisualStudio.Notifications;

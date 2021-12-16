@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
+
 
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 

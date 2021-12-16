@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
 using SpecFlow.VisualStudio.Discovery.TagExpressions;
 
 namespace SpecFlow.VisualStudio.Discovery;

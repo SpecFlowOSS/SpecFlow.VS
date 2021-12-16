@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using SpecFlow.VisualStudio.Editor.Services.StepDefinitions;
-
-namespace SpecFlow.VisualStudio.Editor.Commands;
+﻿#nullable disable
 
 public class RenameStepCommandContext
 {
@@ -17,7 +14,7 @@ public class RenameStepCommandContext
     public ITextBuffer TextBufferOfStepDefinitionClass { get; set; }
     public IProjectScope ProjectOfStepDefinitionClass { get; set; }
     public IStepDefinitionExpressionAnalyzer StepDefinitionExpressionAnalyzer { get; set; }
-    public MethodDeclarationSyntax Method { get; set; }
+    [CanBeNull] public MethodDeclarationSyntax Method { get; set; }
 
     public IProjectScope[] SpecFlowTestProjectsWithFeatureFiles { get; set; }
     public ProjectStepDefinitionBinding StepDefinitionBinding { get; set; }

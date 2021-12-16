@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Discovery;
+﻿#nullable enable
+namespace SpecFlow.VisualStudio.Discovery;
 
 public interface IDiscoveryService : IDisposable
 {

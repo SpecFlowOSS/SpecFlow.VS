@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Converters;
+﻿#nullable disable
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace SpecFlow.VisualStudio.Configuration;

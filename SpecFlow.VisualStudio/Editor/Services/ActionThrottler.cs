@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Threading;
 
 namespace SpecFlow.VisualStudio.Editor.Services;
 

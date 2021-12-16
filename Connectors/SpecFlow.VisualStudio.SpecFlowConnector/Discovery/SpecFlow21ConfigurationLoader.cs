@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
 public class SpecFlow21ConfigurationLoader : SpecFlowConfigurationLoader
 {

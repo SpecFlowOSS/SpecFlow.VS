@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Discovery;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.Discovery;
 
 public class StepDefinitionFileParser
 {

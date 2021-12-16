@@ -1,5 +1,5 @@
-﻿using System.Globalization;
-using Microsoft.VisualStudio.Language.Intellisense;
+﻿#nullable disable
+using System.Globalization;
 
 namespace SpecFlow.VisualStudio.Editor.Completions.Infrastructure;
 

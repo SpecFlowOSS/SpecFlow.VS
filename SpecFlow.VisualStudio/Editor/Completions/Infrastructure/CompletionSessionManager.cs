@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.Language.Intellisense;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.Editor.Completions.Infrastructure;
 

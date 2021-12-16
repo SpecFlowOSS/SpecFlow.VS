@@ -1,4 +1,5 @@
-﻿using System.IO.Abstractions;
+﻿#nullable disable
+using System.IO.Abstractions;
 
 namespace SpecFlow.VisualStudio.Tests.Analytics;
 

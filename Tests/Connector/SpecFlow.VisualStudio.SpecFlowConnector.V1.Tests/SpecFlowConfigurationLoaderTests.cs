@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿#nullable disable
+using FluentAssertions;
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 using TechTalk.SpecFlow.Configuration;
 using Xunit;

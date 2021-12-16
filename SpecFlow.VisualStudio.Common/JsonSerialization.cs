@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 

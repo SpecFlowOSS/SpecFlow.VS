@@ -1,8 +1,5 @@
-﻿using System;
-using System.Text;
+﻿#nullable disable
 using System.Text.RegularExpressions;
-using EnvDTE;
-using SpecFlow.VisualStudio.Diagnostics;
 
 namespace SpecFlow.VisualStudio.Wizards.Infrastructure;
 

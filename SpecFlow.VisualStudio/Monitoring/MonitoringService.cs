@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using SpecFlow.VisualStudio.Analytics;
-using SpecFlow.VisualStudio.Notifications;
-
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.Monitoring;
 
 [Export(typeof(IMonitoringService))]

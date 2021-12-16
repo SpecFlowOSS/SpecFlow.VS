@@ -1,11 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using EnvDTE;
-using Microsoft.VisualStudio.Utilities;
-using SpecFlow.VisualStudio.Common;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Monitoring;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.ProjectSystem;
 

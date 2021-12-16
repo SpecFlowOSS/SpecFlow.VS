@@ -1,4 +1,4 @@
-using System;
+#nullable enable
 
 namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 

@@ -5,14 +5,15 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 public class DefineStepsCommandTests : CommandTestBase<DefineStepsCommand>
 {
     public DefineStepsCommandTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper,
-        ps => new DefineStepsCommand(ps.IdeScope, null, ps.IdeScope.MonitoringService),
+        ps => new DefineStepsCommand(ps.IdeScope, new StubBufferTagAggregatorFactoryService(ps.StubIdeScope),
+            ps.IdeScope.MonitoringService),
         "ShowProblem: User Notification: ")
     {
     }
 
     private void ArrangePopup()
     {
-        (ProjectScope.IdeScope.WindowManager as StubWindowManager)
+        (ProjectScope.IdeScope.WindowManager as StubWindowManager)!
             .RegisterWindowAction<CreateStepDefinitionsDialogViewModel>(model =>
                 model.Result = CreateStepDefinitionsDialogResult.Create);
     }

@@ -1,14 +1,10 @@
-﻿using System;
-using Microsoft.VisualStudio.Text.Tagging;
-using SpecFlow.VisualStudio.Editor.Services;
-
-namespace SpecFlow.VisualStudio.VsxStubs;
+﻿namespace SpecFlow.VisualStudio.VsxStubs;
 
 public class StubBufferTagAggregatorFactoryService : IBufferTagAggregatorFactoryService
 {
-    private readonly StubIdeScope _ideScope;
+    private readonly IIdeScope _ideScope;
 
-    public StubBufferTagAggregatorFactoryService(StubIdeScope ideScope)
+    public StubBufferTagAggregatorFactoryService(IIdeScope ideScope)
     {
         _ideScope = ideScope;
     }

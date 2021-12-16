@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.SampleProjectGenerator;
+﻿#nullable disable
+namespace SpecFlow.SampleProjectGenerator;
 
 public class NuGetPackageData
 {

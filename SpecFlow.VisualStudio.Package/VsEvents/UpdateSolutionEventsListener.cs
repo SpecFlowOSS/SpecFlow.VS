@@ -1,8 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using SpecFlow.VisualStudio.Diagnostics;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.VsEvents;
 

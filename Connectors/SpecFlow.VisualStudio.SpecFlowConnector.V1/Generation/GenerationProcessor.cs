@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable disable
 using SpecFlow.VisualStudio.SpecFlowConnector.AppDomainHelper;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Generation;

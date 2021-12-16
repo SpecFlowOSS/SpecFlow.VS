@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Editor.Commands;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.Editor.Commands;
 
 [Export(typeof(IDeveroomFeatureEditorCommand))]
 public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEditorCommand

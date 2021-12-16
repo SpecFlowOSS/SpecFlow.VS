@@ -1,4 +1,4 @@
-﻿using System;
+﻿#nullable disable
 using System.Security;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector;

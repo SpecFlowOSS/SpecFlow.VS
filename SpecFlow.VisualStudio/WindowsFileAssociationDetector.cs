@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
 using System.Runtime.InteropServices;
 
 namespace SpecFlow.VisualStudio;

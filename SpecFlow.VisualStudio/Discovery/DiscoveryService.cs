@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace SpecFlow.VisualStudio.Discovery;
+﻿namespace SpecFlow.VisualStudio.Discovery;
 
 public class DiscoveryService : IDiscoveryService
 {
@@ -18,8 +16,7 @@ public class DiscoveryService : IDiscoveryService
         _projectSettingsProvider.WeakSettingsInitialized += ProjectSystemOnProjectsBuilt;
         _projectScope.IdeScope.WeakProjectOutputsUpdated += ProjectSystemOnProjectsBuilt;
         BindingRegistryCache = bindingRegistryCacheCache;
-        DiscoveryInvoker = new DiscoveryInvoker(_projectScope,
-            discoveryResultProvider);
+        DiscoveryInvoker = new DiscoveryInvoker(_projectScope, discoveryResultProvider);
     }
 
     public IProjectBindingRegistryCache BindingRegistryCache { get; }

@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Connectors;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.Connectors;
 
 public class OutProcSpecFlowConnector
 {

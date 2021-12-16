@@ -1,8 +1,5 @@
 ﻿using System;
-using System.ComponentModel.Composition;
-using System.Reflection;
 using System.Linq;
-using Microsoft.VisualStudio.Shell;
 
 namespace SpecFlow.VisualStudio;
 

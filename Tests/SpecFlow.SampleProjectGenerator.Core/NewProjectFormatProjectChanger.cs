@@ -1,5 +1,5 @@
-﻿using System;
-using System.Linq;
+﻿#nullable disable
+
 using System.Xml.Linq;
 
 namespace SpecFlow.SampleProjectGenerator;

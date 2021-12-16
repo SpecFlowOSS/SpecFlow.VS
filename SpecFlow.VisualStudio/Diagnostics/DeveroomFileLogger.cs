@@ -1,14 +1,13 @@
-using System;
-
+#nullable disable
 namespace SpecFlow.VisualStudio.Diagnostics;
 
 public class DeveroomFileLogger : IDeveroomLogger
 {
     private static readonly object LockObject = new();
 
-    public DeveroomFileLogger(string logFilePath = null, TraceLevel level = TraceLevel.Verbose)
+    public DeveroomFileLogger(TraceLevel level = TraceLevel.Verbose)
     {
-        LogFilePath = logFilePath ?? GetLogFile();
+        LogFilePath = GetLogFile();
         Level = level;
         CheckLogFolder();
         DeleteOldLogFiles();

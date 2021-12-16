@@ -1,6 +1,6 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.Linq;
-using SpecFlow.VisualStudio.Snippets;
 
 namespace SpecFlow.VisualStudio.UI.ViewModels;
 

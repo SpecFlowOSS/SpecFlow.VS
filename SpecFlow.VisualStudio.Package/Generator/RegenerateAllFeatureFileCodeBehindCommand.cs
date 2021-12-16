@@ -1,14 +1,5 @@
-﻿using System;
+﻿#nullable disable
 using System.ComponentModel.Design;
-using System.Linq;
-using EnvDTE;
-using Microsoft.VisualStudio.Shell;
-using SpecFlow.VisualStudio.Common;
-using SpecFlow.VisualStudio.Diagnostics;
-using SpecFlow.VisualStudio.Editor.Commands;
-using SpecFlow.VisualStudio.Generation;
-using SpecFlow.VisualStudio.ProjectSystem;
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using VSLangProj;
 
 namespace SpecFlow.VisualStudio.Generator;

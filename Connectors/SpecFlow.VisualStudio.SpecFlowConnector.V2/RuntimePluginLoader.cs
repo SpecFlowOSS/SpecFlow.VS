@@ -1,4 +1,5 @@
-﻿namespace TechTalk.SpecFlow.Plugins;
+﻿#nullable disable
+namespace TechTalk.SpecFlow.Plugins;
 
 public abstract class RuntimePluginLoader_Patch : IRuntimePluginLoader
 {

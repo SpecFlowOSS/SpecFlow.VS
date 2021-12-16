@@ -1,13 +1,7 @@
-﻿using System;
+﻿#nullable disable
 using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using SpecFlow.VisualStudio.Diagnostics;
 using SpecFlow.VisualStudio.Generator;
-using SpecFlow.VisualStudio.ProjectSystem;
 
 namespace SpecFlow.VisualStudio.Package;
 

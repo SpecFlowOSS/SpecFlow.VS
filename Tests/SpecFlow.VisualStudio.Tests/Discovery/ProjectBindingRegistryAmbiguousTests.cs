@@ -1,5 +1,4 @@
-﻿using System.Linq;
-
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
 /*
@@ -21,7 +20,7 @@ public class ProjectBindingRegistryAmbiguousTests : ProjectBindingRegistryTestsB
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("other step"));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my cool step"));
+        var result = sut.MatchStep(CreateStep(text: "my cool step"), StubGherkinDocument.Instance);
         result.HasAmbiguous.Should().BeTrue();
         result.Items.Should().HaveCount(2);
         result.HasErrors.Should().BeTrue();
@@ -35,7 +34,7 @@ public class ProjectBindingRegistryAmbiguousTests : ProjectBindingRegistryTestsB
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my .*", methodName: "Method2"));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my cool step"));
+        var result = sut.MatchStep(CreateStep(text: "my cool step"), StubGherkinDocument.Instance);
         result.HasAmbiguous.Should().BeTrue();
         result.HasErrors.Should().BeTrue();
         result.Errors.Should().Contain(m => m.Contains("Method1"));
@@ -53,7 +52,7 @@ public class ProjectBindingRegistryAmbiguousTests : ProjectBindingRegistryTestsB
             parameterTypes: GetParameterTypes("string")));
         var sut = CreateSut();
 
-        var result = sut.MatchStep(CreateStep(text: "my invalid 50 with extras step"));
+        var result = sut.MatchStep(CreateStep(text: "my invalid 50 with extras step"), StubGherkinDocument.Instance);
         result.HasAmbiguous.Should().BeTrue();
         result.Items.Should().HaveCount(2);
 

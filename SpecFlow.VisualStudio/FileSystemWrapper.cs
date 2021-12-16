@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿#nullable enable
 
 namespace SpecFlow.VisualStudio;
 

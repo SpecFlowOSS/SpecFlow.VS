@@ -1,6 +1,6 @@
-﻿using System.Windows.Media;
+﻿#nullable disable
+using System.Windows.Media;
 using Microsoft.VisualStudio.Text.Classification;
-using Microsoft.VisualStudio.Utilities;
 
 namespace SpecFlow.VisualStudio.Editor.Classification;
 

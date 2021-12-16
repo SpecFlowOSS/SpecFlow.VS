@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿#nullable disable
+using System.ComponentModel;
 
 namespace SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs;
 

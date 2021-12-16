@@ -1,8 +1,5 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.Editor;
+﻿#nullable disable
 using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Utilities;
 
 namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 

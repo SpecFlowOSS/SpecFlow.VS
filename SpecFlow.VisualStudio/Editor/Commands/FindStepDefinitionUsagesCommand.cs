@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-
+﻿#nullable disable
 namespace SpecFlow.VisualStudio.Editor.Commands;
 
 [Export(typeof(IDeveroomCodeEditorCommand))]

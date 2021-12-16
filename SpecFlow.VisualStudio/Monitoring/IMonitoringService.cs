@@ -1,5 +1,4 @@
-﻿using System;
-using SpecFlow.VisualStudio.Notifications;
+﻿#nullable disable
 
 namespace SpecFlow.VisualStudio.Monitoring;
 

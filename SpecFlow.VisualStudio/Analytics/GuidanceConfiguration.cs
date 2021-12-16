@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Analytics;
+﻿#nullable disable
+namespace SpecFlow.VisualStudio.Analytics;
 
 [Export(typeof(IGuidanceConfiguration))]
 public class GuidanceConfiguration : IGuidanceConfiguration

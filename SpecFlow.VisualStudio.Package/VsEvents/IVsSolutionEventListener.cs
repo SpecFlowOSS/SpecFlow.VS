@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.VisualStudio.Shell.Events;
 
 namespace SpecFlow.VisualStudio.VsEvents;
 

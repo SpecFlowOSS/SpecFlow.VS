@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.Discovery;
+﻿#nullable enable
+namespace SpecFlow.VisualStudio.Discovery;
 
 internal class DiscoveryInvoker
 {
@@ -62,6 +63,9 @@ internal class DiscoveryInvoker
             _errorListServices = errorListServices;
             _invoker = invoker;
             _errorListServices.ClearErrors(DeveroomUserErrorCategory.Discovery);
+            _discoveryResult = null!;
+            _projectSettings = null!;
+            _testAssemblySource = null!;
         }
 
         public IDiscovery AndProjectIsSpecFlowProject()
@@ -108,7 +112,7 @@ internal class DiscoveryInvoker
                 " Navigation, step completion and other features are disabled. " + Environment.NewLine +
                 "  Please check the error message above and report to https://github.com/SpecFlowOSS/SpecFlow.VS/issues if you cannot fix.");
 
-            _errorListServices?.AddErrors(new[]
+            _errorListServices.AddErrors(new[]
             {
                 new DeveroomUserError
                 {

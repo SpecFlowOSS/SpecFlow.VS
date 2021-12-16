@@ -1,4 +1,5 @@
-﻿using Match = System.Text.RegularExpressions.Match;
+﻿#nullable disable
+using Match = System.Text.RegularExpressions.Match;
 
 namespace SpecFlow.VisualStudio.VsxStubs;
 
