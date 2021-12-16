@@ -194,7 +194,12 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         public void MonitorError(Exception exception, bool? isFatal = null)
         {
-            _analyticsTransmitter.TransmitExceptionEvent(exception, isFatal: isFatal);
+            if (isFatal.HasValue)
+                _analyticsTransmitter.TransmitFatalExceptionEvent(exception, isFatal.Value);
+            else
+            {
+                _analyticsTransmitter.TransmitExceptionEvent(exception, ImmutableDictionary<string,object>.Empty);
+            }
         }
 
 
@@ -247,7 +252,7 @@ namespace SpecFlow.VisualStudio.Monitoring
 
         private Dictionary<string, object> GetProjectSettingsProps(ProjectSettings settings, Dictionary<string, object> additionalSettings = null)
         {
-            Dictionary<string, object> props = null;
+            Dictionary<string, object> props = new Dictionary<string, object>();
             if (settings != null)
             {
                 props = new Dictionary<string, object>
