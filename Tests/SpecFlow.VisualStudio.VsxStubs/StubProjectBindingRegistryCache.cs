@@ -4,7 +4,7 @@ public class StubProjectBindingRegistryCache : Mock<IProjectBindingRegistryCache
 {
     public StubProjectBindingRegistryCache() : base(MockBehavior.Strict)
     {
-        Value = ProjectBindingRegistry.Empty;
+        Value = ProjectBindingRegistry.Invalid;
         Setup(c => c.Update(It.IsAny<Func<ProjectBindingRegistry, Task<ProjectBindingRegistry>>>()))
             .Returns(async (Func<ProjectBindingRegistry, Task<ProjectBindingRegistry>> updateFunc) =>
             {

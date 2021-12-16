@@ -32,7 +32,7 @@ public class MockableDiscoveryService : DiscoveryService
             });
 #pragma warning disable VSTHRD002
         discoveryService.BindingRegistryCache.Update(
-                discoveryService.DiscoveryInvoker.InvokeDiscoveryWithTimer)
+                unknown => discoveryService.DiscoveryInvoker.InvokeDiscoveryWithTimer())
             .Wait();
 #pragma warning restore
 

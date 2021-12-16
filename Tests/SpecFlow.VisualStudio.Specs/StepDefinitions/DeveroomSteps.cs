@@ -219,7 +219,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
             var initialized = new ManualResetEvent(false);
             var discoveryService = projectScope.GetDiscoveryService();
             discoveryService.BindingRegistryCache.Changed += (_, _) => initialized.Set();
-            if (discoveryService.BindingRegistryCache.Value != ProjectBindingRegistry.Empty) initialized.Set();
+            if (discoveryService.BindingRegistryCache.Value != ProjectBindingRegistry.Invalid) initialized.Set();
 
             initialized.WaitOne(TimeSpan.FromSeconds(5))
                 .Should()
@@ -228,7 +228,7 @@ namespace SpecFlow.VisualStudio.Specs.StepDefinitions
              _bindingRegistry = await discoveryService.BindingRegistryCache.GetLatest();
 
              discoveryService.BindingRegistryCache.Value.Should()
-                 .NotBe(ProjectBindingRegistry.Empty, "binding should be discovered");
+                 .NotBe(ProjectBindingRegistry.Invalid, "binding should be discovered");
         }
 
         private StubProjectScope GetProjectScope()

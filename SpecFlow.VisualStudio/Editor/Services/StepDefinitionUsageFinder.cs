@@ -120,7 +120,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
             if (featureNode == null)
                 yield break;
 
-            var dummyRegistry = ProjectBindingRegistry.Empty.WithStepDefinitions(stepDefinitions);
+            var dummyRegistry = ProjectBindingRegistry.FromStepDefinitions(stepDefinitions);
 
             var featureContext = new UsageFinderContext(featureNode);
 

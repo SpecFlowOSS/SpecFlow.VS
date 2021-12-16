@@ -5,7 +5,7 @@ public record ProjectBindingRegistry
 {
     private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
     private const string DocStringDefaultTypeName = TypeShortcuts.StringType;
-    public static ProjectBindingRegistry Empty = new (ImmutableArray<ProjectStepDefinitionBinding>.Empty);
+    public static ProjectBindingRegistry Invalid = new (ImmutableArray<ProjectStepDefinitionBinding>.Empty);
 
     private static int _versionCounter;
 
@@ -22,7 +22,7 @@ public record ProjectBindingRegistry
 
     public int Version { get; } = Interlocked.Increment(ref _versionCounter);
     public int? ProjectHash { get; }
-    public bool IsPatched => !ProjectHash.HasValue && this != Empty;
+    public bool IsPatched => !ProjectHash.HasValue && this != Invalid;
 
     public override string ToString()
     {
@@ -180,6 +180,12 @@ public record ProjectBindingRegistry
         }
 
         return sdMatches;
+    }
+
+    public static ProjectBindingRegistry FromStepDefinitions(
+        IEnumerable<ProjectStepDefinitionBinding> projectStepDefinitionBindings)
+    {
+        return new ProjectBindingRegistry(projectStepDefinitionBindings);
     }
 
     public ProjectBindingRegistry WithStepDefinitions(

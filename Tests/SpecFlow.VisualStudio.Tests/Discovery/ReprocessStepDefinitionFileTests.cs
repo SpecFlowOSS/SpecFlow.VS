@@ -45,7 +45,7 @@ public class ReprocessStepDefinitionFileTests
         var projectStepDefinitionBindings = await stepDefinitionParser.Parse(stepDefinitionFile);
 
         //assert
-        ProjectBindingRegistry bindingRegistry = ProjectBindingRegistry.Empty.WithStepDefinitions(projectStepDefinitionBindings);
+        ProjectBindingRegistry bindingRegistry = ProjectBindingRegistry.FromStepDefinitions(projectStepDefinitionBindings);
         _projectScope.IdeScope.Logger.LogVerbose($"test retrieved reg v{bindingRegistry.Version} has {bindingRegistry.StepDefinitions.Length}");
         var dumped = Dump(bindingRegistry);
         Approvals.Verify(dumped);
@@ -68,8 +68,8 @@ public class Foo{
 }
 }");
 
-        ProjectBindingRegistry bindingRegistry = ProjectBindingRegistry.Empty
-            .WithStepDefinitions(new[]
+        ProjectBindingRegistry bindingRegistry = ProjectBindingRegistry
+            .FromStepDefinitions(new[]
             {
                 BuildProjectStepDefinitionBinding("^outdated expression$", "Method", stepDefinitionFilePath),
                 BuildProjectStepDefinitionBinding("^expression$", "MethodInOtherFile", otherStepDefinitionFilePath)

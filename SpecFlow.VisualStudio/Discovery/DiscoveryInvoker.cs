@@ -29,7 +29,7 @@ internal class DiscoveryInvoker
             ? ConfigSource.TryGetConfigSource(projectSettings.OutputAssemblyPath, _fileSystem, _logger)
             : ConfigSource.Invalid;
 
-    public ProjectBindingRegistry InvokeDiscoveryWithTimer(ProjectBindingRegistry _)
+    public ProjectBindingRegistry InvokeDiscoveryWithTimer()
     {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
@@ -197,7 +197,7 @@ internal class DiscoveryInvoker
         public IDiscovery ThenImportStepDefinitions(string projectName) => this;
 
         public ProjectBindingRegistry AndCreateBindingRegistry(IMonitoringService monitoringService) =>
-            ProjectBindingRegistry.Empty;
+            ProjectBindingRegistry.Invalid;
     }
 
     private interface IDiscovery

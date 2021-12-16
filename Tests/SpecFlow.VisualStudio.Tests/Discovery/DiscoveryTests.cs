@@ -94,7 +94,7 @@ public class DiscoveryTests
         DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
 
         //act
-        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer();
 
         //assert
         discovered.Version.Should().Be(1);
@@ -110,7 +110,7 @@ public class DiscoveryTests
         DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
 
         //act
-        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer();
 
         //assert
         discovered.Version.Should().Be(1);
@@ -126,7 +126,7 @@ public class DiscoveryTests
         DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
 
         //act
-        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer();
 
         //assert
         discovered.Version.Should().Be(1);
@@ -156,7 +156,7 @@ public class DiscoveryTests
         DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
 
         //act
-        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer();
 
         //assert
         discovered.Version.Should().NotBe(1);
@@ -178,7 +178,7 @@ public class DiscoveryTests
         DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
 
         //act
-        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer(ProjectBindingRegistry.Empty);
+        ProjectBindingRegistry discovered = discoveryInvoker.InvokeDiscoveryWithTimer();
 
         //assert
         discovered.Version.Should().Be(1);

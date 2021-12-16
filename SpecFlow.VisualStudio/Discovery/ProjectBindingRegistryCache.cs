@@ -12,7 +12,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         _ideScope = ideScope;
         _logger = ideScope.Logger;
 
-        Value = ProjectBindingRegistry.Empty;
+        Value = ProjectBindingRegistry.Invalid;
         _upToDateBindingRegistrySource = new TaskCompletionSource<ProjectBindingRegistry>();
         _upToDateBindingRegistrySource.SetResult(Value);
     }
@@ -88,6 +88,12 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         if (updatedRegistry.Version >= originalRegistry.Version) 
             return updatedRegistry;
 
+        if (updatedRegistry == ProjectBindingRegistry.Invalid)
+        {
+            _logger.LogVerbose("Got an invalid registry, ignoring...");
+            return originalRegistry;
+        }
+
         DisposeSourceLocationTrackingPositions(updatedRegistry);
         throw new InvalidOperationException(
             $"Cannot downgrade bindingRegistry from V{originalRegistry.Version} to V{updatedRegistry.Version}");
@@ -111,7 +117,10 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 
     private void CalculateSourceLocationTrackingPositions(ProjectBindingRegistry bindingRegistry)
     {
-        var sourceLocations = bindingRegistry.StepDefinitions.Select(sd => sd.Implementation.SourceLocation);
+        var sourceLocations = bindingRegistry.StepDefinitions
+            .Where(sd => sd.IsValid)
+            .Select(sd => sd.Implementation.SourceLocation)
+            .Where(sl => sl != null); //TODO: Handle step definitions without source locations better (https://app.asana.com/0/0/1201527573246078/f)
         _ideScope.CalculateSourceLocationTrackingPositions(sourceLocations);
     }
 

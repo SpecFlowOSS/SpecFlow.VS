@@ -63,7 +63,7 @@ public class DiscoveryService : IDiscoveryService
         _logger.LogVerbose($"Discovery triggered from {callerMemberName}");
 
         _projectScope.IdeScope.RunOnBackgroundThread(
-            () => BindingRegistryCache.Update(DiscoveryInvoker.InvokeDiscoveryWithTimer),
+            () => BindingRegistryCache.Update(_ => DiscoveryInvoker.InvokeDiscoveryWithTimer()),
             _ => { });
     }
 }
