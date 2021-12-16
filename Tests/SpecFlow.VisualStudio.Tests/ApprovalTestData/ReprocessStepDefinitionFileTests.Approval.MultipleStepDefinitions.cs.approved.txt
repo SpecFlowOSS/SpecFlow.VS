@@ -10,7 +10,7 @@
       Method:`TestProject.Feature1StepDefinitions.WhenIPressAdd`
       ParameterTypes:[0]
       SourceLocation:
-        SourceFile:`C:\<Full path to>\MultipleStepDefinitions.cs`
+        SourceFile:`C:\Full path to\MultipleStepDefinitions.cs`
         SourceFileColumn:`9`
         SourceFileEndColumn:`9`
         SourceFileEndLine:`13`
@@ -28,10 +28,11 @@
       Method:`TestProject.Feature1StepDefinitions.WhenIPressAdd`
       ParameterTypes:[0]
       SourceLocation:
-        SourceFile:`C:\<Full path to>\MultipleStepDefinitions.cs`
+        SourceFile:`C:\Full path to\MultipleStepDefinitions.cs`
         SourceFileColumn:`9`
         SourceFileEndColumn:`9`
         SourceFileEndLine:`19`
         SourceLocationSpan:``
         SourceFileLine:`17`
     Expression:`I press subtract`
+ProjectBindingRegistry:end

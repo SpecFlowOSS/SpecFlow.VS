@@ -2,11 +2,7 @@
 
 public interface IDiscoveryService : IDisposable
 {
+    IProjectBindingRegistryCache BindingRegistryCache { get; }
     event EventHandler<EventArgs> WeakBindingRegistryChanged;
-    ProjectBindingRegistry GetBindingRegistry();
-    Task<ProjectBindingRegistry> GetBindingRegistryAsync();
-    void CheckBindingRegistry();
-    void InitializeBindingRegistry();
-    void ReplaceBindingRegistry(ProjectBindingRegistry bindingRegistry);
-    Task ProcessAsync(CSharpStepDefinitionFile stepDefinitionFile);
+    void TriggerDiscovery(string callerMemberName = "?");
 }

@@ -178,7 +178,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands
                 }
 
                 IdeScope.Actions.NavigateTo(ctx.StepDefinitionBinding.Implementation.SourceLocation);
-                UpdateBindingRegistry(ctx);
+                await UpdateBindingRegistry(ctx);
             });
         }
 
@@ -300,20 +300,18 @@ namespace SpecFlow.VisualStudio.Editor.Commands
         private ProjectBindingRegistry GetBindingRegistry(RenameStepCommandContext ctx)
         {
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
-            var bindingRegistry = discoveryService.GetBindingRegistry();
-            if (bindingRegistry.IsFailed)
+            var bindingRegistry = discoveryService.BindingRegistryCache.Value;
+            if (bindingRegistry == ProjectBindingRegistry.Invalid)
                 Logger.LogWarning(
                     $"Unable to get step definitions from project '{ctx.ProjectOfStepDefinitionClass.ProjectName}', usages will not be found for this project.");
             return bindingRegistry;
         }
 
-        private void UpdateBindingRegistry(RenameStepCommandContext ctx)
+        private Task UpdateBindingRegistry(RenameStepCommandContext ctx)
         {
-            var bindingRegistry = GetBindingRegistry(ctx);
-            bindingRegistry =
-                bindingRegistry.ReplaceStepDefinition(ctx.StepDefinitionBinding, ctx.StepDefinitionBinding.WithSpecifiedExpression(ctx.UpdatedExpression));
             var discoveryService = ctx.ProjectOfStepDefinitionClass.GetDiscoveryService();
-            discoveryService.ReplaceBindingRegistry(bindingRegistry);
+            return discoveryService.BindingRegistryCache.Update(bindingRegistry =>
+                bindingRegistry.ReplaceStepDefinition(ctx.StepDefinitionBinding, ctx.StepDefinitionBinding.WithSpecifiedExpression(ctx.UpdatedExpression)));
         }
     }
 }

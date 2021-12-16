@@ -19,6 +19,6 @@ public class DeveroomXUnitLogger : IDeveroomLogger
     {
         if (messageLevel <= Level)
             _testOutputHelper.WriteLine(
-                $"{Interlocked.Increment(ref _order):0000} {_stopwatch.Elapsed} {messageLevel,7} {message}");
+                $"{Interlocked.Increment(ref _order):0000} {_stopwatch.Elapsed:m\\:ss\\.ffffff} {messageLevel,5} {message}");
     }
 }

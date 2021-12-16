@@ -1,13 +1,13 @@
 ﻿#nullable enable
 namespace SpecFlow.VisualStudio.Analytics;
 
-[System.Composition.Export(typeof(IAnalyticsTransmitterSink))]
+[Export(typeof(IAnalyticsTransmitterSink))]
 public class AppInsightsAnalyticsTransmitterSink : IAnalyticsTransmitterSink
 {
     private readonly IEnableAnalyticsChecker _enableAnalyticsChecker;
     private readonly Lazy<TelemetryClient> _telemetryClient;
 
-    [System.Composition.ImportingConstructor]
+    [ImportingConstructor]
     public AppInsightsAnalyticsTransmitterSink(IEnableAnalyticsChecker enableAnalyticsChecker,
         IUserUniqueIdStore userUniqueIdStore)
     {

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Linq;
-using Gherkin.Ast;
+﻿#nullable enable
 
 namespace SpecFlow.VisualStudio.Discovery
 {
     public class MatchResult
     {
-        private static readonly string[] EmptyErrors = new string[0];
+        public static readonly MatchResult NoMatch = new (Array.Empty<MatchResultItem>(), Array.Empty<string>());
 
         public MatchResultItem[] Items { get; }
 
@@ -28,12 +26,10 @@ namespace SpecFlow.VisualStudio.Discovery
         public bool HasSingleMatch =>
             Items.Length == 1;
 
-        private MatchResult(MatchResultItem[] items, string[] errors)
+        private MatchResult([ValidatedNotNull] MatchResultItem[] items, [ValidatedNotNull] string[] errors)
         {
-            Items = items ?? throw new ArgumentNullException(nameof(items));
-            if (items.Length == 0)
-                throw new ArgumentException("Match result should contain at least one item", nameof(items));
-            Errors = errors ?? EmptyErrors;
+            Items = items;
+            Errors = errors;
         }
 
         public override string ToString()
@@ -41,7 +37,7 @@ namespace SpecFlow.VisualStudio.Discovery
             return string.Join(Environment.NewLine, Items.Select(sd => sd.ToString()));
         }
 
-        public string GetErrorMessage()
+        public string? GetErrorMessage()
         {
             if (!HasErrors)
                 return null;

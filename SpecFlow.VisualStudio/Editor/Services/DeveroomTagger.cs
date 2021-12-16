@@ -43,7 +43,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
         private readonly IDeveroomTagParser _deveroomTagParser;
         private readonly IDiscoveryService _discoveryService;
         private readonly IDeveroomConfigurationProvider _deveroomConfigurationProvider;
-        private readonly ProjectSettingsProvider _projectSettingsProvider;
+        private readonly IProjectSettingsProvider _projectSettingsProvider;
         private readonly IActionThrottler _actionThrottler;
         private readonly CalculationCache<TagsCache> _tagsCache = new CalculationCache<TagsCache>();
 
@@ -89,7 +89,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
                 // this is the first feature file in the project
                 var updatedProjectSettings = _projectSettingsProvider.CheckProjectSettings();
                 if (updatedProjectSettings.IsSpecFlowTestProject)
-                    _discoveryService?.CheckBindingRegistry();
+                    _discoveryService?.TriggerDiscovery();
             }
 
             ideScope.Logger.LogVerbose($"Creating DeveroomTagger (project: {project}, SpecFlow: {projectSettings?.GetSpecFlowVersionLabel() ?? "n/a"})");
@@ -172,7 +172,7 @@ namespace SpecFlow.VisualStudio.Editor.Services
             var recalculated = _tagsCache.ReCalculate((() =>
             {
                 var configuration = _deveroomConfigurationProvider.GetConfiguration();
-                var bindingRegistry = _discoveryService?.GetBindingRegistry() ?? ProjectBindingRegistry.Invalid;
+                var bindingRegistry = _discoveryService?.BindingRegistryCache.Value ?? ProjectBindingRegistry.Invalid;
                 var bindingRegistryVersion = bindingRegistry?.Version;
                 var currentTagsCache = _tagsCache.Value;
                 if (currentTagsCache != null &&

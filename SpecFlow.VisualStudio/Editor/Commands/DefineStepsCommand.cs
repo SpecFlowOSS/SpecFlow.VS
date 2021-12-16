@@ -124,14 +124,6 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
             fileNamespace = fileNamespace + ".StepDefinitions";
         }
 
-        var targetFilePath = Path.Combine(targetFolder, className + ".cs");
-
-        if (IdeScope.FileSystem.File.Exists(targetFilePath))
-            if (IdeScope.Actions.ShowSyncQuestion("Overwrite file?",
-                    $"The selected step definition file '{targetFilePath}' already exists. By overwriting the existing file you might loose work. {Environment.NewLine}Do you want to overwrite the file?",
-                    defaultButton: MessageBoxResult.No) != MessageBoxResult.Yes)
-                return;
-
         var template = "using System;" + newLine +
                        "using TechTalk.SpecFlow;" + newLine +
                        newLine +
@@ -144,18 +136,29 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
                        $"{indent}}}" + newLine +
                        "}" + newLine;
 
-        projectScope.AddFile(targetFilePath, template);
-        projectScope.IdeScope.Actions.NavigateTo(new SourceLocation(targetFilePath, 9, 1));
+        var targetFile = CSharpStepDefinitionFile
+            .FromPath(targetFolder, className + ".cs")
+            .WithCSharpContent(template);
+
+        if (IdeScope.FileSystem.File.Exists(targetFile.FullName))
+            if (IdeScope.Actions.ShowSyncQuestion("Overwrite file?",
+                    $"The selected step definition file '{targetFile}' already exists. By overwriting the existing file you might loose work. {Environment.NewLine}Do you want to overwrite the file?",
+                    defaultButton: MessageBoxResult.No) != MessageBoxResult.Yes)
+                return;
+
+        projectScope.AddFile(targetFile, template);
+        projectScope.IdeScope.Actions.NavigateTo(new SourceLocation(targetFile, 9, 1));
+        IDiscoveryService discoveryService = projectScope.GetDiscoveryService();
 
         _ = projectScope.IdeScope.RunOnBackgroundThread(
-            () => RebuildBindingRegistry(projectScope, targetFilePath, template), _ => { });
+            () => RebuildBindingRegistry(discoveryService, targetFile), _ => { Finished.Set(); });
     }
 
-    private async Task RebuildBindingRegistry(IProjectScope projectScope, string targetFilePath, string template)
+    private async Task RebuildBindingRegistry(IDiscoveryService discoveryService, CSharpStepDefinitionFile stepDefinitionFile)
     {
-        var discoveryService = projectScope.GetDiscoveryService();
-        CSharpStepDefinitionFile stepDefinitionFile = new CSharpStepDefinitionFile(targetFilePath, template);
-        await discoveryService.ProcessAsync(stepDefinitionFile);
+        await discoveryService.BindingRegistryCache
+            .Update(bindingRegistry => bindingRegistry.ReplaceStepDefinitions(stepDefinitionFile));
+
         Finished.Set();
     }
 }

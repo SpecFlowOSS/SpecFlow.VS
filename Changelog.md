@@ -1,5 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Fix: Discovery performance improvements
+
 # v2021.2.1 - 2021-12-01
 
 * Fix: (#23) SpecFlow templates come first in the "Add New Item" dialog

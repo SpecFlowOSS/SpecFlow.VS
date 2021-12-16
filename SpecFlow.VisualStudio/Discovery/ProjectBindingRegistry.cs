@@ -1,27 +1,39 @@
 ﻿namespace SpecFlow.VisualStudio.Discovery;
 
-public class ProjectBindingRegistry
+[DebuggerDisplay("{Version}_{ProjectHash}")]
+public record ProjectBindingRegistry
 {
     private const string DataTableDefaultTypeName = TypeShortcuts.SpecFlowTableType;
     private const string DocStringDefaultTypeName = TypeShortcuts.StringType;
-    public static ProjectBindingRegistry Invalid = new(Array.Empty<ProjectStepDefinitionBinding>());
+    public static ProjectBindingRegistry Invalid = new (ImmutableArray<ProjectStepDefinitionBinding>.Empty);
 
     private static int _versionCounter;
 
-    public ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions)
+    private ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions)
     {
         StepDefinitions = stepDefinitions.ToImmutableArray();
     }
 
+    public ProjectBindingRegistry(IEnumerable<ProjectStepDefinitionBinding> stepDefinitions, int projectHash) 
+        : this(stepDefinitions)
+    {
+        ProjectHash = projectHash;
+    }
+
     public int Version { get; } = Interlocked.Increment(ref _versionCounter);
+    public int? ProjectHash { get; }
+    public bool IsPatched => !ProjectHash.HasValue && this != Invalid;
+
+    public override string ToString()
+    {
+        return $"ProjectBindingRegistry_V{Version}_H{ProjectHash}";
+    }
+
     public ImmutableArray<ProjectStepDefinitionBinding> StepDefinitions { get; }
-    public bool IsFailed => this == Invalid;
+
 
     public MatchResult MatchStep(Step step, IGherkinDocumentContext context = null)
     {
-        if (IsFailed)
-            return null;
-
         var stepText = step.Text;
         if (context.IsScenarioOutline() && stepText.Contains("<"))
         {
@@ -170,14 +182,13 @@ public class ProjectBindingRegistry
         return sdMatches;
     }
 
-    public ProjectBindingRegistry AddStepDefinition(ProjectStepDefinitionBinding sd)
+    public static ProjectBindingRegistry FromStepDefinitions(
+        IEnumerable<ProjectStepDefinitionBinding> projectStepDefinitionBindings)
     {
-        var stepDefinitions = StepDefinitions.ToList();
-        stepDefinitions.Add(sd);
-        return new ProjectBindingRegistry(stepDefinitions);
+        return new ProjectBindingRegistry(projectStepDefinitionBindings);
     }
 
-    public ProjectBindingRegistry AddStepDefinitions(
+    public ProjectBindingRegistry WithStepDefinitions(
         IEnumerable<ProjectStepDefinitionBinding> projectStepDefinitionBindings)
     {
         var stepDefinitions = StepDefinitions.ToList();
@@ -194,5 +205,13 @@ public class ProjectBindingRegistry
     public ProjectBindingRegistry Where(Func<ProjectStepDefinitionBinding, bool> predicate)
     {
         return new ProjectBindingRegistry(StepDefinitions.Where(predicate));
+    }
+
+    public async Task<ProjectBindingRegistry> ReplaceStepDefinitions(CSharpStepDefinitionFile stepDefinitionFile)
+    {
+        var stepDefinitionParser = new StepDefinitionFileParser();
+        var projectStepDefinitionBindings = await stepDefinitionParser.Parse(stepDefinitionFile);
+        return Where(binding => binding.Implementation.SourceLocation.SourceFile != stepDefinitionFile.FullName)
+            .WithStepDefinitions(projectStepDefinitionBindings);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
 using SpecFlow.VisualStudio.Common;
 using SpecFlow.VisualStudio.Configuration;
@@ -10,7 +11,7 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 {
-    public class InMemoryStubProjectScope : IProjectScope
+    public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
     {
         public DeveroomConfiguration DeveroomConfiguration { get; } = new DeveroomConfiguration();
         public PropertyCollection Properties { get; } = new PropertyCollection();
@@ -25,15 +26,26 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
         public string ProjectName { get; } = "Test Project";
         public string ProjectFullName { get; } = "Test Project.csproj";
         public string DefaultNamespace => ProjectName.Replace(" ", "");
+        public StubProjectSettingsProvider StubProjectSettingsProvider { get; }
 
         public List<NuGetPackageReference> PackageReferencesList = new List<NuGetPackageReference>();
         public Dictionary<string, string> FilesAdded { get; } = new Dictionary<string, string>();
 
-        public InMemoryStubProjectScope(IIdeScope ideScope)
+        public InMemoryStubProjectScope(StubIdeScope stubIdeScope)
         {
-            StubIdeScope = ideScope as StubIdeScope;
+            StubIdeScope = stubIdeScope;
+
+            StubProjectSettingsProvider = new StubProjectSettingsProvider(this);
+            Properties.AddProperty(typeof(IProjectSettingsProvider), StubProjectSettingsProvider);
             Properties.AddProperty(typeof(IDeveroomConfigurationProvider), new StubDeveroomConfigurationProvider(DeveroomConfiguration));
             StubIdeScope.ProjectScopes.Add(this);
+
+            Build();
+        }
+
+        public InMemoryStubProjectScope(ITestOutputHelper testOutputHelper)
+            :this(new StubIdeScope(testOutputHelper))
+        {
         }
 
         public void AddSpecFlowPackage()
@@ -64,6 +76,18 @@ namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem
 
         public void Dispose()
         {
+        }
+
+        public void Build()
+        {
+            FileInfo fi = new FileInfo(OutputAssemblyPath);
+            StubIdeScope.FileSystem.Directory.CreateDirectory(fi.DirectoryName);
+
+            StubIdeScope.FileSystem.File.WriteAllText(fi.FullName, string.Empty);
+            var file = new MockFile(StubIdeScope.FileSystem as MockFileSystem);
+            file.SetLastWriteTimeUtc(fi.FullName, DateTime.UtcNow);
+
+            StubIdeScope.TriggerProjectsBuilt();
         }
     }
 }

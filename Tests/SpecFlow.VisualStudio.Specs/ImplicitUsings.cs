@@ -5,6 +5,7 @@ global using Microsoft.VisualStudio.Language.Intellisense;
 global using Microsoft.VisualStudio.Text.Editor;
 global using Microsoft.VisualStudio.Text.Tagging;
 global using Microsoft.VisualStudio.Text;
+global using Microsoft.VisualStudio.Threading;
 global using SpecFlow.VisualStudio.Common;
 global using SpecFlow.VisualStudio.Diagnostics;
 global using SpecFlow.VisualStudio.Discovery;
