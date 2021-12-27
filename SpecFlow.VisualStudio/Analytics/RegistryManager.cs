@@ -11,10 +11,12 @@ public interface IRegistryManager
 public class RegistryManager : IRegistryManager
 {
 #if DEBUG
-    private const string REG_PATH = @"Software\TechTalk\SpecFlow\Debug";
+    private static string RegPath => @"Software\Tricentis\SpecFlow\Debug";
 #else
-        private const string REG_PATH = @"Software\TechTalk\SpecFlow";
+    private static string RegPath => @"Software\Tricentis\SpecFlow";
 #endif
+
+    private static string RegPathFallback => @"Software\TechTalk\SpecFlow";
     private const string Version2019 = "version";
     private const string Version = "version.vs2022";
     private const string InstallDate = "installDate.vs2022";
@@ -22,20 +24,12 @@ public class RegistryManager : IRegistryManager
     private const string UsageDays = "usageDays";
     private const string UserLevel = "userLevel";
 
-    private string RegPath
-    {
-        get
-        {
-            var regPath = REG_PATH;
-            return regPath;
-        }
-    }
-
     public SpecFlowInstallationStatus GetInstallStatus()
     {
         var status = new SpecFlowInstallationStatus();
 
-        using (var key = Registry.CurrentUser.OpenSubKey(RegPath, RegistryKeyPermissionCheck.ReadSubTree))
+        using var key = Registry.CurrentUser.OpenSubKey(RegPath, RegistryKeyPermissionCheck.ReadSubTree)
+                        ?? Registry.CurrentUser.OpenSubKey(RegPathFallback, RegistryKeyPermissionCheck.ReadSubTree);
         {
             if (key == null)
                 return status;
@@ -68,7 +62,14 @@ public class RegistryManager : IRegistryManager
             key.SetValue(UserLevel, status.UserLevel);
         }
 
+        DeleteLegacyKey();
+
         return true;
+    }
+
+    private void DeleteLegacyKey()
+    {
+        Registry.CurrentUser.DeleteSubKeyTree(@"Software\TechTalk", false);
     }
 
     private T ReadStringValue<T>(RegistryKey key, string name, Func<string, T> converter)
