@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace SpecFlow.VisualStudio.ProjectSystem;
+﻿namespace SpecFlow.VisualStudio.ProjectSystem;
 
 public interface IVsIdeScope : IIdeScope, IDisposable
 {

@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace SpecFlow.VisualStudio.Diagnostics;
 
 public class DeveroomCompositeLogger : IDeveroomLogger, IEnumerable<IDeveroomLogger>
@@ -8,9 +6,10 @@ public class DeveroomCompositeLogger : IDeveroomLogger, IEnumerable<IDeveroomLog
 
     public TraceLevel Level => _loggers.Max(l => l.Level);
 
-    public void Log(TraceLevel messageLevel, string message)
+    public void Log(LogMessage message)
     {
-        foreach (var logger in _loggers) logger.Log(messageLevel, message);
+        foreach (var logger in _loggers)
+            logger.Log(message);
     }
 
     public IEnumerator<IDeveroomLogger> GetEnumerator() => _loggers.AsEnumerable().GetEnumerator();

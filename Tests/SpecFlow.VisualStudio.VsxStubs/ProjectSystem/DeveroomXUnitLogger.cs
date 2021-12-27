@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
+﻿namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
 public class DeveroomXUnitLogger : IDeveroomLogger
 {
@@ -17,10 +15,10 @@ public class DeveroomXUnitLogger : IDeveroomLogger
 
     public TraceLevel Level { get; }
 
-    public void Log(TraceLevel messageLevel, string message)
+    public void Log(LogMessage message)
     {
-        if (messageLevel <= Level)
+        if (message.Level <= Level)
             _testOutputHelper.WriteLine(
-                $"{Interlocked.Increment(ref _order):0000} {_stopwatch.Elapsed:m\\:ss\\.ffffff} {messageLevel,5} {Thread.CurrentThread.ManagedThreadId,5}  {message}");
+                $"{Interlocked.Increment(ref _order):0000} {_stopwatch.Elapsed:m\\:ss\\.ffffff} {message.Level,5} {Thread.CurrentThread.ManagedThreadId,5}  {message.CallerMethod}:{message.Message}");
     }
 }

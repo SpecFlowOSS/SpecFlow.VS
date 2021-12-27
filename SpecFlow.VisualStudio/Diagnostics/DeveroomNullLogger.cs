@@ -4,7 +4,7 @@ public class DeveroomNullLogger : IDeveroomLogger
 {
     public TraceLevel Level { get; } = TraceLevel.Off;
 
-    public void Log(TraceLevel messageLevel, string message)
+    public void Log(LogMessage message)
     {
         //nop;
     }

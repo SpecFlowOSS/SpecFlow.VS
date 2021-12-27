@@ -44,7 +44,7 @@ public class VsIdeScopeLoader : IVsIdeScope
     {
         try
         {
-            return new DeveroomFileLogger();
+            return new SynchronousFileLogger();
         }
         catch
         {

@@ -1,8 +1,4 @@
-﻿#nullable disable
-using System;
-using System.Linq;
-
-namespace SpecFlow.VisualStudio.UI.ViewModels;
+﻿namespace SpecFlow.VisualStudio.UI.ViewModels;
 
 public class ReportErrorDialogViewModel
 {
@@ -31,7 +27,7 @@ public class ReportErrorDialogViewModel
 #if DEBUG
     public static ReportErrorDialogViewModel DesignData = new()
     {
-        Message = INIT_ERROR + ERROR_SUFFIX_TEMPLATE.Replace("{logFilePath}", DeveroomFileLogger.GetLogFile()),
+        Message = INIT_ERROR + ERROR_SUFFIX_TEMPLATE.Replace("{logFilePath}", AsynchronousFileLogger.GetLogFile()),
         ErrorInfo = @"Error hash: {554A5919-12BC-4AAC-AE3B-E1C77DD98540}
 A MEF Component threw an exception at runtime: Microsoft.VisualStudio.Composition.CompositionFailedException: An exception was thrown while initializing part ""SpecFlow.VisualStudio.IdeScope.VsProjectSystem"". 
 ---> System.TypeInitializationException: The type initializer for 'SpecFlow.VisualStudio.EventTracking.GoogleAnalyticsApi' threw an exception. 
@@ -51,10 +47,10 @@ at Microsoft.VisualStudio.Composition.RuntimeExportProviderFactory.RuntimeExport
     };
 #endif
 
-    public string Message { get; set; }
-    public string ErrorInfo { get; set; }
+    public string Message { get; set; } = string.Empty;
+    public string ErrorInfo { get; set; } = string.Empty;
     public bool DoNotShowThisErrorAgain { get; set; }
-    public Action<ReportErrorDialogViewModel> CopyErrorToClipboardCommand { get; set; }
+    public Action<ReportErrorDialogViewModel> CopyErrorToClipboardCommand { get; set; } = _ => { };
 
     public void CopyErrorToClipboard()
     {

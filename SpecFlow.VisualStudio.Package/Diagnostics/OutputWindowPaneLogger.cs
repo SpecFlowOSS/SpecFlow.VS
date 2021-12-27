@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SpecFlow.VisualStudio.Diagnostics;
+﻿namespace SpecFlow.VisualStudio.Diagnostics;
 
 public class OutputWindowPaneLogger : IDeveroomLogger
 {
@@ -13,9 +11,9 @@ public class OutputWindowPaneLogger : IDeveroomLogger
 
     public TraceLevel Level { get; set; } = TraceLevel.Info;
 
-    public void Log(TraceLevel messageLevel, string message)
+    public void Log(LogMessage message)
     {
-        if (messageLevel <= Level) WriteToOutputPane(messageLevel, message);
+        if (message.Level <= Level) WriteToOutputPane(message.Level, $"{message.CallerMethod}: {message.Message}");
     }
 
     private void WriteToOutputPane(TraceLevel messageLevel, string message)

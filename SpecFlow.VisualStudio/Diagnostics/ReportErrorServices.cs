@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace SpecFlow.VisualStudio.Diagnostics;
+﻿namespace SpecFlow.VisualStudio.Diagnostics;
 
 public static class ReportErrorServices
 {
@@ -31,7 +28,7 @@ public static class ReportErrorServices
 
         message = message +
                   ReportErrorDialogViewModel.ERROR_SUFFIX_TEMPLATE.Replace("{logFilePath}",
-                      DeveroomFileLogger.GetLogFile());
+                      AsynchronousFileLogger.GetLogFile());
 
         var errorInfo = $"Error hash: {hash}{Environment.NewLine}{errorDetails}";
 

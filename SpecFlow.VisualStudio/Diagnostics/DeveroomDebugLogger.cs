@@ -1,5 +1,3 @@
-using System;
-
 namespace SpecFlow.VisualStudio.Diagnostics;
 
 public class DeveroomDebugLogger : IDeveroomLogger
@@ -7,7 +5,7 @@ public class DeveroomDebugLogger : IDeveroomLogger
 #if DEBUG
     private const TraceLevel DefaultDebugTraceLevel = TraceLevel.Verbose;
 #else
-        private const TraceLevel DefaultDebugTraceLevel = TraceLevel.Off;
+    private const TraceLevel DefaultDebugTraceLevel = TraceLevel.Off;
 #endif
     public TraceLevel Level { get; }
 
@@ -23,8 +21,9 @@ public class DeveroomDebugLogger : IDeveroomLogger
         }
     }
 
-    public void Log(TraceLevel messageLevel, string message)
+    public void Log(LogMessage message)
     {
-        Debug.WriteLineIf(messageLevel <= Level, $"{messageLevel}: {message}", "SpecFlowVs");
+        Debug.WriteLineIf(message.Level <= Level, $"{message.Level}: {message.CallerMethod}:{message.Message}",
+            "SpecFlowVs");
     }
 }
