@@ -3,5 +3,5 @@
 public interface IDeveroomLogger
 {
     TraceLevel Level { get; }
-    void Log(TraceLevel messageLevel, string message);
+    void Log(LogMessage message);
 }

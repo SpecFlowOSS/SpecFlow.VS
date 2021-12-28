@@ -33,6 +33,7 @@ public class VsIdeScope : IVsIdeScope
         DeveroomOutputPaneServices = new VsDeveroomOutputPaneServices(this);
         DeveroomErrorListServices = new VsDeveroomErrorListServices(this);
 
+        CompositeLogger.Add(AsynchronousFileLogger.CreateInstance(FileSystem));
         CompositeLogger.Add(new OutputWindowPaneLogger(DeveroomOutputPaneServices));
         Logger.LogVerbose("Creating IDE Scope");
         Actions = new VsIdeActions(this);
@@ -56,8 +57,7 @@ public class VsIdeScope : IVsIdeScope
 
     public DeveroomCompositeLogger CompositeLogger { get; } = new()
     {
-        new DeveroomDebugLogger(),
-        new DeveroomFileLogger()
+        new DeveroomDebugLogger()
     };
 
     public IServiceProvider ServiceProvider { get; }
@@ -212,6 +212,8 @@ public class VsIdeScope : IVsIdeScope
         _solutionEventListener.Closed -= SolutionEventListenerOnClosed;
         (_solutionEventListener as IDisposable)?.Dispose();
         _documentEventsListener?.Dispose();
+
+        CompositeLogger.OfType<AsynchronousFileLogger>().Single().Dispose();
     }
 
     public IProjectScope GetProjectScope(Project project)

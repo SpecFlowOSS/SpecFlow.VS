@@ -31,6 +31,7 @@ global using SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
 global using System.Collections.Concurrent;
 global using System.Collections.Immutable;
 global using System.Diagnostics;
+global using System.IO.Abstractions;
 global using System.IO.Abstractions.TestingHelpers;
 global using System.Reflection;
 global using System.Runtime.CompilerServices;
