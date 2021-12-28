@@ -1,7 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector.SourceDiscovery.Com;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.SourceDiscovery.Com;
 
 // Wrapper for ICLRMetaHost.  Used to find information about runtimes.
 internal class ClrMetaHost

@@ -1,6 +1,4 @@
 #nullable disable
-using TechTalk.SpecFlow;
-
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
 public class SpecFlowV19Discoverer : SpecFlowV20Discoverer

@@ -1,6 +1,3 @@
-using System;
-using System.Runtime.InteropServices;
-
 namespace SpecFlow.VisualStudio.SpecFlowConnector.SourceDiscovery.Com;
 
 // Wrapper for ICLRRuntimeInfo.  Represents information about a CLR install instance.

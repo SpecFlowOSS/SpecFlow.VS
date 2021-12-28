@@ -1,6 +1,5 @@
 ﻿#nullable disable
 using System.Diagnostics.SymbolStore;
-using System.Runtime.InteropServices;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.SourceDiscovery.Com;
 

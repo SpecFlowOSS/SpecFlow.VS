@@ -1,7 +1,4 @@
-﻿using System;
-using TechTalk.SpecFlow;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
 public class SpecFlowV3BaseDiscoverer : BaseDiscoverer
 {

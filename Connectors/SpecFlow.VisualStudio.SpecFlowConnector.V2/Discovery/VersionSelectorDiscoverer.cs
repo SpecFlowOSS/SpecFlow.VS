@@ -3,7 +3,6 @@
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V30;
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V31;
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V38;
-using TechTalk.SpecFlow;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 

@@ -30,7 +30,7 @@ public static class DeveroomLoggerExtensions
         [CallerMemberName] string callerName = "???")
     {
         if (!logger.IsLogging(TraceLevel.Verbose)) return;
-            
+
         var msg = new LogMessage(TraceLevel.Verbose, message(), DateTimeOffset.Now, callerName);
         logger.Log(msg);
     }

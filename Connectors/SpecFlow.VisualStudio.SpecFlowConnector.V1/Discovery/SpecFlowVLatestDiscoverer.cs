@@ -1,6 +1,4 @@
-﻿using TechTalk.SpecFlow;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
 public class SpecFlowVLatestDiscoverer : RemotingBaseDiscoverer
 {

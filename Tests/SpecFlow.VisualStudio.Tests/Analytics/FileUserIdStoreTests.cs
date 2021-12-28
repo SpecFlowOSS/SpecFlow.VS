@@ -1,6 +1,4 @@
 ﻿#nullable disable
-using System.IO.Abstractions;
-
 namespace SpecFlow.VisualStudio.Tests.Analytics;
 
 public class FileUserIdStoreTests

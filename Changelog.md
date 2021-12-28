@@ -1,5 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Fix: Logging performance improvements
+
 # v2021.3.1 - 2021-12-16
 
 * Fix: Discovery performance improvements
