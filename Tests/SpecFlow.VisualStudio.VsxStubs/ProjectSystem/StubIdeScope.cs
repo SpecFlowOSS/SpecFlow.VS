@@ -17,7 +17,10 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
         Actions = new StubIdeActions(this);
         VsxStubObjects.Initialize();
 
-        UseNonSynchronizedRunOnBackgroundThread();
+        SetupFireAndForget();
+        SetupFireAndForgetOnBackgroundThread();
+
+        CurrentTextView = StubWpfTextView.CreateTextView(this, new TestText(Array.Empty<string>()));
     }
 
     public StubAnalyticsTransmitter AnalyticsTransmitter { get; }
@@ -47,8 +50,8 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
     public IDeveroomErrorListServices DeveroomErrorListServices => StubErrorListServices;
     public IMonitoringService MonitoringService { get; }
 
-    public event EventHandler<EventArgs> WeakProjectsBuilt;
-    public event EventHandler<EventArgs> WeakProjectOutputsUpdated;
+    [CanBeNull] public event EventHandler<EventArgs> WeakProjectsBuilt = null!;
+    [CanBeNull] public event EventHandler<EventArgs> WeakProjectOutputsUpdated = null!;
 
     public void CalculateSourceLocationTrackingPositions(IEnumerable<SourceLocation> sourceLocations)
     {
@@ -72,9 +75,12 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
         return CSharpSyntaxTree.ParseText(fileContent);
     }
 
-    public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException,
+    public void FireAndForget(Func<Task> action, Action<Exception> onException,
         [CallerMemberName] string callerName = "???")
-        => Object.RunOnBackgroundThread(action, onException, callerName);
+        => Object.FireAndForget(action, onException, callerName);
+
+    public void FireAndForgetOnBackgroundThread(Func<Task> action, string callerName = "???") =>
+        Object.FireAndForgetOnBackgroundThread(action, callerName);
 
     public Task RunOnUiThread(Action action)
     {
@@ -94,46 +100,6 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
     public IProjectScope[] GetProjectsWithFeatureFiles() => ProjectScopes.ToArray();
 
     public IDisposable CreateUndoContext(string undoLabel) => null;
-
-    public void SynchronizeRunOnBackgroundThread()
-    {
-        Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
-                It.IsAny<string>()))
-            .Returns(async (Func<Task> action, Action<Exception> onException, string callerName) =>
-            {
-                try
-                {
-                    await action();
-                }
-                catch (Exception e)
-                {
-                    Logger.LogException(MonitoringService, e);
-                    onException(e);
-                }
-            });
-    }
-
-    public void UseNonSynchronizedRunOnBackgroundThread()
-    {
-        Setup(s => s.RunOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
-                It.IsAny<string>()))
-            .Returns((Func<Task> action, Action<Exception> onException, string callerName) =>
-            {
-                StackTrace stackTraceSnapshot = new StackTrace();
-                return Task.Run(async () =>
-                {
-                    try
-                    {
-                        await action();
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.LogException(MonitoringService, e, $"Called from {callerName}. {stackTraceSnapshot}");
-                        onException(e);
-                    }
-                });
-            });
-    }
 
     public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null,
         string contentType = VsContentTypes.FeatureFile, string filePath = null)
@@ -173,5 +139,33 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
     public void UsePhysicalFileSystem()
     {
         FileSystem = new FileSystem();
+    }
+
+    private void SetupFireAndForget()
+    {
+        Setup(s => s.FireAndForget(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
+                It.IsAny<string>()))
+            .Callback((Func<Task> action, Action<Exception> onException, string _) =>
+            {
+                try
+                {
+#pragma warning disable VSTHRD002
+                    action().Wait();
+#pragma warning restore
+                }
+                catch (Exception e)
+                {
+                    Logger.LogException(MonitoringService, e);
+                    onException(e);
+                }
+            });
+    }
+
+    private void SetupFireAndForgetOnBackgroundThread()
+    {
+#pragma warning disable VSTHRD002
+        Setup(s => s.FireAndForgetOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<string>()))
+            .Callback((Func<Task> action, string _) => action().Wait());
+#pragma warning restore
     }
 }

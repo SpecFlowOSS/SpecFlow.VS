@@ -170,26 +170,32 @@ public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorC
 
             IdeScope.Actions.NavigateTo(ctx.StepDefinitionBinding.Implementation.SourceLocation);
             await UpdateBindingRegistry(ctx);
+            NotifyUserAboutIssues(ctx);
         });
     }
 
     private void InvokeOnBackgroundThread(RenameStepCommandContext ctx, Func<Task> action)
     {
-        _ = ctx.IdeScope.RunOnBackgroundThread(action, e => ctx.AddCriticalProblem(e.Message))
-            .ContinueWith(_ => NotifyUserAboutIssues(ctx), TaskScheduler.Default);
+        ctx.IdeScope.FireAndForget(async () =>
+        {
+            await action();
+        }, exception =>
+        {
+            ctx.AddCriticalProblem(exception.Message);
+            NotifyUserAboutIssues(ctx);
+        });
     }
 
-    private Task NotifyUserAboutIssues(RenameStepCommandContext ctx)
+    private void NotifyUserAboutIssues(RenameStepCommandContext ctx)
     {
         if (!ctx.Issues.Any())
         {
             MonitoringService.MonitorCommandRenameStepExecuted(ctx);
             Finished.Set();
-            return Task.CompletedTask;
+            return;
         }
 
         ShowProblem(ctx);
-        return Task.CompletedTask;
     }
 
     private bool Erroneous(RenameStepCommandContext ctx)

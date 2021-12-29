@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace SpecFlow.VisualStudio.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Editor.Commands;
 
 internal class RenameStepFeatureFileAction : RenameStepAction
 {
@@ -16,11 +15,17 @@ internal class RenameStepFeatureFileAction : RenameStepAction
         {
             var firstPosition = fileUsage.First().SourceLocation;
             EnsureFeatureFileOpen(firstPosition, ideScope);
-            ideScope.GetTextBuffer(firstPosition, out var textBufferOfFeatureFile);
-            await EditTextBuffer(textBufferOfFeatureFile, ctx.IdeScope, fileUsage,
-                usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
-                usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression,
-                    fileUsage.Key, ctx));
+            if (ideScope.GetTextBuffer(firstPosition, out var textBufferOfFeatureFile))
+            {
+                await EditTextBuffer(textBufferOfFeatureFile, ctx.IdeScope, fileUsage,
+                    usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
+                    usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression,
+                        fileUsage.Key, ctx));
+            }
+            else
+            {
+                ctx.AddCriticalProblem($"Could not access {firstPosition.SourceFile}");
+            }
         }
     }
 

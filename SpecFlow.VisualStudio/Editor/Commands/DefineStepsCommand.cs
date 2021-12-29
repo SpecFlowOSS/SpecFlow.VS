@@ -151,7 +151,7 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
         projectScope.IdeScope.Actions.NavigateTo(new SourceLocation(targetFile, 9, 1));
         IDiscoveryService discoveryService = projectScope.GetDiscoveryService();
 
-        _ = projectScope.IdeScope.RunOnBackgroundThread(
+        projectScope.IdeScope.FireAndForget(
             () => RebuildBindingRegistry(discoveryService, targetFile), _ => { Finished.Set(); });
     }
 

@@ -117,8 +117,11 @@ public class VsIdeScopeLoader : IVsIdeScope
 
     public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer) => VsIdeScope.GetSyntaxTree(textBuffer);
 
-    public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException,
-        [CallerMemberName] string callerName = "???") => VsIdeScope.RunOnBackgroundThread(action, onException);
+    public void FireAndForget(Func<Task> action, Action<Exception> onException,
+        [CallerMemberName] string callerName = "???") => VsIdeScope.FireAndForget(action, onException, callerName);
+
+    public void FireAndForgetOnBackgroundThread(Func<Task> action, string callerName = "???")
+        => VsIdeScope.FireAndForgetOnBackgroundThread(action, callerName);
 
     public Task RunOnUiThread(Action action) => VsIdeScope.RunOnUiThread(action);
 

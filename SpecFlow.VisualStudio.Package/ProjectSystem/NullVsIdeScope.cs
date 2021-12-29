@@ -61,8 +61,14 @@ public class NullVsIdeScope : IVsIdeScope
 
     public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer) => null;
 
-    public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException,
-        [CallerMemberName] string callerName = "???") => Task.CompletedTask;
+    public void FireAndForget(Func<Task> action, Action<Exception> onException,
+        [CallerMemberName] string callerName = "???")
+    {
+    }
+
+    public void FireAndForgetOnBackgroundThread(Func<Task> action, string callerName = "???")
+    {
+    }
 
     public Task RunOnUiThread(Action action) => Task.CompletedTask;
 

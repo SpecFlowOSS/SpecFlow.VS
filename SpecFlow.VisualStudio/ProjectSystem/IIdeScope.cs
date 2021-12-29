@@ -23,9 +23,9 @@ public interface IIdeScope
     bool GetTextBuffer(SourceLocation sourceLocation, out ITextBuffer textBuffer);
     SyntaxTree GetSyntaxTree(ITextBuffer textBuffer);
 
-    Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException,
-        [CallerMemberName] string callerName = "???");
-
+    void FireAndForget(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???");
+    void FireAndForgetOnBackgroundThread(Func<Task> action, [CallerMemberName] string callerName = "???");
     Task RunOnUiThread(Action action);
+
     void OpenIfNotOpened(string path);
 }

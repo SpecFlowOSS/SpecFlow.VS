@@ -8,6 +8,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem;
 [Export(typeof(VsIdeScope))]
 public class VsIdeScope : IVsIdeScope
 {
+    private readonly CancellationTokenSource _backgroundTaskTokenSource = new();
     private readonly DocumentEventsListener _documentEventsListener;
 
     private readonly IPersistentSpanFactory _persistentSpanFactory;
@@ -18,7 +19,7 @@ public class VsIdeScope : IVsIdeScope
     private readonly IVsSolutionEventListener _solutionEventListener;
     private readonly UpdateSolutionEventsListener _updateSolutionEventsListener;
 
-    private bool _acivityStarted;
+    private bool _activityStarted;
 
     [ImportingConstructor]
     public VsIdeScope([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
@@ -140,37 +141,43 @@ public class VsIdeScope : IVsIdeScope
         return null;
     }
 
-    public Task RunOnBackgroundThread(Func<Task> action, Action<Exception> onException,
+    public void FireAndForget(Func<Task> action, Action<Exception> onException,
         [CallerMemberName] string callerName = "???")
     {
-        return ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-        {
-            try
+        action().FileAndForget($"vs/SpecFlow/{nameof(FireAndForget)}/{callerName}",
+            "Error on a background task in SpecFlow",
+            exception =>
             {
-                await action();
-            }
-            catch (Exception e)
-            {
-                Logger.LogException(MonitoringService, e, $"Called from {callerName}");
-                onException(e);
-            }
-        }).Task;
+                Logger.LogException(MonitoringService, exception, $"Called from {callerName}");
+                onException(exception);
+                return true;
+            });
     }
 
-    public Task RunOnUiThread(Action action)
+    public void FireAndForgetOnBackgroundThread(Func<Task> action, [CallerMemberName] string callerName = "???")
     {
-        if (ThreadHelper.CheckAccess())
-        {
-            action();
-            return Task.CompletedTask;
-        }
+        Task.Factory.StartNew(async () =>
+            {
+                try
+                {
+                    ThreadHelper.ThrowIfOnUIThread(callerName);
+                    await action();
+                }
+                catch (Exception e)
+                {
+                    Logger.LogException(MonitoringService, e, $"Called from {callerName}");
+                }
+            },
+            _backgroundTaskTokenSource.Token,
+            TaskCreationOptions.LongRunning,
+            TaskScheduler.Default
+        );
+    }
 
-        var task = ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-        {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            action();
-        });
-        return task.JoinAsync();
+    public async Task RunOnUiThread(Action action)
+    {
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        action();
     }
 
     public void OpenIfNotOpened(string path)
@@ -206,6 +213,8 @@ public class VsIdeScope : IVsIdeScope
 
     public void Dispose()
     {
+        _backgroundTaskTokenSource.Cancel();
+
         _updateSolutionEventsListener.BuildCompleted -= UpdateSolutionEventsListenerOnBuildCompleted;
         _updateSolutionEventsListener.Dispose();
 
@@ -227,16 +236,16 @@ public class VsIdeScope : IVsIdeScope
         return projectScope;
     }
 
-    public event EventHandler<EventArgs> ProjectsBuilt;
+    [CanBeNull] public event EventHandler<EventArgs> ProjectsBuilt = null!;
 
-    public event EventHandler<EventArgs> ProjectOutputsUpdated;
+    [CanBeNull] public event EventHandler<EventArgs> ProjectOutputsUpdated = null!;
 
     private void OnActivityStarted()
     {
-        if (_acivityStarted)
+        if (_activityStarted)
             return;
 
-        _acivityStarted = true;
+        _activityStarted = true;
         Logger.LogInfo("Starting Visual Studio Extension...");
         MonitoringService.MonitorOpenProjectSystem(this);
     }

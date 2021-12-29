@@ -27,7 +27,6 @@ public class DiscoveryTests
         var bindingRegistryCache = new StubProjectBindingRegistryCache();
         var projectScope = new InMemoryStubProjectScope(_testOutputHelper);
         var discoveryResultProvider = new StubDiscoveryResultProvider();
-        projectScope.StubIdeScope.SynchronizeRunOnBackgroundThread();
         return new Sut(bindingRegistryCache, projectScope, discoveryResultProvider);
     }
 

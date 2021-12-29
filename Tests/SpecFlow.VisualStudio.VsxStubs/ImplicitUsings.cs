@@ -7,6 +7,7 @@ global using Microsoft.VisualStudio.Text.Tagging;
 global using Microsoft.VisualStudio.Utilities;
 global using Moq;
 global using SpecFlow.VisualStudio.Analytics;
+global using SpecFlow.VisualStudio.Annotations;
 global using SpecFlow.VisualStudio.Common;
 global using SpecFlow.VisualStudio.Configuration;
 global using SpecFlow.VisualStudio.Diagnostics;
