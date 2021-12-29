@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs;
-
-namespace SpecFlow.VisualStudio.UI.ViewModels;
+﻿namespace SpecFlow.VisualStudio.UI.ViewModels;
 
 public class UpgradeDialogViewModel : WizardViewModel
 {

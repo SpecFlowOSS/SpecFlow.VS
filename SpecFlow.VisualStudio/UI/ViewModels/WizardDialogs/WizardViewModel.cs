@@ -1,11 +1,4 @@
-﻿#nullable disable
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows.Input;
-using Microsoft.VisualStudio.PlatformUI;
-
-namespace SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs;
+﻿namespace SpecFlow.VisualStudio.UI.ViewModels.WizardDialogs;
 
 public class WizardViewModel : INotifyPropertyChanged
 {
@@ -14,8 +7,8 @@ public class WizardViewModel : INotifyPropertyChanged
         VisitedPages = new HashSet<WizardPageViewModel>();
         FinishButtonLabel = finishButtonLabel;
         DialogTitle = dialogTitle;
-        NextCommand = new DelegateCommand(_ => MovePageBy(1), _ => CanMovePageBy(1));
-        PreviousCommand = new DelegateCommand(_ => MovePageBy(-1), _ => CanMovePageBy(-1));
+        NextCommand = new DelegateCommand(_ => MovePageBy(1), _ => CanMovePageBy(1), null);
+        PreviousCommand = new DelegateCommand(_ => MovePageBy(-1), _ => CanMovePageBy(-1), null);
         Pages = new ObservableCollection<WizardPageViewModel>();
         if (pages != null)
             foreach (var page in pages)
@@ -45,7 +38,7 @@ public class WizardViewModel : INotifyPropertyChanged
 
     public bool IsOnLastPage => ActivePageIndex == Pages.Count - 1;
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    [CanBeNull] public event PropertyChangedEventHandler PropertyChanged = null!;
 
     private bool CanMovePageBy(int step)
     {
@@ -78,7 +71,7 @@ public class WizardViewModel : INotifyPropertyChanged
     }
 
     [NotifyPropertyChangedInvocator]
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "?")
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

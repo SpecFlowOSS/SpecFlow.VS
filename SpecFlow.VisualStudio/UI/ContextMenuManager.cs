@@ -1,8 +1,4 @@
-﻿using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using Microsoft.VisualStudio.PlatformUI;
-
-namespace SpecFlow.VisualStudio.UI;
+﻿namespace SpecFlow.VisualStudio.UI;
 
 public class ContextMenuManager
 {
@@ -53,7 +49,7 @@ public class ContextMenuManager
             Header = contextMenuItem.Label,
             Command = contextMenuItem.Command == null
                 ? null
-                : new DelegateCommand(_ => contextMenuItem.Command(contextMenuItem)),
+                : new DelegateCommand(() => contextMenuItem.Command(contextMenuItem), ()=>true, null),
             IsEnabled = contextMenuItem.Command != null,
             FontStyle = contextMenuItem.Command != null ? FontStyles.Normal : FontStyles.Italic,
             Tag = contextMenuItem
