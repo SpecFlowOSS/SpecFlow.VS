@@ -91,6 +91,7 @@
     <AdditionalDeveroomDependencies Include="Newtonsoft.Json.dll" />
     <AdditionalDeveroomDependencies Include="Gherkin.dll" />
     <AdditionalDeveroomDependencies Include="System.IO.Abstractions.dll" />
+    <AdditionalDeveroomDependencies Include="System.Threading.Channels.dll" />
   </ItemGroup>
 
   <Import Project="..\Connectors\DeploymentAssets.props" />

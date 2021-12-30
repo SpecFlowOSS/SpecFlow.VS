@@ -1,5 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Fix: Add missing System.Threading.Channels.dll to the package
+
 # v2021.4.1 - 2021-12-28
 
 * Fix: Logging performance improvements
