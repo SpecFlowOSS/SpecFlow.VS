@@ -1,6 +1,8 @@
 ﻿# v$vNext$ - $buildDate$
 
-* Fix: Add missing System.Threading.Channels.dll to the package
+# v2021.4.5 - 2021-12-30
+
+* Fix: (#51) (#52) (#54) Fix System.IO.FileNotFoundException: Could not load file or assembly 'System.Threading.Channels, Version=4.0.2.0, Add missing System.Threading.Channels.dll to the package
 
 # v2021.4.1 - 2021-12-28
 
