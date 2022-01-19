@@ -6,6 +6,7 @@ global using Microsoft.VisualStudio.Text.Editor;
 global using Microsoft.VisualStudio.Text.Tagging;
 global using Microsoft.VisualStudio.Text;
 global using Microsoft.VisualStudio.Threading;
+global using Moq;
 global using SpecFlow.SampleProjectGenerator;
 global using SpecFlow.VisualStudio.Common;
 global using SpecFlow.VisualStudio.Configuration;

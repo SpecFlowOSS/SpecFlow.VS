@@ -149,14 +149,15 @@ public class VsIdeScope : IVsIdeScope
             });
     }
 
-    public void FireAndForgetOnBackgroundThread(Func<Task> action, [CallerMemberName] string callerName = "???")
+    public void FireAndForgetOnBackgroundThread(Func<CancellationToken, Task> action,
+        [CallerMemberName] string callerName = "???")
     {
         Task.Factory.StartNew(async () =>
             {
                 try
                 {
                     ThreadHelper.ThrowIfOnUIThread(callerName);
-                    await action();
+                    await action(_backgroundTaskTokenSource.Token);
                 }
                 catch (Exception e)
                 {

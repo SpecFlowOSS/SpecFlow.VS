@@ -35,8 +35,8 @@ public class DeveroomTaggerTests
         ideScope.SetupGet(s => s.DeveroomErrorListServices).Returns(Mock.Of<IDeveroomErrorListServices>);
         ideScope.SetupGet(s => s.IsSolutionLoaded).Returns(true);
         ideScope.Setup(s =>
-                s.FireAndForgetOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<string>()))
-            .Callback((Func<Task> t, string _) => t());
+                s.FireAndForgetOnBackgroundThread(It.IsAny<Func<CancellationToken,Task>>(), It.IsAny<string>()))
+            .Callback((Func<CancellationToken, Task> t, string _) => t(new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(5)).Token));
 
         projectScope.SetupGet(s => s.Properties).Returns(propertyCollection);
         projectScope.SetupGet(s => s.IdeScope).Returns(ideScope.Object);

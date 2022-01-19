@@ -66,7 +66,7 @@ public class NullVsIdeScope : IVsIdeScope
     {
     }
 
-    public void FireAndForgetOnBackgroundThread(Func<Task> action, string callerName = "???")
+    public void FireAndForgetOnBackgroundThread(Func<CancellationToken, Task> action, string callerName = "???")
     {
     }
 

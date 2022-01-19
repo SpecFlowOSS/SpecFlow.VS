@@ -1,5 +1,4 @@
-﻿#nullable enable
-#pragma warning disable xUnit1026 // Theory methods should use all of their parameters. Allow to use _ as identifier
+﻿#pragma warning disable xUnit1026 // Theory methods should use all of their parameters. Allow to use _ as identifier
 
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
@@ -27,6 +26,12 @@ public class DiscoveryTests
         var bindingRegistryCache = new StubProjectBindingRegistryCache();
         var projectScope = new InMemoryStubProjectScope(_testOutputHelper);
         var discoveryResultProvider = new StubDiscoveryResultProvider();
+#pragma warning disable VSTHRD002
+        projectScope.StubIdeScope
+            .Setup(s => s.FireAndForgetOnBackgroundThread(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<string>()))
+            .Callback((Func<CancellationToken, Task> action, string _) 
+                => action(projectScope.StubIdeScope.BackgroundTaskTokenSource.Token).Wait());
+#pragma warning restore VSTHRD002
         return new Sut(bindingRegistryCache, projectScope, discoveryResultProvider);
     }
 
@@ -34,7 +39,7 @@ public class DiscoveryTests
     public void TriggerDiscoveryUpdatesTheCache()
     {
         //arrange
-        var sut = ArrangeSut();
+        using var sut = ArrangeSut();
         var discoveryService = sut.BuildDiscoveryService();
 
         //act
@@ -51,7 +56,7 @@ public class DiscoveryTests
     public void TriggersCacheUpdateOnEvents(string _, Action<Sut> triggerEvent)
     {
         //arrange
-        var sut = ArrangeSut();
+        using var sut = ArrangeSut();
         sut.BuildDiscoveryService();
 
         //act
@@ -68,7 +73,7 @@ public class DiscoveryTests
     public void DoNotTriggersCacheUpdateOnEventsForTheSameProject(string _, Action<Sut> triggerEvent)
     {
         //arrange
-        var sut = ArrangeSut();
+        using var sut = ArrangeSut();
         sut.BuildDiscoveryService();
 
         //act
@@ -89,8 +94,9 @@ public class DiscoveryTests
     public void DoNotDiscoverWhenProjectIsNotInitialized()
     {
         //arrange
-        var sut = ArrangeSut();
+        using var sut = ArrangeSut();
         sut.ProjectScope.StubProjectSettingsProvider.Kind = DeveroomProjectKind.Uninitialized;
+
         DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
 
         //act
@@ -105,8 +111,9 @@ public class DiscoveryTests
     public void DoNotDiscoverWhenProjectIsNotSpecFlowTestProject()
     {
         //arrange
-        var sut = ArrangeSut();
+        using var sut = ArrangeSut();
         sut.ProjectScope.StubProjectSettingsProvider.Kind = DeveroomProjectKind.SpecFlowLibProject;
+
         DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
 
         //act
@@ -121,7 +128,7 @@ public class DiscoveryTests
     public void DoNotDiscoverWhenConfigSourceIsInvalid()
     {
         //arrange
-        var sut = ArrangeSut();
+        using var sut = ArrangeSut();
         sut.ProjectScope.StubIdeScope.FileSystem.File.Delete(sut.ProjectScope.OutputAssemblyPath);
         DiscoveryInvoker discoveryInvoker = sut.BuildDiscoveryInvoker();
 
@@ -140,7 +147,7 @@ public class DiscoveryTests
     public void DoNotDiscoverWhenDiscoveryFails()
     {
         //arrange
-        var sut = ArrangeSut();
+        using var sut = ArrangeSut();
         sut.DiscoveryResultProvider.DiscoveryResult = new DiscoveryResult
         {
             StepDefinitions = new StepDefinition[]
@@ -170,7 +177,7 @@ public class DiscoveryTests
     public void InvalidStepDefinitionsAreReported()
     {
         //arrange
-        var sut = ArrangeSut();
+        using var sut = ArrangeSut();
         sut.DiscoveryResultProvider.DiscoveryResult = new DiscoveryResult
         {
             ErrorMessage = nameof(DoNotDiscoverWhenDiscoveryFails)
@@ -190,11 +197,16 @@ public class DiscoveryTests
     }
 
     public record Sut(StubProjectBindingRegistryCache BindingRegistryCache, InMemoryStubProjectScope ProjectScope,
-        StubDiscoveryResultProvider DiscoveryResultProvider)
+        StubDiscoveryResultProvider DiscoveryResultProvider) : IDisposable
     {
         public DiscoveryService BuildDiscoveryService() =>
             new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
 
         internal DiscoveryInvoker BuildDiscoveryInvoker() => new(ProjectScope, DiscoveryResultProvider);
+
+        public void Dispose()
+        {
+            ProjectScope.StubIdeScope.Dispose();
+        }
     }
 }

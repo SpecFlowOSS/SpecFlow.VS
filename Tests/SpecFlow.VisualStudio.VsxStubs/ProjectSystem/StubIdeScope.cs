@@ -1,7 +1,6 @@
-﻿#nullable disable
-namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
+﻿namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
-public class StubIdeScope : Mock<IIdeScope>, IIdeScope
+public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
 {
     public StubIdeScope(ITestOutputHelper testOutputHelper) : base(MockBehavior.Strict)
     {
@@ -21,8 +20,10 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
         SetupFireAndForgetOnBackgroundThread();
 
         CurrentTextView = StubWpfTextView.CreateTextView(this, new TestText(Array.Empty<string>()));
+        BackgroundTaskTokenSource = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(20));
     }
 
+    public CancellationTokenSource BackgroundTaskTokenSource { get; }
     public StubAnalyticsTransmitter AnalyticsTransmitter { get; }
     public IDictionary<string, StubWpfTextView> OpenViews { get; } = new Dictionary<string, StubWpfTextView>();
     public StubLogger StubLogger { get; } = new();
@@ -46,7 +47,10 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
     public IIdeActions Actions { get; set; }
     public IDeveroomWindowManager WindowManager => StubWindowManager;
     public IFileSystem FileSystem { get; private set; } = new MockFileSystem();
-    public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; } = null;
+
+    public IDeveroomOutputPaneServices DeveroomOutputPaneServices { get; } =
+        new Mock<IDeveroomOutputPaneServices>().Object;
+
     public IDeveroomErrorListServices DeveroomErrorListServices => StubErrorListServices;
     public IMonitoringService MonitoringService { get; }
 
@@ -79,8 +83,48 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
         [CallerMemberName] string callerName = "???")
         => Object.FireAndForget(action, onException, callerName);
 
-    public void FireAndForgetOnBackgroundThread(Func<Task> action, string callerName = "???") =>
+    private void SetupFireAndForget()
+    {
+        Setup(s => s.FireAndForget(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
+                It.IsAny<string>()))
+            .Callback((Func<Task> action, Action<Exception> onException, string _) =>
+            {
+                try
+                {
+#pragma warning disable VSTHRD002
+                    action().Wait();
+#pragma warning restore
+                }
+                catch (Exception e)
+                {
+                    Logger.LogException(MonitoringService, e);
+                    onException(e);
+                }
+            });
+    }
+
+    public void FireAndForgetOnBackgroundThread(Func<CancellationToken, Task> action, string callerName = "???") =>
         Object.FireAndForgetOnBackgroundThread(action, callerName);
+
+    private volatile int _taskId = 0;
+
+    private ImmutableDictionary<string, Func<CancellationToken, Task>> BackGroundTasks { get; set; } =
+        ImmutableDictionary<string, Func<CancellationToken, Task>>.Empty;
+
+    public Task StartAndWaitAllBackgroundTasks()
+    {
+        var allTasks =
+            BackGroundTasks.Values.Select(t => Task.Run(async () => await t(BackgroundTaskTokenSource.Token)));
+        BackGroundTasks = BackGroundTasks.Clear();
+        return Task.WhenAll(allTasks);
+    }
+
+    private void SetupFireAndForgetOnBackgroundThread()
+    {
+        Setup(s => s.FireAndForgetOnBackgroundThread(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<string>()))
+            .Callback((Func<CancellationToken, Task> action, string callerName) =>
+                BackGroundTasks = BackGroundTasks.Add($"{Interlocked.Increment(ref _taskId)}:{callerName}", action));
+    }
 
     public Task RunOnUiThread(Action action)
     {
@@ -113,7 +157,7 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
 
         var textView = StubWpfTextView.CreateTextView(this, inputText, newLine, projectScope, contentType, filePath);
         if (filePath != null)
-            OpenViews[filePath] = textView;
+        OpenViews[filePath] = textView;
 
         CurrentTextView = textView;
 
@@ -141,31 +185,9 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope
         FileSystem = new FileSystem();
     }
 
-    private void SetupFireAndForget()
+    public void Dispose()
     {
-        Setup(s => s.FireAndForget(It.IsAny<Func<Task>>(), It.IsAny<Action<Exception>>(),
-                It.IsAny<string>()))
-            .Callback((Func<Task> action, Action<Exception> onException, string _) =>
-            {
-                try
-                {
-#pragma warning disable VSTHRD002
-                    action().Wait();
-#pragma warning restore
-                }
-                catch (Exception e)
-                {
-                    Logger.LogException(MonitoringService, e);
-                    onException(e);
-                }
-            });
-    }
-
-    private void SetupFireAndForgetOnBackgroundThread()
-    {
-#pragma warning disable VSTHRD002
-        Setup(s => s.FireAndForgetOnBackgroundThread(It.IsAny<Func<Task>>(), It.IsAny<string>()))
-            .Callback((Func<Task> action, string _) => action().Wait());
-#pragma warning restore
+        BackgroundTaskTokenSource.Cancel();
+        BackgroundTaskTokenSource.Dispose();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
+using SpecFlow.VisualStudio.Editor.Services;
 using Project = EnvDTE.Project;
 
 namespace SpecFlow.VisualStudio.ProjectSystem;
@@ -20,6 +21,7 @@ public class VsIdeScopeLoader : IVsIdeScope
         _safeMonitoringService = GetSafeMonitoringService(serviceProvider);
         _projectSystemReference =
             new Lazy<IVsIdeScope>(LoadProjectSystem, LazyThreadSafetyMode.ExecutionAndPublication);
+        //var x = VsUtils.ResolveMefDependency<IDeveroomTagParser>(serviceProvider);
     }
 
     private IVsIdeScope VsIdeScope => _projectSystemReference.Value;
@@ -141,7 +143,7 @@ public class VsIdeScopeLoader : IVsIdeScope
     public void FireAndForget(Func<Task> action, Action<Exception> onException,
         [CallerMemberName] string callerName = "???") => VsIdeScope.FireAndForget(action, onException, callerName);
 
-    public void FireAndForgetOnBackgroundThread(Func<Task> action, string callerName = "???")
+    public void FireAndForgetOnBackgroundThread(Func<CancellationToken, Task> action, string callerName = "???")
         => VsIdeScope.FireAndForgetOnBackgroundThread(action, callerName);
 
     public Task RunOnUiThread(Action action) => VsIdeScope.RunOnUiThread(action);
