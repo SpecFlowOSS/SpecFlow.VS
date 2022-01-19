@@ -15,7 +15,7 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         WarningHeader = warningHeader;
     }
 
-    protected Task<(StubWpfTextView textView, T command)> ArrangeSut(
+    protected Task<(IWpfTextView textView, T command)> ArrangeSut(
         TestStepDefinition stepDefinition, TestFeatureFile featureFile)
     {
         var stepDefinitions = stepDefinition.IsVoid
@@ -29,7 +29,7 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         return ArrangeSut(stepDefinitions, featureFiles);
     }
 
-    protected async Task<(StubWpfTextView textView, T command)> ArrangeSut(
+    protected async Task<(IWpfTextView textView, T command)> ArrangeSut(
         TestStepDefinition[] stepDefinitions,
         TestFeatureFile[] featureFiles)
     {
@@ -39,13 +39,13 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         return (textView, command);
     }
 
-    protected Task InvokeAndWaitAnalyticsEvent(T command, StubWpfTextView textView)
+    protected Task InvokeAndWaitAnalyticsEvent(T command, IWpfTextView textView)
     {
         Invoke(command, textView);
         return WaitForCommandToComplete(command);
     }
 
-    protected static bool Invoke(T command, StubWpfTextView textView) =>
+    protected static bool Invoke(T command, IWpfTextView textView) =>
         command.PreExec(textView, command.Targets.First());
 
     protected Task WaitForCommandToComplete(T command)

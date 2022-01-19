@@ -18,8 +18,9 @@ public class AutoFormatDocumentCommandTests
         new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
         new GherkinDocumentFormatter());
 
-    private StubWpfTextView CreateTextView(TestText inputText, string newLine = null) =>
-        StubWpfTextView.CreateTextView(_ideScope, inputText, newLine);
+    private StubWpfTextView CreateTextView(TestText inputText) =>
+        StubWpfTextView.CreateTextView(inputText,
+            text => VsxStubObjects.CreateTextBuffer(text.ToString(), VsContentTypes.FeatureFile));
 
     [Fact]
     public void Should_format_simple_document()

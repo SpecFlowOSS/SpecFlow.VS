@@ -19,13 +19,26 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
         SetupFireAndForget();
         SetupFireAndForgetOnBackgroundThread();
 
-        CurrentTextView = StubWpfTextView.CreateTextView(this, new TestText(Array.Empty<string>()));
+        CurrentTextView = new Mock<IWpfTextView>(MockBehavior.Strict).Object;
+        TextViewFactory = (inputText, filePath) => BasicTextViewFactory(inputText, filePath, VsContentTypes.FeatureFile);
         BackgroundTaskTokenSource = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(20));
+    }
+
+    public StubWpfTextView BasicTextViewFactory(TestText inputText, string filePath, string contentType)
+    {
+        return StubWpfTextView.CreateTextView(inputText, text =>
+        {
+            var projectScope = ProjectScopes.Single(p => p.FilesAdded.Any(f => f.Key == filePath));
+            var textBuffer = VsxStubObjects.CreateTextBuffer(text.ToString(), contentType);
+            textBuffer.Properties.AddProperty(typeof(IProjectScope), projectScope);
+            textBuffer.Properties.AddProperty(typeof(IVsTextBuffer), new FilePathProvider(filePath));
+            return textBuffer;
+        });
     }
 
     public CancellationTokenSource BackgroundTaskTokenSource { get; }
     public StubAnalyticsTransmitter AnalyticsTransmitter { get; }
-    public IDictionary<string, StubWpfTextView> OpenViews { get; } = new Dictionary<string, StubWpfTextView>();
+    public IDictionary<string, IWpfTextView> OpenViews { get; } = new Dictionary<string, IWpfTextView>();
     public StubLogger StubLogger { get; } = new();
 
     public DeveroomCompositeLogger CompositeLogger { get; } = new()
@@ -34,14 +47,15 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
     };
 
     public StubWindowManager StubWindowManager { get; } = new();
-    public List<IProjectScope> ProjectScopes { get; } = new();
+    public List<InMemoryStubProjectScope> ProjectScopes { get; } = new();
     public IWpfTextView CurrentTextView { get; internal set; }
     public StubErrorListServices StubErrorListServices { get; } = new();
 
     public bool IsSolutionLoaded { get; } = true;
 
     public IProjectScope GetProject(ITextBuffer textBuffer) =>
-        textBuffer.Properties.GetProperty<IProjectScope>(typeof(IProjectScope));
+        textBuffer.Properties.GetOrCreateSingletonProperty(typeof(IProjectScope), 
+            () => ProjectScopes.DefaultIfEmpty(new InMemoryStubProjectScope(this)).Single());
 
     public IDeveroomLogger Logger => CompositeLogger;
     public IIdeActions Actions { get; set; }
@@ -69,7 +83,7 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
             return true;
         }
 
-        textBuffer = default;
+        textBuffer = new Mock<ITextBuffer>(MockBehavior.Strict).Object;
         return false;
     }
 
@@ -138,31 +152,23 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
             return;
 
         var lines = FileSystem.File.ReadAllLines(path);
-        CreateTextView(new TestText(lines), filePath: path);
+        CreateTextView(new TestText(lines), path);
     }
 
     public IProjectScope[] GetProjectsWithFeatureFiles() => ProjectScopes.ToArray();
 
-    public IDisposable CreateUndoContext(string undoLabel) => null;
+    public IDisposable CreateUndoContext(string undoLabel) => new Mock<IDisposable>().Object;
 
-    public StubWpfTextView CreateTextView(TestText inputText, string newLine = null, IProjectScope projectScope = null,
-        string contentType = VsContentTypes.FeatureFile, string filePath = null)
+    public IWpfTextView CreateTextView(TestText inputText, string filePath)
     {
-        if (filePath != null && !Path.IsPathRooted(filePath) && projectScope != null)
-            filePath = Path.Combine(projectScope.ProjectFolder, filePath);
+        var textView = TextViewFactory(inputText, filePath);
 
-        if (projectScope == null && filePath != null)
-            projectScope = ProjectScopes.FirstOrDefault(p =>
-                (p as InMemoryStubProjectScope)?.FilesAdded.Any(f => f.Key == filePath) ?? false);
-
-        var textView = StubWpfTextView.CreateTextView(this, inputText, newLine, projectScope, contentType, filePath);
-        if (filePath != null)
         OpenViews[filePath] = textView;
-
         CurrentTextView = textView;
-
         return textView;
     }
+
+    public Func<TestText, string, IWpfTextView> TextViewFactory;
 
     public IWpfTextView EnsureOpenTextView(SourceLocation sourceLocation)
     {
@@ -170,7 +176,7 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
             return view;
 
         var lines = FileSystem.File.ReadAllLines(sourceLocation.SourceFile);
-        var textView = CreateTextView(new TestText(lines), filePath: sourceLocation.SourceFile);
+        var textView = CreateTextView(new TestText(lines), sourceLocation.SourceFile);
         return textView;
     }
 

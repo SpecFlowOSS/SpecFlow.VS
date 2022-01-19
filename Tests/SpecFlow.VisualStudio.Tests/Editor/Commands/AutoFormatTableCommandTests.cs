@@ -1,7 +1,4 @@
 ﻿#nullable disable
-
-using SpecFlow.VisualStudio.Editor.Services.Formatting;
-
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public class AutoFormatTableCommandTests
@@ -16,6 +13,7 @@ public class AutoFormatTableCommandTests
         @"");
 
     private readonly StubIdeScope _ideScope;
+    private readonly DeveroomTaggerProvider _taggerProvider;
 
     private readonly TestText _unformattedText = new(
         @"Feature: foo", //12+2
@@ -29,10 +27,15 @@ public class AutoFormatTableCommandTests
     public AutoFormatTableCommandTests(ITestOutputHelper testOutputHelper)
     {
         _ideScope = new StubIdeScope(testOutputHelper);
+        _taggerProvider = new DeveroomTaggerProvider(_ideScope);
     }
 
-    private StubWpfTextView CreateTextView(TestText inputText, string newLine = null) =>
-        StubWpfTextView.CreateTextView(_ideScope, inputText, newLine);
+    private StubWpfTextView CreateTextView(TestText inputText, string newLine) =>
+        StubWpfTextView.CreateTextView(inputText,
+            text => VsxStubObjects.CreateTextBuffer(text.ToString(newLine), VsContentTypes.FeatureFile));
+
+    private StubWpfTextView CreateTextView(TestText inputText) =>
+        CreateTextView(inputText, Environment.NewLine);
 
     [Fact]
     public void Formats_data_table_when_last_pipe_typed()
@@ -43,7 +46,7 @@ public class AutoFormatTableCommandTests
         var textView = CreateTextView(inputText);
         inputText.MoveCaretTo(textView, -2, -1);
 
-        textView.SimulateType(command, '|');
+        textView.SimulateType(command, '|', _taggerProvider);
 
         Assert.Equal(_expectedText.ToString(), textView.TextSnapshot.GetText());
     }
@@ -57,7 +60,7 @@ public class AutoFormatTableCommandTests
         var textView = CreateTextView(inputText);
         inputText.MoveCaretTo(textView, -3, "     | bozboz".Length);
 
-        textView.SimulateType(command, '|');
+        textView.SimulateType(command, '|', _taggerProvider);
 
         Assert.Equal(_expectedText.ToString(), textView.TextSnapshot.GetText());
     }
@@ -71,7 +74,7 @@ public class AutoFormatTableCommandTests
         var textView = CreateTextView(inputText);
         inputText.MoveCaretTo(textView, -2, -1);
 
-        textView.SimulateType(command, '|');
+        textView.SimulateType(command, '|', _taggerProvider);
 
         var expectedText = new TestText(
             @"Feature: foo",
@@ -106,7 +109,7 @@ public class AutoFormatTableCommandTests
         var textView = CreateTextView(inputText);
         inputText.MoveCaretTo(textView, -2, -1);
 
-        textView.SimulateType(command, '|');
+        textView.SimulateType(command, '|', _taggerProvider);
 
         var expectedText = new TestText(
             @"Feature: foo",
@@ -134,7 +137,7 @@ public class AutoFormatTableCommandTests
         var textView = CreateTextView(inputText);
         inputText.MoveCaretTo(textView, -2, -1);
 
-        textView.SimulateType(command, '|');
+        textView.SimulateType(command, '|', _taggerProvider);
 
         Assert.Equal(inputText.ToString().Replace(@"x\", @"x\|"), textView.TextSnapshot.GetText());
     }

@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace SpecFlow.VisualStudio.Tests.Editor;
+﻿namespace SpecFlow.VisualStudio.Tests.Editor;
 
 public abstract class EditorTestBase
 {
@@ -9,11 +8,10 @@ public abstract class EditorTestBase
     protected EditorTestBase(ITestOutputHelper testOutputHelper)
     {
         TestOutputHelper = testOutputHelper;
-        StubIdeScope ideScope = new StubIdeScope(testOutputHelper);
-        ProjectScope = new InMemoryStubProjectScope(ideScope);
+        ProjectScope = new InMemoryStubProjectScope(testOutputHelper);
     }
 
-    protected async Task<StubWpfTextView> ArrangeTextView(
+    protected async Task<IWpfTextView> ArrangeTextView(
         TestStepDefinition[] stepDefinitions,
         TestFeatureFile[] featureFiles)
     {
@@ -30,7 +28,6 @@ public abstract class EditorTestBase
 
         return textView;
     }
-
 
     protected TestText Dump(TestFeatureFile featureFile, string title)
     {
@@ -55,7 +52,7 @@ public abstract class EditorTestBase
         TestOutputHelper.WriteLine("---------------------------------------------");
     }
 
-    protected StubWpfTextView CreateTextView(StepDefinitionClassFile stepDefinitionClassFile)
+    protected IWpfTextView CreateTextView(StepDefinitionClassFile stepDefinitionClassFile)
     {
         var filePath = Path.Combine(ProjectScope.ProjectFolder, "Steps.cs");
         var inputText = stepDefinitionClassFile.GetText(filePath);
@@ -68,20 +65,17 @@ public abstract class EditorTestBase
         return textView;
     }
 
-
-    protected StubWpfTextView CreateTextView(TestFeatureFile featureFile)
+    protected IWpfTextView CreateTextView(TestFeatureFile featureFile)
     {
         var inputText = new TestText(featureFile.Content);
         return CreateTextView(inputText, VsContentTypes.FeatureFile, featureFile.FileName);
     }
 
-    protected StubWpfTextView CreateTextView(TestText inputText, string contentType, string filePath) =>
-        ProjectScope.StubIdeScope.CreateTextView(
-            inputText,
-            Environment.NewLine,
-            ProjectScope,
-            contentType,
-            filePath);
+    protected IWpfTextView CreateTextView(TestText inputText, string contentType, string filePath)
+    {
+        ProjectScope.FilesAdded[filePath] = inputText.ToString();
+        return ProjectScope.StubIdeScope.CreateTextView(inputText, filePath);
+    }
 
     protected TestFeatureFile ArrangeOneFeatureFile() =>
         ArrangeOneFeatureFile(
@@ -119,8 +113,14 @@ public abstract class EditorTestBase
 
     protected static TestStepDefinition ArrangeStepDefinition() => ArrangeStepDefinition(@"""I press add""");
 
-    protected static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord = "When",
-        string attributeName = null)
+    protected static TestStepDefinition ArrangeStepDefinition(string textExpression)
+        => ArrangeStepDefinition(textExpression, "When");
+
+    protected static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord)
+        => ArrangeStepDefinition(textExpression, keyWord, keyWord);
+
+    protected static TestStepDefinition ArrangeStepDefinition(string textExpression, string keyWord,
+        string attributeName)
     {
         var token = textExpression == null
             ? SyntaxFactory.MissingToken(SyntaxKind.StringLiteralToken)
@@ -130,7 +130,7 @@ public abstract class EditorTestBase
             Method = keyWord + "IPressAdd",
             Type = keyWord,
             TestExpression = token,
-            AttributeName = attributeName ?? keyWord
+            AttributeName = attributeName
         };
         return testStepDefinition;
     }
@@ -147,13 +147,13 @@ public abstract class EditorTestBase
         textEdit.Apply();
     }
 
-    protected StubLogger GetStubLogger() => GetStubLogger(ProjectScope.IdeScope as StubIdeScope);
+    protected StubLogger GetStubLogger() => GetStubLogger(ProjectScope.StubIdeScope);
 
     protected static StubLogger GetStubLogger(StubIdeScope ideScope)
     {
-        var stubLogger = (ideScope.Logger as DeveroomCompositeLogger).Single(logger =>
+        var stubLogger = (ideScope.Logger as DeveroomCompositeLogger)!.Single(logger =>
             logger.GetType() == typeof(StubLogger)) as StubLogger;
-        return stubLogger;
+        return stubLogger!;
     }
 
     protected void ThereWereNoWarnings()
