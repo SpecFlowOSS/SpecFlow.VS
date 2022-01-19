@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace SpecFlow.VisualStudio.Editor.Services;
+﻿namespace SpecFlow.VisualStudio.Editor.Services;
 
 public static class VsContentTypes
 {

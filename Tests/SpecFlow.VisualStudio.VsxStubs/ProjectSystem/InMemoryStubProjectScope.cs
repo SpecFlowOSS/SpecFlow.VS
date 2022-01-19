@@ -16,6 +16,8 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
             new StubDeveroomConfigurationProvider(DeveroomConfiguration));
         StubIdeScope.ProjectScopes.Add(this);
 
+        AddFile(ProjectFullPath, "<Project Sdk=\"Microsoft.NET.Sdk\"></Project>");
+
         Build();
     }
 
@@ -38,6 +40,7 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
     public string PlatformTargetName { get; } = "Any CPU";
     public string ProjectName { get; } = "Test Project";
     public string ProjectFullName { get; } = "Test Project.csproj";
+    public string ProjectFullPath => Path.Combine(ProjectFolder, ProjectFullName);
     public string DefaultNamespace => ProjectName.Replace(" ", "");
 
     public void AddFile(string targetFilePath, string template)

@@ -25,10 +25,12 @@ public class DeveroomTaggerProvider : ITaggerProvider
                     new ActionThrottlerFactory()), key: typeof(DeveroomTagger));
     }
 
-    public static DeveroomTagger GetDeveroomTagger(ITextBuffer buffer)
+    public static DeveroomTagger GetDeveroomTagger(ITextBuffer buffer, IIdeScope ideScope)
     {
         if (buffer.Properties.TryGetProperty<DeveroomTagger>(typeof(DeveroomTagger), out var tagger))
             return tagger;
-        return null;
+        var deveroomTagger = new DeveroomTaggerProvider(ideScope).CreateTagger<DeveroomTag>(buffer) as DeveroomTagger;
+        deveroomTagger.InvalidateCache();
+        return deveroomTagger;
     }
 }

@@ -1,14 +1,4 @@
 ﻿#nullable disable
-
-using System.Windows;
-using System.Windows.Media;
-using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Text.Formatting;
-using Microsoft.VisualStudio.Text.Projection;
-using Microsoft.VisualStudio.TextManager.Interop;
-using SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
-
 namespace SpecFlow.VisualStudio.VsxStubs;
 
 public class StubWpfTextView : IWpfTextView
@@ -20,9 +10,6 @@ public class StubWpfTextView : IWpfTextView
     {
         TextBuffer = textBuffer;
         _caret = new StubTextCaret(this);
-        //_selection = VsxStubObjects.CreateObject<ITextSelection>(
-        //    "Microsoft.VisualStudio.Text.Editor.Implementation.WpfTextSelection, Microsoft.VisualStudio.Platform.VSEditor",
-        //    this, new StubEditorFormatMap(), VsxStubObjects.GuardedOperations);
         Selection = new StubTextSelection(this);
     }
 
@@ -166,42 +153,23 @@ public class StubWpfTextView : IWpfTextView
     public event EventHandler LostAggregateFocus;
     public event EventHandler GotAggregateFocus;
 
-    public static StubWpfTextView CreateTextView(StubIdeScope ideScope, TestText inputText, string newLine = null,
-        IProjectScope projectScope = null, string contentType = VsContentTypes.FeatureFile, string filePath = null)
+    public static StubWpfTextView CreateTextView(TestText inputText, Func<TestText, ITextBuffer> textBufferFactory)
     {
-        var textBuffer = VsxStubObjects.CreateTextBuffer(inputText.ToString(newLine), contentType);
-        textBuffer.Properties.AddProperty(typeof(IProjectScope), projectScope);
-        if (filePath != null)
-            textBuffer.Properties.AddProperty(typeof(IVsTextBuffer), new FilePathProvider(filePath));
+        var textBuffer = textBufferFactory(inputText);
 
         var textView = new StubWpfTextView(textBuffer);
-        if (contentType == VsContentTypes.FeatureFile)
-        {
-            var tagAggregator =
-                new StubBufferTagAggregatorFactoryService(ideScope).CreateTagAggregator<DeveroomTag>(
-                    textView.TextBuffer);
-            tagAggregator.GetTags(new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length)).ToArray();
-        }
-
         inputText.SetSelection(textView);
         inputText.SetCaret(textView);
 
         return textView;
     }
 
-    public Tuple<int, int> GetCaretPosition()
+    public void SimulateTypeText(DeveroomEditorTypeCharCommandBase command, string text, ITaggerProvider taggerProvider)
     {
-        var pos = Caret.Position.BufferPosition;
-        var line = pos.GetContainingLine();
-        return new Tuple<int, int>(line.LineNumber, pos.Position - line.Start.Position);
+        foreach (var ch in text) SimulateType(command, ch, taggerProvider);
     }
 
-    public void SimulateTypeText(DeveroomEditorTypeCharCommandBase command, string text)
-    {
-        foreach (var ch in text) SimulateType(command, ch);
-    }
-
-    public void SimulateType(DeveroomEditorTypeCharCommandBase command, char c)
+    public void SimulateType(DeveroomEditorTypeCharCommandBase command, char c, ITaggerProvider taggerProvider)
     {
         var caretPosition = Caret.Position.BufferPosition.Position;
         using (var textEdit = TextBuffer.CreateEdit())
@@ -211,116 +179,15 @@ public class StubWpfTextView : IWpfTextView
         }
 
         Caret.MoveTo(new SnapshotPoint(TextSnapshot, caretPosition + 1));
-        ForceReparse(); //this is needed because currently partial table formatting is not supported
+        ForceReparse(taggerProvider); //this is needed because currently partial table formatting is not supported
 
         command.PostExec(this, c);
     }
 
-    public void ForceReparse()
+    public void ForceReparse(ITaggerProvider taggerProvider)
     {
-        var tagger = DeveroomTaggerProvider.GetDeveroomTagger(TextBuffer);
-        tagger.InvalidateCache();
-        tagger.GetTags(
-            new NormalizedSnapshotSpanCollection(new[]
-                {new SnapshotSpan(TextSnapshot, 0, TextSnapshot.Length)})).ToArray();
-    }
-
-    private class FilePathProvider : IVsTextBuffer, IPersistFileFormat
-    {
-        private readonly string _filePath;
-
-        public FilePathProvider(string filePath)
-        {
-            _filePath = filePath;
-        }
-
-        #region IVsTextBuffer
-
-        public int LockBuffer() => throw new NotImplementedException();
-
-        public int UnlockBuffer() => throw new NotImplementedException();
-
-        public int InitializeContent(string pszText, int iLength) => throw new NotImplementedException();
-
-        public int GetStateFlags(out uint pdwReadOnlyFlags) => throw new NotImplementedException();
-
-        public int SetStateFlags(uint dwReadOnlyFlags) => throw new NotImplementedException();
-
-        public int GetPositionOfLine(int iLine, out int piPosition) => throw new NotImplementedException();
-
-        public int GetPositionOfLineIndex(int iLine, int iIndex, out int piPosition) =>
-            throw new NotImplementedException();
-
-        public int GetLineIndexOfPosition(int iPosition, out int piLine, out int piColumn) =>
-            throw new NotImplementedException();
-
-        public int GetLengthOfLine(int iLine, out int piLength) => throw new NotImplementedException();
-
-        public int GetLineCount(out int piLineCount) => throw new NotImplementedException();
-
-        public int GetSize(out int piLength) => throw new NotImplementedException();
-
-        public int GetLanguageServiceID(out Guid pguidLangService) => throw new NotImplementedException();
-
-        public int SetLanguageServiceID(ref Guid guidLangService) => throw new NotImplementedException();
-
-        public int GetUndoManager(out IOleUndoManager ppUndoManager) => throw new NotImplementedException();
-
-        public int Reserved1() => throw new NotImplementedException();
-
-        public int Reserved2() => throw new NotImplementedException();
-
-        public int Reserved3() => throw new NotImplementedException();
-
-        public int Reserved4() => throw new NotImplementedException();
-
-        public int Reload(int fUndoable) => throw new NotImplementedException();
-
-        public int LockBufferEx(uint dwFlags) => throw new NotImplementedException();
-
-        public int UnlockBufferEx(uint dwFlags) => throw new NotImplementedException();
-
-        public int GetLastLineIndex(out int piLine, out int piIndex) => throw new NotImplementedException();
-
-        public int Reserved5() => throw new NotImplementedException();
-
-        public int Reserved6() => throw new NotImplementedException();
-
-        public int Reserved7() => throw new NotImplementedException();
-
-        public int Reserved8() => throw new NotImplementedException();
-
-        public int Reserved9() => throw new NotImplementedException();
-
-        public int Reserved10() => throw new NotImplementedException();
-
-        #endregion
-
-        #region IPersistFileFormat
-
-        int IPersist.GetClassID(out Guid pClassID) => throw new NotImplementedException();
-
-        int IPersistFileFormat.GetClassID(out Guid pClassID) => throw new NotImplementedException();
-
-        public int IsDirty(out int pfIsDirty) => throw new NotImplementedException();
-
-        public int InitNew(uint nFormatIndex) => throw new NotImplementedException();
-
-        public int Load(string pszFilename, uint grfMode, int fReadOnly) => throw new NotImplementedException();
-
-        public int Save(string pszFilename, int fRemember, uint nFormatIndex) => throw new NotImplementedException();
-
-        public int SaveCompleted(string pszFilename) => throw new NotImplementedException();
-
-        public int GetCurFile(out string ppszFilename, out uint pnFormatIndex)
-        {
-            ppszFilename = _filePath;
-            pnFormatIndex = 0;
-            return 0;
-        }
-
-        public int GetFormatList(out string ppszFormatList) => throw new NotImplementedException();
-
-        #endregion
+        var tagger = taggerProvider.CreateTagger<DeveroomTag>(TextBuffer);
+        var span = new SnapshotSpan(TextSnapshot, 0, TextSnapshot.Length);
+        ((DeveroomTagger) tagger).InvalidateCache(); tagger.GetTags(new NormalizedSnapshotSpanCollection(span));
     }
 }

@@ -155,8 +155,13 @@ public class ProjectSystemSteps : Steps
         var stepDefinitions = ParseStepDefinitions(stepDefinitionFile, filePath);
 
         RegisterStepDefinitions(stepDefinitions.ToArray());
-        _wpfTextView = _ideScope.CreateTextView(new TestText(stepDefinitionFile), projectScope: _projectScope,
-            contentType: VsContentTypes.CSharp, filePath: fileName);
+
+        _ideScope.TextViewFactory = (TestText inputText, string path) =>
+            _ideScope.BasicTextViewFactory(inputText, path, VsContentTypes.CSharp);
+
+        _wpfTextView =
+            _ideScope.CreateTextView(new TestText(stepDefinitionFile), filePath) as
+                StubWpfTextView;
     }
 
     private static string GetStepDefinitionFileContentFromClass(string stepDefinitionClass) =>
@@ -243,8 +248,11 @@ public class ProjectSystemSteps : Steps
         var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
         _projectScope.FilesAdded[filePath] = featureFileContent;
 
-        _wpfTextView = _ideScope.CreateTextView(new TestText(featureFileContent), projectScope: _projectScope,
-            filePath: filePath);
+        _ideScope.TextViewFactory = (TestText inputText, string path) =>
+            _ideScope.BasicTextViewFactory(inputText, path, VsContentTypes.FeatureFile);
+        _wpfTextView =
+            _ideScope.CreateTextView(new TestText(featureFileContent), filePath) as
+                StubWpfTextView;
         GivenTheFollowingFeatureFile(fileName, _wpfTextView.TextBuffer.CurrentSnapshot.GetText());
     }
 
@@ -317,7 +325,7 @@ public class ProjectSystemSteps : Steps
                 _invokedCommand = new AutoFormatTableCommand(_ideScope,
                     new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
                     new GherkinDocumentFormatter());
-                _wpfTextView.SimulateType((AutoFormatTableCommand) _invokedCommand, parameter?[0] ?? '|');
+                _wpfTextView.SimulateType((AutoFormatTableCommand) _invokedCommand, parameter?[0] ?? '|', new DeveroomTaggerProvider(_ideScope));
                 break;
             }
             case "Define Steps":
@@ -337,7 +345,7 @@ public class ProjectSystemSteps : Steps
                 if (parameter == null)
                     _invokedCommand.PreExec(_wpfTextView, commandTargetKey ?? _invokedCommand.Targets.First());
                 else
-                    _wpfTextView.SimulateTypeText((CompleteCommand) _invokedCommand, parameter);
+                    _wpfTextView.SimulateTypeText((CompleteCommand) _invokedCommand, parameter, new DeveroomTaggerProvider(_ideScope));
                 break;
             }
             case "Rename Step":
@@ -407,7 +415,7 @@ public class ProjectSystemSteps : Steps
 
     private IEnumerable<DeveroomTag> GetDeveroomTags(IWpfTextView textView)
     {
-        var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer);
+        var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer, _ideScope);
         if (tagger != null) return GetVsTagSpans<DeveroomTag, DeveroomTagger>(textView, tagger).Select(t => t.Tag);
         return Enumerable.Empty<DeveroomTag>();
     }

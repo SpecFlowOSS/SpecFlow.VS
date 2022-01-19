@@ -123,9 +123,9 @@ public class TestText
         return start + Lines[lineNo].Length + (includingNl ? NewLineLenght : 0);
     }
 
-    public override string ToString() => ToString(null);
+    public override string ToString() => ToString(Environment.NewLine);
 
-    public string ToString(string newLine) => string.Join(newLine ?? Environment.NewLine, Lines);
+    public string ToString(string newLine) => string.Join(newLine, Lines);
 
     public void SetCaret(IWpfTextView textView)
     {

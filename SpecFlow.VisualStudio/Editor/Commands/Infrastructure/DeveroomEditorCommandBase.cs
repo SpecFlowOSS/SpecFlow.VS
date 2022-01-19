@@ -44,7 +44,7 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
 
     protected DeveroomTag GetDeveroomTagForCaret(IWpfTextView textView, params string[] tagTypes)
     {
-        var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer);
+        var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer, IdeScope);
         if (tagger == null) return null;
         var tag = DumpDeveroomTags(tagger.GetDeveroomTagsForCaret(textView))
             .FirstOrDefault(t => tagTypes.Contains(t.Type));

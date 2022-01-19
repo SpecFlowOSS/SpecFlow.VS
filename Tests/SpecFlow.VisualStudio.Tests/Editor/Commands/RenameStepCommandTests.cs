@@ -9,6 +9,14 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
             ps.IdeScope.MonitoringService),
         "User Notification: The following problems occurred:" + Environment.NewLine)
     {
+        ProjectScope.StubIdeScope.TextViewFactory = (TestText inputText, string filePath)
+            => StubWpfTextView.CreateTextView(inputText, text =>
+            {
+                var textBuffer = VsxStubObjects.CreateTextBuffer(text.ToString(), VsContentTypes.CSharp);
+                textBuffer.Properties.AddProperty(typeof(IProjectScope), ProjectScope);
+                textBuffer.Properties.AddProperty(typeof(IVsTextBuffer), new FilePathProvider(filePath));
+                return textBuffer;
+            });
     }
 
     private void ArrangePopup(string modelStepText)
@@ -18,13 +26,21 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     }
 
     [Fact]
-    public void There_is_a_project_in_ide()
+    public void There_is_an_uninitialized_project_in_ide()
     {
         var emptyIde = new StubIdeScope(TestOutputHelper);
-        var command = new RenameStepCommand(emptyIde, new StubBufferTagAggregatorFactoryService(emptyIde),
+        var uninitializedProject = new InMemoryStubProjectScope(TestOutputHelper);
+        var command = new RenameStepCommand(
+            emptyIde, 
+            new StubBufferTagAggregatorFactoryService(emptyIde),
             emptyIde.MonitoringService);
         var inputText = new TestText(string.Empty);
-        var textView = emptyIde.CreateTextView(inputText, contentType: VsContentTypes.CSharp);
+        var textView = StubWpfTextView.CreateTextView(inputText, text =>
+         {
+             var textBuffer = VsxStubObjects.CreateTextBuffer(text.ToString(), "whatEver");
+             textBuffer.Properties.AddProperty(typeof(IProjectScope), uninitializedProject);
+             return textBuffer;
+         });
 
         command.PreExec(textView, command.Targets.First());
 
@@ -214,7 +230,7 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     [Fact]
     public async Task Step_definition_is_declared_with_a_derived_attribute()
     {
-        var stepDefinition = ArrangeStepDefinition(@"""I press add""", attributeName: "WhenDerived");
+        var stepDefinition = ArrangeStepDefinition(@"""I press add""", "When", "WhenDerived");
         var featureFile = ArrangeOneFeatureFile(string.Empty);
         ArrangePopup(@"I choose add");
         var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
