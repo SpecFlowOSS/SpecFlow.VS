@@ -2,11 +2,11 @@
 
 public class StubBufferTagAggregatorFactoryService : IBufferTagAggregatorFactoryService
 {
-    private readonly IIdeScope _ideScope;
+    private readonly ITaggerProvider _taggerProvider;
 
-    public StubBufferTagAggregatorFactoryService(IIdeScope ideScope)
+    public StubBufferTagAggregatorFactoryService(ITaggerProvider taggerProvider)
     {
-        _ideScope = ideScope;
+        _taggerProvider = taggerProvider;
     }
 
     public ITagAggregator<T> CreateTagAggregator<T>(ITextBuffer textBuffer) where T : ITag =>
@@ -16,10 +16,11 @@ public class StubBufferTagAggregatorFactoryService : IBufferTagAggregatorFactory
     {
         if (typeof(T) == typeof(DeveroomTag))
         {
-            var taggerProvider = new DeveroomTaggerProvider(_ideScope);
-            taggerProvider.CreateImmediateParsingTagger = true;
+            var tagger = _taggerProvider.CreateTagger<DeveroomTag>(textBuffer);
+            if (tagger is DeveroomTagger deveroomTagger)
+                deveroomTagger.InvalidateCache();
 
-            return new StubTagAggregator<T>((ITagger<T>) taggerProvider.CreateTagger<DeveroomTag>(textBuffer),
+            return new StubTagAggregator<T>((ITagger<T>) tagger,
                 VsxStubObjects.BufferGraphFactoryService.CreateBufferGraph(textBuffer));
         }
 

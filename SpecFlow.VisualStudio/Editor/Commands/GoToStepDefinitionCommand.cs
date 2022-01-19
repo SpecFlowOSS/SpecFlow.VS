@@ -8,8 +8,11 @@ public class GoToStepDefinitionCommand : DeveroomEditorCommandBase, IDeveroomFea
     private const string PopupHeader = "Go to step definitions";
 
     [ImportingConstructor]
-    public GoToStepDefinitionCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
-        IMonitoringService monitoringService) : base(ideScope, aggregatorFactory, monitoringService)
+    public GoToStepDefinitionCommand(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider)
+        : base(ideScope, aggregatorFactory, taggerProvider)
     {
     }
 

@@ -13,9 +13,11 @@ public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorC
     private readonly RenameStepStepDefinitionClassAction _renameStepStepDefinitionClassAction;
 
     [ImportingConstructor]
-    public RenameStepCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
-        IMonitoringService monitoringService) :
-        base(ideScope, aggregatorFactory, monitoringService)
+    public RenameStepCommand(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider) 
+        : base(ideScope, aggregatorFactory, taggerProvider)
     {
         _renameStepFeatureFileAction = new RenameStepFeatureFileAction();
         _renameStepStepDefinitionClassAction = new RenameStepStepDefinitionClassAction();
@@ -30,12 +32,12 @@ public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorC
         IntPtr inArgs = default)
     {
         Logger.LogVerbose("Rename Step");
-        var ctx = new RenameStepCommandContext(IdeScope);
+        var ctx = new RenameStepCommandContext(IdeScope, DeveroomTaggerProvider);
 
         if (textView.TextBuffer.ContentType.IsOfType(VsContentTypes.FeatureFile))
         {
             var goToStepDefinitionCommand =
-                new GoToStepDefinitionCommand(IdeScope, AggregatorFactory, MonitoringService);
+                new GoToStepDefinitionCommand(IdeScope, AggregatorFactory, DeveroomTaggerProvider);
             goToStepDefinitionCommand.InvokeCommand(textView, projectStepDefinitionBinding =>
             {
                 ctx.StepDefinitionBinding = projectStepDefinitionBinding;
@@ -176,10 +178,7 @@ public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorC
 
     private void InvokeOnBackgroundThread(RenameStepCommandContext ctx, Func<Task> action)
     {
-        ctx.IdeScope.FireAndForget(async () =>
-        {
-            await action();
-        }, exception =>
+        ctx.IdeScope.FireAndForget(async () => { await action(); }, exception =>
         {
             ctx.AddCriticalProblem(exception.Message);
             NotifyUserAboutIssues(ctx);

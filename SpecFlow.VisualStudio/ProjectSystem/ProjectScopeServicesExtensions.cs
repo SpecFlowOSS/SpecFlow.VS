@@ -22,6 +22,19 @@ public static class ProjectScopeServicesExtensions
         });
     }
 
+    public static IDeveroomTagParser GetDeveroomTagParser(this IProjectScope projectScope)
+    {
+        return projectScope.Properties.GetOrCreateSingletonProperty(() =>
+        {
+            var deveroomConfigurationProvider = projectScope.GetDeveroomConfigurationProvider();
+            var discoveryService = projectScope.GetDiscoveryService();
+            IDeveroomTagParser tagParser = new DeveroomTagParser(
+                projectScope.IdeScope.Logger,
+                projectScope.IdeScope.MonitoringService);
+            return tagParser;
+        });
+    }
+
     public static GenerationService GetGenerationService(this IProjectScope projectScope)
     {
         if (!projectScope.GetProjectSettings().IsSpecFlowProject)

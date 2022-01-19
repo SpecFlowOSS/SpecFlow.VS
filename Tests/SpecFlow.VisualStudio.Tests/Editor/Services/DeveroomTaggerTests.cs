@@ -72,7 +72,7 @@ public class DeveroomTaggerTests
         DeveroomTagger tagger = sut.BuildTagger();
 
         //act
-        IEnumerable<DeveroomTag> tags = tagger.GetDeveroomTagsForCaret(sut.BuildTextView());
+        var tags = tagger.GetDeveroomTagsForCaret(sut.BuildTextView());
 
         ////assert
         tags.Should().BeEmpty();
@@ -90,10 +90,10 @@ public class DeveroomTaggerTests
         sut.TriggerAction();
 
         //act
-        IEnumerable<DeveroomTag> tags = tagger.GetDeveroomTagsForCaret(sut.BuildTextView());
+        var tags = tagger.GetDeveroomTagsForCaret(sut.BuildTextView());
 
         ////assert
-        tags.Single().Type.Should().Be("Document", "the feature file has no content");
+        tags.Single().Tag.Type.Should().Be("Document", "the feature file has no content");
         sut.AssertNoErrorLogged();
     }
 
@@ -206,8 +206,9 @@ public class DeveroomTaggerTests
 
         public DeveroomTagger BuildTagger()
         {
+            var parser = new DeveroomTagParser(IdeScope.Object.Logger, IdeScope.Object.MonitoringService);
             var deveroomTagger =
-                new DeveroomTagger(TextBuffer.Object, IdeScope.Object, false, ActionThrottlerFactory.Object);
+                new DeveroomTagger(TextBuffer.Object, IdeScope.Object, false, ActionThrottlerFactory.Object, parser);
             deveroomTagger.TagsChanged += DeveroomTagger_TagsChanged;
             return deveroomTagger;
         }

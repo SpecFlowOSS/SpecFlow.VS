@@ -1,15 +1,18 @@
 ﻿#nullable disable
+namespace SpecFlow.VisualStudio.Editor.Commands;
 
 public class RenameStepCommandContext
 {
-    public RenameStepCommandContext(IIdeScope ideScope)
+    public RenameStepCommandContext(IIdeScope ideScope, ITaggerProvider taggerProvider)
     {
         IdeScope = ideScope;
+        TaggerProvider = taggerProvider;
         Issues = new List<Problem>();
     }
 
     public SnapshotPoint TriggerPointOfStepDefinitionClass { get; set; }
     public IIdeScope IdeScope { get; }
+    public ITaggerProvider TaggerProvider { get; }
     public List<Problem> Issues { get; }
     public ITextBuffer TextBufferOfStepDefinitionClass { get; set; }
     public IProjectScope ProjectOfStepDefinitionClass { get; set; }

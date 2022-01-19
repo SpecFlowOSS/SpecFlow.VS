@@ -4,10 +4,10 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public class DefineStepsCommandTests : CommandTestBase<DefineStepsCommand>
 {
-    public DefineStepsCommandTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper,
-        ps => new DefineStepsCommand(ps.IdeScope, new StubBufferTagAggregatorFactoryService(ps.StubIdeScope),
-            ps.IdeScope.MonitoringService),
-        "ShowProblem: User Notification: ")
+    public DefineStepsCommandTests(ITestOutputHelper testOutputHelper)
+        : base(testOutputHelper, (ps, tp) =>
+                new DefineStepsCommand(ps.IdeScope, new StubBufferTagAggregatorFactoryService(tp), tp),
+            "ShowProblem: User Notification: ")
     {
     }
 

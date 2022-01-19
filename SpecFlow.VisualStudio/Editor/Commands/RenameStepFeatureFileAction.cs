@@ -16,16 +16,12 @@ internal class RenameStepFeatureFileAction : RenameStepAction
             var firstPosition = fileUsage.First().SourceLocation;
             EnsureFeatureFileOpen(firstPosition, ideScope);
             if (ideScope.GetTextBuffer(firstPosition, out var textBufferOfFeatureFile))
-            {
                 await EditTextBuffer(textBufferOfFeatureFile, ctx.IdeScope, fileUsage,
                     usage => CalculateReplaceSpan((textBufferOfFeatureFile, usage)),
                     usage => CalculateReplacementText((textBufferOfFeatureFile, usage), ctx.AnalyzedUpdatedExpression,
                         fileUsage.Key, ctx));
-            }
             else
-            {
                 ctx.AddCriticalProblem($"Could not access {firstPosition.SourceFile}");
-            }
         }
     }
 
@@ -56,13 +52,15 @@ internal class RenameStepFeatureFileAction : RenameStepAction
         string filePath, RenameStepCommandContext ctx)
     {
         var snapshotSpan = new SnapshotSpan(from.textBufferOfFeatureFile.CurrentSnapshot, CalculateReplaceSpan(from));
-        DeveroomTagger? tagger = DeveroomTaggerProvider.GetDeveroomTagger(from.textBufferOfFeatureFile, ctx.IdeScope);
+        var tagger = ctx.TaggerProvider.CreateTagger<DeveroomTag>(from.textBufferOfFeatureFile) as DeveroomTagger;
         tagger.InvalidateCache();
         var deveroomTagsForSpan = tagger.GetDeveroomTagsForSpan(snapshotSpan).ToList();
         DeveroomTag matchedStepTag =
             deveroomTagsForSpan
+                .Where(t => t.Tag.Type == DeveroomTagTypes.DefinedStep)
+                .Select(t => t.Tag)
                 .DefaultIfEmpty(new DeveroomTag(DeveroomTagTypes.DefinedStep, new SnapshotSpan()))
-                .Single(t => t.Type == DeveroomTagTypes.DefinedStep);
+                .Single();
 
         if (matchedStepTag.Data is not MatchResult matchResult)
             return ParameterMatch.NotMatch;

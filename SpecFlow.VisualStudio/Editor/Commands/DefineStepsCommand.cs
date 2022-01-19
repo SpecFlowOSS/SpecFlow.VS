@@ -5,9 +5,11 @@ namespace SpecFlow.VisualStudio.Editor.Commands;
 public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEditorCommand
 {
     [ImportingConstructor]
-    public DefineStepsCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
-        IMonitoringService monitoringService) :
-        base(ideScope, aggregatorFactory, monitoringService)
+    public DefineStepsCommand(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider)
+        : base(ideScope, aggregatorFactory, taggerProvider)
     {
     }
 

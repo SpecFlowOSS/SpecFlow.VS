@@ -273,65 +273,80 @@ public class ProjectSystemSteps : Steps
         DeveroomEditorCommandTargetKey? commandTargetKey = null)
     {
         ActionsMock.ResetMock();
+        var taggerProvider = CreateTaggerProvider(_ideScope);
+        var aggregatorFactoryService = new StubBufferTagAggregatorFactoryService(taggerProvider);
         switch (commandName)
         {
             case "Go To Definition":
             {
-                _invokedCommand = new GoToStepDefinitionCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                _invokedCommand = new GoToStepDefinitionCommand(
+                    _ideScope,
+                    aggregatorFactoryService, 
+                    taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 break;
             }
             case "Find Step Definition Usages":
             {
-                _invokedCommand = new FindStepDefinitionUsagesCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                _invokedCommand = new FindStepDefinitionUsagesCommand(
+                    _ideScope, 
+                    aggregatorFactoryService,
+                    taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 Wait.For(() => ActionsMock.IsComplete.Should().BeTrue());
                 break;
             }
             case "Comment":
             {
-                _invokedCommand = new CommentCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                _invokedCommand = new CommentCommand(
+                    _ideScope, 
+                    aggregatorFactoryService,
+                    taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 break;
             }
             case "Uncomment":
             {
-                _invokedCommand = new UncommentCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                _invokedCommand = new UncommentCommand(
+                    _ideScope, 
+                    aggregatorFactoryService,
+                    taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 break;
             }
             case "Auto Format Document":
             {
-                _invokedCommand = new AutoFormatDocumentCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
+                _invokedCommand = new AutoFormatDocumentCommand(
+                    _ideScope, 
+                    aggregatorFactoryService, 
+                    taggerProvider, 
                     new GherkinDocumentFormatter());
                 _invokedCommand.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatDocumentKey);
                 break;
             }
             case "Auto Format Selection":
             {
-                _invokedCommand = new AutoFormatDocumentCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
+                _invokedCommand = new AutoFormatDocumentCommand(
+                    _ideScope, 
+                    aggregatorFactoryService,
+                    taggerProvider, 
                     new GherkinDocumentFormatter());
                 _invokedCommand.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatSelectionKey);
                 break;
             }
             case "Auto Format Table":
             {
-                _invokedCommand = new AutoFormatTableCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
+                _invokedCommand = new AutoFormatTableCommand(
+                    _ideScope, 
+                    aggregatorFactoryService, 
+                    taggerProvider,
                     new GherkinDocumentFormatter());
                 _wpfTextView.SimulateType((AutoFormatTableCommand) _invokedCommand, parameter?[0] ?? '|', new DeveroomTaggerProvider(_ideScope));
                 break;
             }
             case "Define Steps":
             {
-                _invokedCommand = new DefineStepsCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                _invokedCommand = new DefineStepsCommand(_ideScope, aggregatorFactoryService, taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 break;
             }
@@ -339,9 +354,11 @@ public class ProjectSystemSteps : Steps
             case "Filter Completion":
             {
                 EnsureStubCompletionBroker();
-                _invokedCommand = new CompleteCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope),
-                    _completionBroker, _ideScope.MonitoringService);
+                _invokedCommand = new CompleteCommand(
+                    _ideScope,
+                   aggregatorFactoryService, 
+                    taggerProvider,
+                    _completionBroker);
                 if (parameter == null)
                     _invokedCommand.PreExec(_wpfTextView, commandTargetKey ?? _invokedCommand.Targets.First());
                 else
@@ -350,8 +367,10 @@ public class ProjectSystemSteps : Steps
             }
             case "Rename Step":
             {
-                _invokedCommand = new RenameStepCommand(_ideScope,
-                    new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService);
+                _invokedCommand = new RenameStepCommand(
+                    _ideScope,
+                    aggregatorFactoryService, 
+                    taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
 
                 break;
@@ -361,6 +380,11 @@ public class ProjectSystemSteps : Steps
         }
     }
 
+    private StubBufferTagAggregatorFactoryService CreateAggregatorFactory() => new StubBufferTagAggregatorFactoryService(CreateTaggerProvider(_ideScope));
+
+    private static IDeveroomTaggerProvider CreateTaggerProvider(IIdeScope ideScope) 
+        => new DeveroomTaggerProvider(ideScope);
+
     private void EnsureStubCompletionBroker()
     {
         if (_completionBroker != null)
@@ -369,7 +393,7 @@ public class ProjectSystemSteps : Steps
         var textBuffer = _wpfTextView.TextBuffer;
         var completionSource = new DeveroomCompletionSource(
             textBuffer,
-            new StubBufferTagAggregatorFactoryService(_ideScope).CreateTagAggregator<DeveroomTag>(textBuffer),
+            CreateAggregatorFactory().CreateTagAggregator<DeveroomTag>(textBuffer),
             _ideScope);
         _completionBroker = new StubCompletionBroker(completionSource);
     }
@@ -415,7 +439,7 @@ public class ProjectSystemSteps : Steps
 
     private IEnumerable<DeveroomTag> GetDeveroomTags(IWpfTextView textView)
     {
-        var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer, _ideScope);
+        var tagger = CreateTaggerProvider(_ideScope).CreateTagger<DeveroomTag>(textView.TextBuffer) as DeveroomTagger;
         if (tagger != null) return GetVsTagSpans<DeveroomTag, DeveroomTagger>(textView, tagger).Select(t => t.Tag);
         return Enumerable.Empty<DeveroomTag>();
     }
@@ -438,6 +462,7 @@ public class ProjectSystemSteps : Steps
     [Then(@"all section of types (.*) should be highlighted as")]
     public void ThenAllSectionOfTypesShouldBeHighlightedAs(string[] keywordTypes, string expectedContent)
     {
+        CreateTagAggregator();
         var expectedContentText = new TestText(expectedContent);
         var tags = GetDeveroomTags(_wpfTextView).Where(t => keywordTypes.Contains(t.Type)).ToArray();
         var testTextSections = expectedContentText.Sections.Where(s => keywordTypes.Contains(s.Label)).ToArray();
@@ -460,6 +485,14 @@ public class ProjectSystemSteps : Steps
         matchedTags.Should().BeEmpty();
     }
 
+    private ITagAggregator<DeveroomTag> CreateTagAggregator()
+    {
+        var textView = _ideScope.CurrentTextView;
+        ITagAggregator<DeveroomTag> tagAggregator = CreateAggregatorFactory().CreateTagAggregator<DeveroomTag>(textView.TextBuffer);
+        tagAggregator.GetTags(new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length)).ToArray();
+        return tagAggregator;
+    }
+
     [Then(@"no binding error should be highlighted")]
     public void ThenNoBindingErrorShouldBeHighlighted()
     {
@@ -477,7 +510,7 @@ public class ProjectSystemSteps : Steps
     public void ThenTheTagLinksShouldTargetToTheFollowingURLs(Table expectedTagLinksTable)
     {
         var tagSpans = GetVsTagSpans<UrlTag>(_wpfTextView,
-            new DeveroomUrlTaggerProvider(new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope)).ToArray();
+            new DeveroomUrlTaggerProvider(CreateAggregatorFactory(), _ideScope)).ToArray();
         var actualTagLinks = tagSpans.Select(t => new {Tag = t.Span.GetText(), URL = t.Tag.Url.ToString()});
         expectedTagLinksTable.CompareToSet(actualTagLinks);
     }

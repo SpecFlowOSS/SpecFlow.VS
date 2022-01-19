@@ -17,7 +17,7 @@ public class DeveroomTagger : ITagger<DeveroomTag>, IDisposable
     private int _trackParseCounter;
 
     public DeveroomTagger(ITextBuffer buffer, IIdeScope ideScope, bool immediateParsing,
-        IActionThrottlerFactory actionThrottlerFactory)
+        IActionThrottlerFactory actionThrottlerFactory, IDeveroomTagParser tagParser)
     {
         _buffer = buffer;
         _ideScope = ideScope;
@@ -29,7 +29,7 @@ public class DeveroomTagger : ITagger<DeveroomTag>, IDisposable
 
         InitializeWithDiscoveryService(ideScope, project);
 
-        _deveroomTagParser = new DeveroomTagParser(ideScope.Logger, ideScope.MonitoringService);
+        _deveroomTagParser = tagParser;
         _actionThrottler = actionThrottlerFactory.Build(() =>
         {
             if (ideScope.IsSolutionLoaded)
@@ -138,13 +138,13 @@ public class DeveroomTagger : ITagger<DeveroomTag>, IDisposable
         return currentTagsCache?.Tags;
     }
 
-    public IEnumerable<DeveroomTag> GetDeveroomTagsForCaret(IWpfTextView textView) =>
+    public IEnumerable<ITagSpan<DeveroomTag>> GetDeveroomTagsForCaret(IWpfTextView textView) =>
         GetDeveroomTagsForSpan(new SnapshotSpan(textView.Caret.Position.BufferPosition, 0));
 
-    public IEnumerable<DeveroomTag> GetDeveroomTagsForSpan(SnapshotSpan span)
+    public IEnumerable<ITagSpan<DeveroomTag>> GetDeveroomTagsForSpan(SnapshotSpan span)
     {
         var spans = new NormalizedSnapshotSpanCollection(span);
-        return GetTags(spans).Select(t => t.Tag);
+        return GetTags(spans);
     }
 
     private void ReCalculate(ITextSnapshot fileSnapshot)

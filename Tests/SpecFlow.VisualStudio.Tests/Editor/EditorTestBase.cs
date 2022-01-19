@@ -168,4 +168,11 @@ public abstract class EditorTestBase
         bindingRegistry.StepDefinitions.Should().Contain(sd => sd.Expression == expression,
             $"after modification I should see <{expression}>");
     }
+
+    protected static DeveroomTaggerProvider CreateTaggerProvider(IIdeScope ideScope)
+    {
+        var taggerProvider = new DeveroomTaggerProvider(ideScope);
+
+        return taggerProvider;
+    }
 }
