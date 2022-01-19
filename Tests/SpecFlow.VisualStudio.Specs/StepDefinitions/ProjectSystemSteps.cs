@@ -18,6 +18,10 @@ public class ProjectSystemSteps : Steps
     public ProjectSystemSteps(StubIdeScope stubIdeScope)
     {
         _ideScope = stubIdeScope;
+        _ideScope.Setup(s =>
+                s.FireAndForgetOnBackgroundThread(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<string>()))
+            .Callback((Func<CancellationToken, Task> action, string _) =>
+                action(_ideScope.BackgroundTaskTokenSource.Token));
     }
 
     private StubIdeActions ActionsMock => (StubIdeActions) _ideScope.Actions;
@@ -146,6 +150,7 @@ public class ProjectSystemSteps : Steps
         var fileName = DomainDefaults.StepDefinitionFileName;
         var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
         var stepDefinitionFile = GetStepDefinitionFileContentFromClass(stepDefinitionClass);
+        _projectScope.FilesAdded[filePath] = stepDefinitionFile;
 
         var stepDefinitions = ParseStepDefinitions(stepDefinitionFile, filePath);
 
@@ -212,7 +217,7 @@ public class ProjectSystemSteps : Steps
     [Given("the project is built and the initial binding discovery is performed")]
     public async Task GivenTheProjectIsBuiltAndTheInitialBindingDiscoveryIsPerformed()
     {
-        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        using var cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
         var bindingRegistryChanged = new AsyncManualResetEvent();
         _discoveryService.BindingRegistryCache.Changed += (_, _) => bindingRegistryChanged.Set();
         WhenTheProjectIsBuilt();
@@ -226,7 +231,7 @@ public class ProjectSystemSteps : Steps
         var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
         _ideScope.FileSystem.Directory.CreateDirectory(_projectScope.ProjectFolder);
         _ideScope.FileSystem.File.WriteAllText(filePath, fileContent);
-        _projectScope.FilesAdded.Add(filePath, fileContent);
+        _projectScope.FilesAdded[filePath] = fileContent;
     }
 
 
@@ -236,6 +241,7 @@ public class ProjectSystemSteps : Steps
     {
         var fileName = "Feature1.feature";
         var filePath = Path.Combine(_projectScope.ProjectFolder, fileName);
+        _projectScope.FilesAdded[filePath] = featureFileContent;
 
         _wpfTextView = _ideScope.CreateTextView(new TestText(featureFileContent), projectScope: _projectScope,
             filePath: filePath);
@@ -363,7 +369,7 @@ public class ProjectSystemSteps : Steps
     [When(@"when the command is finished")]
     private async Task WhenTheCommandIsFinished()
     {
-        var cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
+        using var cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
         await _invokedCommand.Finished.WaitAsync(cts.Token);
     }
 

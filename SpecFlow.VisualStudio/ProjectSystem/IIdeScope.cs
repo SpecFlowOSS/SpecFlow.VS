@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.ProjectSystem;
+﻿namespace SpecFlow.VisualStudio.ProjectSystem;
 
 public interface IIdeScope
 {
@@ -24,7 +22,8 @@ public interface IIdeScope
     SyntaxTree GetSyntaxTree(ITextBuffer textBuffer);
 
     void FireAndForget(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???");
-    void FireAndForgetOnBackgroundThread(Func<Task> action, [CallerMemberName] string callerName = "???");
+    void FireAndForgetOnBackgroundThread(Func<CancellationToken, Task> action,
+        [CallerMemberName] string callerName = "???");
     Task RunOnUiThread(Action action);
 
     void OpenIfNotOpened(string path);
