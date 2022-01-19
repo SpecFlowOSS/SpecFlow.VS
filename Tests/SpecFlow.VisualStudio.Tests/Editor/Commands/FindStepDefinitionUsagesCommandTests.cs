@@ -6,9 +6,8 @@ public class FindStepDefinitionUsagesCommandTests : CommandTestBase<FindStepDefi
 {
     public FindStepDefinitionUsagesCommandTests(ITestOutputHelper testOutputHelper) :
         base(testOutputHelper,
-            ps => new FindStepDefinitionUsagesCommand(ps.IdeScope,
-                new StubBufferTagAggregatorFactoryService(ps.StubIdeScope), ps.IdeScope.MonitoringService),
-            "???")
+            (ps, tp) => new FindStepDefinitionUsagesCommand(ps.IdeScope,
+                new StubBufferTagAggregatorFactoryService(tp), tp), "???")
     {
     }
 

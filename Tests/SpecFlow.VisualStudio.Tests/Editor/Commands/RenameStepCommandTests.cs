@@ -5,8 +5,8 @@ namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
 {
     public RenameStepCommandTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper,
-        ps => new RenameStepCommand(ps.IdeScope, new StubBufferTagAggregatorFactoryService(ps.StubIdeScope),
-            ps.IdeScope.MonitoringService),
+        (ps, tp) => new RenameStepCommand(ps.IdeScope, new StubBufferTagAggregatorFactoryService(tp),
+            tp),
         "User Notification: The following problems occurred:" + Environment.NewLine)
     {
         ProjectScope.StubIdeScope.TextViewFactory = (TestText inputText, string filePath)
@@ -30,17 +30,20 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     {
         var emptyIde = new StubIdeScope(TestOutputHelper);
         var uninitializedProject = new InMemoryStubProjectScope(TestOutputHelper);
+
+        var taggerProvider = CreateTaggerProvider(emptyIde);
         var command = new RenameStepCommand(
-            emptyIde, 
-            new StubBufferTagAggregatorFactoryService(emptyIde),
-            emptyIde.MonitoringService);
+            emptyIde,
+            new StubBufferTagAggregatorFactoryService(taggerProvider),
+            taggerProvider);
+
         var inputText = new TestText(string.Empty);
         var textView = StubWpfTextView.CreateTextView(inputText, text =>
-         {
-             var textBuffer = VsxStubObjects.CreateTextBuffer(text.ToString(), "whatEver");
-             textBuffer.Properties.AddProperty(typeof(IProjectScope), uninitializedProject);
-             return textBuffer;
-         });
+        {
+            var textBuffer = VsxStubObjects.CreateTextBuffer(text.ToString(), "whatEver");
+            textBuffer.Properties.AddProperty(typeof(IProjectScope), uninitializedProject);
+            return textBuffer;
+        });
 
         command.PreExec(textView, command.Targets.First());
 
@@ -55,9 +58,10 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     public void Only_specflow_projects_are_supported()
     {
         MockableDiscoveryService.Setup(ProjectScope, TimeSpan.Zero);
+        var taggerProvider = CreateTaggerProvider(ProjectScope.IdeScope);
         var command = new RenameStepCommand(ProjectScope.IdeScope,
-            new StubBufferTagAggregatorFactoryService(ProjectScope.StubIdeScope),
-            ProjectScope.IdeScope.MonitoringService);
+            new StubBufferTagAggregatorFactoryService(taggerProvider),
+            taggerProvider);
         var inputText = new TestText(string.Empty);
         var textView = CreateTextView(inputText, VsContentTypes.CSharp, "Steps.cs");
 
@@ -73,9 +77,10 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
     {
         MockableDiscoveryService.Setup(ProjectScope, TimeSpan.Zero);
         ProjectScope.AddSpecFlowPackage();
+        var taggerProvider = CreateTaggerProvider(ProjectScope.IdeScope);
         var command = new RenameStepCommand(ProjectScope.IdeScope,
-            new StubBufferTagAggregatorFactoryService(ProjectScope.StubIdeScope),
-            ProjectScope.IdeScope.MonitoringService);
+            new StubBufferTagAggregatorFactoryService(taggerProvider),
+            taggerProvider);
         var inputText = new TestText(string.Empty);
 
         var textView = CreateTextView(inputText, VsContentTypes.CSharp, "Steps.cs");

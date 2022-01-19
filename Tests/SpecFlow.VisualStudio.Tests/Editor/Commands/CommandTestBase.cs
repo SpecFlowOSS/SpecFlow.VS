@@ -1,14 +1,16 @@
-﻿#nullable enable
+﻿using Microsoft.VisualStudio.Text.Tagging;
+
+#nullable enable
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEditorCommandBase
 {
-    private readonly Func<InMemoryStubProjectScope, T> _commandFactory;
+    private readonly Func<InMemoryStubProjectScope, IDeveroomTaggerProvider, T> _commandFactory;
     protected readonly string WarningHeader;
 
     protected CommandTestBase(
         ITestOutputHelper testOutputHelper,
-        Func<InMemoryStubProjectScope, T> commandFactory,
+        Func<InMemoryStubProjectScope, IDeveroomTaggerProvider, T> commandFactory,
         string warningHeader) : base(testOutputHelper)
     {
         _commandFactory = commandFactory;
@@ -34,8 +36,9 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         TestFeatureFile[] featureFiles)
     {
         var textView = await ArrangeTextView(stepDefinitions, featureFiles);
-
-        var command = _commandFactory(ProjectScope);
+        var ideScope = ProjectScope.IdeScope;
+        var taggerProvider = CreateTaggerProvider(ideScope);
+        var command = _commandFactory(ProjectScope, taggerProvider);
         return (textView, command);
     }
 

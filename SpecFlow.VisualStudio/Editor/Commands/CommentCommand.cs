@@ -1,14 +1,14 @@
-﻿using System;
-using System.Linq;
-
-namespace SpecFlow.VisualStudio.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Editor.Commands;
 
 [Export(typeof(IDeveroomFeatureEditorCommand))]
 public class CommentCommand : DeveroomEditorCommandBase, IDeveroomFeatureEditorCommand
 {
     [ImportingConstructor]
-    public CommentCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
-        IMonitoringService monitoringService) : base(ideScope, aggregatorFactory, monitoringService)
+    public CommentCommand(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider)
+        : base(ideScope, aggregatorFactory, taggerProvider)
     {
     }
 

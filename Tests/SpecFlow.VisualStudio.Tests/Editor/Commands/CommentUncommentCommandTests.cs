@@ -1,18 +1,14 @@
-﻿using System;
-using System.Linq;
-
-namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public class CommentUncommentCommandTests
 {
     private readonly IIdeScope _ideScope;
-    private readonly IMonitoringService _monitoringService;
+    private readonly IDeveroomTaggerProvider _taggerProvider;
 
-    public CommentUncommentCommandTests()
+    public CommentUncommentCommandTests(ITestOutputHelper testOutputHelper)
     {
-        _monitoringService = new Mock<IMonitoringService>().Object;
-        _ideScope = new Mock<IIdeScope>().Object;
-        VsxStubObjects.Initialize();
+        _taggerProvider = new Mock<IDeveroomTaggerProvider>().Object;
+        _ideScope = new StubIdeScope(testOutputHelper);
     }
 
     [Theory]
@@ -32,8 +28,10 @@ Scenario: bar
         int? selectionEndLine, int? selectionEndColumn, string expectedTextValue)
     {
         Console.WriteLine($"running: {test}");
-        var command = new CommentCommand(_ideScope, new StubBufferTagAggregatorFactoryService(_ideScope),
-            _monitoringService);
+        var command = new CommentCommand(
+            _ideScope,
+            new StubBufferTagAggregatorFactoryService(_taggerProvider),
+            _taggerProvider);
         var inputText = new TestText(
             "Feature: foo",
             "Scenario: bar",
@@ -69,8 +67,10 @@ Scenario: bar
         int? selectionEndLine, int? selectionEndColumn, string inputTextValue)
     {
         Console.WriteLine($"running: {test}");
-        var command = new UncommentCommand(_ideScope, new StubBufferTagAggregatorFactoryService(_ideScope),
-            _monitoringService);
+        var command = new UncommentCommand(
+            _ideScope,
+            new StubBufferTagAggregatorFactoryService(_taggerProvider),
+            _taggerProvider);
         var inputText = new TestText(inputTextValue);
         var textView = CreateTextView(inputText, selectionStartLine, selectionStartColumn, selectionEndLine,
             selectionEndColumn);

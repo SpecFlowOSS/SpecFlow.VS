@@ -5,15 +5,20 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
 {
     protected readonly IBufferTagAggregatorFactoryService AggregatorFactory;
     protected readonly IIdeScope IdeScope;
-    protected readonly IMonitoringService MonitoringService;
 
-    protected DeveroomEditorCommandBase(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
-        IMonitoringService monitoringService)
+    protected DeveroomEditorCommandBase(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider)
     {
         IdeScope = ideScope;
         AggregatorFactory = aggregatorFactory;
-        MonitoringService = monitoringService;
+        DeveroomTaggerProvider = taggerProvider;
     }
+
+    protected IDeveroomTaggerProvider DeveroomTaggerProvider { get; }
+
+    protected IMonitoringService MonitoringService => IdeScope.MonitoringService;
 
     public AsyncManualResetEvent Finished { get; } = new();
 
@@ -44,8 +49,7 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
 
     protected DeveroomTag GetDeveroomTagForCaret(IWpfTextView textView, params string[] tagTypes)
     {
-        var tagger = DeveroomTaggerProvider.GetDeveroomTagger(textView.TextBuffer, IdeScope);
-        if (tagger == null) return null;
+        var tagger = DeveroomTaggerProvider.CreateTagger<DeveroomTag>(textView.TextBuffer) as DeveroomTagger;
         var tag = DumpDeveroomTags(tagger.GetDeveroomTagsForCaret(textView))
             .FirstOrDefault(t => tagTypes.Contains(t.Type));
         if (tag != null &&
@@ -60,16 +64,16 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
         return tag;
     }
 
-    protected IEnumerable<DeveroomTag> DumpDeveroomTags(IEnumerable<DeveroomTag> deveroomTags)
+    protected IEnumerable<DeveroomTag> DumpDeveroomTags(IEnumerable<ITagSpan<DeveroomTag>> deveroomTags)
     {
 #if DEBUG
         foreach (var deveroomTag in deveroomTags)
         {
-            Logger.LogVerbose($"  Tag: {deveroomTag.Type}");
-            yield return deveroomTag;
+            Logger.LogVerbose($"  Tag: {deveroomTag.Tag.Type}");
+            yield return deveroomTag.Tag;
         }
 #else
-            return deveroomTags;
+            return deveroomTags.Select(t=>t.Tag);
 #endif
     }
 

@@ -1,11 +1,10 @@
-﻿#nullable disable
-
-namespace SpecFlow.VisualStudio.Editor.Services;
+﻿namespace SpecFlow.VisualStudio.Editor.Services;
 
 [Export(typeof(ITaggerProvider))]
+[Export(typeof(IDeveroomTaggerProvider))]
 [ContentType(VsContentTypes.FeatureFile)]
 [TagType(typeof(DeveroomTag))]
-public class DeveroomTaggerProvider : ITaggerProvider
+public class DeveroomTaggerProvider : IDeveroomTaggerProvider
 {
     private readonly IIdeScope _ideScope;
 
@@ -15,22 +14,22 @@ public class DeveroomTaggerProvider : ITaggerProvider
         _ideScope = ideScope;
     }
 
-    internal bool CreateImmediateParsingTagger { get; set; } = false;
-
     public ITagger<T> CreateTagger<T>(ITextBuffer buffer) where T : ITag
     {
-        return buffer.Properties.GetOrCreateSingletonProperty(
-            creator: () =>
-                (ITagger<T>) new DeveroomTagger(buffer, _ideScope, CreateImmediateParsingTagger,
-                    new ActionThrottlerFactory()), key: typeof(DeveroomTagger));
+        if (buffer is not ITextBuffer2 buffer2)
+            throw new InvalidOperationException($"Cannot assign {buffer.GetType()} to {typeof(ITextBuffer2)}");
+
+        return buffer.Properties.GetOrCreateSingletonProperty(typeof(ITagger<T>),
+            () => (ITagger<T>) CreateFeatureFileTagger(buffer2));
     }
 
-    public static DeveroomTagger GetDeveroomTagger(ITextBuffer buffer, IIdeScope ideScope)
+    private ITagger<DeveroomTag> CreateFeatureFileTagger(ITextBuffer2 buffer)
     {
-        if (buffer.Properties.TryGetProperty<DeveroomTagger>(typeof(DeveroomTagger), out var tagger))
-            return tagger;
-        var deveroomTagger = new DeveroomTaggerProvider(ideScope).CreateTagger<DeveroomTag>(buffer) as DeveroomTagger;
-        deveroomTagger.InvalidateCache();
-        return deveroomTagger;
+        var project = _ideScope.GetProject(buffer);
+        var discoveryService = project.GetDiscoveryService();
+        var tagParser = project.GetDeveroomTagParser();
+        var tagger = new DeveroomTagger(buffer, _ideScope, false, new ActionThrottlerFactory(), tagParser);
+        tagger.InvalidateCache();
+        return tagger;
     }
 }

@@ -1,15 +1,15 @@
-﻿using System;
-using System.Linq;
-
-namespace SpecFlow.VisualStudio.Editor.Completions;
+﻿namespace SpecFlow.VisualStudio.Editor.Completions;
 
 [Export(typeof(IDeveroomFeatureEditorCommand))]
 public class CompleteCommand : CompletionCommandBase, IDeveroomFeatureEditorCommand
 {
     [ImportingConstructor]
-    public CompleteCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
-        ICompletionBroker completionBroker, IMonitoringService monitoringService) : base(ideScope, aggregatorFactory,
-        completionBroker, monitoringService)
+    public CompleteCommand(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider,
+        ICompletionBroker completionBroker)
+        : base(ideScope, aggregatorFactory, taggerProvider, completionBroker)
     {
     }
 

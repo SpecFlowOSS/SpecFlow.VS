@@ -1,22 +1,25 @@
 ﻿#nullable disable
 
-using SpecFlow.VisualStudio.Editor.Services.Formatting;
-
 namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 // See Gherkin formatting tests also in GherkinDocumentFormatterTests
 
 public class AutoFormatDocumentCommandTests
 {
     private readonly StubIdeScope _ideScope;
+    private readonly DeveroomTaggerProvider _deveroomTaggerProvider;
 
     public AutoFormatDocumentCommandTests(ITestOutputHelper testOutputHelper)
     {
         _ideScope = new StubIdeScope(testOutputHelper);
+        _deveroomTaggerProvider = new DeveroomTaggerProvider(_ideScope);
     }
 
-    private AutoFormatDocumentCommand CreateSUT() => new(_ideScope,
-        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
-        new GherkinDocumentFormatter());
+    private AutoFormatDocumentCommand CreateSUT() => new(
+        _ideScope,
+        new StubBufferTagAggregatorFactoryService(_deveroomTaggerProvider),
+        _deveroomTaggerProvider,
+        new GherkinDocumentFormatter()
+    );
 
     private StubWpfTextView CreateTextView(TestText inputText) =>
         StubWpfTextView.CreateTextView(inputText,

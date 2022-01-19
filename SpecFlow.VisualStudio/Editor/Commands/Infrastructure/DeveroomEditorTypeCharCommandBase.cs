@@ -1,13 +1,12 @@
-using System;
-using System.Runtime.InteropServices;
-
 namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 
 public abstract class DeveroomEditorTypeCharCommandBase : DeveroomEditorCommandBase
 {
-    protected DeveroomEditorTypeCharCommandBase(IIdeScope ideScope,
-        IBufferTagAggregatorFactoryService aggregatorFactory, IMonitoringService monitoringService) : base(ideScope,
-        aggregatorFactory, monitoringService)
+    protected DeveroomEditorTypeCharCommandBase(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider)
+        : base(ideScope, aggregatorFactory, taggerProvider)
     {
     }
 

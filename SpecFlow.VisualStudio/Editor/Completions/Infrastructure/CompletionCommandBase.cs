@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace SpecFlow.VisualStudio.Editor.Completions.Infrastructure;
+﻿namespace SpecFlow.VisualStudio.Editor.Completions.Infrastructure;
 
 public abstract class CompletionCommandBase : DeveroomEditorTypeCharCommandBase
 {
@@ -30,9 +27,12 @@ public abstract class CompletionCommandBase : DeveroomEditorTypeCharCommandBase
 
     protected readonly ICompletionBroker _completionBroker;
 
-    protected CompletionCommandBase(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
-        ICompletionBroker completionBroker, IMonitoringService monitoringService) : base(ideScope, aggregatorFactory,
-        monitoringService)
+    protected CompletionCommandBase(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider,
+        ICompletionBroker completionBroker)
+        : base(ideScope, aggregatorFactory, taggerProvider)
     {
         _completionBroker = completionBroker;
     }

@@ -1,7 +1,4 @@
 ﻿#nullable disable
-using SpecFlow.VisualStudio.Editor.Services.EditorConfig;
-using SpecFlow.VisualStudio.Editor.Services.Formatting;
-
 namespace SpecFlow.VisualStudio.Editor.Commands;
 
 [Export(typeof(IDeveroomFeatureEditorCommand))]
@@ -12,10 +9,13 @@ public class AutoFormatTableCommand : DeveroomEditorTypeCharCommandBase, IDevero
     private readonly GherkinDocumentFormatter _gherkinDocumentFormatter;
 
     [ImportingConstructor]
-    public AutoFormatTableCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
-        IMonitoringService monitoringService, GherkinDocumentFormatter gherkinDocumentFormatter,
-        EditorConfigOptionsProvider editorConfigOptionsProvider = null) : base(ideScope, aggregatorFactory,
-        monitoringService)
+    public AutoFormatTableCommand(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider,
+        GherkinDocumentFormatter gherkinDocumentFormatter,
+        EditorConfigOptionsProvider editorConfigOptionsProvider = null)
+        : base(ideScope, aggregatorFactory, taggerProvider)
     {
         _gherkinDocumentFormatter = gherkinDocumentFormatter;
         _editorConfigOptionsProvider = editorConfigOptionsProvider;

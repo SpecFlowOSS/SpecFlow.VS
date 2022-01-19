@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace SpecFlow.VisualStudio.Editor.Commands.Infrastructure;
 
 public interface IDeveroomEditorCommand

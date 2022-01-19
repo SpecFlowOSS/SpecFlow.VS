@@ -9,8 +9,11 @@ public class FindStepDefinitionUsagesCommand : DeveroomEditorCommandBase, IDever
     private readonly StepDefinitionUsageFinder _stepDefinitionUsageFinder;
 
     [ImportingConstructor]
-    public FindStepDefinitionUsagesCommand(IIdeScope ideScope, IBufferTagAggregatorFactoryService aggregatorFactory,
-        IMonitoringService monitoringService) : base(ideScope, aggregatorFactory, monitoringService)
+    public FindStepDefinitionUsagesCommand(
+        IIdeScope ideScope,
+        IBufferTagAggregatorFactoryService aggregatorFactory,
+        IDeveroomTaggerProvider taggerProvider)
+        : base(ideScope, aggregatorFactory, taggerProvider)
     {
         _stepDefinitionUsageFinder = new StepDefinitionUsageFinder(ideScope);
     }

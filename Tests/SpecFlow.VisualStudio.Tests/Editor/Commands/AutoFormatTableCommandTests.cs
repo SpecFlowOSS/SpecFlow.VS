@@ -302,7 +302,14 @@ public class AutoFormatTableCommandTests
         Assert.Equal(expectedText.ToString(configuredNewLine), textView.TextSnapshot.GetText());
     }
 
-    private AutoFormatTableCommand CreateSUT() => new(_ideScope,
-        new StubBufferTagAggregatorFactoryService(_ideScope), _ideScope.MonitoringService,
-        new GherkinDocumentFormatter());
+    private AutoFormatTableCommand CreateSUT()
+    {
+        var taggerProvider = new DeveroomTaggerProvider(_ideScope);
+        return new AutoFormatTableCommand(
+            _ideScope,
+            new StubBufferTagAggregatorFactoryService(taggerProvider),
+            taggerProvider,
+            new GherkinDocumentFormatter()
+        );
+    }
 }
