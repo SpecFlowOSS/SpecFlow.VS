@@ -219,7 +219,7 @@ public class DeveroomTagger : ITagger<DeveroomTag>, IDisposable
     private List<DeveroomTag> ReParse(ITextSnapshot fileSnapshot, ProjectBindingRegistry bindingRegistry,
         DeveroomConfiguration configuration)
     {
-        var tags = new List<DeveroomTag>(_deveroomTagParser.Parse(fileSnapshot, bindingRegistry, configuration));
+        var tags = new List<DeveroomTag>(_deveroomTagParser.Parse(fileSnapshot));
         tags.Sort((t1, t2) => t1.Span.Start.Position.CompareTo(t2.Span.Start.Position));
         return tags;
     }

@@ -51,12 +51,10 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
     protected static bool Invoke(T command, IWpfTextView textView) =>
         command.PreExec(textView, command.Targets.First());
 
-    protected Task WaitForCommandToComplete(T command)
+    protected async Task WaitForCommandToComplete(T command)
     {
-        CancellationTokenSource cts = Debugger.IsAttached
-            ? new CancellationTokenSource(TimeSpan.FromMinutes(1))
-            : new CancellationTokenSource(TimeSpan.FromSeconds(10));
-        return command.Finished.WaitAsync(cts.Token);
+        using CancellationTokenSource cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
+        await command.Finished.WaitAsync(cts.Token);
     }
 
     public ImmutableArray<string> WarningMessages()

@@ -206,7 +206,8 @@ public class DeveroomTaggerTests
 
         public DeveroomTagger BuildTagger()
         {
-            var parser = new DeveroomTagParser(IdeScope.Object.Logger, IdeScope.Object.MonitoringService);
+            var project = IdeScope.Object.GetProject(TextBuffer.Object);
+            var parser = project.GetDeveroomTagParser();
             var deveroomTagger =
                 new DeveroomTagger(TextBuffer.Object, IdeScope.Object, false, ActionThrottlerFactory.Object, parser);
             deveroomTagger.TagsChanged += DeveroomTagger_TagsChanged;
