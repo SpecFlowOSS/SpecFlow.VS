@@ -30,7 +30,9 @@ public static class ProjectScopeServicesExtensions
             var discoveryService = projectScope.GetDiscoveryService();
             IDeveroomTagParser tagParser = new DeveroomTagParser(
                 projectScope.IdeScope.Logger,
-                projectScope.IdeScope.MonitoringService);
+                projectScope.IdeScope.MonitoringService,
+                deveroomConfigurationProvider,
+                discoveryService);
             return tagParser;
         });
     }

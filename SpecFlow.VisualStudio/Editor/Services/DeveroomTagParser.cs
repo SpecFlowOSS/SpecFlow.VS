@@ -1,28 +1,37 @@
-﻿#nullable disable
-using Location = Gherkin.Ast.Location;
+﻿using Location = Gherkin.Ast.Location;
 
 namespace SpecFlow.VisualStudio.Editor.Services;
 
 public class DeveroomTagParser : IDeveroomTagParser
 {
     internal static readonly Regex NewLineRe = new(@"\r\n|\n|\r");
+    private readonly IDeveroomConfigurationProvider _deveroomConfigurationProvider;
+    private readonly IDiscoveryService _discoveryService;
     private readonly IDeveroomLogger _logger;
     private readonly IMonitoringService _monitoringService;
 
-    public DeveroomTagParser(IDeveroomLogger logger, IMonitoringService monitoringService)
+    public DeveroomTagParser(
+        IDeveroomLogger logger,
+        IMonitoringService monitoringService,
+        IDeveroomConfigurationProvider deveroomConfigurationProvider,
+        IDiscoveryService discoveryService
+    )
     {
         _logger = logger;
         _monitoringService = monitoringService;
+        _deveroomConfigurationProvider = deveroomConfigurationProvider;
+        _discoveryService = discoveryService;
     }
 
-    public ICollection<DeveroomTag> Parse(ITextSnapshot fileSnapshot, ProjectBindingRegistry bindingRegistry,
-        DeveroomConfiguration configuration)
+    public IReadOnlyCollection<DeveroomTag> Parse(ITextSnapshot fileSnapshot)
     {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
         try
         {
+        var configuration = _deveroomConfigurationProvider.GetConfiguration();
+        var bindingRegistry = _discoveryService.BindingRegistryCache.Value;
             return ParseInternal(fileSnapshot, bindingRegistry, configuration);
         }
         catch (Exception ex)
@@ -38,7 +47,8 @@ public class DeveroomTagParser : IDeveroomTagParser
         }
     }
 
-    private ICollection<DeveroomTag> ParseInternal(ITextSnapshot fileSnapshot, ProjectBindingRegistry bindingRegistry,
+    private IReadOnlyCollection<DeveroomTag> ParseInternal(ITextSnapshot fileSnapshot,
+        ProjectBindingRegistry bindingRegistry,
         DeveroomConfiguration deveroomConfiguration)
     {
         var dialectProvider = SpecFlowGherkinDialectProvider.Get(deveroomConfiguration.DefaultFeatureLanguage);
@@ -47,7 +57,8 @@ public class DeveroomTagParser : IDeveroomTagParser
         parser.ParseAndCollectErrors(fileSnapshot.GetText(), _logger,
             out var gherkinDocument, out var parserErrors);
 
-        var result = new List<DeveroomTag>();
+        ImmutableSortedSet<DeveroomTag>.Builder result =
+            ImmutableSortedSet.CreateBuilder(new DeveroomTagPositionComparer());
 
         if (gherkinDocument != null)
             AddGherkinDocumentTags(fileSnapshot, bindingRegistry, gherkinDocument, result);
@@ -58,15 +69,16 @@ public class DeveroomTagParser : IDeveroomTagParser
             var startPoint = GetColumnPoint(line, parserException.Location);
             var span = new SnapshotSpan(startPoint, line.End);
 
-            result.Add(new DeveroomTag(DeveroomTagTypes.ParserError,
-                span, parserException.Message));
+            var deveroomTag = new DeveroomTag(DeveroomTagTypes.ParserError,
+                span, parserException.Message);
+            result.Add(deveroomTag);
         }
 
-        return result;
+        return result.ToImmutable();
     }
 
     private void AddGherkinDocumentTags(ITextSnapshot fileSnapshot, ProjectBindingRegistry bindingRegistry,
-        DeveroomGherkinDocument gherkinDocument, List<DeveroomTag> result)
+        DeveroomGherkinDocument gherkinDocument, ISet<DeveroomTag> result)
     {
         var documentTag = new DeveroomTag(DeveroomTagTypes.Document,
             new SnapshotSpan(fileSnapshot, 0, fileSnapshot.Length), gherkinDocument);
@@ -75,13 +87,17 @@ public class DeveroomTagParser : IDeveroomTagParser
         if (gherkinDocument.Feature != null)
         {
             var featureTag = GetFeatureTags(fileSnapshot, bindingRegistry, gherkinDocument.Feature);
-            result.AddRange(GetAllTags(featureTag));
+            var allTags = GetAllTags(featureTag);
+            result.UnionWith(allTags);
         }
 
         if (gherkinDocument.Comments != null)
             foreach (var comment in gherkinDocument.Comments)
-                result.Add(new DeveroomTag(DeveroomTagTypes.Comment,
-                    GetTextSpan(fileSnapshot, comment.Location, comment.Text)));
+            {
+                var deveroomTag = new DeveroomTag(DeveroomTagTypes.Comment,
+                    GetTextSpan(fileSnapshot, comment.Location, comment.Text));
+                result.Add(deveroomTag);
+            }
     }
 
     private DeveroomTag GetFeatureTags(ITextSnapshot fileSnapshot, ProjectBindingRegistry bindingRegistry,
@@ -154,31 +170,28 @@ public class DeveroomTagParser : IDeveroomTagParser
             if (scenarioDefinition is ScenarioOutline) AddPlaceholderTags(fileSnapshot, stepTag, step);
 
             var match = bindingRegistry.MatchStep(step, scenarioDefinitionTag);
-            if (match != null)
+            if (match.HasDefined || match.HasAmbiguous)
             {
-                if (match.HasDefined || match.HasAmbiguous)
+                stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.DefinedStep,
+                    GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
+                    match));
+                if (!(scenarioDefinition is ScenarioOutline) || !step.Text.Contains("<"))
                 {
-                    stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.DefinedStep,
-                        GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
-                        match));
-                    if (!(scenarioDefinition is ScenarioOutline) || !step.Text.Contains("<"))
-                    {
-                        var parameterMatch = match.Items.FirstOrDefault(m => m.ParameterMatch != null)
-                            ?.ParameterMatch;
-                        AddParameterTags(fileSnapshot, parameterMatch, stepTag, step);
-                    }
+                    var parameterMatch = match.Items.FirstOrDefault(m => m.ParameterMatch != null)
+                        ?.ParameterMatch;
+                    AddParameterTags(fileSnapshot, parameterMatch, stepTag, step);
                 }
-
-                if (match.HasUndefined)
-                    stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.UndefinedStep,
-                        GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
-                        match));
-
-                if (match.HasErrors)
-                    stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.BindingError,
-                        GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
-                        match.GetErrorMessage()));
             }
+
+            if (match.HasUndefined)
+                stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.UndefinedStep,
+                    GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
+                    match));
+
+            if (match.HasErrors)
+                stepTag.AddChild(new DeveroomTag(DeveroomTagTypes.BindingError,
+                    GetTextSpan(fileSnapshot, step.Location, step.Text, offset: step.Keyword.Length),
+                    match.GetErrorMessage()));
         }
 
         if (scenarioDefinition is ScenarioOutline scenarioOutline)
