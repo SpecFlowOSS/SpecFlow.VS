@@ -24,8 +24,9 @@ public class VsIdeScope : IVsIdeScope
     [ImportingConstructor]
     public VsIdeScope([Import(typeof(SVsServiceProvider))] IServiceProvider serviceProvider,
         IVsSolutionEventListener solutionEventListener, IMonitoringService monitoringService,
-        IDeveroomWindowManager windowManager, IFileSystem fileSystem)
+        IDeveroomWindowManager windowManager, IFileSystem fileSystem, DeveroomCompositeLogger compositeLogger)
     {
+        Logger = compositeLogger;
         ServiceProvider = serviceProvider;
         MonitoringService = monitoringService;
         FileSystem = fileSystem;
@@ -34,8 +35,7 @@ public class VsIdeScope : IVsIdeScope
         DeveroomOutputPaneServices = new VsDeveroomOutputPaneServices(this);
         DeveroomErrorListServices = new VsDeveroomErrorListServices(this);
 
-        CompositeLogger.Add(AsynchronousFileLogger.CreateInstance(FileSystem));
-        CompositeLogger.Add(new OutputWindowPaneLogger(DeveroomOutputPaneServices));
+        compositeLogger.Add(new OutputWindowPaneLogger(DeveroomOutputPaneServices));
         Logger.LogVerbose("Creating IDE Scope");
         Actions = new VsIdeActions(this);
 
@@ -56,17 +56,12 @@ public class VsIdeScope : IVsIdeScope
         IsSolutionLoaded = Dte.Solution.IsOpen;
     }
 
-    public DeveroomCompositeLogger CompositeLogger { get; } = new()
-    {
-        new DeveroomDebugLogger()
-    };
-
     public IServiceProvider ServiceProvider { get; }
     public DTE Dte { get; }
 
     public bool IsSolutionLoaded { get; private set; }
 
-    public IDeveroomLogger Logger => CompositeLogger;
+    public IDeveroomLogger Logger { get; }
     public IMonitoringService MonitoringService { get; }
     public IIdeActions Actions { get; }
     public IDeveroomWindowManager WindowManager { get; }
@@ -221,8 +216,6 @@ public class VsIdeScope : IVsIdeScope
         _solutionEventListener.Closed -= SolutionEventListenerOnClosed;
         (_solutionEventListener as IDisposable)?.Dispose();
         _documentEventsListener?.Dispose();
-
-        CompositeLogger.OfType<AsynchronousFileLogger>().Single().Dispose();
     }
 
     public IProjectScope GetProjectScope(Project project)

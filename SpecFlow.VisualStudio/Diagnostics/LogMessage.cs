@@ -4,6 +4,9 @@ namespace SpecFlow.VisualStudio.Diagnostics;
 public record LogMessage(
     TraceLevel Level,
     string Message,
-    DateTimeOffset TimeStamp,
     string CallerMethod,
-    [CanBeNull] Exception Exception = default!);
+    [CanBeNull] Exception Exception = default!)
+{
+    public DateTimeOffset TimeStamp { get; } = DateTimeOffset.Now;
+    public int ManagedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
+}

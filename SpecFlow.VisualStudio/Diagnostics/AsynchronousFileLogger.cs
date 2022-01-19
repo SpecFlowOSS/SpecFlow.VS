@@ -67,24 +67,20 @@ public class AsynchronousFileLogger : IDeveroomLogger, IDisposable
                 var message = await _channel.Reader.ReadAsync(_stopTokenSource.Token);
                 WriteLogMessage(message);
             }
-            catch (ChannelClosedException)
-            {
-                return;
-            }
-            catch (TaskCanceledException)
-            {
-                return;
-            }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not (ChannelClosedException or TaskCanceledException))
             {
                 Debug.WriteLine(ex, $"Error writing to the {LogFilePath}");
+            }
+            catch
+            {
+                // ignored
             }
     }
 
     protected void WriteLogMessage(LogMessage message)
     {
         var content =
-            $"{message.TimeStamp:yyyy-MM-ddTHH\\:mm\\:ss.fffzzz}, {message.Level}, {message.CallerMethod}: {message.Message}";
+            $"{message.TimeStamp:yyyy-MM-ddTHH\\:mm\\:ss.fffzzz}, {message.Level}@{message.ManagedThreadId}, {message.CallerMethod}: {message.Message}";
         if (message.Exception != null) content += $" : {message.Exception}";
         content += Environment.NewLine;
 
