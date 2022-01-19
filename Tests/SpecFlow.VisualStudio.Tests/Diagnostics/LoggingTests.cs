@@ -15,24 +15,23 @@ public class LoggingTests
         Warmup(logger, fileSystem);
 
         //act
-        var message = new LogMessage(logLevel, "msg", DateTimeOffset.Parse("2021.12.27"), nameof(MessageIsLogged));
+        var message = new LogMessage(logLevel, "msg", nameof(MessageIsLogged));
         logger.Log(message);
 
         var sw = Stopwatch.StartNew();
         while (!fileSystem.File.ReadAllText(logger.LogFilePath).Contains("msg") &&
                sw.Elapsed < TimeSpan.FromMilliseconds(10))
-            Thread.Sleep(1);
+            Thread.Sleep(10);
 
         //assert
         fileSystem.File.Exists(logger.LogFilePath).Should().BeTrue("the log should be written quickly");
         fileSystem.File.ReadAllText(logger.LogFilePath).Should().Contain(
-            $"{message.TimeStamp:yyyy-MM-ddTHH\\:mm\\:ss.fffzzz}, {message.Level}, {message.CallerMethod}: {message.Message}");
+            $"{message.TimeStamp:yyyy-MM-ddTHH\\:mm\\:ss.fffzzz}, {message.Level}@{message.ManagedThreadId}, {message.CallerMethod}: {message.Message}");
     }
 
     private void Warmup(AsynchronousFileLogger logger, IFileSystem fileSystem)
     {
-        var message = new LogMessage(TraceLevel.Error, "warmup", DateTimeOffset.Parse("2021.12.28"),
-            nameof(MessageIsLogged));
+        var message = new LogMessage(TraceLevel.Error, "warmup", nameof(MessageIsLogged));
         logger.Log(message);
 
         var sw = Stopwatch.StartNew();
@@ -50,8 +49,7 @@ public class LoggingTests
 
         //act
         logger.Dispose();
-        var message = new LogMessage(TraceLevel.Error, "msg", DateTimeOffset.Parse("2021.12.28"),
-            nameof(DisposeStopsLogging));
+        var message = new LogMessage(TraceLevel.Error, "msg", nameof(DisposeStopsLogging));
         logger.Log(message);
 
         Thread.Sleep(100);

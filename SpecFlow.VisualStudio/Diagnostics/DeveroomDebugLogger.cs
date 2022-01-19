@@ -3,9 +3,9 @@ namespace SpecFlow.VisualStudio.Diagnostics;
 public class DeveroomDebugLogger : IDeveroomLogger
 {
 #if DEBUG
-    private const TraceLevel DefaultDebugTraceLevel = TraceLevel.Verbose;
+    public const TraceLevel DefaultDebugTraceLevel = TraceLevel.Verbose;
 #else
-    private const TraceLevel DefaultDebugTraceLevel = TraceLevel.Off;
+    public const TraceLevel DefaultDebugTraceLevel = TraceLevel.Off;
 #endif
     public TraceLevel Level { get; }
 
