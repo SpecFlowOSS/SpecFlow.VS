@@ -38,9 +38,7 @@ public class StubLogger : IDeveroomLogger
 
     public StubLogger WithoutHeader(string warningHeader)
     {
-        return new StubLogger(Logs.Select(m =>
-            new LogMessage(m.Level, m.Message.Replace(warningHeader, string.Empty), m.TimeStamp,
-                m.CallerMethod)));
+        return new StubLogger(Logs.Select(m => m with {Message = m.Message.Replace(warningHeader, string.Empty)}));
     }
 
     public void Clear()

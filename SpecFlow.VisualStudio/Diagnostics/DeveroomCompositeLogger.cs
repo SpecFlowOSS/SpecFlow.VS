@@ -1,10 +1,12 @@
 namespace SpecFlow.VisualStudio.Diagnostics;
 
+[Export(typeof(IDeveroomLogger))]
+[Export(typeof(DeveroomCompositeLogger))]
 public class DeveroomCompositeLogger : IDeveroomLogger, IEnumerable<IDeveroomLogger>
 {
-    private IDeveroomLogger[] _loggers = {new DeveroomNullLogger()};
+    private IDeveroomLogger[] _loggers = Array.Empty<IDeveroomLogger>();
 
-    public TraceLevel Level => _loggers.Max(l => l.Level);
+    public TraceLevel Level { get; private set; } = TraceLevel.Off;
 
     public void Log(LogMessage message)
     {
@@ -18,6 +20,7 @@ public class DeveroomCompositeLogger : IDeveroomLogger, IEnumerable<IDeveroomLog
     public DeveroomCompositeLogger Add(IDeveroomLogger logger)
     {
         _loggers = _loggers.Concat(new[] {logger}).ToArray();
+        Level = _loggers.Max(l => l.Level);
         return this;
     }
 }

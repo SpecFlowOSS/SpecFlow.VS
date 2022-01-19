@@ -16,7 +16,7 @@ public class VsIdeScopeLoader : IVsIdeScope
     {
         _serviceProvider = serviceProvider;
         // ReSharper disable once RedundantArgumentDefaultValue
-        _safeLogger = GetSafeLogger();
+        _safeLogger = GetSafeLogger(serviceProvider);
         _safeMonitoringService = GetSafeMonitoringService(serviceProvider);
         _projectSystemReference =
             new Lazy<IVsIdeScope>(LoadProjectSystem, LazyThreadSafetyMode.ExecutionAndPublication);
@@ -37,6 +37,27 @@ public class VsIdeScopeLoader : IVsIdeScope
         catch
         {
             return NullVsIdeScope.GetNullMonitoringService();
+        }
+    }
+
+    private static IDeveroomLogger GetSafeLogger(IServiceProvider serviceProvider)
+    {
+        try
+        {
+            var fileSystem = VsUtils.ResolveMefDependency<IFileSystem>(serviceProvider);
+            var asyncLogger = AsynchronousFileLogger.CreateInstance(fileSystem);
+            var compositeLogger = VsUtils.ResolveMefDependency<DeveroomCompositeLogger>(serviceProvider);
+            compositeLogger.Add(asyncLogger);
+#if DEBUG
+            compositeLogger.Add(new DeveroomDebugLogger());
+#endif
+            return compositeLogger;
+        }
+        catch (Exception e)
+        {
+            var logger = GetSafeLogger();
+            logger.LogError(e.ToString());
+            return logger;
         }
     }
 
@@ -144,6 +165,9 @@ public class VsIdeScopeLoader : IVsIdeScope
     public void Dispose()
     {
         VsIdeScope.Dispose();
+
+        (_safeLogger as DeveroomCompositeLogger)?
+            .OfType<AsynchronousFileLogger>().Single().Dispose();
     }
 
     #endregion
