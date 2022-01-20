@@ -4,7 +4,7 @@ namespace SpecFlow.VisualStudio.Editor.Commands;
 [Export(typeof(IDeveroomFeatureEditorCommand))]
 public class AutoFormatTableCommand : DeveroomEditorTypeCharCommandBase, IDeveroomFeatureEditorCommand
 {
-    private readonly EditorConfigOptionsProvider _editorConfigOptionsProvider;
+    private readonly IEditorConfigOptionsProvider _editorConfigOptionsProvider;
 
     private readonly GherkinDocumentFormatter _gherkinDocumentFormatter;
 
@@ -14,7 +14,7 @@ public class AutoFormatTableCommand : DeveroomEditorTypeCharCommandBase, IDevero
         IBufferTagAggregatorFactoryService aggregatorFactory,
         IDeveroomTaggerProvider taggerProvider,
         GherkinDocumentFormatter gherkinDocumentFormatter,
-        EditorConfigOptionsProvider editorConfigOptionsProvider = null)
+        IEditorConfigOptionsProvider editorConfigOptionsProvider)
         : base(ideScope, aggregatorFactory, taggerProvider)
     {
         _gherkinDocumentFormatter = gherkinDocumentFormatter;
@@ -27,7 +27,7 @@ public class AutoFormatTableCommand : DeveroomEditorTypeCharCommandBase, IDevero
             return false;
 
         var dataTableTag = GetDeveroomTagForCaret(textView, DeveroomTagTypes.DataTable, DeveroomTagTypes.ExamplesBlock);
-        if (!(dataTableTag?.Data is IHasRows hasRows))
+        if (dataTableTag.Data is not IHasRows hasRows)
             return false;
 
         var currentText = dataTableTag.Span.GetText();
@@ -161,7 +161,7 @@ public class AutoFormatTableCommand : DeveroomEditorTypeCharCommandBase, IDevero
         Debug.Assert(caretPosition.Cell != null);
         var positionAfterCellOpenPipe =
             indent.Length +
-            widths.Take(Math.Min(widths.Length, caretPosition.Cell.Value))
+            widths.Take(Math.Min(widths.Length, caretPosition.Cell!.Value))
                 .Sum(w => w + formatSettings.TableCellPadding.Length * 2 + PIPE_LENGTH) +
             PIPE_LENGTH;
 

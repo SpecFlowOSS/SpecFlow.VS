@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace SpecFlow.VisualStudio.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Editor.Commands;
 
 [Export(typeof(IDeveroomFeatureEditorCommand))]
 public class AutoFormatDocumentCommand : DeveroomEditorCommandBase, IDeveroomFeatureEditorCommand
@@ -10,7 +9,7 @@ public class AutoFormatDocumentCommand : DeveroomEditorCommandBase, IDeveroomFea
     internal static readonly DeveroomEditorCommandTargetKey FormatSelectionKey =
         new(VSConstants.VSStd2K, VSConstants.VSStd2KCmdID.FORMATSELECTION);
 
-    private readonly EditorConfigOptionsProvider _editorConfigOptionsProvider;
+    private readonly IEditorConfigOptionsProvider _editorConfigOptionsProvider;
 
     private readonly GherkinDocumentFormatter _gherkinDocumentFormatter;
 
@@ -20,7 +19,7 @@ public class AutoFormatDocumentCommand : DeveroomEditorCommandBase, IDeveroomFea
         IBufferTagAggregatorFactoryService aggregatorFactory,
         IDeveroomTaggerProvider taggerProvider,
         GherkinDocumentFormatter gherkinDocumentFormatter,
-        EditorConfigOptionsProvider editorConfigOptionsProvider = null)
+        IEditorConfigOptionsProvider editorConfigOptionsProvider)
         : base(ideScope, aggregatorFactory, taggerProvider)
     {
         _gherkinDocumentFormatter = gherkinDocumentFormatter;
@@ -37,7 +36,7 @@ public class AutoFormatDocumentCommand : DeveroomEditorCommandBase, IDeveroomFea
         IntPtr inArgs = default)
     {
         var documentTag = GetDeveroomTagForCaret(textView, DeveroomTagTypes.Document);
-        if (!(documentTag?.Data is DeveroomGherkinDocument gherkinDocument))
+        if (documentTag.Data is not DeveroomGherkinDocument gherkinDocument)
             return false;
 
         var isSelectionFormatting = commandKey.Equals(FormatSelectionKey);

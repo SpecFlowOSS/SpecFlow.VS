@@ -28,8 +28,8 @@ public class DeveroomTaggerProvider : IDeveroomTaggerProvider
         var project = _ideScope.GetProject(buffer);
         var discoveryService = project.GetDiscoveryService();
         var tagParser = project.GetDeveroomTagParser();
-        var tagger = new DeveroomTagger(buffer, _ideScope, false, new ActionThrottlerFactory(), tagParser);
-        tagger.InvalidateCache();
-        return tagger;
+        var featureFileTagger = new FeatureFileTagger(discoveryService, _ideScope.Logger, tagParser, buffer);
+        featureFileTagger.ForceReparseOnBackground();
+        return featureFileTagger;
     }
 }

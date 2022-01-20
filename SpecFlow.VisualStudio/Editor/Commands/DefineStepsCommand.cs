@@ -43,7 +43,7 @@ public class DefineStepsCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdi
         }
 
         var featureTag = GetDeveroomTagForCaret(textView, DeveroomTagTypes.FeatureBlock);
-        if (featureTag == null)
+        if (featureTag == VoidDeveroomTag.Instance)
         {
             Logger.LogWarning("Define steps command called for a file without feature block");
             return true;

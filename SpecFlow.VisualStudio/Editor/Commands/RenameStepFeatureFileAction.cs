@@ -52,9 +52,8 @@ internal class RenameStepFeatureFileAction : RenameStepAction
         string filePath, RenameStepCommandContext ctx)
     {
         var snapshotSpan = new SnapshotSpan(from.textBufferOfFeatureFile.CurrentSnapshot, CalculateReplaceSpan(from));
-        var tagger = ctx.TaggerProvider.CreateTagger<DeveroomTag>(from.textBufferOfFeatureFile) as DeveroomTagger;
-        tagger.InvalidateCache();
-        var deveroomTagsForSpan = tagger.GetDeveroomTagsForSpan(snapshotSpan).ToList();
+        var tagger = ctx.TaggerProvider.CreateTagger<DeveroomTag>(from.textBufferOfFeatureFile);
+        var deveroomTagsForSpan = tagger.GetUpToDateDeveroomTagsForSpan(snapshotSpan).ToList();
         DeveroomTag matchedStepTag =
             deveroomTagsForSpan
                 .Where(t => t.Tag.Type == DeveroomTagTypes.DefinedStep)

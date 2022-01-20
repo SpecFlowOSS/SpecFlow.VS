@@ -188,6 +188,6 @@ public class StubWpfTextView : IWpfTextView
     {
         var tagger = taggerProvider.CreateTagger<DeveroomTag>(TextBuffer);
         var span = new SnapshotSpan(TextSnapshot, 0, TextSnapshot.Length);
-        ((DeveroomTagger) tagger).InvalidateCache(); tagger.GetTags(new NormalizedSnapshotSpanCollection(span));
+        tagger.GetUpToDateDeveroomTagsForSpan(span);
     }
 }

@@ -273,7 +273,7 @@ public class ProjectSystemSteps : Steps
         DeveroomEditorCommandTargetKey? commandTargetKey = null)
     {
         ActionsMock.ResetMock();
-        var taggerProvider = CreateTaggerProvider(_ideScope);
+        var taggerProvider = CreateTaggerProvider();
         var aggregatorFactoryService = new StubBufferTagAggregatorFactoryService(taggerProvider);
         switch (commandName)
         {
@@ -320,7 +320,8 @@ public class ProjectSystemSteps : Steps
                     _ideScope, 
                     aggregatorFactoryService, 
                     taggerProvider, 
-                    new GherkinDocumentFormatter());
+                    new GherkinDocumentFormatter(),
+                    new StubEditorConfigOptionsProvider());
                 _invokedCommand.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatDocumentKey);
                 break;
             }
@@ -330,7 +331,8 @@ public class ProjectSystemSteps : Steps
                     _ideScope, 
                     aggregatorFactoryService,
                     taggerProvider, 
-                    new GherkinDocumentFormatter());
+                    new GherkinDocumentFormatter(),
+                    new StubEditorConfigOptionsProvider());
                 _invokedCommand.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatSelectionKey);
                 break;
             }
@@ -340,8 +342,9 @@ public class ProjectSystemSteps : Steps
                     _ideScope, 
                     aggregatorFactoryService, 
                     taggerProvider,
-                    new GherkinDocumentFormatter());
-                _wpfTextView.SimulateType((AutoFormatTableCommand) _invokedCommand, parameter?[0] ?? '|', new DeveroomTaggerProvider(_ideScope));
+                    new GherkinDocumentFormatter(),
+                    new StubEditorConfigOptionsProvider());
+                _wpfTextView.SimulateType((AutoFormatTableCommand) _invokedCommand, parameter?[0] ?? '|', taggerProvider);
                 break;
             }
             case "Define Steps":
@@ -362,7 +365,7 @@ public class ProjectSystemSteps : Steps
                 if (parameter == null)
                     _invokedCommand.PreExec(_wpfTextView, commandTargetKey ?? _invokedCommand.Targets.First());
                 else
-                    _wpfTextView.SimulateTypeText((CompleteCommand) _invokedCommand, parameter, new DeveroomTaggerProvider(_ideScope));
+                    _wpfTextView.SimulateTypeText((CompleteCommand) _invokedCommand, parameter, taggerProvider);
                 break;
             }
             case "Rename Step":
@@ -380,10 +383,16 @@ public class ProjectSystemSteps : Steps
         }
     }
 
-    private StubBufferTagAggregatorFactoryService CreateAggregatorFactory() => new StubBufferTagAggregatorFactoryService(CreateTaggerProvider(_ideScope));
+    private StubBufferTagAggregatorFactoryService CreateAggregatorFactory() => new StubBufferTagAggregatorFactoryService(CreateTaggerProvider());
 
-    private static IDeveroomTaggerProvider CreateTaggerProvider(IIdeScope ideScope) 
-        => new DeveroomTaggerProvider(ideScope);
+    private IDeveroomTaggerProvider CreateTaggerProvider()
+    {
+        var taggerProvider = new DeveroomTaggerProvider(_ideScope);
+        var tagger = taggerProvider.CreateTagger<DeveroomTag>(_ideScope.CurrentTextView.TextBuffer);
+        var span = new SnapshotSpan(_ideScope.CurrentTextView.TextSnapshot, 0, 0);
+        tagger.GetUpToDateDeveroomTagsForSpan(span);
+        return taggerProvider;
+    }
 
     private void EnsureStubCompletionBroker()
     {
@@ -439,9 +448,9 @@ public class ProjectSystemSteps : Steps
 
     private IEnumerable<DeveroomTag> GetDeveroomTags(IWpfTextView textView)
     {
-        var tagger = CreateTaggerProvider(_ideScope).CreateTagger<DeveroomTag>(textView.TextBuffer) as DeveroomTagger;
-        if (tagger != null) return GetVsTagSpans<DeveroomTag, DeveroomTagger>(textView, tagger).Select(t => t.Tag);
-        return Enumerable.Empty<DeveroomTag>();
+        var tagger = CreateTaggerProvider().CreateTagger<DeveroomTag>(textView.TextBuffer);
+        var span = new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length);
+        return tagger.GetUpToDateDeveroomTagsForSpan(span).Select(t => t.Tag);
     }
 
     private IEnumerable<ITagSpan<TTag>> GetVsTagSpans<TTag>(IWpfTextView textView, ITaggerProvider taggerProvider)
@@ -463,6 +472,7 @@ public class ProjectSystemSteps : Steps
     public void ThenAllSectionOfTypesShouldBeHighlightedAs(string[] keywordTypes, string expectedContent)
     {
         CreateTagAggregator();
+
         var expectedContentText = new TestText(expectedContent);
         var tags = GetDeveroomTags(_wpfTextView).Where(t => keywordTypes.Contains(t.Type)).ToArray();
         var testTextSections = expectedContentText.Sections.Where(s => keywordTypes.Contains(s.Label)).ToArray();

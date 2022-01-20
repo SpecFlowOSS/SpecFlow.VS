@@ -1,29 +1,18 @@
 ﻿#nullable disable
 namespace SpecFlow.VisualStudio.Editor.Services;
 
-public class DeveroomTag : ITag, IGherkinDocumentContext
+public record DeveroomTag(string Type, SnapshotSpan Span, object Data = null) : ITag, IGherkinDocumentContext
 {
     private readonly List<DeveroomTag> _childTags = new();
 
-    public DeveroomTag(string type, SnapshotSpan span, object data = null)
-    {
-        Type = type;
-        Span = span;
-        Data = data;
-    }
-
-    public string Type { get; }
-    public SnapshotSpan Span { get; }
-    public object Data { get; }
-
-    public DeveroomTag ParentTag { get; private set; }
+    public DeveroomTag ParentTag { get; protected internal set; }
     public ICollection<DeveroomTag> ChildTags => _childTags;
     public bool IsError => Type.EndsWith("Error");
 
     IGherkinDocumentContext IGherkinDocumentContext.Parent => ParentTag;
     object IGherkinDocumentContext.Node => Data;
 
-    internal DeveroomTag AddChild(DeveroomTag childTag)
+    internal virtual DeveroomTag AddChild(DeveroomTag childTag)
     {
         childTag.ParentTag = this;
         _childTags.Add(childTag);
