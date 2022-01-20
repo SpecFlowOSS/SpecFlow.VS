@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace SpecFlow.VisualStudio.Discovery;
+﻿namespace SpecFlow.VisualStudio.Discovery;
 
 [DebuggerDisplay("{Value} {_upToDateBindingRegistrySource.Task.Status}")]
 public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
@@ -20,9 +19,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 
     public ProjectBindingRegistry Value { get; private set; }
 
-    public bool Processing => _upToDateBindingRegistrySource.Task.Status != TaskStatus.RanToCompletion;
-
-    public event EventHandler<EventArgs> Changed;
+    public event EventHandler<EventArgs>? Changed;
 
     public Task Update(Func<ProjectBindingRegistry, ProjectBindingRegistry> updateFunc)
     {
@@ -103,7 +100,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
     private static async Task<ProjectBindingRegistry> WaitForCompletion(
         TaskCompletionSource<ProjectBindingRegistry> task)
     {
-        CancellationTokenSource cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(15));
+        using CancellationTokenSource cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(15));
 
         var timeoutTask = Task.Delay(-1, cts.Token);
         var result = await Task.WhenAny(task.Task, timeoutTask);
@@ -134,7 +131,7 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
         foreach (var sourceLocation in bindingRegistry.StepDefinitions.Select(sd => sd.Implementation.SourceLocation)
                      .Where(sl => sl?.SourceLocationSpan != null))
         {
-            sourceLocation.SourceLocationSpan.Dispose();
+            sourceLocation.SourceLocationSpan!.Dispose();
             sourceLocation.SourceLocationSpan = null;
         }
 

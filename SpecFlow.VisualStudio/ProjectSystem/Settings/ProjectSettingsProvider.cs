@@ -138,20 +138,21 @@ public class ProjectSettingsProvider : IDisposable, IProjectSettingsProvider
         var hasFeatureFiles = (featureFileCount ?? 0) > 0;
         var kind = GetKind(isInvalid, specFlowSettings != null, hasFeatureFiles);
         var platformTarget = GetPlatformTarget(_projectScope.PlatformTargetName);
+        
+        var targetFrameworkMoniker = TargetFrameworkMoniker.Create(_projectScope.TargetFrameworkMoniker);
 
         var settings = new ProjectSettings(
             kind,
-            _projectScope.OutputAssemblyPath,
-            TargetFrameworkMoniker.Create(_projectScope.TargetFrameworkMoniker),
-            _projectScope.TargetFrameworkMonikers,
+            targetFrameworkMoniker,
+            _projectScope.TargetFrameworkMonikers ?? targetFrameworkMoniker.Value,
             platformTarget,
+            _projectScope.OutputAssemblyPath,
             _projectScope.DefaultNamespace,
             specFlowSettings?.Version,
             specFlowSettings?.GeneratorFolder,
             specFlowSettings?.ConfigFilePath,
             specFlowSettings?.Traits ?? SpecFlowProjectTraits.None,
-            _projectScope.ProjectFullName);
-
+            GetProgrammingLanguage(_projectScope.ProjectFullName));
         return settings;
     }
 
@@ -177,5 +178,19 @@ public class ProjectSettingsProvider : IDisposable, IProjectSettingsProvider
         return hasFeatureFiles
             ? DeveroomProjectKind.SpecFlowTestProject
             : DeveroomProjectKind.SpecFlowLibProject;
+    }
+
+    private static ProjectProgrammingLanguage GetProgrammingLanguage(string projectFullName)
+    {
+        if (projectFullName.EndsWith(".csproj", StringComparison.InvariantCultureIgnoreCase))
+            return ProjectProgrammingLanguage.CSharp;
+
+        if (projectFullName.EndsWith(".vbproj", StringComparison.InvariantCultureIgnoreCase))
+            return ProjectProgrammingLanguage.VB;
+
+        if (projectFullName.EndsWith(".fsproj", StringComparison.InvariantCultureIgnoreCase))
+            return ProjectProgrammingLanguage.FSharp;
+
+        return ProjectProgrammingLanguage.Other;
     }
 }

@@ -12,8 +12,8 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
 
         StubProjectSettingsProvider = new StubProjectSettingsProvider(this);
         Properties.AddProperty(typeof(IProjectSettingsProvider), StubProjectSettingsProvider);
-        Properties.AddProperty(typeof(IDeveroomConfigurationProvider),
-            new StubDeveroomConfigurationProvider(DeveroomConfiguration));
+        StubDeveroomConfigurationProvider = new StubDeveroomConfigurationProvider(DeveroomConfiguration);
+        Properties.AddProperty(typeof(IDeveroomConfigurationProvider), StubDeveroomConfigurationProvider);
         StubIdeScope.ProjectScopes.Add(this);
 
         AddFile(ProjectFullPath, "<Project Sdk=\"Microsoft.NET.Sdk\"></Project>");
@@ -26,10 +26,12 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
     {
     }
 
+    public StubDeveroomConfigurationProvider StubDeveroomConfigurationProvider { get; }
     public DeveroomConfiguration DeveroomConfiguration { get; } = new();
     public StubIdeScope StubIdeScope { get; }
     public StubProjectSettingsProvider StubProjectSettingsProvider { get; }
     public Dictionary<string, string> FilesAdded { get; } = new();
+    public string ProjectFullPath => Path.Combine(ProjectFolder, ProjectFullName);
     public PropertyCollection Properties { get; } = new();
     public IIdeScope IdeScope => StubIdeScope;
     public IEnumerable<NuGetPackageReference> PackageReferences => PackageReferencesList;
@@ -40,7 +42,6 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
     public string PlatformTargetName { get; } = "Any CPU";
     public string ProjectName { get; } = "Test Project";
     public string ProjectFullName { get; } = "Test Project.csproj";
-    public string ProjectFullPath => Path.Combine(ProjectFolder, ProjectFullName);
     public string DefaultNamespace => ProjectName.Replace(" ", "");
 
     public void AddFile(string targetFilePath, string template)
