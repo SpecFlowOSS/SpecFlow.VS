@@ -196,8 +196,8 @@ public class FeatureFileTaggerTests
     }
 
     [Theory]
-    [InlineData(ProjectScopeDeveroomConfigurationProvider.DeveroomConfigFileName    , "{}")]
-    [InlineData(ProjectScopeDeveroomConfigurationProvider.SpecFlowAppConfigFileName , "<xml />")]
+    [InlineData(ProjectScopeDeveroomConfigurationProvider.DeveroomConfigFileName, "{}")]
+    [InlineData(ProjectScopeDeveroomConfigurationProvider.SpecFlowAppConfigFileName, "<xml />")]
     [InlineData(ProjectScopeDeveroomConfigurationProvider.SpecFlowJsonConfigFileName, "{}")]
     [InlineData(ProjectScopeDeveroomConfigurationProvider.SpecSyncJsonConfigFileName, "{}")]
     [InlineData("Test Project.csproj", "<xml><PropertyGroup><AppConfig>xx</AppConfig></PropertyGroup></xml>")]
@@ -209,7 +209,8 @@ public class FeatureFileTaggerTests
         sut.WaitForTagsChangedEvent();
 
         //act
-        sut.IdeScope.FileSystem.File.WriteAllText(Path.Combine(sut.ProjectScope.ProjectFolder, configFileName), content);
+        sut.IdeScope.FileSystem.File.WriteAllText(Path.Combine(sut.ProjectScope.ProjectFolder, configFileName),
+            content);
         InMemoryStubProjectBuilder.CreateOutputAssembly(sut.ProjectScope);
         sut.IdeScope.TriggerProjectsBuilt();
 
@@ -223,8 +224,8 @@ public class FeatureFileTaggerTests
         //arrange
         using var sut = TaggerSut.Arrange(_testOutputHelper);
         var configurationProvider = new Mock<IDeveroomConfigurationProvider>(MockBehavior.Strict);
-        sut.ProjectScope.Properties.RemoveProperty(typeof(IDeveroomConfigurationProvider)); 
-        sut.ProjectScope.Properties.AddProperty(typeof(IDeveroomConfigurationProvider), configurationProvider.Object); 
+        sut.ProjectScope.Properties.RemoveProperty(typeof(IDeveroomConfigurationProvider));
+        sut.ProjectScope.Properties.AddProperty(typeof(IDeveroomConfigurationProvider), configurationProvider.Object);
         var discoveryService = new Mock<IDiscoveryService>(MockBehavior.Strict);
         sut.ProjectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService.Object);
         sut.BuildFeatureFileTagger();

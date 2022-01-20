@@ -15,7 +15,7 @@ public class AutoFormatDocumentCommand : DeveroomEditorCommandBase, IDeveroomFea
 
     [ImportingConstructor]
     public AutoFormatDocumentCommand(
-        IIdeScope ideScope, 
+        IIdeScope ideScope,
         IBufferTagAggregatorFactoryService aggregatorFactory,
         IDeveroomTaggerProvider taggerProvider,
         GherkinDocumentFormatter gherkinDocumentFormatter,

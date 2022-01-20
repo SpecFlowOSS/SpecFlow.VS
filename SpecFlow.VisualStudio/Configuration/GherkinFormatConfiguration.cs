@@ -1,7 +1,4 @@
-﻿using System;
-using SpecFlow.VisualStudio.Editor.Services.EditorConfig;
-
-namespace SpecFlow.VisualStudio.Configuration;
+﻿namespace SpecFlow.VisualStudio.Configuration;
 
 public class GherkinFormatConfiguration
 {

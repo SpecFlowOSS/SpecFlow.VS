@@ -22,8 +22,10 @@ public interface IIdeScope
     SyntaxTree GetSyntaxTree(ITextBuffer textBuffer);
 
     void FireAndForget(Func<Task> action, Action<Exception> onException, [CallerMemberName] string callerName = "???");
+
     void FireAndForgetOnBackgroundThread(Func<CancellationToken, Task> action,
         [CallerMemberName] string callerName = "???");
+
     Task RunOnUiThread(Action action);
 
     void OpenIfNotOpened(string path);

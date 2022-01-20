@@ -49,7 +49,7 @@ public class ContextMenuManager
             Header = contextMenuItem.Label,
             Command = contextMenuItem.Command == null
                 ? null
-                : new DelegateCommand(() => contextMenuItem.Command(contextMenuItem), ()=>true, null),
+                : new DelegateCommand(() => contextMenuItem.Command(contextMenuItem), () => true, null),
             IsEnabled = contextMenuItem.Command != null,
             FontStyle = contextMenuItem.Command != null ? FontStyles.Normal : FontStyles.Italic,
             Tag = contextMenuItem

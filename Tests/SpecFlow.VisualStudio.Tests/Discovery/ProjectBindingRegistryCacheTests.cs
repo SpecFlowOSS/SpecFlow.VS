@@ -89,10 +89,11 @@ public class ProjectBindingRegistryCacheTests
         var timeout = TimeSpan.FromSeconds(20);
         using var cts = new CancellationTokenSource(timeout);
         int i = 0;
-        var taskCreationOptions = TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler;
-        
+        var taskCreationOptions = TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach |
+                                  TaskCreationOptions.HideScheduler;
+
         WarmUpThreads(logger, timeout);
-        
+
         //act
         try
         {
@@ -121,7 +122,8 @@ public class ProjectBindingRegistryCacheTests
         var cachedRegistry = projectBindingRegistryCache.Value;
         var registry = projectBindingRegistryCache.GetLatest().Result;
 #pragma warning restore
-        registry.Version.Should().BeGreaterOrEqualTo(cachedRegistry.Version, "cached value is modified at the end of the update");
+        registry.Version.Should()
+            .BeGreaterOrEqualTo(cachedRegistry.Version, "cached value is modified at the end of the update");
         registry.Version.Should().BeGreaterOrEqualTo(initialRegistry.Version + _updateTaskCount);
 
         oldVersions.Count.Should().BeGreaterOrEqualTo(_updateTaskCount);

@@ -16,7 +16,7 @@ public class RenameStepCommand : DeveroomEditorCommandBase, IDeveroomCodeEditorC
     public RenameStepCommand(
         IIdeScope ideScope,
         IBufferTagAggregatorFactoryService aggregatorFactory,
-        IDeveroomTaggerProvider taggerProvider) 
+        IDeveroomTaggerProvider taggerProvider)
         : base(ideScope, aggregatorFactory, taggerProvider)
     {
         _renameStepFeatureFileAction = new RenameStepFeatureFileAction();

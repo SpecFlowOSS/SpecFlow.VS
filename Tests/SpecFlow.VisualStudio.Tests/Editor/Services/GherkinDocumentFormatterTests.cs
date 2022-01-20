@@ -1,7 +1,4 @@
-﻿using System;
-using SpecFlow.VisualStudio.Editor.Services.Formatting;
-
-namespace SpecFlow.VisualStudio.Tests.Editor.Services;
+﻿namespace SpecFlow.VisualStudio.Tests.Editor.Services;
 
 public class GherkinDocumentFormatterTests
 {

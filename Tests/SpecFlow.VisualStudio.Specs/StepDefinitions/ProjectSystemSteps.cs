@@ -291,7 +291,7 @@ public class ProjectSystemSteps : Steps
             {
                 _invokedCommand = new GoToStepDefinitionCommand(
                     _ideScope,
-                    aggregatorFactoryService, 
+                    aggregatorFactoryService,
                     taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 break;
@@ -299,7 +299,7 @@ public class ProjectSystemSteps : Steps
             case "Find Step Definition Usages":
             {
                 _invokedCommand = new FindStepDefinitionUsagesCommand(
-                    _ideScope, 
+                    _ideScope,
                     aggregatorFactoryService,
                     taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
@@ -309,7 +309,7 @@ public class ProjectSystemSteps : Steps
             case "Comment":
             {
                 _invokedCommand = new CommentCommand(
-                    _ideScope, 
+                    _ideScope,
                     aggregatorFactoryService,
                     taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
@@ -318,7 +318,7 @@ public class ProjectSystemSteps : Steps
             case "Uncomment":
             {
                 _invokedCommand = new UncommentCommand(
-                    _ideScope, 
+                    _ideScope,
                     aggregatorFactoryService,
                     taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
@@ -327,9 +327,9 @@ public class ProjectSystemSteps : Steps
             case "Auto Format Document":
             {
                 _invokedCommand = new AutoFormatDocumentCommand(
-                    _ideScope, 
-                    aggregatorFactoryService, 
-                    taggerProvider, 
+                    _ideScope,
+                    aggregatorFactoryService,
+                    taggerProvider,
                     new GherkinDocumentFormatter(),
                     new StubEditorConfigOptionsProvider());
                 _invokedCommand.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatDocumentKey);
@@ -338,9 +338,9 @@ public class ProjectSystemSteps : Steps
             case "Auto Format Selection":
             {
                 _invokedCommand = new AutoFormatDocumentCommand(
-                    _ideScope, 
+                    _ideScope,
                     aggregatorFactoryService,
-                    taggerProvider, 
+                    taggerProvider,
                     new GherkinDocumentFormatter(),
                     new StubEditorConfigOptionsProvider());
                 _invokedCommand.PreExec(_wpfTextView, AutoFormatDocumentCommand.FormatSelectionKey);
@@ -349,12 +349,13 @@ public class ProjectSystemSteps : Steps
             case "Auto Format Table":
             {
                 _invokedCommand = new AutoFormatTableCommand(
-                    _ideScope, 
-                    aggregatorFactoryService, 
+                    _ideScope,
+                    aggregatorFactoryService,
                     taggerProvider,
                     new GherkinDocumentFormatter(),
                     new StubEditorConfigOptionsProvider());
-                _wpfTextView.SimulateType((AutoFormatTableCommand) _invokedCommand, parameter?[0] ?? '|', taggerProvider);
+                _wpfTextView.SimulateType((AutoFormatTableCommand) _invokedCommand, parameter?[0] ?? '|',
+                    taggerProvider);
                 break;
             }
             case "Define Steps":
@@ -369,7 +370,7 @@ public class ProjectSystemSteps : Steps
                 EnsureStubCompletionBroker();
                 _invokedCommand = new CompleteCommand(
                     _ideScope,
-                   aggregatorFactoryService, 
+                    aggregatorFactoryService,
                     taggerProvider,
                     _completionBroker);
                 if (parameter == null)
@@ -382,7 +383,7 @@ public class ProjectSystemSteps : Steps
             {
                 _invokedCommand = new RenameStepCommand(
                     _ideScope,
-                    aggregatorFactoryService, 
+                    aggregatorFactoryService,
                     taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
 
@@ -393,7 +394,7 @@ public class ProjectSystemSteps : Steps
         }
     }
 
-    private StubBufferTagAggregatorFactoryService CreateAggregatorFactory() => new StubBufferTagAggregatorFactoryService(CreateTaggerProvider());
+    private StubBufferTagAggregatorFactoryService CreateAggregatorFactory() => new(CreateTaggerProvider());
 
     private IDeveroomTaggerProvider CreateTaggerProvider()
     {
@@ -508,7 +509,8 @@ public class ProjectSystemSteps : Steps
     private ITagAggregator<DeveroomTag> CreateTagAggregator()
     {
         var textView = _ideScope.CurrentTextView;
-        ITagAggregator<DeveroomTag> tagAggregator = CreateAggregatorFactory().CreateTagAggregator<DeveroomTag>(textView.TextBuffer);
+        ITagAggregator<DeveroomTag> tagAggregator =
+            CreateAggregatorFactory().CreateTagAggregator<DeveroomTag>(textView.TextBuffer);
         tagAggregator.GetTags(new SnapshotSpan(textView.TextSnapshot, 0, textView.TextSnapshot.Length)).ToArray();
         return tagAggregator;
     }

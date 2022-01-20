@@ -5,7 +5,7 @@ public class UncommentCommand : DeveroomEditorCommandBase, IDeveroomFeatureEdito
 {
     [ImportingConstructor]
     public UncommentCommand(
-        IIdeScope ideScope, 
+        IIdeScope ideScope,
         IBufferTagAggregatorFactoryService aggregatorFactory,
         IDeveroomTaggerProvider taggerProvider)
         : base(ideScope, aggregatorFactory, taggerProvider)

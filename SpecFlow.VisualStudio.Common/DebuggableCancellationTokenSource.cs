@@ -3,7 +3,7 @@
 public class DebuggableCancellationTokenSource : CancellationTokenSource
 {
     /// <summary>
-    /// Do not forget to Dispose!
+    ///     Do not forget to Dispose!
     /// </summary>
     /// <param name="nonDebuggerTimeout"></param>
     public DebuggableCancellationTokenSource(TimeSpan nonDebuggerTimeout)
@@ -11,6 +11,6 @@ public class DebuggableCancellationTokenSource : CancellationTokenSource
     {
     }
 
-    public static TimeSpan GetDebuggerTimeout(TimeSpan nonDebuggerTimeout) 
+    public static TimeSpan GetDebuggerTimeout(TimeSpan nonDebuggerTimeout)
         => Debugger.IsAttached ? TimeSpan.FromMinutes(1) : nonDebuggerTimeout;
 }

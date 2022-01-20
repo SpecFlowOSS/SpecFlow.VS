@@ -3,8 +3,8 @@
 
 public class AutoFormatDocumentCommandTests
 {
-    private readonly StubIdeScope _ideScope;
     private readonly DeveroomTaggerProvider _deveroomTaggerProvider;
+    private readonly StubIdeScope _ideScope;
 
     public AutoFormatDocumentCommandTests(ITestOutputHelper testOutputHelper)
     {

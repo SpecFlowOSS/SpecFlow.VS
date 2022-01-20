@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using SpecFlow.VisualStudio.Editor.Services;
 using Project = EnvDTE.Project;
 
 namespace SpecFlow.VisualStudio.ProjectSystem;

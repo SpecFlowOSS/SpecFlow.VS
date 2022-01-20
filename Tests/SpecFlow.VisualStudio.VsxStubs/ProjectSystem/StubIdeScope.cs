@@ -20,7 +20,8 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
         SetupFireAndForgetOnBackgroundThread();
 
         CurrentTextView = new Mock<IWpfTextView>(MockBehavior.Strict).Object;
-        TextViewFactory = (inputText, filePath) => BasicTextViewFactory(inputText, filePath, VsContentTypes.FeatureFile);
+        TextViewFactory = (inputText, filePath) =>
+            BasicTextViewFactory(inputText, filePath, VsContentTypes.FeatureFile);
         BackgroundTaskTokenSource = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(20));
     }
 
@@ -54,7 +55,7 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
     public bool IsSolutionLoaded { get; } = true;
 
     public IProjectScope GetProject(ITextBuffer textBuffer) =>
-        textBuffer.Properties.GetOrCreateSingletonProperty(typeof(IProjectScope), 
+        textBuffer.Properties.GetOrCreateSingletonProperty(typeof(IProjectScope),
             () => ProjectScopes.SingleOrDefault() as IProjectScope ?? new VoidProjectScope(this));
 
     public IDeveroomLogger Logger => CompositeLogger;
@@ -120,7 +121,7 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
     public void FireAndForgetOnBackgroundThread(Func<CancellationToken, Task> action, string callerName = "???") =>
         Object.FireAndForgetOnBackgroundThread(action, callerName);
 
-    private volatile int _taskId = 0;
+    private volatile int _taskId;
 
     private ImmutableDictionary<string, Func<CancellationToken, Task>> BackGroundTasks { get; set; } =
         ImmutableDictionary<string, Func<CancellationToken, Task>>.Empty;

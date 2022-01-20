@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.Text.Projection;
-
-namespace SpecFlow.VisualStudio.VsxStubs;
+﻿namespace SpecFlow.VisualStudio.VsxStubs;
 
 public class StubTagAggregator<T> : ITagAggregator<T> where T : ITag
 {

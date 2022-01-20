@@ -67,15 +67,17 @@ public static class DeveroomLoggerExtensions
     }
 
 
-    public static void Trace(this IDeveroomLogger logger, Stopwatch sw, string message = "", [CallerFilePath] string callerFilePath = "?", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "???")
+    public static void Trace(this IDeveroomLogger logger, Stopwatch sw, string message = "",
+        [CallerFilePath] string callerFilePath = "?", [CallerLineNumber] int callerLineNumber = 0,
+        [CallerMemberName] string callerName = "???")
     {
         if (sw.ElapsedMilliseconds > 10)
-        {
             Trace(logger, $"{sw.Elapsed} {message}", callerFilePath, callerLineNumber, callerName);
-        }
     }
 
-    public static void Trace(this IDeveroomLogger logger, string message = "", [CallerFilePath] string callerFilePath = "?", [CallerLineNumber] int callerLineNumber = 0, [CallerMemberName] string callerName = "???")
+    public static void Trace(this IDeveroomLogger logger, string message = "",
+        [CallerFilePath] string callerFilePath = "?", [CallerLineNumber] int callerLineNumber = 0,
+        [CallerMemberName] string callerName = "???")
     {
         logger.LogVerbose($"{message} in {callerFilePath}: line {callerLineNumber}", callerName);
     }

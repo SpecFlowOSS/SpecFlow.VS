@@ -1,7 +1,4 @@
 ﻿#nullable disable
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-
 namespace SpecFlow.VisualStudio.UI.ViewModels;
 
 public class AddNewSpecFlowProjectViewModel : INotifyPropertyChanged

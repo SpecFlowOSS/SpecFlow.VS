@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.Text.Formatting;
-
-namespace SpecFlow.VisualStudio.VsxStubs;
+﻿namespace SpecFlow.VisualStudio.VsxStubs;
 
 public class StubTextCaret : ITextCaret
 {

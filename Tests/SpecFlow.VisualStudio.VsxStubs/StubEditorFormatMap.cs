@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows;
-using Microsoft.VisualStudio.Text.Classification;
+﻿using Microsoft.VisualStudio.Text.Classification;
 
 namespace SpecFlow.VisualStudio.VsxStubs;
 

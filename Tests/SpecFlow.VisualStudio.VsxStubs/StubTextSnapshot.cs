@@ -126,7 +126,8 @@ public record StubTextSnapshot(
 
             var start = new SnapshotPoint(this, processedLength);
             var end = new SnapshotPoint(this, processedLength + line.Length);
-            var endIncludingLineBreak = new SnapshotPoint(this, Math.Min(processedLength + line.Length + newLine.Length, Length));
+            var endIncludingLineBreak =
+                new SnapshotPoint(this, Math.Min(processedLength + line.Length + newLine.Length, Length));
             var extent = new SnapshotSpan(start, end);
             var extentIncludingLineBreak = new SnapshotSpan(start, endIncludingLineBreak);
 

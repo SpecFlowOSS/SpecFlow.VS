@@ -14,7 +14,7 @@ public class FeatureFileTagger : ITagger<DeveroomTag>
     public int ParsedSnapshotVersionNumber = int.MinValue;
 
     public FeatureFileTagger(
-        IDeveroomConfigurationProvider configurationProvider, 
+        IDeveroomConfigurationProvider configurationProvider,
         IDiscoveryService discoveryService,
         IDeveroomLogger logger,
         IDeveroomTagParser tagParser,
@@ -32,18 +32,6 @@ public class FeatureFileTagger : ITagger<DeveroomTag>
         configurationProvider.WeakConfigurationChanged += ProjectIsModified;
     }
 
-    public IEnumerable<ITagSpan<DeveroomTag>> GetUpToDateTags(SnapshotSpan span)
-    {
-        if (ParsedSnapshotVersionNumber < span.Snapshot.Version.VersionNumber)
-        {
-            using var tagsChanged = new TagsChangedSubscriber(this, _logger);
-            tagsChanged.Wait(span.Snapshot.Version.VersionNumber);
-        }
-
-        var normalizedCaretSpan = new NormalizedSnapshotSpanCollection(span);
-        return GetTags(normalizedCaretSpan);
-    }
-
     public IEnumerable<ITagSpan<DeveroomTag>> GetTags(NormalizedSnapshotSpanCollection spans)
     {
         foreach (SnapshotSpan queriedSpan in spans)
@@ -58,6 +46,18 @@ public class FeatureFileTagger : ITagger<DeveroomTag>
     }
 
     public event EventHandler<SnapshotSpanEventArgs>? TagsChanged;
+
+    public IEnumerable<ITagSpan<DeveroomTag>> GetUpToDateTags(SnapshotSpan span)
+    {
+        if (ParsedSnapshotVersionNumber < span.Snapshot.Version.VersionNumber)
+        {
+            using var tagsChanged = new TagsChangedSubscriber(this, _logger);
+            tagsChanged.Wait(span.Snapshot.Version.VersionNumber);
+        }
+
+        var normalizedCaretSpan = new NormalizedSnapshotSpanCollection(span);
+        return GetTags(normalizedCaretSpan);
+    }
 
     private void ProjectIsModified(object sender, EventArgs e)
     {

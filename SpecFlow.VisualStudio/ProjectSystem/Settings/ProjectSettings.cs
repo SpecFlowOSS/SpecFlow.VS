@@ -1,7 +1,6 @@
 ﻿namespace SpecFlow.VisualStudio.ProjectSystem.Settings;
 
 public record ProjectSettings(
-
     DeveroomProjectKind Kind,
     TargetFrameworkMoniker TargetFrameworkMoniker,
     string TargetFrameworkMonikers,

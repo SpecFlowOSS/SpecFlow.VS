@@ -32,7 +32,7 @@ public record TaggerSut
         var deveroomTags = ImmutableArray<DeveroomTag>.Empty;
         tagParser
             .Setup(s => s.Parse(It.IsAny<ITextSnapshot>()))
-            .Callback<ITextSnapshot>((fileSnapshot) => {projectScope.IdeScope.Logger.Trace($"Parsing {fileSnapshot}");})
+            .Callback<ITextSnapshot>(fileSnapshot => { projectScope.IdeScope.Logger.Trace($"Parsing {fileSnapshot}"); })
             .Returns(deveroomTags);
 
         projectScope.StubIdeScope.TextViewFactory =
@@ -66,8 +66,8 @@ public record TaggerSut
 
     private T BuildTagger<T>(DeveroomTaggerProvider taggerProvider) where T : ITagger<DeveroomTag>
     {
-       IdeScope.CreateTextView(new TestText(Array.Empty<string>()),
-                IdeScope.ProjectScopes.Select(p=>p.ProjectFullName).DefaultIfEmpty(string.Empty).Single());
+        IdeScope.CreateTextView(new TestText(Array.Empty<string>()),
+            IdeScope.ProjectScopes.Select(p => p.ProjectFullName).DefaultIfEmpty(string.Empty).Single());
 
         var tagger = (T) taggerProvider.CreateTagger<DeveroomTag>(IdeScope.CurrentTextView.TextBuffer);
 

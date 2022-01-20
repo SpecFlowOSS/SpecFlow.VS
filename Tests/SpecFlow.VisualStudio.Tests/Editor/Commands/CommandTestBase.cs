@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualStudio.Text.Tagging;
-
-#nullable enable
-namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEditorCommandBase
 {

@@ -9,7 +9,7 @@ public class VoidProjectScope : IProjectScope
         ProjectName = string.Empty;
         ProjectFullName = string.Empty;
         ProjectFolder = string.Empty;
-        PackageReferences = ImmutableArray< NuGetPackageReference>.Empty;
+        PackageReferences = ImmutableArray<NuGetPackageReference>.Empty;
         OutputAssemblyPath = string.Empty;
         TargetFrameworkMoniker = string.Empty;
         TargetFrameworkMonikers = string.Empty;
@@ -18,6 +18,7 @@ public class VoidProjectScope : IProjectScope
     }
 
     public PropertyCollection Properties { get; }
+
     public void Dispose()
     {
     }
@@ -32,6 +33,7 @@ public class VoidProjectScope : IProjectScope
     public string TargetFrameworkMonikers { get; }
     public string PlatformTargetName { get; }
     public string DefaultNamespace { get; }
+
     public void AddFile(string targetFilePath, string template)
     {
     }

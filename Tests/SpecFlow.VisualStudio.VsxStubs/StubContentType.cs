@@ -3,7 +3,7 @@
 public record StubContentType(
         IEnumerable<IContentType> BaseTypes,
         string DisplayName,
-        string TypeName) 
+        string TypeName)
     : IContentType
 {
     public bool IsOfType(string type) => type == TypeName;

@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using Microsoft.VisualStudio.Text.Projection;
 
 namespace SpecFlow.VisualStudio.VsxStubs;
 

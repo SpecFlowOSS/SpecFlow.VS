@@ -14,6 +14,8 @@ public class StubProjectBindingRegistryCache : Mock<IProjectBindingRegistryCache
             });
     }
 
+    public bool Processing { get; }
+
     public event EventHandler<EventArgs>? Changed;
 
     public Task Update(Func<ProjectBindingRegistry, ProjectBindingRegistry> updateFunc)
@@ -23,6 +25,5 @@ public class StubProjectBindingRegistryCache : Mock<IProjectBindingRegistryCache
         => Object.Update(updateTask);
 
     public ProjectBindingRegistry Value { get; private set; }
-    public bool Processing { get; }
     public Task<ProjectBindingRegistry> GetLatest() => throw new NotImplementedException();
 }

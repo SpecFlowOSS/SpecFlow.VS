@@ -50,7 +50,7 @@ public record StubTextVersion2(
 
     public ITextVersion CreateNext()
     {
-       Next = this with { VersionNumber = VersionNumber + 1 };
-       return Next;
+        Next = this with {VersionNumber = VersionNumber + 1};
+        return Next;
     }
 }

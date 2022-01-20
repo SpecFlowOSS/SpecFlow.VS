@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using Microsoft.VisualStudio.Text.Formatting;
 
 namespace SpecFlow.VisualStudio.VsxStubs;
 

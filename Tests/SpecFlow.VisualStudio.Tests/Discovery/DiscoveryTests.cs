@@ -28,8 +28,9 @@ public class DiscoveryTests
         var discoveryResultProvider = new StubDiscoveryResultProvider();
 #pragma warning disable VSTHRD002
         projectScope.StubIdeScope
-            .Setup(s => s.FireAndForgetOnBackgroundThread(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<string>()))
-            .Callback((Func<CancellationToken, Task> action, string _) 
+            .Setup(
+                s => s.FireAndForgetOnBackgroundThread(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<string>()))
+            .Callback((Func<CancellationToken, Task> action, string _)
                 => action(projectScope.StubIdeScope.BackgroundTaskTokenSource.Token).Wait());
 #pragma warning restore VSTHRD002
 
@@ -202,14 +203,14 @@ public class DiscoveryTests
     public record Sut(StubProjectBindingRegistryCache BindingRegistryCache, InMemoryStubProjectScope ProjectScope,
         StubDiscoveryResultProvider DiscoveryResultProvider) : IDisposable
     {
-        public DiscoveryService BuildDiscoveryService() =>
-            new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
-
-        internal DiscoveryInvoker BuildDiscoveryInvoker() => new(ProjectScope, DiscoveryResultProvider);
-
         public void Dispose()
         {
             ProjectScope.StubIdeScope.Dispose();
         }
+
+        public DiscoveryService BuildDiscoveryService() =>
+            new(ProjectScope, DiscoveryResultProvider, BindingRegistryCache);
+
+        internal DiscoveryInvoker BuildDiscoveryInvoker() => new(ProjectScope, DiscoveryResultProvider);
     }
 }

@@ -138,7 +138,7 @@ public class ProjectSettingsProvider : IDisposable, IProjectSettingsProvider
         var hasFeatureFiles = (featureFileCount ?? 0) > 0;
         var kind = GetKind(isInvalid, specFlowSettings != null, hasFeatureFiles);
         var platformTarget = GetPlatformTarget(_projectScope.PlatformTargetName);
-        
+
         var targetFrameworkMoniker = TargetFrameworkMoniker.Create(_projectScope.TargetFrameworkMoniker);
 
         var settings = new ProjectSettings(

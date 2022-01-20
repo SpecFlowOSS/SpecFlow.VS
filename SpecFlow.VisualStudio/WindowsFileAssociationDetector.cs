@@ -1,6 +1,4 @@
 ﻿#nullable disable
-using System.Runtime.InteropServices;
-
 namespace SpecFlow.VisualStudio;
 
 public class WindowsFileAssociationDetector

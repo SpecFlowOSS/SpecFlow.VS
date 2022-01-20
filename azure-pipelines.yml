@@ -36,7 +36,7 @@ steps:
   inputs:
     command: test
     projects: '**/*[Tt]ests/*.csproj'
-    arguments: '--configuration $(BuildConfiguration) --no-build'
+    arguments: '--configuration $(BuildConfiguration) --no-build --collect "Code coverage"'
     testRunTitle: Unit Tests
 
 - task: DotNetCoreCLI@2
@@ -46,6 +46,7 @@ steps:
     projects: '**/*[Ss]pecs/*.csproj'
     arguments: '--configuration $(BuildConfiguration) --runtime win-x64'
     testRunTitle: 'Deveroom Specs'
+  condition: succeededOrFailed()
 
 - task: CopyFiles@2
   displayName: 'Copy dlls and changelog'

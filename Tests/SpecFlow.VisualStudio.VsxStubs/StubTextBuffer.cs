@@ -10,11 +10,16 @@ public class StubTextBuffer : Mock<ITextBuffer2>, ITextBuffer2
 
         var contentType = new Mock<IContentType>(MockBehavior.Strict);
         contentType.Setup(t => t.IsOfType(VsContentTypes.FeatureFile)).Returns(true);
-        StubContentType =  new StubContentType(Array.Empty<IContentType>(), VsContentTypes.FeatureFile, VsContentTypes.FeatureFile);
+        StubContentType = new StubContentType(Array.Empty<IContentType>(), VsContentTypes.FeatureFile,
+            VsContentTypes.FeatureFile);
 
         SetupAdd(tb => tb.ChangedOnBackground += It.IsAny<EventHandler<TextContentChangedEventArgs>>());
         SetupRemove(tb => tb.ChangedOnBackground -= It.IsAny<EventHandler<TextContentChangedEventArgs>>());
     }
+
+    public StubContentType StubContentType { get; set; }
+
+    public StubTextSnapshot CurrentStubSnapshot { get; private set; }
 
     public PropertyCollection Properties { get; }
 
@@ -54,7 +59,6 @@ public class StubTextBuffer : Mock<ITextBuffer2>, ITextBuffer2
     public NormalizedSpanCollection GetReadOnlyExtents(Span span) => throw new NotImplementedException();
 
     public IContentType ContentType => StubContentType;
-    public StubContentType StubContentType { get; set; }
     public ITextSnapshot CurrentSnapshot => CurrentStubSnapshot;
     public bool EditInProgress { get; }
     public event EventHandler<SnapshotSpanEventArgs>? ReadOnlyRegionsChanged;
@@ -64,24 +68,27 @@ public class StubTextBuffer : Mock<ITextBuffer2>, ITextBuffer2
     public event EventHandler<TextContentChangingEventArgs>? Changing;
     public event EventHandler? PostChanged;
     public event EventHandler<ContentTypeChangedEventArgs>? ContentTypeChanged;
-    private event EventHandler<TextContentChangedEventArgs>? _changedOnBackground;
+
     public event EventHandler<TextContentChangedEventArgs>? ChangedOnBackground
     {
-        add { 
+        add
+        {
             Object.ChangedOnBackground += value;
             _changedOnBackground += value;
         }
-        remove { 
+        remove
+        {
             Object.ChangedOnBackground -= value;
             _changedOnBackground -= value;
         }
     }
 
-    public StubTextSnapshot CurrentStubSnapshot { get; private set; }
+    private event EventHandler<TextContentChangedEventArgs>? _changedOnBackground;
 
     public void InvokeChanged()
     {
-        Changed?.Invoke(this, new TextContentChangedEventArgs(CurrentSnapshot, CurrentSnapshot, EditOptions.None, string.Empty));
+        Changed?.Invoke(this,
+            new TextContentChangedEventArgs(CurrentSnapshot, CurrentSnapshot, EditOptions.None, string.Empty));
     }
 
     public void InvokeChangedOnBackground()
@@ -90,10 +97,14 @@ public class StubTextBuffer : Mock<ITextBuffer2>, ITextBuffer2
         var afterSnapshot = CurrentStubSnapshot = CurrentStubSnapshot.CreateNext();
 
         //VS invokes this event multiple times for some reason
-        _changedOnBackground?.Invoke(this, new TextContentChangedEventArgs(beforeSnapshot, afterSnapshot, EditOptions.None, string.Empty));
-        _changedOnBackground?.Invoke(this, new TextContentChangedEventArgs(beforeSnapshot, afterSnapshot, EditOptions.None, string.Empty));
-        _changedOnBackground?.Invoke(this, new TextContentChangedEventArgs(beforeSnapshot, afterSnapshot, EditOptions.None, string.Empty));
-        _changedOnBackground?.Invoke(this, new TextContentChangedEventArgs(beforeSnapshot, afterSnapshot, EditOptions.None, string.Empty));
+        _changedOnBackground?.Invoke(this,
+            new TextContentChangedEventArgs(beforeSnapshot, afterSnapshot, EditOptions.None, string.Empty));
+        _changedOnBackground?.Invoke(this,
+            new TextContentChangedEventArgs(beforeSnapshot, afterSnapshot, EditOptions.None, string.Empty));
+        _changedOnBackground?.Invoke(this,
+            new TextContentChangedEventArgs(beforeSnapshot, afterSnapshot, EditOptions.None, string.Empty));
+        _changedOnBackground?.Invoke(this,
+            new TextContentChangedEventArgs(beforeSnapshot, afterSnapshot, EditOptions.None, string.Empty));
     }
 
     public void ModifyContent(string content)

@@ -301,14 +301,12 @@ public class AutoFormatTableCommandTests
         Assert.Equal(expectedText.ToString(configuredNewLine), textView.TextSnapshot.GetText());
     }
 
-    private AutoFormatTableCommand CreateSUT()
-    {
-        return new AutoFormatTableCommand(
+    private AutoFormatTableCommand CreateSUT() =>
+        new(
             _ideScope,
             new StubBufferTagAggregatorFactoryService(_taggerProvider),
             _taggerProvider,
             new GherkinDocumentFormatter(),
             new StubEditorConfigOptionsProvider()
         );
-    }
 }

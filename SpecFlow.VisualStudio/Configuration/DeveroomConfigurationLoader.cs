@@ -8,7 +8,9 @@ public class DeveroomConfigurationLoader
     private readonly IConfigDeserializer<DeveroomConfiguration> _configDeserializer;
     private readonly IFileSystem _fileSystem;
 
-    private DeveroomConfigurationLoader(IConfigDeserializer<DeveroomConfiguration> configDeserializer, IFileSystem fileSystem)
+    private DeveroomConfigurationLoader(
+        IConfigDeserializer<DeveroomConfiguration> configDeserializer,
+        IFileSystem fileSystem)
     {
         _configDeserializer = configDeserializer;
         _fileSystem = fileSystem;

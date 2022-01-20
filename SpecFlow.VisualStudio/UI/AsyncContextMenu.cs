@@ -1,7 +1,5 @@
 ﻿#nullable disable
 
-using System.Windows.Controls;
-
 namespace SpecFlow.VisualStudio.UI;
 
 public class AsyncContextMenu : IAsyncContextMenu

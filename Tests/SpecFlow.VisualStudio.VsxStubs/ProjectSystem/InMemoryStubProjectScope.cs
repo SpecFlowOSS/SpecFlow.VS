@@ -20,13 +20,6 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
     {
     }
 
-    private ProjectScopeDeveroomConfigurationProvider CreateConfigurationProvider()
-    {
-        AddFile(ProjectFullName, "<Project Sdk=\"Microsoft.NET.Sdk\"></Project>");
-        var configProvider = new ProjectScopeDeveroomConfigurationProvider(this);
-        return configProvider;
-    }
-
     public StubIdeScope StubIdeScope { get; }
     public StubProjectSettingsProvider StubProjectSettingsProvider { get; }
     public Dictionary<string, string> FilesAdded { get; } = new();
@@ -66,6 +59,13 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
 
     public void Dispose()
     {
+    }
+
+    private ProjectScopeDeveroomConfigurationProvider CreateConfigurationProvider()
+    {
+        AddFile(ProjectFullName, "<Project Sdk=\"Microsoft.NET.Sdk\"></Project>");
+        var configProvider = new ProjectScopeDeveroomConfigurationProvider(this);
+        return configProvider;
     }
 
     public void AddSpecFlowPackage()

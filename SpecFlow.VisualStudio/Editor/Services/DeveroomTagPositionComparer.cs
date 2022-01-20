@@ -8,7 +8,7 @@ internal class DeveroomTagPositionComparer : IComparer<DeveroomTag>
         if (ReferenceEquals(null, t2)) return 1;
         if (ReferenceEquals(null, t1)) return -1;
         var order = t1.Span.Start.Position.CompareTo(t2.Span.Start.Position);
-        if (order !=0) return order;
+        if (order != 0) return order;
         order = t1.Span.End.Position.CompareTo(t2.Span.End.Position);
         if (order != 0) return order;
         order = string.Compare(t1.Type, t2.Type, StringComparison.Ordinal);

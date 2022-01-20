@@ -1,7 +1,5 @@
 ﻿#nullable disable
 
-using System.ComponentModel;
-
 namespace SpecFlow.VisualStudio.UI.ViewModels;
 
 public class RenameStepViewModel : INotifyPropertyChanged

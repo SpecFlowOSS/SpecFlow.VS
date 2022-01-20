@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.Text.Formatting;
-
-namespace SpecFlow.VisualStudio.Editor.Completions;
+﻿namespace SpecFlow.VisualStudio.Editor.Completions;
 
 [Export(typeof(IDeveroomFeatureEditorCommand))]
 public class CompleteCommand : CompletionCommandBase, IDeveroomFeatureEditorCommand

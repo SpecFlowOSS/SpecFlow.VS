@@ -19,7 +19,8 @@ public class DeveroomXUnitLogger : IDeveroomLogger
     {
         if (message.Level > Level) return;
 
-        var content = $"{Interlocked.Increment(ref _order):0000} {_stopwatch.Elapsed:m\\:ss\\.ffffff} {message.Level,5} {message.ManagedThreadId,5}  {message.CallerMethod}:{message.Message}";
+        var content =
+            $"{Interlocked.Increment(ref _order):0000} {_stopwatch.Elapsed:m\\:ss\\.ffffff} {message.Level,5} {message.ManagedThreadId,5}  {message.CallerMethod}:{message.Message}";
         if (message.Exception != null) content += $"{Environment.NewLine}{message.Exception}";
 
         _testOutputHelper.WriteLine(content);
