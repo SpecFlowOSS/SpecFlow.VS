@@ -17,7 +17,7 @@ public class StubCompletionSession : ICompletionSession
     public PropertyCollection Properties { get; } = new();
     public ITextView TextView { get; }
     public IIntellisensePresenter Presenter { get; }
-    public bool IsDismissed { get; }
+    public bool IsDismissed { get; private set; }
     public ReadOnlyObservableCollection<CompletionSet> CompletionSets { get; }
 
     public CompletionSet SelectedCompletionSet
@@ -45,7 +45,7 @@ public class StubCompletionSession : ICompletionSession
 
     public void Dismiss()
     {
-        throw new NotImplementedException();
+        IsDismissed = true;
     }
 
     public void Recalculate()

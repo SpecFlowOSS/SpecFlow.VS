@@ -17,8 +17,6 @@ public class StubBufferTagAggregatorFactoryService : IBufferTagAggregatorFactory
         if (typeof(T) == typeof(DeveroomTag))
         {
             var tagger = _taggerProvider.CreateTagger<DeveroomTag>(textBuffer);
-            if (tagger is DeveroomTagger deveroomTagger)
-                deveroomTagger.InvalidateCache();
 
             return new StubTagAggregator<T>((ITagger<T>) tagger,
                 VsxStubObjects.BufferGraphFactoryService.CreateBufferGraph(textBuffer));

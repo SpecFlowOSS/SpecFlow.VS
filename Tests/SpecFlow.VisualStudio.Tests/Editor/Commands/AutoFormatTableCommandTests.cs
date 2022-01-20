@@ -1,5 +1,4 @@
-﻿#nullable disable
-namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 
 public class AutoFormatTableCommandTests
 {
@@ -13,7 +12,7 @@ public class AutoFormatTableCommandTests
         @"");
 
     private readonly StubIdeScope _ideScope;
-    private readonly DeveroomTaggerProvider _taggerProvider;
+    private readonly IDeveroomTaggerProvider _taggerProvider;
 
     private readonly TestText _unformattedText = new(
         @"Feature: foo", //12+2
@@ -304,12 +303,12 @@ public class AutoFormatTableCommandTests
 
     private AutoFormatTableCommand CreateSUT()
     {
-        var taggerProvider = new DeveroomTaggerProvider(_ideScope);
         return new AutoFormatTableCommand(
             _ideScope,
-            new StubBufferTagAggregatorFactoryService(taggerProvider),
-            taggerProvider,
-            new GherkinDocumentFormatter()
+            new StubBufferTagAggregatorFactoryService(_taggerProvider),
+            _taggerProvider,
+            new GherkinDocumentFormatter(),
+            new StubEditorConfigOptionsProvider()
         );
     }
 }

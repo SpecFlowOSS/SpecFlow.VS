@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.Editor.Completions;
+﻿using Microsoft.VisualStudio.Text.Formatting;
+
+namespace SpecFlow.VisualStudio.Editor.Completions;
 
 [Export(typeof(IDeveroomFeatureEditorCommand))]
 public class CompleteCommand : CompletionCommandBase, IDeveroomFeatureEditorCommand
@@ -15,20 +17,23 @@ public class CompleteCommand : CompletionCommandBase, IDeveroomFeatureEditorComm
 
     protected override bool ShouldStartSessionOnTyping(IWpfTextView textView, char? ch, bool isSessionActive)
     {
+        var caretBufferPosition = textView.Caret.Position.BufferPosition;
+        var line = caretBufferPosition.GetContainingLine();
+
         if (ch == null || char.IsWhiteSpace(ch.Value))
         {
             var showStepCompletionAfterStepKeywords =
                 GetConfiguration(textView).Editor.ShowStepCompletionAfterStepKeywords;
+            var containingText = line.GetText();
+
             if (showStepCompletionAfterStepKeywords &&
-                GetDeveroomTagForCaret(textView, DeveroomTagTypes.StepKeyword) != null)
+                Regex.IsMatch(containingText, "^\\s*\\S+\\s$") &&
+                GetDeveroomTagForCaret(textView, DeveroomTagTypes.StepKeyword) != VoidDeveroomTag.Instance)
                 return true;
         }
 
         if (ch == null || ch == '|' || ch == '#' || ch == '*' || ch == '@' || isSessionActive)
             return false;
-
-        var caretBufferPosition = textView.Caret.Position.BufferPosition;
-        var line = caretBufferPosition.GetContainingLine();
 
         if (caretBufferPosition == line.Start)
             return false; // we are at the beginning of a line (after an enter?)

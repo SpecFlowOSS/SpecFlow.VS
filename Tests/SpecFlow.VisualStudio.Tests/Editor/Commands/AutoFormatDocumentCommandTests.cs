@@ -1,6 +1,4 @@
-﻿#nullable disable
-
-namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
+﻿namespace SpecFlow.VisualStudio.Tests.Editor.Commands;
 // See Gherkin formatting tests also in GherkinDocumentFormatterTests
 
 public class AutoFormatDocumentCommandTests
@@ -18,7 +16,8 @@ public class AutoFormatDocumentCommandTests
         _ideScope,
         new StubBufferTagAggregatorFactoryService(_deveroomTaggerProvider),
         _deveroomTaggerProvider,
-        new GherkinDocumentFormatter()
+        new GherkinDocumentFormatter(),
+        new StubEditorConfigOptionsProvider()
     );
 
     private StubWpfTextView CreateTextView(TestText inputText) =>

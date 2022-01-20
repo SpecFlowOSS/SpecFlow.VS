@@ -49,31 +49,29 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
 
     protected DeveroomTag GetDeveroomTagForCaret(IWpfTextView textView, params string[] tagTypes)
     {
-        var tagger = DeveroomTaggerProvider.CreateTagger<DeveroomTag>(textView.TextBuffer) as DeveroomTagger;
-        var tag = DumpDeveroomTags(tagger.GetDeveroomTagsForCaret(textView))
-            .FirstOrDefault(t => tagTypes.Contains(t.Type));
-        if (tag != null &&
-            tag.Span.Snapshot.Version.VersionNumber != textView.TextSnapshot.Version.VersionNumber)
-        {
-            Logger.LogVerbose("Snapshot version mismatch");
-            tagger.InvalidateCache();
-            tag = DumpDeveroomTags(tagger.GetDeveroomTagsForCaret(textView))
-                .FirstOrDefault(t => tagTypes.Contains(t.Type));
-        }
+        var tagger = DeveroomTaggerProvider.CreateTagger<DeveroomTag>(textView.TextBuffer);
+        var caretSpan = new SnapshotSpan(textView.Caret.Position.BufferPosition, 0);
+        var tags = tagger.GetUpToDateDeveroomTagsForSpan(caretSpan);
+
+        var tag = DumpDeveroomTags(tags)
+            .Where(t => tagTypes.Contains(t.Tag.Type))
+            .Select(t => t.Tag)
+            .DefaultIfEmpty(VoidDeveroomTag.Instance)
+            .First();
 
         return tag;
     }
 
-    protected IEnumerable<DeveroomTag> DumpDeveroomTags(IEnumerable<ITagSpan<DeveroomTag>> deveroomTags)
+    protected IEnumerable<ITagSpan<DeveroomTag>> DumpDeveroomTags(IEnumerable<ITagSpan<DeveroomTag>> deveroomTags)
     {
 #if DEBUG
         foreach (var deveroomTag in deveroomTags)
         {
-            Logger.LogVerbose($"  Tag: {deveroomTag.Tag.Type}");
-            yield return deveroomTag.Tag;
+            Logger.LogVerbose($"  Tag: {deveroomTag.Tag.Type} @ {deveroomTag.Span}");
+            yield return deveroomTag;
         }
 #else
-            return deveroomTags.Select(t=>t.Tag);
+            return deveroomTags;
 #endif
     }
 
@@ -146,19 +144,17 @@ public abstract class DeveroomEditorCommandBase : IDeveroomEditorCommand
     protected string GetNewLine(IWpfTextView textView)
     {
         // based on EditorOperations.InsertNewLine()
-        string newLineString = null;
         if (textView.Options.GetReplicateNewLineCharacter())
         {
             var caretLine = textView.Caret.Position.BufferPosition.GetContainingLine();
             if (caretLine.LineBreakLength > 0)
-                newLineString = caretLine.GetLineBreakText();
-            else if (textView.TextSnapshot.LineCount > 1)
-                newLineString = textView.TextSnapshot.GetLineFromLineNumber(textView.TextSnapshot.LineCount - 2)
+                return caretLine.GetLineBreakText();
+            if (textView.TextSnapshot.LineCount > 1)
+                return textView.TextSnapshot.GetLineFromLineNumber(textView.TextSnapshot.LineCount - 2)
                     .GetLineBreakText();
         }
 
-        newLineString = newLineString ?? textView.Options.GetNewLineCharacter();
-        return newLineString;
+        return textView.Options.GetNewLineCharacter();
     }
 
     #endregion

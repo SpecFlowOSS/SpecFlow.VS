@@ -233,11 +233,15 @@ public class DeveroomTagParser : IDeveroomTagParser
     }
 
     private DeveroomTag CreateDefinitionBlockTag(IHasDescription astNode, string tagType, ITextSnapshot fileSnapshot,
-        int lastLine, DeveroomTag parentTag = null)
+        int lastLine)
+        => CreateDefinitionBlockTag(astNode, tagType, fileSnapshot, lastLine, VoidDeveroomTag.Instance);
+
+    private DeveroomTag CreateDefinitionBlockTag(IHasDescription astNode, string tagType, ITextSnapshot fileSnapshot,
+        int lastLine, DeveroomTag parentTag)
     {
         var span = GetBlockSpan(fileSnapshot, ((IHasLocation) astNode).Location, lastLine);
         var blockTag = new DeveroomTag(tagType, span, astNode);
-        parentTag?.AddChild(blockTag);
+        parentTag.AddChild(blockTag);
         blockTag.AddChild(CreateDefinitionLineKeyword(fileSnapshot, astNode));
         if (astNode is IHasTags hasTags)
             foreach (var gherkinTag in hasTags.Tags)

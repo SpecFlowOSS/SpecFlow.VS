@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace SpecFlow.VisualStudio.Editor.Traceability;
+﻿namespace SpecFlow.VisualStudio.Editor.Traceability;
 
 [Export(typeof(ITaggerProvider))]
 [ContentType(VsContentTypes.FeatureFile)]

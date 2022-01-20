@@ -1,7 +1,4 @@
-﻿#nullable disable
-using SpecFlow.VisualStudio.Editor.Services.EditorConfig;
-
-namespace SpecFlow.VisualStudio.Editor.Services.Formatting;
+﻿namespace SpecFlow.VisualStudio.Editor.Services.Formatting;
 
 public class GherkinFormatSettings
 {
@@ -27,12 +24,12 @@ public class GherkinFormatSettings
     public string TableCellPadding => new(' ', Configuration.TableCellPaddingSize);
 
 
-    public static GherkinFormatSettings Load(EditorConfigOptionsProvider editorConfigOptionsProvider,
+    public static GherkinFormatSettings Load(IEditorConfigOptionsProvider editorConfigOptionsProvider,
         IWpfTextView textView, DeveroomConfiguration configuration)
     {
         var gherkinFormatConfiguration = configuration?.Editor?.GherkinFormat ?? new GherkinFormatConfiguration();
 
-        var editorConfigOptions = editorConfigOptionsProvider?.GetEditorConfigOptions(textView);
+        var editorConfigOptions = editorConfigOptionsProvider.GetEditorConfigOptions(textView);
         editorConfigOptions.UpdateFromEditorConfig(gherkinFormatConfiguration);
 
         var editorOptions = textView.Options;

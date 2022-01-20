@@ -32,8 +32,6 @@ public class GoToStepDefinitionCommand : DeveroomEditorCommandBase, IDeveroomFea
         var textBuffer = textView.TextBuffer;
 
         var stepTag = GetDeveroomTagForCaret(textView, DeveroomTagTypes.StepBlock);
-        if (stepTag == null)
-            return false;
 
         var matchedStepTag = stepTag.ChildTags.FirstOrDefault(t =>
             t.Type == DeveroomTagTypes.DefinedStep || t.Type == DeveroomTagTypes.UndefinedStep);
