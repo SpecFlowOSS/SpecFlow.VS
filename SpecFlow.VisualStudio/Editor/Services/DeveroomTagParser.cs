@@ -30,8 +30,8 @@ public class DeveroomTagParser : IDeveroomTagParser
 
         try
         {
-        var configuration = _deveroomConfigurationProvider.GetConfiguration();
-        var bindingRegistry = _discoveryService.BindingRegistryCache.Value;
+            var configuration = _deveroomConfigurationProvider.GetConfiguration();
+            var bindingRegistry = _discoveryService.BindingRegistryCache.Value;
             return ParseInternal(fileSnapshot, bindingRegistry, configuration);
         }
         catch (Exception ex)
@@ -177,8 +177,7 @@ public class DeveroomTagParser : IDeveroomTagParser
                     match));
                 if (!(scenarioDefinition is ScenarioOutline) || !step.Text.Contains("<"))
                 {
-                    var parameterMatch = match.Items.FirstOrDefault(m => m.ParameterMatch != null)
-                        ?.ParameterMatch;
+                    var parameterMatch = match.Items.First(m => m.ParameterMatch != null).ParameterMatch;
                     AddParameterTags(fileSnapshot, parameterMatch, stepTag, step);
                 }
             }

@@ -4,38 +4,37 @@ public class StubProjectSettingsProvider : Mock<IProjectSettingsProvider>, IProj
 {
     public StubProjectSettingsProvider(InMemoryStubProjectScope inMemoryStubProjectScope) : base(MockBehavior.Strict)
     {
-        OutputAssemblyPath = inMemoryStubProjectScope.OutputAssemblyPath;
-        SpecFlowVersion = new NuGetVersion("3.9.40", "3.9.40");
-        SpecFlowGeneratorFolder = string.Empty;
-        SpecFlowConfigFilePath = string.Empty;
-        Setup(p => p.GetProjectSettings())
-            .Returns(() => new ProjectSettings(Kind, OutputAssemblyPath, TargetFrameworkMoniker,
-                TargetFrameworkMonikers,
-                PlatformTarget, DefaultNamespace, SpecFlowVersion, SpecFlowGeneratorFolder, SpecFlowConfigFilePath,
-                SpecFlowProjectTraits, ProjectFullName));
+        ProjectSettings = new ProjectSettings(
+            DeveroomProjectKind.SpecFlowTestProject,
+            TargetFrameworkMoniker.CreateFromShortName("net6"),
+            $"{TargetFrameworkMoniker.CreateFromShortName("net6").Value};{TargetFrameworkMoniker.CreateFromShortName("net48").Value}",
+            ProjectPlatformTarget.AnyCpu,
+            inMemoryStubProjectScope.OutputAssemblyPath,
+            "TestProject",
+            new NuGetVersion("3.9.40", "3.9.40"),
+            string.Empty,
+            string.Empty,
+            SpecFlowProjectTraits.None,
+            ProjectProgrammingLanguage.CSharp
+        );
+
+        Setup(p => p.GetProjectSettings()).Returns(() => ProjectSettings);
+        Setup(p => p.CheckProjectSettings()).Returns(() => ProjectSettings);
     }
 
-    public DeveroomProjectKind Kind { get; set; } = DeveroomProjectKind.SpecFlowTestProject;
+    private ProjectSettings ProjectSettings { get; set; }
 
-    public TargetFrameworkMoniker TargetFrameworkMoniker { get; set; } =
-        TargetFrameworkMoniker.CreateFromShortName("net6");
+    public DeveroomProjectKind Kind
+    {
+        get => ProjectSettings.Kind;
+        set => ProjectSettings = ProjectSettings with {Kind = value};
+    }
 
-    public string TargetFrameworkMonikers { get; set; } =
-        $"{TargetFrameworkMoniker.CreateFromShortName("net6").Value};{TargetFrameworkMoniker.CreateFromShortName("net48").Value}";
-
-    public ProjectPlatformTarget PlatformTarget { get; set; } = ProjectPlatformTarget.AnyCpu;
-    public string OutputAssemblyPath { get; set; }
-    public string DefaultNamespace { get; set; } = "TestProject";
-    public NuGetVersion SpecFlowVersion { get; set; }
-    public string SpecFlowGeneratorFolder { get; set; }
-    public string SpecFlowConfigFilePath { get; set; }
-    public SpecFlowProjectTraits SpecFlowProjectTraits { get; set; }
-    public string ProjectFullName { get; set; } = "Test Project.csproj";
     public event EventHandler<EventArgs>? WeakSettingsInitialized;
     public event EventHandler<EventArgs>? SettingsInitialized;
-    public ProjectSettings GetProjectSettings() => Object.GetProjectSettings();
 
-    public ProjectSettings CheckProjectSettings() => throw new NotImplementedException();
+    public ProjectSettings GetProjectSettings() => Object.GetProjectSettings();
+    public ProjectSettings CheckProjectSettings() => Object.CheckProjectSettings();
 
     public void InvokeWeakSettingsInitializedEvent()
     {

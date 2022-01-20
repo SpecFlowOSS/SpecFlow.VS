@@ -4,6 +4,8 @@ public class ProjectBindingRegistryCacheTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
 
+    private volatile int _updateTaskCount;
+
     public ProjectBindingRegistryCacheTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
@@ -65,8 +67,8 @@ public class ProjectBindingRegistryCacheTests
         cache.Value.Should().BeSameAs(bindingRegistry);
     }
 
-    [Fact(Skip = "Sporadically fails on Azure")]
-    public async Task ParallelUpdate()
+    [Fact]
+    public void ParallelUpdate()
     {
         //arrange
         var start = DateTimeOffset.UtcNow;
@@ -84,48 +86,27 @@ public class ProjectBindingRegistryCacheTests
         var oldVersions = new ConcurrentQueue<int>();
         var initialRegistry = new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(), 123456);
 
-        //act
-        var updateTaskCount = 0;
         var timeout = TimeSpan.FromSeconds(20);
-        var cts = new CancellationTokenSource(timeout);
+        using var cts = new CancellationTokenSource(timeout);
         int i = 0;
+        var taskCreationOptions = TaskCreationOptions.LongRunning | TaskCreationOptions.DenyChildAttach | TaskCreationOptions.HideScheduler;
+        
+        WarmUpThreads(logger, timeout);
+        
+        //act
         try
         {
-            RunInThread(async () =>
-            {
-                var priorVer = 0;
-                while (!cts.IsCancellationRequested)
-                {
-                    var bindingRegistry = await projectBindingRegistryCache.GetLatest();
-                    priorVer.Should().BeLessOrEqualTo(bindingRegistry.Version);
-                    priorVer = bindingRegistry.Version;
-                    await Task.Delay(10, cts.Token);
-                }
-            }, cts.Token);
+            Task.Factory.StartNew(async () => { await GetLatestInvoker(cts, projectBindingRegistryCache); }, cts.Token,
+                taskCreationOptions, TaskScheduler.Default);
 
             for (i = 0; i < 1000 && !cts.IsCancellationRequested; ++i)
             {
-                RunInThread(async () =>
-                {
-                    while (!cts.IsCancellationRequested)
-                    {
-                        Interlocked.Increment(ref updateTaskCount);
-                        await projectBindingRegistryCache.Update(async old =>
-                        {
-                            await Task.Yield();
-                            oldVersions.Enqueue(old.Version);
-                            return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(),
-                                Guid.NewGuid().GetHashCode());
-                        });
-
-
-                        await Task.Yield();
-
-                        if (stubLogger.Logs.Any(log => log.Message.Contains("in 2 iteration")))
-                            cts.Cancel();
-                    }
-                }, cts.Token);
-                await Task.Delay(i / 10, cts.Token);
+                Task.Factory.StartNew(
+                    async () => { await InvokeUpdate(cts, projectBindingRegistryCache, oldVersions, stubLogger); },
+                    cts.Token, taskCreationOptions, TaskScheduler.Default);
+#pragma warning disable VSTHRD002
+                Task.Delay(i / 10, cts.Token).Wait(cts.Token);
+#pragma warning restore
             }
         }
         catch (OperationCanceledException e)
@@ -134,32 +115,67 @@ public class ProjectBindingRegistryCacheTests
         }
 
         //assert
-        var finish = DateTimeOffset.UtcNow;
-        _testOutputHelper.WriteLine($"i:{i} cancelled:{cts.IsCancellationRequested}");
-        (finish - start).Should().BeLessThan(timeout, $"started at {start} and not finished until {finish}");
-        var registry = await projectBindingRegistryCache.GetLatest();
-        registry.Should().BeSameAs(projectBindingRegistryCache.Value);
-        registry.Version.Should().BeGreaterOrEqualTo(initialRegistry.Version + updateTaskCount);
-        oldVersions.Count.Should().Be(updateTaskCount);
+        var elapsed = DateTimeOffset.UtcNow - start;
+        _testOutputHelper.WriteLine($"i:{i} cancelled:{cts.IsCancellationRequested} elapsed:{elapsed}");
+#pragma warning disable VSTHRD002
+        var cachedRegistry = projectBindingRegistryCache.Value;
+        var registry = projectBindingRegistryCache.GetLatest().Result;
+#pragma warning restore
+        registry.Version.Should().BeGreaterOrEqualTo(cachedRegistry.Version, "cached value is modified at the end of the update");
+        registry.Version.Should().BeGreaterOrEqualTo(initialRegistry.Version + _updateTaskCount);
+
+        oldVersions.Count.Should().BeGreaterOrEqualTo(_updateTaskCount);
         oldVersions.Should().BeInAscendingOrder();
     }
 
-    private void RunInThread(Func<Task> action, CancellationToken ct)
+    private static void WarmUpThreads(DeveroomCompositeLogger logger, TimeSpan timeout)
     {
-        var thread = new Thread(_ =>
+        logger.LogInfo("Warming up threads");
+
+        var w = new CountdownEvent(100);
+        for (int i = 0; i < w.InitialCount; ++i)
+            new Thread(_ => { w.Signal(); }).Start();
+
+        w.Wait(timeout).Should()
+            .BeTrue(
+                $"Warmup has to be completed while there are {w.CurrentCount} threads left.");
+        logger.LogInfo("Warmup done");
+    }
+
+    private static async Task GetLatestInvoker(CancellationTokenSource cts,
+        ProjectBindingRegistryCache projectBindingRegistryCache)
+    {
+        var priorVer = 0;
+        while (!cts.IsCancellationRequested)
         {
-            try
+            var bindingRegistry = await projectBindingRegistryCache.GetLatest();
+            priorVer.Should().BeLessOrEqualTo(bindingRegistry.Version);
+            priorVer = bindingRegistry.Version;
+            await Task.Delay(10, cts.Token);
+        }
+    }
+
+    private async Task InvokeUpdate(CancellationTokenSource cts,
+        ProjectBindingRegistryCache projectBindingRegistryCache,
+        ConcurrentQueue<int> oldVersions, StubLogger stubLogger)
+    {
+        while (!cts.IsCancellationRequested)
+        {
+            await projectBindingRegistryCache.Update(async old =>
             {
-#pragma warning disable VSTHRD002
-                action().Wait(ct);
-#pragma warning restore
-            }
-            catch (Exception e)
-            {
-                _testOutputHelper.WriteLine(e.ToString());
-            }
-        }) {IsBackground = true, Priority = ThreadPriority.Highest};
-        thread.Start();
+                await Task.Yield();
+                oldVersions.Enqueue(old.Version);
+                return new ProjectBindingRegistry(Array.Empty<ProjectStepDefinitionBinding>(),
+                    Guid.NewGuid().GetHashCode());
+            });
+
+            Interlocked.Increment(ref _updateTaskCount);
+
+            await Task.Yield();
+
+            if (stubLogger.Logs.Any(log => log.Message.Contains("in 2 iteration")))
+                cts.Cancel();
+        }
     }
 
     private class TestProjectStepDefinitionBinding : ProjectStepDefinitionBinding

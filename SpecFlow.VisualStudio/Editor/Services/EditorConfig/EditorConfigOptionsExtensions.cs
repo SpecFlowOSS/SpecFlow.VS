@@ -20,8 +20,6 @@ public static class EditorConfigOptionsExtensions
     public static void UpdateFromEditorConfig<TConfig>(this IEditorConfigOptions editorConfigOptions, TConfig config)
     {
         if (config == null) throw new ArgumentNullException(nameof(config));
-        if (editorConfigOptions == null)
-            return;
 
         var propertiesWithEditorConfig = typeof(TConfig)
             .GetProperties(BindingFlags.Instance | BindingFlags.Public)

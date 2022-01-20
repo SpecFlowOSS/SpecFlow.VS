@@ -1,5 +1,4 @@
-﻿@focus
-Feature: RenameStepsCommand
+﻿Feature: RenameStepsCommand
 
 Rule: Simple parameterless step definition can be renamed
 

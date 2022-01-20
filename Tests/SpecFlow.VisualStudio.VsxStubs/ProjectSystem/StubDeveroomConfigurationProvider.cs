@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
 public class StubDeveroomConfigurationProvider : IDeveroomConfigurationProvider
@@ -11,11 +9,12 @@ public class StubDeveroomConfigurationProvider : IDeveroomConfigurationProvider
         _configuration = configuration;
     }
 
-    public event EventHandler<EventArgs> WeakConfigurationChanged
-    {
-        add { }
-        remove { }
-    }
+    public event EventHandler<EventArgs>? WeakConfigurationChanged;
 
     public DeveroomConfiguration GetConfiguration() => _configuration;
+
+    public void InvokeWeakConfigurationChanged()
+    {
+        WeakConfigurationChanged?.Invoke(this, EventArgs.Empty);
+    }
 }
