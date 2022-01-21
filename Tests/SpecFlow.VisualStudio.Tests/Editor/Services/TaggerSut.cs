@@ -64,7 +64,7 @@ public record TaggerSut(InMemoryStubProjectScope ProjectScope, Mock<IDeveroomTag
     private T BuildTagger<T>(DeveroomTaggerProvider taggerProvider) where T : ITagger<DeveroomTag>
     {
         IdeScope.CreateTextView(new TestText(Array.Empty<string>()),
-            IdeScope.ProjectScopes.Single().ProjectFullPath);
+            IdeScope.ProjectScopes.Single().ProjectFullName);
 
         var tagger = (T) taggerProvider.CreateTagger<DeveroomTag>(IdeScope.CurrentTextView.TextBuffer);
 

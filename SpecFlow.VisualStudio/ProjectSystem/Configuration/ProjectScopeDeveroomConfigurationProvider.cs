@@ -124,14 +124,15 @@ public class ProjectScopeDeveroomConfigurationProvider : IDeveroomConfigurationP
     private string GetAppConfigPathFromProject()
     {
         var projectFilePath = _projectScope.ProjectFullName;
-        XElement csProjXElement = XElement.Load(projectFilePath);
+        using var configFile = FileSystem.File.OpenRead(_projectScope.ProjectFullName);
+        XElement csProjXElement = XElement.Load(configFile);
 
         string appConfigPath = csProjXElement
             .Element("PropertyGroup")?
             .Element("AppConfig")?
             .Value;
         if (!string.IsNullOrEmpty(appConfigPath) && !Path.IsPathRooted(appConfigPath))
-            appConfigPath = Path.Combine(Path.GetDirectoryName(projectFilePath), appConfigPath);
+            appConfigPath = Path.Combine(Path.GetDirectoryName(projectFilePath)!, appConfigPath);
 
         return appConfigPath;
     }
@@ -262,4 +263,7 @@ public class ProjectScopeDeveroomConfigurationProvider : IDeveroomConfigurationP
             UrlTemplate = projectUrl + "/_workitems/edit/{id}"
         });
     }
+
+    public override string ToString() =>
+        $"{nameof(ProjectScopeDeveroomConfigurationProvider)}({string.Join(",", _configCache.ConfigSources.Select(cs => cs.ToString()))})";
 }

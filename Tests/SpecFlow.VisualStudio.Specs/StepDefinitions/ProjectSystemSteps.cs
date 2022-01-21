@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace SpecFlow.VisualStudio.Specs.StepDefinitions;
@@ -31,6 +32,14 @@ public class ProjectSystemSteps : Steps
     {
         _projectScope = new InMemoryStubProjectScope(_ideScope);
         _projectScope.AddSpecFlowPackage();
+        _discoveryService = MockableDiscoveryService.Setup(_projectScope, TimeSpan.FromMilliseconds(100));
+    }
+
+    [Given("there is a non-SpecFlow project scope")]
+    public void GivenThereIsANon_SpecFlowProjectScope()
+    {
+        _projectScope = new InMemoryStubProjectScope(_ideScope);
+        _projectScope.StubProjectSettingsProvider.Kind = DeveroomProjectKind.FeatureFileContainerProject;
         _discoveryService = MockableDiscoveryService.Setup(_projectScope, TimeSpan.FromMilliseconds(100));
     }
 
@@ -69,27 +78,34 @@ public class ProjectSystemSteps : Steps
         _projectScope.AddFile(filePath, string.Empty);
     }
 
+    [When("the specflow.json configuration file is updated to")]
+    public void WhenTheSpecFlowJsonConfigurationFileContains(string configFileContent)
+    {
+        var configFileName = "specflow.json";
+        _projectScope.UpdateConfigFile(configFileName, configFileContent);
+    }
+
     [Given(@"the specflow.json configuration file contains")]
     public void GivenTheSpecFlowJsonConfigurationFileContains(string configFileContent)
     {
-        ProjectScopeDeveroomConfigurationProvider.UpdateFromSpecFlowJsonConfig(_projectScope.DeveroomConfiguration,
-            configFileContent, _projectScope.ProjectFolder);
-        _projectScope.DeveroomConfiguration.CheckConfiguration();
-        _projectScope.DeveroomConfiguration.ConfigurationChangeTime = DateTime.Now;
+        var configFileName = "specflow.json";
+        _projectScope
+            .UpdateConfigFile(configFileName, configFileContent)
+            .Build();
     }
 
     [Given(@"the project is configured for SpecSync with Azure DevOps project URL ""([^""]*)""")]
-    public void GivenTheProjectIsConfiguredForSpecSyncWithAzureDevOpsProjectURL(string projectUrl)
+    public void GivenTheProjectIsConfiguredForSpecSyncWithAzureDevOpsProjectUrl(string projectUrl)
     {
         string specSyncConfigFileContent = @"{
                     'remote': {
                         'projectUrl': '" + projectUrl + @"',
                     }
                 }";
-        ProjectScopeDeveroomConfigurationProvider.UpdateFromSpecSyncJsonConfig(_projectScope.DeveroomConfiguration,
-            specSyncConfigFileContent);
-        _projectScope.DeveroomConfiguration.CheckConfiguration();
-        _projectScope.DeveroomConfiguration.ConfigurationChangeTime = DateTime.Now;
+
+        _projectScope
+            .UpdateConfigFile("specsync.json", specSyncConfigFileContent)
+            .Build();
     }
 
     [When(@"a new step definition is added to the project as:")]
@@ -222,13 +238,23 @@ public class ProjectSystemSteps : Steps
     [Given("the project is built and the initial binding discovery is performed")]
     public async Task GivenTheProjectIsBuiltAndTheInitialBindingDiscoveryIsPerformed()
     {
+        var tagChanged = new AsyncManualResetEvent();
+        var taggerProvider = new DeveroomTaggerProvider(_ideScope);
+        var tagger = taggerProvider.CreateTagger<DeveroomTag>(_ideScope.CurrentTextView.TextBuffer);
+        tagger.TagsChanged += TaggerOnTagsChanged;
+
         using var cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
         var bindingRegistryChanged = new AsyncManualResetEvent();
         _discoveryService.BindingRegistryCache.Changed += (_, _) => bindingRegistryChanged.Set();
         WhenTheProjectIsBuilt();
         await bindingRegistryChanged.WaitAsync(cts.Token);
-    }
+        await tagChanged.WaitAsync(cts.Token);
 
+        void TaggerOnTagsChanged(object sender, SnapshotSpanEventArgs e)
+        {
+            tagChanged.Set();
+        }
+    }
 
     [Given(@"the following feature file ""([^""]*)""")]
     public void GivenTheFollowingFeatureFile(string fileName, string fileContent)
@@ -254,6 +280,7 @@ public class ProjectSystemSteps : Steps
             _ideScope.CreateTextView(new TestText(featureFileContent), filePath) as
                 StubWpfTextView;
         GivenTheFollowingFeatureFile(fileName, _wpfTextView.TextBuffer.CurrentSnapshot.GetText());
+        CreateTagAggregator();
     }
 
     [When(@"I invoke the ""(.*)"" command by typing ""(.*)""")]
@@ -494,6 +521,27 @@ public class ProjectSystemSteps : Steps
 
         matchedTags.Should().BeEmpty();
     }
+
+    [Then("all section of types (.*) should be eventually highlighted as")]
+    public void ThenAllSectionOfTypesStepKeywordDefinitionLineKeywordShouldBeEventuallyHighlightedAs(string[] keywordTypes, string expectedContent)
+    {
+        AutoResetEvent tagsChangedEvent = new(false);
+        var tagger = CreateTaggerProvider().CreateTagger<DeveroomTag>(_wpfTextView.TextBuffer);
+        tagger.TagsChanged += (sender, args) =>
+        {
+            tagsChangedEvent.Set();
+        };
+        try
+        {
+            ThenAllSectionOfTypesShouldBeHighlightedAs(keywordTypes, expectedContent);
+            return;
+        }
+        catch { }
+
+        tagsChangedEvent.WaitOne(DebuggableCancellationTokenSource.GetDebuggerTimeout(TimeSpan.FromSeconds(3)));
+        ThenAllSectionOfTypesShouldBeHighlightedAs(keywordTypes, expectedContent);
+    }
+
 
     private ITagAggregator<DeveroomTag> CreateTagAggregator()
     {

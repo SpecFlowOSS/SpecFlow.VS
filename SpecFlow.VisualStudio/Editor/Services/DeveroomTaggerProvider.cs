@@ -28,7 +28,9 @@ public class DeveroomTaggerProvider : IDeveroomTaggerProvider
         var project = _ideScope.GetProject(buffer);
         var discoveryService = project.GetDiscoveryService();
         var tagParser = project.GetDeveroomTagParser();
-        var featureFileTagger = new FeatureFileTagger(discoveryService, _ideScope.Logger, tagParser, buffer);
+        var configurationProvider = project.GetDeveroomConfigurationProvider();
+        var featureFileTagger =
+            new FeatureFileTagger(configurationProvider, discoveryService, _ideScope.Logger, tagParser, buffer);
         featureFileTagger.ForceReparseOnBackground();
         return featureFileTagger;
     }

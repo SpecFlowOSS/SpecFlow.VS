@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
+﻿namespace SpecFlow.VisualStudio.VsxStubs.ProjectSystem;
 
 public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
 {
@@ -12,11 +10,9 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
 
         StubProjectSettingsProvider = new StubProjectSettingsProvider(this);
         Properties.AddProperty(typeof(IProjectSettingsProvider), StubProjectSettingsProvider);
-        StubDeveroomConfigurationProvider = new StubDeveroomConfigurationProvider(DeveroomConfiguration);
-        Properties.AddProperty(typeof(IDeveroomConfigurationProvider), StubDeveroomConfigurationProvider);
+        var configProvider = CreateConfigurationProvider();
+        Properties.AddProperty(typeof(IDeveroomConfigurationProvider), configProvider);
         StubIdeScope.ProjectScopes.Add(this);
-
-        AddFile(ProjectFullPath, "<Project Sdk=\"Microsoft.NET.Sdk\"></Project>");
 
         Build();
     }
@@ -26,12 +22,17 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
     {
     }
 
-    public StubDeveroomConfigurationProvider StubDeveroomConfigurationProvider { get; }
-    public DeveroomConfiguration DeveroomConfiguration { get; } = new();
+    private ProjectScopeDeveroomConfigurationProvider CreateConfigurationProvider()
+    {
+        AddFile(ProjectFullName, "<Project Sdk=\"Microsoft.NET.Sdk\"></Project>");
+        var configProvider = new ProjectScopeDeveroomConfigurationProvider(this);
+        return configProvider;
+    }
+
     public StubIdeScope StubIdeScope { get; }
     public StubProjectSettingsProvider StubProjectSettingsProvider { get; }
     public Dictionary<string, string> FilesAdded { get; } = new();
-    public string ProjectFullPath => Path.Combine(ProjectFolder, ProjectFullName);
+    public string ProjectFileName => ProjectName + ".csproj";
     public PropertyCollection Properties { get; } = new();
     public IIdeScope IdeScope => StubIdeScope;
     public IEnumerable<NuGetPackageReference> PackageReferences => PackageReferencesList;
@@ -41,7 +42,7 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
     public string TargetFrameworkMonikers { get; } = ".NETCoreApp,Version=v5.0;.NETFramework,Version=v4.5.2";
     public string PlatformTargetName { get; } = "Any CPU";
     public string ProjectName { get; } = "Test Project";
-    public string ProjectFullName { get; } = "Test Project.csproj";
+    public string ProjectFullName => Path.Combine(ProjectFolder, ProjectFileName);
     public string DefaultNamespace => ProjectName.Replace(" ", "");
 
     public void AddFile(string targetFilePath, string template)
@@ -85,5 +86,14 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
         file.SetLastWriteTimeUtc(fi.FullName, DateTime.UtcNow);
 
         StubIdeScope.TriggerProjectsBuilt();
+    }
+
+    public InMemoryStubProjectScope UpdateConfigFile(string configFileName, string configFileContent)
+    {
+        var configFileFullPath = Path.Combine(ProjectFolder, configFileName);
+        IdeScope.FileSystem.File
+            .WriteAllText(configFileFullPath, configFileContent, Encoding.UTF8);
+        IdeScope.FileSystem.File.SetLastWriteTimeUtc(configFileFullPath, DateTime.UtcNow);
+        return this;
     }
 }

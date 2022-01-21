@@ -137,4 +137,6 @@ public class ProjectBindingRegistryCache : IProjectBindingRegistryCache
 
         _logger.LogVerbose($"Tracking positions disposed on V{bindingRegistry.Version}");
     }
+
+    public override string ToString() => $"{nameof(ProjectBindingRegistryCache)}({Value} {_upToDateBindingRegistrySource.Task.Status})";
 }
