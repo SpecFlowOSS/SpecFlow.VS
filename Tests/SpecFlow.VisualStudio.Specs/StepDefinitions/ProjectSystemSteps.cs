@@ -238,17 +238,34 @@ public class ProjectSystemSteps : Steps
     [Given("the project is built and the initial binding discovery is performed")]
     public async Task GivenTheProjectIsBuiltAndTheInitialBindingDiscoveryIsPerformed()
     {
+        using var cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
+
+        Task Builder(CancellationToken ct) => WaitForBindingRegistry(WhenTheProjectIsBuilt, ct);
+
+        if (_ideScope.CurrentTextView.TextBuffer.ContentType.TypeName == VsContentTypes.FeatureFile)
+            await WaitForParse(Builder, cts.Token);
+        else
+            await Builder(cts.Token);
+    }
+
+    private async Task WaitForBindingRegistry(Action build, CancellationToken ct)
+    {
+        var bindingRegistryChanged = new AsyncManualResetEvent();
+        _discoveryService.BindingRegistryCache.Changed += (_, _) => bindingRegistryChanged.Set();
+        build();
+        await bindingRegistryChanged.WaitAsync(ct);
+    }
+
+    private async Task WaitForParse(Func<CancellationToken, Task> build,  CancellationToken ct)
+    {
         var tagChanged = new AsyncManualResetEvent();
         var taggerProvider = new DeveroomTaggerProvider(_ideScope);
         var tagger = taggerProvider.CreateTagger<DeveroomTag>(_ideScope.CurrentTextView.TextBuffer);
         tagger.TagsChanged += TaggerOnTagsChanged;
 
-        using var cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
-        var bindingRegistryChanged = new AsyncManualResetEvent();
-        _discoveryService.BindingRegistryCache.Changed += (_, _) => bindingRegistryChanged.Set();
-        WhenTheProjectIsBuilt();
-        await bindingRegistryChanged.WaitAsync(cts.Token);
-        await tagChanged.WaitAsync(cts.Token);
+        await build(ct);
+
+        await tagChanged.WaitAsync(ct);
 
         void TaggerOnTagsChanged(object sender, SnapshotSpanEventArgs e)
         {
