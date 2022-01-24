@@ -31,6 +31,7 @@ global using SpecFlow.VisualStudio.UI;
 global using SpecFlow.VisualStudio.UI.ViewModels;
 global using SpecFlow.VisualStudio.VsEvents;
 global using System.Collections.Concurrent;
+global using System.Collections.Immutable;
 global using System.ComponentModel.Composition;
 global using System.Diagnostics;
 global using System.IO.Abstractions;

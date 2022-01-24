@@ -69,7 +69,7 @@ public class SpecFlowProjectSettingsProvider
     private SpecFlowSettings GetSpecFlowSettingsFromOutputFolder()
     {
         var outputAssemblyPath = _projectScope.OutputAssemblyPath;
-        if (outputAssemblyPath == null)
+        if (!IsValidPath(outputAssemblyPath))
             return null;
         var outputFolder = Path.GetDirectoryName(_projectScope.OutputAssemblyPath);
         if (outputFolder == null)
@@ -87,6 +87,8 @@ public class SpecFlowProjectSettingsProvider
 
         return CreateSpecFlowSettings(specFlowNuGetVersion, SpecFlowProjectTraits.None, null, configFilePath);
     }
+
+    private static bool IsValidPath(string outputAssemblyPath) => !string.IsNullOrWhiteSpace(outputAssemblyPath);
 
     private FileVersionInfo GetSpecFlowVersion(string outputFolder)
     {

@@ -210,7 +210,8 @@ public class FeatureFileTaggerTests
 
         //act
         sut.IdeScope.FileSystem.File.WriteAllText(Path.Combine(sut.ProjectScope.ProjectFolder, configFileName), content);
-        using var _ = new InMemoryStubProjectBuilder(sut.ProjectScope).TriggerBuild();
+        InMemoryStubProjectBuilder.CreateOutputAssembly(sut.ProjectScope);
+        sut.IdeScope.TriggerProjectsBuilt();
 
         //assert
         sut.WaitForTagsChangedEvent().Should().HaveCount(2);
@@ -240,5 +241,21 @@ public class FeatureFileTaggerTests
         configurationProvider.VerifyRemove(m => m.WeakConfigurationChanged -= It.IsAny<EventHandler<EventArgs>>());
         sut.StubTextBuffer.VerifyRemove(
             tb => tb.ChangedOnBackground -= It.IsAny<EventHandler<TextContentChangedEventArgs>>());
+    }
+
+    [Fact]
+    public void Able_to_generate_tags_when_there_is_no_project_loaded()
+    {
+        //arrange
+        using var sut = TaggerSut
+            .Arrange(_testOutputHelper)
+            .WithoutProject();
+
+        //act
+        var tagger = sut.BuildFeatureFileTagger();
+
+        //assert
+        tagger.GetUpToDateDeveroomTagsForSpan(sut.CurrentSnapshotSpan);
+        tagger.As<FeatureFileTagger>().ParsedSnapshotVersionNumber.Should().Be(0);
     }
 }

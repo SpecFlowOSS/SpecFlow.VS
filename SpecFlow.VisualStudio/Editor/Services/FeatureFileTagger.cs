@@ -57,7 +57,7 @@ public class FeatureFileTagger : ITagger<DeveroomTag>
         }
     }
 
-    public event EventHandler<SnapshotSpanEventArgs> TagsChanged = null!;
+    public event EventHandler<SnapshotSpanEventArgs>? TagsChanged;
 
     private void ProjectIsModified(object sender, EventArgs e)
     {
@@ -114,6 +114,8 @@ public class FeatureFileTagger : ITagger<DeveroomTag>
         _parsedTags = _tagParser.Parse(snapshot);
         ParsedSnapshotVersionNumber = snapshot.Version.VersionNumber;
         _getTagsCache.Clear();
-        TagsChanged?.Invoke(this, new SnapshotSpanEventArgs(new SnapshotSpan(snapshot, 0, snapshot.Length)));
+        var snapshotSpan = new SnapshotSpan(snapshot, 0, snapshot.Length);
+        var snapshotSpanEventArgs = new SnapshotSpanEventArgs(snapshotSpan);
+        TagsChanged?.Invoke(this, snapshotSpanEventArgs);
     }
 }
