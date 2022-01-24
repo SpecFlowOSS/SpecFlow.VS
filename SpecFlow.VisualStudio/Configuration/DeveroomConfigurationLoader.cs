@@ -6,17 +6,19 @@ namespace SpecFlow.VisualStudio.Configuration;
 public class DeveroomConfigurationLoader
 {
     private readonly IConfigDeserializer<DeveroomConfiguration> _configDeserializer;
+    private readonly IFileSystem _fileSystem;
 
-    private DeveroomConfigurationLoader(IConfigDeserializer<DeveroomConfiguration> configDeserializer)
+    private DeveroomConfigurationLoader(IConfigDeserializer<DeveroomConfiguration> configDeserializer, IFileSystem fileSystem)
     {
         _configDeserializer = configDeserializer;
+        _fileSystem = fileSystem;
     }
 
-    public static DeveroomConfigurationLoader CreateSpecFlowJsonConfigurationLoader() =>
-        new(new SpecFlowConfigDeserializer());
+    public static DeveroomConfigurationLoader CreateSpecFlowJsonConfigurationLoader(IFileSystem fileSystem) =>
+        new(new SpecFlowConfigDeserializer(), fileSystem);
 
-    public static DeveroomConfigurationLoader CreateDeveroomJsonConfigurationLoader() =>
-        new(new JsonNetConfigDeserializer<DeveroomConfiguration>());
+    public static DeveroomConfigurationLoader CreateDeveroomJsonConfigurationLoader(IFileSystem fileSystem) =>
+        new(new JsonNetConfigDeserializer<DeveroomConfiguration>(), fileSystem);
 
     public DeveroomConfiguration Load(string configFilePath)
     {
@@ -27,17 +29,17 @@ public class DeveroomConfigurationLoader
 
     public void Update(DeveroomConfiguration config, string configFilePath)
     {
-        if (!File.Exists(configFilePath))
+        if (!_fileSystem.File.Exists(configFilePath))
             throw new DeveroomConfigurationException($"The specified config file '{configFilePath}' does not exist.");
         var configFolder = Path.GetDirectoryName(configFilePath) ??
                            throw new DeveroomConfigurationException(
                                $"The specified config file '{configFilePath}' does not contain a folder.");
 
-        var jsonString = File.ReadAllText(configFilePath);
+        var jsonString = _fileSystem.File.ReadAllText(configFilePath);
         Update(config, jsonString, configFolder);
     }
 
-    public void Update(DeveroomConfiguration config, string configFileContent, string configFolder)
+    private void Update(DeveroomConfiguration config, string configFileContent, string configFolder)
     {
         _configDeserializer.Populate(configFileContent, config);
 

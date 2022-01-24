@@ -1,12 +1,12 @@
 ﻿namespace SpecFlow.VisualStudio.Tests.Editor.Services;
 
-public record TaggerSut(InMemoryStubProjectScope ProjectScope, Mock<IDeveroomTagParser> TagParser) : IDisposable
+public record TaggerSut
+    (IProjectScope ProjectScope, StubIdeScope IdeScope, Mock<IDeveroomTagParser> TagParser) : IDisposable
 {
     private readonly ManualResetEvent _tagsChanged = new(false);
     private readonly List<SnapshotSpanEventArgs> _tagsChangedEvents = new();
 
     public IReadOnlyCollection<SnapshotSpanEventArgs> TagsChangedEvents => _tagsChangedEvents;
-    public StubIdeScope IdeScope => ProjectScope.StubIdeScope;
 
     public IEnumerable<LogMessage> LoggerMessages => IdeScope.StubLogger.Logs;
 
@@ -30,12 +30,15 @@ public record TaggerSut(InMemoryStubProjectScope ProjectScope, Mock<IDeveroomTag
         var tagParser = new Mock<IDeveroomTagParser>(MockBehavior.Strict);
 
         var deveroomTags = ImmutableArray<DeveroomTag>.Empty;
-        tagParser.Setup(s => s.Parse(It.IsAny<ITextSnapshot>())).Returns(deveroomTags);
+        tagParser
+            .Setup(s => s.Parse(It.IsAny<ITextSnapshot>()))
+            .Callback<ITextSnapshot>((fileSnapshot) => {projectScope.IdeScope.Logger.Trace($"Parsing {fileSnapshot}");})
+            .Returns(deveroomTags);
 
         projectScope.StubIdeScope.TextViewFactory =
             (inputText, filePath) => new StubWpfTextView(new StubTextBuffer(projectScope));
 
-        var sut = new TaggerSut(projectScope, tagParser);
+        var sut = new TaggerSut(projectScope, projectScope.StubIdeScope, tagParser);
 
         VsxStubObjects.Initialize();
 
@@ -63,8 +66,8 @@ public record TaggerSut(InMemoryStubProjectScope ProjectScope, Mock<IDeveroomTag
 
     private T BuildTagger<T>(DeveroomTaggerProvider taggerProvider) where T : ITagger<DeveroomTag>
     {
-        IdeScope.CreateTextView(new TestText(Array.Empty<string>()),
-            IdeScope.ProjectScopes.Single().ProjectFullName);
+       IdeScope.CreateTextView(new TestText(Array.Empty<string>()),
+                IdeScope.ProjectScopes.Select(p=>p.ProjectFullName).DefaultIfEmpty(string.Empty).Single());
 
         var tagger = (T) taggerProvider.CreateTagger<DeveroomTag>(IdeScope.CurrentTextView.TextBuffer);
 
@@ -73,10 +76,9 @@ public record TaggerSut(InMemoryStubProjectScope ProjectScope, Mock<IDeveroomTag
 
     private void SimulateTagsChangedIfNecessary(FeatureFileTagger tagger)
     {
-        if (tagger.ParsedSnapshotVersionNumber == IdeScope.CurrentTextView.TextBuffer.CurrentSnapshot.Version.VersionNumber)
-        {
+        if (tagger.ParsedSnapshotVersionNumber ==
+            IdeScope.CurrentTextView.TextBuffer.CurrentSnapshot.Version.VersionNumber)
             DeveroomTagger_TagsChanged(tagger, new SnapshotSpanEventArgs(new SnapshotSpan()));
-        }
     }
 
     private void DeveroomTagger_TagsChanged(object sender, SnapshotSpanEventArgs e)
@@ -114,5 +116,15 @@ public record TaggerSut(InMemoryStubProjectScope ProjectScope, Mock<IDeveroomTag
                 => realParser.Parse(fileSnapshot));
 
         return this with {TagParser = tagParserMock};
+    }
+
+    public TaggerSut WithoutProject()
+    {
+        var voidProjectScope = new VoidProjectScope(IdeScope);
+        var withoutProject = this with {ProjectScope = voidProjectScope};
+        IdeScope.ProjectScopes.Clear();
+        IdeScope.TextViewFactory =
+            (inputText, filePath) => new StubWpfTextView(new StubTextBuffer(voidProjectScope));
+        return withoutProject;
     }
 }

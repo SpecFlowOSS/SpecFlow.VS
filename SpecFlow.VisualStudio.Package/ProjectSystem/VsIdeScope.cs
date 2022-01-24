@@ -223,7 +223,7 @@ public class VsIdeScope : IVsIdeScope
     {
         if (project == null ||
             !VsUtils.IsSolutionProject(project))
-            return null;
+            return new VoidProjectScope(this);
 
         var projectId = GetProjectId(project);
         var projectScope = _projectScopes.GetOrAdd(projectId, id => CreateProjectScope(id, project));

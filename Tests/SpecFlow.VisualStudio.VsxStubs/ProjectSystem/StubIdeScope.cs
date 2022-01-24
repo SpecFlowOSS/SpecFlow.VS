@@ -55,7 +55,7 @@ public class StubIdeScope : Mock<IIdeScope>, IIdeScope, IDisposable
 
     public IProjectScope GetProject(ITextBuffer textBuffer) =>
         textBuffer.Properties.GetOrCreateSingletonProperty(typeof(IProjectScope), 
-            () => ProjectScopes.DefaultIfEmpty(new InMemoryStubProjectScope(this)).Single());
+            () => ProjectScopes.SingleOrDefault() as IProjectScope ?? new VoidProjectScope(this));
 
     public IDeveroomLogger Logger => CompositeLogger;
     public IIdeActions Actions { get; set; }

@@ -47,7 +47,9 @@ public class ProjectScopeDeveroomConfigurationProvider : IDeveroomConfigurationP
 
     private void InitializeConfiguration()
     {
-        var configSources = GetConfigSources().ToArray();
+        var configSources = _projectScope is VoidProjectScope
+            ? Array.Empty<ConfigSource>()
+            : GetConfigSources().ToArray();
         _configCache = LoadConfiguration(configSources);
     }
 
@@ -188,7 +190,7 @@ public class ProjectScopeDeveroomConfigurationProvider : IDeveroomConfigurationP
     private void LoadFromDeveroomConfig(string configSourceFilePath, DeveroomConfiguration configuration)
     {
         Logger.LogVerbose($"Loading Deveroom config from '{configSourceFilePath}'");
-        var loader = DeveroomConfigurationLoader.CreateDeveroomJsonConfigurationLoader();
+        var loader = DeveroomConfigurationLoader.CreateDeveroomJsonConfigurationLoader(FileSystem);
         loader.Update(configuration, configSourceFilePath);
     }
 
@@ -210,16 +212,8 @@ public class ProjectScopeDeveroomConfigurationProvider : IDeveroomConfigurationP
     private void LoadFromSpecFlowJsonConfig(string configSourceFilePath, DeveroomConfiguration configuration)
     {
         Logger.LogVerbose($"Loading configuration from '{configSourceFilePath}'");
-
-        var fileContent = FileSystem.File.ReadAllText(configSourceFilePath);
-        UpdateFromSpecFlowJsonConfig(configuration, fileContent, Path.GetDirectoryName(configSourceFilePath));
-    }
-
-    internal static void UpdateFromSpecFlowJsonConfig(DeveroomConfiguration configuration, string fileContent,
-        string configFileFolderPath)
-    {
-        var configLoader = DeveroomConfigurationLoader.CreateSpecFlowJsonConfigurationLoader();
-        configLoader.Update(configuration, fileContent, configFileFolderPath);
+        var configLoader = DeveroomConfigurationLoader.CreateSpecFlowJsonConfigurationLoader(FileSystem);
+        configLoader.Update(configuration, configSourceFilePath);
     }
 
     private void LoadFromSpecSyncJsonConfig(string configSourceFilePath, DeveroomConfiguration configuration)
