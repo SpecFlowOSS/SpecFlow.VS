@@ -35,6 +35,7 @@ public abstract class CommandTestBase<T> : EditorTestBase where T : DeveroomEdit
         TestStepDefinition[] stepDefinitions,
         TestFeatureFile[] featureFiles)
     {
+        //new InMemoryStubProjectBuilder(ProjectScope).TriggerBuild();
         var textView = await ArrangeTextView(stepDefinitions, featureFiles);
         var ideScope = ProjectScope.IdeScope;
         var taggerProvider = CreateTaggerProvider(ideScope);

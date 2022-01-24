@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
+﻿namespace SpecFlow.VisualStudio.VsxStubs.StepDefinitions;
 
 public class MockableDiscoveryService : DiscoveryService
 {
@@ -24,6 +22,8 @@ public class MockableDiscoveryService : DiscoveryService
         {
             LastDiscoveryResult = new DiscoveryResult {StepDefinitions = stepDefinitions}
         };
+
+        InMemoryStubProjectBuilder.CreateOutputAssembly(projectScope);
 
         discoveryResultProviderMock
             .Setup(ds => ds.RunDiscovery(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ProjectSettings>()))

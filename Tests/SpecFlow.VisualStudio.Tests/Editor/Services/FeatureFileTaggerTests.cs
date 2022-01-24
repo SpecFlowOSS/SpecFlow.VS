@@ -210,7 +210,7 @@ public class FeatureFileTaggerTests
 
         //act
         sut.IdeScope.FileSystem.File.WriteAllText(Path.Combine(sut.ProjectScope.ProjectFolder, configFileName), content);
-        sut.ProjectScope.Build();
+        using var _ = new InMemoryStubProjectBuilder(sut.ProjectScope).TriggerBuild();
 
         //assert
         sut.WaitForTagsChangedEvent().Should().HaveCount(2);

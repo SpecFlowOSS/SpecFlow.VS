@@ -32,6 +32,9 @@ public class DiscoveryTests
             .Callback((Func<CancellationToken, Task> action, string _) 
                 => action(projectScope.StubIdeScope.BackgroundTaskTokenSource.Token).Wait());
 #pragma warning restore VSTHRD002
+
+        InMemoryStubProjectBuilder.CreateOutputAssembly(projectScope);
+
         return new Sut(bindingRegistryCache, projectScope, discoveryResultProvider);
     }
 

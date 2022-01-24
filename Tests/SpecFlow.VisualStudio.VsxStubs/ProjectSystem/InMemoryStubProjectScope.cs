@@ -13,8 +13,6 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
         var configProvider = CreateConfigurationProvider();
         Properties.AddProperty(typeof(IDeveroomConfigurationProvider), configProvider);
         StubIdeScope.ProjectScopes.Add(this);
-
-        Build();
     }
 
     public InMemoryStubProjectScope(ITestOutputHelper testOutputHelper)
@@ -74,18 +72,6 @@ public class InMemoryStubProjectScope : Mock<IProjectScope>, IProjectScope
     {
         PackageReferencesList.Add(new NuGetPackageReference("SpecFlow", new NuGetVersion("2.3.2", "2.3.2"),
             Path.Combine(ProjectFolder, "packages", "SpecFlow")));
-    }
-
-    public void Build()
-    {
-        FileInfo fi = new FileInfo(OutputAssemblyPath);
-        StubIdeScope.FileSystem.Directory.CreateDirectory(fi.DirectoryName);
-
-        StubIdeScope.FileSystem.File.WriteAllText(fi.FullName, string.Empty);
-        var file = new MockFile(StubIdeScope.FileSystem as MockFileSystem);
-        file.SetLastWriteTimeUtc(fi.FullName, DateTime.UtcNow);
-
-        StubIdeScope.TriggerProjectsBuilt();
     }
 
     public InMemoryStubProjectScope UpdateConfigFile(string configFileName, string configFileContent)

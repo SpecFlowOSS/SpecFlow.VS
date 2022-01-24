@@ -395,7 +395,7 @@ Scenario: Default feature file language was changed
 		}
 		"""
 	And the project is built
-	Then all section of types StepKeyword, DefinitionLineKeyword should be eventually highlighted as
+	Then all section of types StepKeyword, DefinitionLineKeyword should be highlighted as
 		"""
 		{DefinitionLineKeyword}Jellemző:{/DefinitionLineKeyword} Összeadás
 

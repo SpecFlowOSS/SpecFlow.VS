@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using SpecFlow.VisualStudio.ProjectSystem.Settings;
 using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace SpecFlow.VisualStudio.Specs.StepDefinitions;
@@ -90,8 +89,10 @@ public class ProjectSystemSteps : Steps
     {
         var configFileName = "specflow.json";
         _projectScope
-            .UpdateConfigFile(configFileName, configFileContent)
-            .Build();
+            .UpdateConfigFile(configFileName, configFileContent);
+
+        InMemoryStubProjectBuilder.CreateOutputAssembly(_projectScope);
+        _ideScope.TriggerProjectsBuilt();
     }
 
     [Given(@"the project is configured for SpecSync with Azure DevOps project URL ""([^""]*)""")]
@@ -104,8 +105,10 @@ public class ProjectSystemSteps : Steps
                 }";
 
         _projectScope
-            .UpdateConfigFile("specsync.json", specSyncConfigFileContent)
-            .Build();
+            .UpdateConfigFile("specsync.json", specSyncConfigFileContent);
+
+        InMemoryStubProjectBuilder.CreateOutputAssembly(_projectScope);
+        _ideScope.TriggerProjectsBuilt();
     }
 
     [When(@"a new step definition is added to the project as:")]
@@ -229,48 +232,11 @@ public class ProjectSystemSteps : Steps
     }
 
     [When(@"the project is built")]
-    public void WhenTheProjectIsBuilt()
-    {
-        _projectScope.Build();
-    }
-
     [When("the project is built and the initial binding discovery is performed")]
     [Given("the project is built and the initial binding discovery is performed")]
     public async Task GivenTheProjectIsBuiltAndTheInitialBindingDiscoveryIsPerformed()
     {
-        using var cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
-
-        Task Builder(CancellationToken ct) => WaitForBindingRegistry(WhenTheProjectIsBuilt, ct);
-
-        if (_ideScope.CurrentTextView.TextBuffer.ContentType.TypeName == VsContentTypes.FeatureFile)
-            await WaitForParse(Builder, cts.Token);
-        else
-            await Builder(cts.Token);
-    }
-
-    private async Task WaitForBindingRegistry(Action build, CancellationToken ct)
-    {
-        var bindingRegistryChanged = new AsyncManualResetEvent();
-        _discoveryService.BindingRegistryCache.Changed += (_, _) => bindingRegistryChanged.Set();
-        build();
-        await bindingRegistryChanged.WaitAsync(ct);
-    }
-
-    private async Task WaitForParse(Func<CancellationToken, Task> build,  CancellationToken ct)
-    {
-        var tagChanged = new AsyncManualResetEvent();
-        var taggerProvider = new DeveroomTaggerProvider(_ideScope);
-        var tagger = taggerProvider.CreateTagger<DeveroomTag>(_ideScope.CurrentTextView.TextBuffer);
-        tagger.TagsChanged += TaggerOnTagsChanged;
-
-        await build(ct);
-
-        await tagChanged.WaitAsync(ct);
-
-        void TaggerOnTagsChanged(object sender, SnapshotSpanEventArgs e)
-        {
-            tagChanged.Set();
-        }
+        await InMemoryStubProjectBuilder.BuildAndWaitBackGroundTasks(_projectScope);
     }
 
     [Given(@"the following feature file ""([^""]*)""")]
@@ -538,27 +504,6 @@ public class ProjectSystemSteps : Steps
 
         matchedTags.Should().BeEmpty();
     }
-
-    [Then("all section of types (.*) should be eventually highlighted as")]
-    public void ThenAllSectionOfTypesStepKeywordDefinitionLineKeywordShouldBeEventuallyHighlightedAs(string[] keywordTypes, string expectedContent)
-    {
-        AutoResetEvent tagsChangedEvent = new(false);
-        var tagger = CreateTaggerProvider().CreateTagger<DeveroomTag>(_wpfTextView.TextBuffer);
-        tagger.TagsChanged += (sender, args) =>
-        {
-            tagsChangedEvent.Set();
-        };
-        try
-        {
-            ThenAllSectionOfTypesShouldBeHighlightedAs(keywordTypes, expectedContent);
-            return;
-        }
-        catch { }
-
-        tagsChangedEvent.WaitOne(DebuggableCancellationTokenSource.GetDebuggerTimeout(TimeSpan.FromSeconds(3)));
-        ThenAllSectionOfTypesShouldBeHighlightedAs(keywordTypes, expectedContent);
-    }
-
 
     private ITagAggregator<DeveroomTag> CreateTagAggregator()
     {

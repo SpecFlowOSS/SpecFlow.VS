@@ -22,6 +22,7 @@ global using SpecFlow.VisualStudio.Editor.Services.EditorConfig;
 global using SpecFlow.VisualStudio.Editor.Traceability;
 global using SpecFlow.VisualStudio.ProjectSystem.Configuration;
 global using SpecFlow.VisualStudio.ProjectSystem;
+global using SpecFlow.VisualStudio.ProjectSystem.Settings;
 global using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 global using SpecFlow.VisualStudio.Specs.Support;
 global using SpecFlow.VisualStudio.UI.ViewModels;

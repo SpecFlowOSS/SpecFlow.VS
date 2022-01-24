@@ -155,6 +155,11 @@ public class RenameStepCommandTests : CommandTestBase<RenameStepCommand>
         var featureFile = ArrangeOneFeatureFile(string.Empty);
         var (textView, command) = await ArrangeSut(stepDefinition, featureFile);
 
+        //await InMemoryStubProjectBuilder.BuildAndWaitBackGroundTasks(ProjectScope);
+       //ProjectScope.StubIdeScope.TriggerProjectsBuilt();
+
+     //  new InMemoryStubProjectBuilder(ProjectScope).TriggerBuild();
+
         await InvokeAndWaitAnalyticsEvent(command, textView);
 
         Dump(textView, "Step definition class after rename");
