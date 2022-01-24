@@ -2,14 +2,16 @@
 
 public class InMemoryStubProjectBuilder : IDisposable
 {
-    private readonly InMemoryStubProjectScope _project;
     private readonly AsyncManualResetEvent _bindingRegistryChanged;
+    private readonly DebuggableCancellationTokenSource _cts;
+    private readonly InMemoryStubProjectScope _project;
     private readonly AsyncManualResetEvent _tagChanged;
     private readonly ITagger<DeveroomTag> _tagger;
+    private readonly IProjectBindingRegistryCache bindingRegistryCache;
 
     public InMemoryStubProjectBuilder(InMemoryStubProjectScope project)
     {
-        this._project = project;
+        _project = project;
         bindingRegistryCache = project.Properties.GetProperty<IDiscoveryService>(typeof(IDiscoveryService))
             .BindingRegistryCache;
 
@@ -20,11 +22,18 @@ public class InMemoryStubProjectBuilder : IDisposable
         _tagChanged = new AsyncManualResetEvent();
         _cts = new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(10));
     }
+
     private StubIdeScope StubIdeScope => _project.StubIdeScope;
     private ITextBuffer VisibleTextBuffer => StubIdeScope.CurrentTextView.TextBuffer;
     private StubProjectSettingsProvider ProjectSettingsProvider => _project.StubProjectSettingsProvider;
-    private readonly IProjectBindingRegistryCache bindingRegistryCache;
-    private readonly DebuggableCancellationTokenSource _cts;
+
+
+    public void Dispose()
+    {
+        _tagger.TagsChanged -= TaggerOnTagsChanged;
+        bindingRegistryCache.Changed -= OnBindingRegistryCacheOnChanged;
+        _cts.Dispose();
+    }
 
 
     public static FileInfo CreateOutputAssembly(IProjectScope project)
@@ -60,9 +69,9 @@ public class InMemoryStubProjectBuilder : IDisposable
             .WaitBackgroundTasksToFinish();
     }
 
-    void OnBindingRegistryCacheOnChanged(object o, EventArgs eventArgs) => _bindingRegistryChanged.Set();
+    private void OnBindingRegistryCacheOnChanged(object o, EventArgs eventArgs) => _bindingRegistryChanged.Set();
 
-    void TaggerOnTagsChanged(object sender, SnapshotSpanEventArgs e)
+    private void TaggerOnTagsChanged(object sender, SnapshotSpanEventArgs e)
     {
         _tagChanged.Set();
     }
@@ -73,17 +82,10 @@ public class InMemoryStubProjectBuilder : IDisposable
         if (ConfigurationChanged() && FeatureFileIsDisplayed()) await _tagChanged.WaitAsync(_cts.Token);
     }
 
-    private bool BindingRegistryIsExpected() => ProjectSettingsProvider.Kind != DeveroomProjectKind.FeatureFileContainerProject;
+    private bool BindingRegistryIsExpected() =>
+        ProjectSettingsProvider.Kind != DeveroomProjectKind.FeatureFileContainerProject;
 
     private bool ConfigurationChanged() => true;
 
     private bool FeatureFileIsDisplayed() => VisibleTextBuffer.ContentType.TypeName == VsContentTypes.FeatureFile;
-
-
-    public void Dispose()
-    {
-        _tagger.TagsChanged -= TaggerOnTagsChanged;
-        bindingRegistryCache.Changed -= OnBindingRegistryCacheOnChanged;
-        _cts.Dispose();
-    }
 }
