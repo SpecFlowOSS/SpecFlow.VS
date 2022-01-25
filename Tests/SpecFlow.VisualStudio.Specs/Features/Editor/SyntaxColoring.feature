@@ -403,7 +403,7 @@ Scenario: Default feature file language was changed
 			{StepKeyword}Amennyiben {/StepKeyword}összadom a számokat
 		"""
 
-Scenario Outline: Do not highlights undefined step keywords
+Scenario Outline: Do not highlight undefined step keywords
 	Given there is a project scope which is <projectKind>
 	When the following feature file is opened in the editor
 		"""
@@ -422,6 +422,4 @@ Examples:
 	| projectKind                 |
 	| FeatureFileContainerProject |
 	| OtherProject                |
-	| SpecFlowLibProject          |
 	| Uninitialized               |
-	| Unknown                     |
