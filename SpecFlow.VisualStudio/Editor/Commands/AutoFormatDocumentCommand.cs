@@ -77,7 +77,9 @@ public class AutoFormatDocumentCommand : DeveroomEditorCommandBase, IDeveroomFea
             textEdit.Apply();
         }
 
-        textView.Caret.MoveTo(textView.TextSnapshot.GetLineFromLineNumber(caretLineNumber).End);
+        var lineFromLineNumber = textView.TextSnapshot.GetLineFromLineNumber(caretLineNumber);
+        textView.Caret.MoveTo(lineFromLineNumber.End);
+        textView.ViewScroller.EnsureSpanVisible(lineFromLineNumber.Extent);
 
         return true;
     }

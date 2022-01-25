@@ -37,7 +37,7 @@ public class ProjectSystemSteps : Steps
     {
         CreateProject(ps => ps.StubProjectSettingsProvider.Kind = DeveroomProjectKind.FeatureFileContainerProject);
     }
-    
+
     [Given("there is a project scope which is (.*)")]
     public void GivenThereIsAProjectScopeWhichIs(DeveroomProjectKind kind)
     {

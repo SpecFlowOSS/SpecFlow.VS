@@ -11,6 +11,7 @@ public class StubWpfTextView : IWpfTextView
         TextBuffer = textBuffer;
         _caret = new StubTextCaret(this);
         Selection = new StubTextSelection(this);
+        ViewScroller = new StubViewScroller();
     }
 
     public StubEditorOptions StubEditorOptions { get; } = new();
@@ -73,7 +74,7 @@ public class StubWpfTextView : IWpfTextView
 
     public bool InLayout => true; //in a process of layout
 
-    public IViewScroller ViewScroller => throw new NotImplementedException();
+    public IViewScroller ViewScroller { get; }
 
     public IWpfTextViewLineCollection TextViewLines => throw new NotImplementedException();
 

@@ -3,6 +3,7 @@
 * Fix: (#40) Typing performance issue
 * Fix: Some commands (e.g. comment / uncomment / format table) is executed with delay
 * Fix: Steps are reported as undefined for newly opened project and for non-project feature files
+* Fix: (#25) Scroll position in code editor is reset when reformatting feature file
 
 # v2021.4.5 - 2021-12-30
 
