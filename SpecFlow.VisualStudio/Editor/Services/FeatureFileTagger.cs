@@ -2,6 +2,7 @@
 
 public class FeatureFileTagger : ITagger<DeveroomTag>
 {
+    private readonly IDeveroomConfigurationProvider _configurationProvider;
     private readonly IDiscoveryService _discoveryService;
     private readonly ConcurrentDictionary<SnapshotSpan, IEnumerable<ITagSpan<DeveroomTag>>> _getTagsCache = new();
     private readonly IDeveroomLogger _logger;
@@ -13,6 +14,7 @@ public class FeatureFileTagger : ITagger<DeveroomTag>
     public int ParsedSnapshotVersionNumber = int.MinValue;
 
     public FeatureFileTagger(
+        IDeveroomConfigurationProvider configurationProvider, 
         IDiscoveryService discoveryService,
         IDeveroomLogger logger,
         IDeveroomTagParser tagParser,
@@ -20,12 +22,14 @@ public class FeatureFileTagger : ITagger<DeveroomTag>
     {
         _tagParser = tagParser;
         _textBuffer = textBuffer;
+        _configurationProvider = configurationProvider;
         _logger = logger;
         _discoveryService = discoveryService;
         _parsedTags = ImmutableArray<DeveroomTag>.Empty;
         _currentSnapshot = textBuffer.CurrentSnapshot;
         textBuffer.ChangedOnBackground += TextBuffer_ChangedOnBackground;
-        discoveryService.WeakBindingRegistryChanged += BindingRegistryChanged;
+        discoveryService.WeakBindingRegistryChanged += ProjectIsModified;
+        configurationProvider.WeakConfigurationChanged += ProjectIsModified;
     }
 
     public IEnumerable<ITagSpan<DeveroomTag>> GetUpToDateTags(SnapshotSpan span)
@@ -55,15 +59,17 @@ public class FeatureFileTagger : ITagger<DeveroomTag>
 
     public event EventHandler<SnapshotSpanEventArgs> TagsChanged = null!;
 
-    private void BindingRegistryChanged(object sender, EventArgs e)
+    private void ProjectIsModified(object sender, EventArgs e)
     {
+        _logger.LogVerbose($"Triggering parse by {sender} on {_textBuffer} {_textBuffer.CurrentSnapshot.Version}");
         if (_textBuffer.ContentType.IsOfType(VsContentTypes.FeatureFile))
         {
             ForceReparseOnBackground();
         }
         else
         {
-            _discoveryService.WeakBindingRegistryChanged -= BindingRegistryChanged;
+            _discoveryService.WeakBindingRegistryChanged -= ProjectIsModified;
+            _configurationProvider.WeakConfigurationChanged -= ProjectIsModified;
             _textBuffer.ChangedOnBackground -= TextBuffer_ChangedOnBackground;
             _textBuffer.Properties.RemoveProperty(typeof(ITagger<DeveroomTag>));
         }

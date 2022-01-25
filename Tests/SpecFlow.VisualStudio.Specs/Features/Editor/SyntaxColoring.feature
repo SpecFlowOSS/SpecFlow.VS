@@ -365,3 +365,42 @@ Scenario: Highlights Scenario Outline placeholders
 			| {ScenarioOutlinePlaceholder}a{/ScenarioOutlinePlaceholder} | {ScenarioOutlinePlaceholder}b{/ScenarioOutlinePlaceholder} | {ScenarioOutlinePlaceholder}op{/ScenarioOutlinePlaceholder}  |
 			| 1 | 2 | add |
 		"""
+
+Rule: Language configuration changes are applied to open feature file editors
+
+@focus
+Scenario: Default feature file language was changed
+	Given there is a non-SpecFlow project scope
+	And the specflow.json configuration file contains
+		"""
+		{ 
+			"language": {
+				"feature": "en-US"
+			}
+		}
+		"""
+	And the following feature file in the editor
+		"""
+		Jellemző: Összeadás
+
+		Forgatókönyv: Két számot összeadok
+			Amennyiben összadom a számokat
+		"""
+	When the specflow.json configuration file is updated to
+		"""
+		{ 
+			"language": {
+				"feature": "hu-HU"
+			}
+		}
+		"""
+	And the project is built
+	Then all section of types StepKeyword, DefinitionLineKeyword should be highlighted as
+		"""
+		{DefinitionLineKeyword}Jellemző:{/DefinitionLineKeyword} Összeadás
+
+		{DefinitionLineKeyword}Forgatókönyv:{/DefinitionLineKeyword} Két számot összeadok
+			{StepKeyword}Amennyiben {/StepKeyword}összadom a számokat
+		"""
+
+

@@ -35,7 +35,7 @@ public class FeatureFileTaggerTests
     {
         //arrange
         using var sut = TaggerSut.Arrange(_testOutputHelper);
-        var view = sut.IdeScope.CreateTextView(new TestText(Array.Empty<string>()), sut.ProjectScope.ProjectFullPath);
+        var view = sut.IdeScope.CreateTextView(new TestText(Array.Empty<string>()), sut.ProjectScope.ProjectFullName);
 
         IReadOnlyCollection<DeveroomTag> parseResult = ImmutableArray<DeveroomTag>.Empty;
 
@@ -195,17 +195,41 @@ public class FeatureFileTaggerTests
         sut.WaitForTagsChangedEvent().Should().HaveCount(2);
     }
 
+    [Theory]
+    [InlineData(ProjectScopeDeveroomConfigurationProvider.DeveroomConfigFileName    , "{}")]
+    [InlineData(ProjectScopeDeveroomConfigurationProvider.SpecFlowAppConfigFileName , "<xml />")]
+    [InlineData(ProjectScopeDeveroomConfigurationProvider.SpecFlowJsonConfigFileName, "{}")]
+    [InlineData(ProjectScopeDeveroomConfigurationProvider.SpecSyncJsonConfigFileName, "{}")]
+    [InlineData("Test Project.csproj", "<xml><PropertyGroup><AppConfig>xx</AppConfig></PropertyGroup></xml>")]
+    public void Reparse_after_build_when_configuration_is_changed(string configFileName, string content)
+    {
+        //arrange
+        using var sut = TaggerSut.Arrange(_testOutputHelper);
+        sut.BuildInitializedFeatureFileTagger();
+        sut.WaitForTagsChangedEvent();
+
+        //act
+        sut.IdeScope.FileSystem.File.WriteAllText(Path.Combine(sut.ProjectScope.ProjectFolder, configFileName), content);
+        using var _ = new InMemoryStubProjectBuilder(sut.ProjectScope).TriggerBuild();
+
+        //assert
+        sut.WaitForTagsChangedEvent().Should().HaveCount(2);
+    }
+
     [Fact]
     public void Deregister_events_when_TextBuffer_is_not_a_feature_file()
     {
         //arrange
         using var sut = TaggerSut.Arrange(_testOutputHelper);
+        var configurationProvider = new Mock<IDeveroomConfigurationProvider>(MockBehavior.Strict);
+        sut.ProjectScope.Properties.RemoveProperty(typeof(IDeveroomConfigurationProvider)); 
+        sut.ProjectScope.Properties.AddProperty(typeof(IDeveroomConfigurationProvider), configurationProvider.Object); 
         var discoveryService = new Mock<IDiscoveryService>(MockBehavior.Strict);
         sut.ProjectScope.Properties.AddProperty(typeof(IDiscoveryService), discoveryService.Object);
         sut.BuildFeatureFileTagger();
-        sut.StubTextBuffer.StubContentType = sut.StubTextBuffer.StubContentType with {TypeName = "inert"};
 
         //act
+        sut.StubTextBuffer.StubContentType = sut.StubTextBuffer.StubContentType with {TypeName = "inert"};
         discoveryService.Raise(ds => ds.WeakBindingRegistryChanged -= null!, EventArgs.Empty);
 
         //assert
@@ -213,6 +237,7 @@ public class FeatureFileTaggerTests
             .Should()
             .BeFalse();
         discoveryService.VerifyRemove(m => m.WeakBindingRegistryChanged -= It.IsAny<EventHandler<EventArgs>>());
+        configurationProvider.VerifyRemove(m => m.WeakConfigurationChanged -= It.IsAny<EventHandler<EventArgs>>());
         sut.StubTextBuffer.VerifyRemove(
             tb => tb.ChangedOnBackground -= It.IsAny<EventHandler<TextContentChangedEventArgs>>());
     }
