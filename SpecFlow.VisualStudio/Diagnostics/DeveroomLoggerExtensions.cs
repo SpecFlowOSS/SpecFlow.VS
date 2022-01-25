@@ -45,7 +45,14 @@ public static class DeveroomLoggerExtensions
     public static void LogException(this IDeveroomLogger logger, IMonitoringService monitoringService, Exception ex,
         string message = "Exception", [CallerMemberName] string callerName = "???")
     {
-        monitoringService?.MonitorError(ex);
+        monitoringService.MonitorError(ex);
+        LogException(logger, ex, message, callerName);
+    }
+
+    public static void LogException(this IDeveroomLogger logger, Exception ex, string message = "Exception",
+        [CallerMemberName] string callerName = "???")
+    {
+        Debug.Fail(ex.ToString());
         var msg = new LogMessage(TraceLevel.Error, message, callerName, ex);
         logger.Log(msg);
     }

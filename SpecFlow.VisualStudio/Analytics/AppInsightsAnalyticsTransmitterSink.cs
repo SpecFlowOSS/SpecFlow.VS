@@ -1,17 +1,20 @@
-﻿#nullable enable
-namespace SpecFlow.VisualStudio.Analytics;
+﻿namespace SpecFlow.VisualStudio.Analytics;
 
 [Export(typeof(IAnalyticsTransmitterSink))]
 public class AppInsightsAnalyticsTransmitterSink : IAnalyticsTransmitterSink
 {
     private readonly IEnableAnalyticsChecker _enableAnalyticsChecker;
+    private readonly IDeveroomLogger _logger;
     private readonly Lazy<TelemetryClient> _telemetryClient;
 
     [ImportingConstructor]
-    public AppInsightsAnalyticsTransmitterSink(IEnableAnalyticsChecker enableAnalyticsChecker,
-        IUserUniqueIdStore userUniqueIdStore)
+    public AppInsightsAnalyticsTransmitterSink(
+        IEnableAnalyticsChecker enableAnalyticsChecker,
+        IUserUniqueIdStore userUniqueIdStore,
+        IDeveroomLogger logger)
     {
         _enableAnalyticsChecker = enableAnalyticsChecker;
+        _logger = logger;
         _telemetryClient = new Lazy<TelemetryClient>(() => GetTelemetryClient(userUniqueIdStore.GetUserId()));
     }
 
@@ -62,7 +65,18 @@ public class AppInsightsAnalyticsTransmitterSink : IAnalyticsTransmitterSink
                 break;
         }
 
-        _telemetryClient.Value.Flush();
+        Task.Run(async () =>
+        {
+            try
+            {
+                await _telemetryClient.Value.FlushAndTransmitAsync(
+                    new DebuggableCancellationTokenSource(TimeSpan.FromSeconds(1)).Token);
+            }
+            catch (Exception e)
+            {
+                _logger.LogException(e);
+            }
+        });
     }
 
     private TelemetryClient GetTelemetryClient(string userUniqueId) =>

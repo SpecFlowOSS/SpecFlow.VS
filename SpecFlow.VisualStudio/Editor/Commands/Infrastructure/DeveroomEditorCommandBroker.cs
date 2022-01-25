@@ -10,8 +10,8 @@ public class DeveroomFeatureEditorCommandBroker : DeveroomEditorCommandBroker<ID
 {
     [ImportingConstructor]
     public DeveroomFeatureEditorCommandBroker(IVsEditorAdaptersFactoryService adaptersFactory,
-        [ImportMany] IEnumerable<IDeveroomFeatureEditorCommand> commands)
-        : base(adaptersFactory, commands)
+        [ImportMany] IEnumerable<IDeveroomFeatureEditorCommand> commands, IDeveroomLogger logger)
+        : base(adaptersFactory, commands, logger)
     {
     }
 }
@@ -23,8 +23,8 @@ public class DeveroomCodeEditorCommandBroker : DeveroomEditorCommandBroker<IDeve
 {
     [ImportingConstructor]
     public DeveroomCodeEditorCommandBroker(IVsEditorAdaptersFactoryService adaptersFactory,
-        [ImportMany] IEnumerable<IDeveroomCodeEditorCommand> commands)
-        : base(adaptersFactory, commands)
+        [ImportMany] IEnumerable<IDeveroomCodeEditorCommand> commands, IDeveroomLogger logger)
+        : base(adaptersFactory, commands, logger)
     {
     }
 }
@@ -35,11 +35,13 @@ public abstract class DeveroomEditorCommandBroker<TCommand> : IVsTextViewCreatio
     private readonly IVsEditorAdaptersFactoryService _adaptersFactory;
     private readonly List<TCommand> _commands;
     private readonly Lazy<Dictionary<DeveroomEditorCommandTargetKey, IDeveroomEditorCommand[]>> _editorCommandRegistry;
+    private readonly IDeveroomLogger _logger;
 
     protected DeveroomEditorCommandBroker(IVsEditorAdaptersFactoryService adaptersFactory,
-        [ImportMany] IEnumerable<TCommand> commands)
+        [ImportMany] IEnumerable<TCommand> commands, IDeveroomLogger logger)
     {
         _adaptersFactory = adaptersFactory;
+        _logger = logger;
         _commands = commands.ToList();
         Debug.Assert(_commands.Count == 8, "There have to be 8 commands");
         _editorCommandRegistry =
@@ -52,7 +54,7 @@ public abstract class DeveroomEditorCommandBroker<TCommand> : IVsTextViewCreatio
         IWpfTextView view = _adaptersFactory.GetWpfTextView(textViewAdapter);
         Debug.Assert(view != null);
 
-        var filter = new EditorCommandsFilter(view, _editorCommandRegistry.Value);
+        var filter = new EditorCommandsFilter(view, _editorCommandRegistry.Value, _logger);
 
         textViewAdapter.AddCommandFilter(filter, out var next);
         filter.Next = next;
@@ -72,9 +74,13 @@ public abstract class DeveroomEditorCommandBroker<TCommand> : IVsTextViewCreatio
 
     private class EditorCommandsFilter : IOleCommandTarget
     {
+        private readonly IDeveroomLogger _logger;
+
         public EditorCommandsFilter(IWpfTextView textView,
-            Dictionary<DeveroomEditorCommandTargetKey, IDeveroomEditorCommand[]> commandRegistry)
+            Dictionary<DeveroomEditorCommandTargetKey, IDeveroomEditorCommand[]> commandRegistry,
+            IDeveroomLogger logger)
         {
+            _logger = logger;
             TextView = textView;
             CommandRegistry = commandRegistry;
         }
@@ -104,18 +110,21 @@ public abstract class DeveroomEditorCommandBroker<TCommand> : IVsTextViewCreatio
 
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
+            var sw = Stopwatch.StartNew();
             bool handled = false;
             int hresult = VSConstants.S_OK;
 
             var commandKey = new DeveroomEditorCommandTargetKey(pguidCmdGroup, nCmdID);
+
             if (!CommandRegistry.TryGetValue(commandKey, out var commands))
                 return Next.Exec(commandKey.CommandGroup, commandKey.CommandId, nCmdexecopt, pvaIn, pvaOut);
-
+            _logger.Trace(sw, "Run custom commands");
             // Pre-process
             foreach (var editorCommand in commands)
             {
                 editorCommand.Prepare();
                 handled = editorCommand.PreExec(TextView, commandKey, pvaIn);
+                _logger.Trace(sw, $"PreExec {editorCommand.GetType().Name} handled:{handled}");
                 if (handled)
                     break;
             }
@@ -124,7 +133,11 @@ public abstract class DeveroomEditorCommandBroker<TCommand> : IVsTextViewCreatio
                 hresult = Next.Exec(commandKey.CommandGroup, commandKey.CommandId, nCmdexecopt, pvaIn, pvaOut);
 
             // Post-process
-            foreach (var editorCommand in commands) editorCommand.PostExec(TextView, commandKey, pvaIn);
+            foreach (var editorCommand in commands)
+            {
+                handled = editorCommand.PostExec(TextView, commandKey, pvaIn);
+                _logger.Trace(sw, $"PostExec {editorCommand.GetType().Name} handled:{handled}");
+            }
 
             return hresult;
         }
