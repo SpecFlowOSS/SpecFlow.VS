@@ -41,6 +41,7 @@ public abstract class DeveroomEditorCommandBroker<TCommand> : IVsTextViewCreatio
     {
         _adaptersFactory = adaptersFactory;
         _commands = commands.ToList();
+        Debug.Assert(_commands.Count == 8, "There have to be 8 commands");
         _editorCommandRegistry =
             new Lazy<Dictionary<DeveroomEditorCommandTargetKey, IDeveroomEditorCommand[]>>(BuildRegistry,
                 LazyThreadSafetyMode.ExecutionAndPublication);

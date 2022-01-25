@@ -21,7 +21,6 @@ public class VsIdeScopeLoader : IVsIdeScope
         _safeMonitoringService = GetSafeMonitoringService(serviceProvider);
         _projectSystemReference =
             new Lazy<IVsIdeScope>(LoadProjectSystem, LazyThreadSafetyMode.ExecutionAndPublication);
-        //var x = VsUtils.ResolveMefDependency<IDeveroomTagParser>(serviceProvider);
     }
 
     private IVsIdeScope VsIdeScope => _projectSystemReference.Value;

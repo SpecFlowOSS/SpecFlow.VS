@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.LanguageServices;
 
 namespace SpecFlow.VisualStudio.Editor.Services.EditorConfig;
 
-[Export(typeof(EditorConfigOptionsProvider))]
+[Export(typeof(IEditorConfigOptionsProvider))]
 public class EditorConfigOptionsProvider : IEditorConfigOptionsProvider
 {
     private readonly VisualStudioWorkspace _visualStudioWorkspace;
