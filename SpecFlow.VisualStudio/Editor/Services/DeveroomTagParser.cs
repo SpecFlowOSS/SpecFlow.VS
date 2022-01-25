@@ -169,6 +169,9 @@ public class DeveroomTagParser : IDeveroomTagParser
 
             if (scenarioDefinition is ScenarioOutline) AddPlaceholderTags(fileSnapshot, stepTag, step);
 
+            if (bindingRegistry == ProjectBindingRegistry.Invalid)
+                continue;
+
             var match = bindingRegistry.MatchStep(step, scenarioDefinitionTag);
             if (match.HasDefined || match.HasAmbiguous)
             {
