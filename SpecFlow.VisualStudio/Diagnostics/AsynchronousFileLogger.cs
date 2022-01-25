@@ -123,6 +123,7 @@ public class AsynchronousFileLogger : IDeveroomLogger, IDisposable
         if (!disposing) return;
 
         _channel.Writer.TryComplete();
+        _stopTokenSource.Cancel(true);
         _stopTokenSource.Dispose();
     }
 }

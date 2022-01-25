@@ -29,16 +29,25 @@ public class ProjectSystemSteps : Steps
     [Given(@"there is a SpecFlow project scope")]
     public void GivenThereIsASpecFlowProjectScope()
     {
-        _projectScope = new InMemoryStubProjectScope(_ideScope);
-        _projectScope.AddSpecFlowPackage();
-        _discoveryService = MockableDiscoveryService.Setup(_projectScope, TimeSpan.FromMilliseconds(100));
+        CreateProject(ps => ps.AddSpecFlowPackage());
     }
 
     [Given("there is a non-SpecFlow project scope")]
     public void GivenThereIsANon_SpecFlowProjectScope()
     {
+        CreateProject(ps => ps.StubProjectSettingsProvider.Kind = DeveroomProjectKind.FeatureFileContainerProject);
+    }
+    
+    [Given("there is a project scope which is (.*)")]
+    public void GivenThereIsAProjectScopeWhichIs(DeveroomProjectKind kind)
+    {
+        CreateProject(ps => ps.StubProjectSettingsProvider.Kind = kind);
+    }
+
+    private void CreateProject(Action<InMemoryStubProjectScope> initialize)
+    {
         _projectScope = new InMemoryStubProjectScope(_ideScope);
-        _projectScope.StubProjectSettingsProvider.Kind = DeveroomProjectKind.FeatureFileContainerProject;
+        initialize(_projectScope);
         _discoveryService = MockableDiscoveryService.Setup(_projectScope, TimeSpan.FromMilliseconds(100));
     }
 
@@ -505,6 +514,17 @@ public class ProjectSystemSteps : Steps
 
         matchedTags.Should().BeEmpty();
     }
+
+    [Then("there are no sections of type (.*)")]
+    public void ThenThereAreNoSectionsOfTypeUndefinedStep(string[] keywordTypes)
+    {
+        CreateTagAggregator();
+        var allTags = GetDeveroomTags(_wpfTextView).ToArray();
+        var tags = allTags.Where(t => keywordTypes.Contains(t.Type)).ToArray();
+        allTags.Should().NotBeEmpty();
+        tags.Should().BeEmpty();
+    }
+
 
     private ITagAggregator<DeveroomTag> CreateTagAggregator()
     {
