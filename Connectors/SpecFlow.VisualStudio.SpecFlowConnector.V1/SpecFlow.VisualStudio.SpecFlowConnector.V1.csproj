@@ -9,7 +9,7 @@
     <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
     <PlatformTarget>anycpu</PlatformTarget>
     <RootNamespace>SpecFlow.VisualStudio.SpecFlowConnector</RootNamespace>
-    <_OutputCopyLocation>$(SolutionDir)Connectors\bin\$(configuration)</_OutputCopyLocation>
+    <_OutputCopyLocation>$(SolutionDir)Connectors\bin\$(configuration)\V1</_OutputCopyLocation>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,11 +47,13 @@
       Text="DestFiles:&#xD;&#xA;        @(_FilesToCopy->'$(_OutputCopyLocation)\V1\%(RecursiveDir)%(Filename)%(Extension)')"
       Importance="high" />
 
-    <RemoveDir Directories="$(_OutputCopyLocation)\V1" />
+    <Message
+      Text="Copying: @(_FilesToCopy)->'$(_OutputCopyLocation)\%(RecursiveDir)%(Filename)%(Extension)'"
+      Importance="high" />
+
+    <RemoveDir Directories="$(_OutputCopyLocation)" />
+
     <Copy SourceFiles="@(_FilesToCopy)"
-          DestinationFiles="@(_FilesToCopy->'$(_OutputCopyLocation)\V1\%(RecursiveDir)%(Filename)%(Extension)')" />
-    <RemoveDir Directories="$(_OutputCopyLocation)\V1-$(TargetFramework)" />
-    <Copy SourceFiles="@(_FilesToCopy)"
-          DestinationFiles="@(_FilesToCopy->'$(_OutputCopyLocation)\V1-$(TargetFramework)\%(RecursiveDir)%(Filename)%(Extension)')" />
+          DestinationFiles="$(_OutputCopyLocation)\%(RecursiveDir)%(Filename)%(Extension)" />
   </Target>
 </Project>

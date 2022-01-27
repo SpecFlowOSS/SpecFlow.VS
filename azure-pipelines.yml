@@ -31,6 +31,12 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
+- task: NuGetCommand@2
+  displayName: 'Install nuget packages'
+  inputs:
+    command: 'custom'
+    arguments: 'install .\Tests\SpecFlowPackages\Packages.config'
+
 - task: DotNetCoreCLI@2
   displayName: Run Unit Tests
   inputs:
@@ -38,6 +44,7 @@ steps:
     projects: '**/*[Tt]ests/*.csproj'
     arguments: '--configuration $(BuildConfiguration) --no-build --collect "Code coverage"'
     testRunTitle: Unit Tests
+    publishTestResults: true
 
 - task: DotNetCoreCLI@2
   displayName: Run SpecFlow Scenarios

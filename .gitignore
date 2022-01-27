@@ -268,3 +268,4 @@ Deveroom.VisualStudio.Package/Changelog.txt
 launchSettings.json
 /GitExtensions.settings.backup
 *.received.txt
+/Tests/SpecFlowPackages/SpecFlow*/*
