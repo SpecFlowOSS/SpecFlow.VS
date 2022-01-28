@@ -13,17 +13,13 @@ public class ConsoleRunner
     {
         try
         {
-            var connectorOptions = ConnectorOptions.Parse(args);
-
-            connectorOptions.AttachDebuggerWhenRequired();
-
-            var command = ToCommand(connectorOptions);
-
-            var result = command.Execute();
-
-            PrintResult(result);
-
-            return result.Code;
+            return PrintResult(
+                    ToCommand(
+                            ConnectorOptions.Parse(args)
+                                .AttachDebuggerWhenRequired()
+                        )
+                        .Execute())
+                .Code;
         }
         catch (Exception ex)
         {
