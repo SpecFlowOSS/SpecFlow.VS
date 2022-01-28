@@ -14,17 +14,16 @@ public class ConsoleRunner
         try
         {
             return PrintResult(
-                    ToCommand(
-                            ConnectorOptions.Parse(args)
-                                .AttachDebuggerWhenRequired()
-                        )
+                    args.Map(ConnectorOptions.Parse)
+                        .AttachDebuggerWhenRequired()
+                        .Map(ToCommand)
                         .Execute())
-                .Code;
+                .Map(result => result.Code);
         }
         catch (Exception ex)
         {
-            PrintException(ex);
-            return ToResultCode(ex);
+            return PrintException(ex)
+                .Map(ToResultCode);
         }
     }
 
