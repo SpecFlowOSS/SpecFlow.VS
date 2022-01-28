@@ -1,2 +1,4 @@
-﻿Console.Error.WriteLine("!!!!!!!!!! Not implemented yet !!!!!!!!!!!!");
-return 1;
+﻿var log = new ConsoleLogger();
+
+return new ConsoleRunner(log)
+    .EntryPoint(args);

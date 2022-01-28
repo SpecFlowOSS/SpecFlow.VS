@@ -3,12 +3,17 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>specflow-vs</AssemblyName>
-    <TargetFramework>net6.0</TargetFramework>
-    <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworks>net48;net6.0</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>SpecFlow.VisualStudio.SpecFlowConnector</RootNamespace>
     <_OutputCopyLocation>$(SolutionDir)Connectors\bin\$(configuration)\General-$(TargetFramework)</_OutputCopyLocation>
   </PropertyGroup>
+
+  <ItemGroup Condition="$(TargetFramework)=='net48'">
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
 
   <Target Name="CustomAfterBuild" AfterTargets="Build" Condition="$(configuration)=='Debug'">
 
@@ -22,4 +27,5 @@
 
     <Copy SourceFiles="@(_FilesToCopy)" DestinationFiles="$(_OutputCopyLocation)\%(RecursiveDir)%(Filename)%(Extension)" />
   </Target>
+
 </Project>

@@ -1,0 +1,14 @@
+﻿Error: Message1 -> Message2
+Exception: System.AggregateException->System.NotImplementedException
+StackTrace of NotImplementedException:
+  at ... in ...
+  .
+  .
+  .
+  at ... in ...
+StackTrace of AggregateException:
+  at ... in ...
+  .
+  .
+  .
+  at ... in ...

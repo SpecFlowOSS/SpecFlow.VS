@@ -1,0 +1,12 @@
+﻿stdout:
+stderr:Error: Invalid command: xxx
+Exception: System.ArgumentException
+StackTrace of ArgumentException:
+  at ... in ...
+  .
+  .
+  .
+  at ... in ...
+
+
+resultCode:3
