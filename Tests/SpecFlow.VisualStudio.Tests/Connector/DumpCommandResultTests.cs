@@ -48,6 +48,8 @@ public class DumpCommandResultTests
     {
         NamerFactory.AdditionalInformation = testName;
 
-        _testOutputHelper.ApprovalsVerify(ConsoleRunner.Dump(exception), XunitExtensions.StackTraceScrubber);
+        var dump = exception.Dump();
+
+        _testOutputHelper.ApprovalsVerify(dump, XunitExtensions.StackTraceScrubber);
     }
 }
