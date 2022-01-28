@@ -13,16 +13,18 @@ public class ConsoleRunner
     {
         try
         {
-            return PrintResult(
-                    args.Map(ConnectorOptions.Parse)
-                        .AttachDebuggerWhenRequired()
-                        .Map(ToCommand)
-                        .Execute())
+            return args
+                .Map(ConnectorOptions.Parse)
+                .AttachDebuggerWhenRequired()
+                .Map(ToCommand)
+                .Execute()
+                .Tie(PrintResult)
                 .Map(result => result.Code);
         }
         catch (Exception ex)
         {
-            return PrintException(ex)
+            return ex
+                .Tie(PrintException)
                 .Map(ToResultCode);
         }
     }
@@ -37,16 +39,14 @@ public class ConsoleRunner
         }
     }
 
-    private CommandResult PrintResult(CommandResult result)
+    private static void PrintResult(CommandResult result)
     {
         Log.Info(JsonSerialization.MarkResult(result.Json));
-        return result;
     }
 
-    private Exception PrintException(Exception ex)
+    private static void PrintException(Exception ex)
     {
         Log.Error(Dump(ex));
-        return ex;
     }
 
     public static string Dump(Exception ex)
