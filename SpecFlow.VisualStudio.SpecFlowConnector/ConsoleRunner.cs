@@ -9,19 +9,25 @@ public class ConsoleRunner
 
     private ILogger Log { get; }
 
-    public int EntryPoint(string[] args) =>
-        args.TryCatch(
-            a => a
+    public int EntryPoint(string[] args)
+    {
+        try
+        {
+            return args
                 .Map(ConnectorOptions.Parse)
                 .AttachDebuggerWhenRequired()
                 .Map(ToCommand)
                 .Execute()
                 .Tie(PrintResult)
-                .Map(result => result.Code),
-            ex => ex
+                .Map(result => result.Code);
+        }
+        catch (Exception ex)
+        {
+            return ex
                 .Tie(e => Log.Error(e.Dump()))
-                .Map(ToResultCode)
-        );
+                .Map(ToResultCode);
+        }
+    }
 
     public static ICommand ToCommand(ConnectorOptions options)
     {
