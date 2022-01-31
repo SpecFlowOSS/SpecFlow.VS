@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿using System.Reflection;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector;
 
 public record ConnectorOptions(bool DebugMode)
 {
@@ -29,33 +31,40 @@ public record ConnectorOptions(bool DebugMode)
 
 public record DiscoveryOptions(
     bool DebugMode,
-    string AssemblyFilePath,
-    string ConfigFilePath,
-    string ConnectorFolder,
+    FileDetails AssemblyFile,
+    Option<FileDetails> ConfigFilePath,
+    DirectoryInfo ConnectorFolder,
     string TargetFolder
 ) : ConnectorOptions(DebugMode)
 {
     public static Either<Exception, ConnectorOptions> Parse(string[] args, bool debugMode)
     {
         if (args.Length < 1)
-            throw new InvalidOperationException("Usage: discovery <test-assembly-path> [<config-file-path>]");
+            return new InvalidOperationException("Usage: discovery <test-assembly-path> [<config-file-path>]");
 
-        var assemblyFilePath = FileDetails.FromPath(args[0]);
+        var assemblyFile = FileDetails.FromPath(args[0]);
+        Option<FileDetails> configFilePath = args.Length < 2 || string.IsNullOrWhiteSpace(args[1])
+            ? None.Value
+            : FileDetails.FromPath(args[1]);
 
-        var AssemblyFilePath = Path.GetFullPath(args[0]);
-        if (assemblyFilePath.FullName != AssemblyFilePath) throw new InvalidOperationException("nemjó");
-
-        var ConfigFilePath = args.Length < 2 || string.IsNullOrWhiteSpace(args[1]) ? null : Path.GetFullPath(args[1]);
-
-        var TargetFolder = Path.GetDirectoryName(AssemblyFilePath);
+        var TargetFolder = Path.GetDirectoryName(assemblyFile);
         if (TargetFolder == null)
             return new InvalidOperationException(
-                $"Unable to detect target folder from test assembly path '{AssemblyFilePath}'");
+                $"Unable to detect target folder from test assembly path '{assemblyFile}'");
 
-        string ConnectorFolder = null;// Path.GetDirectoryName(typeof(Runner).Assembly.GetLocalCodeBase());
-        if (ConnectorFolder == null)
-            return new InvalidOperationException("Unable to detect connector folder.");
+        return typeof(Runner)
+            .Assembly
+            .GetLocalCodeBase()
+            .Map(Directory)
+            .Map(connectorFolder =>
+                new DiscoveryOptions(debugMode, assemblyFile, configFilePath, connectorFolder, TargetFolder)
+                    as ConnectorOptions
+            );
+    }
 
-        return new DiscoveryOptions(debugMode, AssemblyFilePath, ConfigFilePath, ConnectorFolder, TargetFolder);
+    private static Either<Exception, DirectoryInfo> Directory(FileDetails fileDetails)
+    {
+        return fileDetails.Directory.Map<Exception, DirectoryInfo>(() =>
+            new InvalidOperationException("Unable to detect connector folder."));
     }
 }

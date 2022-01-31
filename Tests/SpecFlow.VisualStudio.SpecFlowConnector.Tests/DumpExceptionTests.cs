@@ -1,8 +1,8 @@
 ﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
-[UseApprovalSubdirectory("ApprovalTestData")]
-public class DumpCommandResultTests
+[UseApprovalSubdirectory("ApprovalTestData\\DumpException")]
+public class DumpExceptionTests
 {
     public static IEnumerable<LabeledTestData<Exception>> TestData = new List<LabeledTestData<Exception>>
     {
@@ -47,18 +47,18 @@ public class DumpCommandResultTests
 
     private readonly ITestOutputHelper _testOutputHelper;
 
-    public DumpCommandResultTests(ITestOutputHelper testOutputHelper)
+    public DumpExceptionTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
     }
 
     [Theory]
     [LabeledMemberData(nameof(TestData))]
-    public void Approval(LabeledTestData<Exception> testTestData)
+    public void Approval(LabeledTestData<Exception> @case)
     {
-        NamerFactory.AdditionalInformation = testTestData.Label;
+        NamerFactory.AdditionalInformation = @case.Label;
 
-        var dump = testTestData.Data.Dump();
+        var dump = @case.Data.Dump();
 
         _testOutputHelper.ApprovalsVerify(dump, XunitExtensions.StackTraceScrubber);
     }

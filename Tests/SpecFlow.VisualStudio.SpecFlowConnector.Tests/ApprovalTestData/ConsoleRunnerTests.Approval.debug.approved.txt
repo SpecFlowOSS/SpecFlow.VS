@@ -1,4 +1,0 @@
-﻿stdout:
-stderr:Error: Invalid command: xxx
-Exception: System.ArgumentException
-resultCode:3
