@@ -41,3 +41,33 @@ public static class XunitExtensions
         });
     }
 }
+
+public class LabeledTestData<T>
+{
+    public LabeledTestData(string label, T data)
+    {
+        Data = data;
+        Label = label;
+    }
+
+    public T Data { get; }
+    public string Label { get; }
+
+    public override string ToString() => Label;
+}
+
+public class LabeledMemberDataAttribute : MemberDataAttributeBase
+{
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="T:Xunit.MemberDataAttribute" /> class.
+    /// </summary>
+    /// <param name="memberName">The name of the public static member on the test class that will provide the test data</param>
+    /// <param name="parameters">The parameters for the member (only supported for methods; ignored for everything else)</param>
+    public LabeledMemberDataAttribute(string memberName, params object[] parameters)
+        : base(memberName, parameters)
+    {
+    }
+
+    /// <inheritdoc />
+    protected override object[] ConvertDataItem(MethodInfo testMethod, object item) => new[] {item};
+}

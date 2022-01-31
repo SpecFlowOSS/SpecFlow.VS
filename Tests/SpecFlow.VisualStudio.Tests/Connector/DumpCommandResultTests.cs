@@ -4,19 +4,17 @@
 [UseApprovalSubdirectory("../ApprovalTestData")]
 public class DumpCommandResultTests
 {
-    public static IEnumerable<object[]> Exceptions = new List<object[]>
+    public static IEnumerable<LabeledTestData<Exception>> TestData = new List<LabeledTestData<Exception>>
     {
-        new object[] {"SimpleException", new Exception().WithStackTrace()},
-        new object[] {"SimpleExceptionWithMessage", new Exception("Message").WithStackTrace()},
-        new object[] {"NotImplementedException", new NotImplementedException().WithStackTrace()},
-        new object[] {"NotImplementedExceptionWithMessage", new NotImplementedException("Message").WithStackTrace()},
-        new object[]
-        {
+        new("SimpleException", new Exception().WithStackTrace()),
+        new("SimpleExceptionWithMessage", new Exception("Message").WithStackTrace()),
+        new("NotImplementedException", new NotImplementedException().WithStackTrace()),
+        new("NotImplementedExceptionWithMessage", new NotImplementedException("Message").WithStackTrace()),
+        new(
             "WithOneException",
             new Exception("Message1", new NotImplementedException("Message2").WithStackTrace())
-        },
-        new object[]
-        {
+        ),
+        new(
             "NestedExceptions",
             new Exception("Message1",
                     new NotImplementedException("Message2"
@@ -24,29 +22,27 @@ public class DumpCommandResultTests
                                 .WithStackTrace())
                         .WithStackTrace())
                 .WithStackTrace()
-        },
-        new object[]
-        {
+        ),
+        new(
             "AggregateException",
             new AggregateException("Message1",
                 new NotImplementedException("Message2").WithStackTrace(),
                 new InvalidOperationException("Messasge3").WithStackTrace()
             ).WithStackTrace()
-        },
-        new object[]
-        {
+        ),
+        new(
             "NestedAggregateException",
             new AggregateException("Message1",
                 new NotImplementedException("Message2"
                     , new AggregateException("Message3"
                         , new Exception("Message4").WithStackTrace()
-                        ).WithStackTrace()
-                    ).WithStackTrace(),
+                    ).WithStackTrace()
+                ).WithStackTrace(),
                 new AggregateException("Message5"
                     , new InvalidOperationException("Message6").WithStackTrace()
-                    ).WithStackTrace()
+                ).WithStackTrace()
             ).WithStackTrace()
-        }
+        )
     };
 
     private readonly ITestOutputHelper _testOutputHelper;
@@ -57,12 +53,12 @@ public class DumpCommandResultTests
     }
 
     [Theory]
-    [MemberData(nameof(Exceptions))]
-    public void Approval(string testName, Exception exception)
+    [LabeledMemberData(nameof(TestData))]
+    public void Approval(LabeledTestData<Exception> testTestData)
     {
-        NamerFactory.AdditionalInformation = testName;
+        NamerFactory.AdditionalInformation = testTestData.Label;
 
-        var dump = exception.Dump();
+        var dump = testTestData.Data.Dump();
 
         _testOutputHelper.ApprovalsVerify(dump, XunitExtensions.StackTraceScrubber);
     }
