@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿// ReSharper disable once CheckNamespace
 
 public static class FunctionalExtensions
 {
