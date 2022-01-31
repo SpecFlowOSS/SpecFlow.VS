@@ -15,7 +15,7 @@ public static class XunitExtensions
             .ToString();
 
     public static string StackTraceScrubber(string content) => Regex.Replace(content,
-        @"StackTrace of (?<exceptionName>.*):\r\n( +at .* in .*\r\n)+",
+        @"StackTrace of (?<exceptionName>.*):\r\n( +at .* in .*[\r\n]*)+",
         $"StackTrace of ${{exceptionName}}:{StackTraceReplacement}");
 
     public static void ApprovalsVerify(this ITestOutputHelper testOutputHelper, object value)

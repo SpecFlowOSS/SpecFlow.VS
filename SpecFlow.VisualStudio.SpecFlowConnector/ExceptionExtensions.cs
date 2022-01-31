@@ -5,7 +5,7 @@ public static class ExceptionExtensions
     public static string Dump(this Exception ex) =>
         ex.AsEnumerable()
             .Select(e => (
-                message: e.Message,
+                message:  FormatMessage(e),
                 fullName: e.GetType().FullName ?? "<Unknown>",
                 stackTrace: e.StackTrace is null
                     ? string.Empty
@@ -22,6 +22,14 @@ public static class ExceptionExtensions
             .Map(blocks => new StringBuilder().AppendLines(blocks))
             .ToString()
             .Map(s=>s.TrimEnd('\r','\n'));
+
+    private static string FormatMessage(Exception e)
+    {
+        var splitIndex = e.Message.IndexOf(" (", StringComparison.Ordinal);
+        return splitIndex < 0 
+            ? e.Message 
+            : e.Message.Substring(0, splitIndex);
+    }
 
     public static IEnumerable<Exception> AsEnumerable(this Exception? ex)
     {

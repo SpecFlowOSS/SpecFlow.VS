@@ -1,5 +1,10 @@
-﻿stdout:>>>>>>>>>>
-{}
-<<<<<<<<<<
-stderr:
-resultCode:0
+﻿stdout:
+stderr:Error: Usage: discovery <test-assembly-path> [<config-file-path>]
+Exception: System.InvalidOperationException
+StackTrace of InvalidOperationException:
+  at ... in ...
+  .
+  .
+  .
+  at ... in ...
+resultCode:4

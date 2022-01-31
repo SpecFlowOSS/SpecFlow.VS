@@ -16,11 +16,10 @@ public class CommandFactory
 
     public static Either<Exception, ICommand> ToCommand(ConnectorOptions options)
     {
-        switch (options.CommandName)
+        return options switch
         {
-            case DiscoveryCommand.CommandName: return new DiscoveryCommand(options);
-            //case GeneratorCommand.CommandName: return new GeneratorCommand(options);
-            default: return new ArgumentException($"Invalid command: {options.CommandName}");
-        }
+            DiscoveryOptions o => new DiscoveryCommand(o),
+            _ => new ArgumentException($"Invalid command: {options.GetType().Name}")
+        };
     }
 }

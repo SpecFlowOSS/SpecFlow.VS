@@ -1,4 +1,4 @@
 ﻿stdout:
-stderr:Error: Invalid command: xxx
+stderr:Error: Invalid command: --debug
 Exception: System.ArgumentException
 resultCode:3

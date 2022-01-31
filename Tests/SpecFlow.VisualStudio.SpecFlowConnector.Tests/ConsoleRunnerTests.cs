@@ -9,7 +9,8 @@ public class ConsoleRunnerTests
         new object[] {"Missing arguments", Array.Empty<string>()},
         new object[] {"Invalid command", new[] {"xxx"}},
         new object[] {"discovery command", new[] {"discovery"}},
-        new object[] {"debug", new[] {"discovery --debug"}}
+        new object[] {"debug", new[] {"xxx", "--debug"}},
+        new object[] {"debug must be after command", new[] {"--debug", "yyy"}}
     };
 
     private readonly ITestOutputHelper _testOutputHelper;

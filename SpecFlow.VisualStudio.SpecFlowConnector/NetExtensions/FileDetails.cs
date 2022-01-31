@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.Common;
+﻿// ReSharper disable once CheckNamespace
+
+namespace System;
 
 public record FileDetails
 {
