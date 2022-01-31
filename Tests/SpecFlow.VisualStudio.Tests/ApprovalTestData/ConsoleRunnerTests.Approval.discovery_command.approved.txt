@@ -1,6 +1,5 @@
 ﻿stdout:>>>>>>>>>>
 {}
 <<<<<<<<<<
-
 stderr:
 resultCode:0

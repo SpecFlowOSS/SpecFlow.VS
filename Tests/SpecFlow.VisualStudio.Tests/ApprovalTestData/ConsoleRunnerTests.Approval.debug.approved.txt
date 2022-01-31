@@ -7,6 +7,4 @@ StackTrace of ArgumentException:
   .
   .
   at ... in ...
-
-
 resultCode:3

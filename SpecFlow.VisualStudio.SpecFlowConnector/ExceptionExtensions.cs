@@ -1,6 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
-
-namespace System;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
 
 public static class ExceptionExtensions
 {
@@ -9,16 +7,21 @@ public static class ExceptionExtensions
             .Select(e => (
                 message: e.Message,
                 fullName: e.GetType().FullName ?? "<Unknown>",
-                stackTrace: $"StackTrace of {e.GetType().Name}:{Environment.NewLine}{e.StackTrace}"
+                stackTrace: e.StackTrace is null
+                    ? string.Empty
+                    : $"StackTrace of {e.GetType().Name}:{Environment.NewLine}{e.StackTrace}"
             ))
             .Aggregate((accumulate, current) => (
                 message: $"{accumulate.message} -> {current.message}",
                 fullName: $"{accumulate.fullName}->{current.fullName}",
-                stackTrace: $"{current.stackTrace}{Environment.NewLine}{accumulate.stackTrace}")
+                stackTrace:
+                $"{current.stackTrace}{(string.IsNullOrWhiteSpace(accumulate.stackTrace) ? string.Empty : Environment.NewLine + accumulate.stackTrace)}")
             )
             .Map(ToTextBlocks)
-            .Map(block => new StringBuilder().AppendLines(block))
-            .ToString();
+            .Where(block => !string.IsNullOrWhiteSpace(block))
+            .Map(blocks => new StringBuilder().AppendLines(blocks))
+            .ToString()
+            .Map(s=>s.TrimEnd('\r','\n'));
 
     public static IEnumerable<Exception> AsEnumerable(this Exception? ex)
     {
@@ -42,6 +45,7 @@ public static class ExceptionExtensions
         var (messages, fullNames, stackTraces) = result;
         yield return $"Error: {messages}";
         yield return $"Exception: {fullNames}";
+        if (string.IsNullOrWhiteSpace(stackTraces)) yield break;
         yield return stackTraces;
     }
 }

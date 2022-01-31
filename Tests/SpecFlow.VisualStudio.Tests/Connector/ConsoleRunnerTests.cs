@@ -26,16 +26,16 @@ public class ConsoleRunnerTests
         //arrange
         NamerFactory.AdditionalInformation = testName.Replace(' ', '_');
         var logger = new StringBuilderLogger();
-        var consoleRunner = new ConsoleRunner(logger);
+        var consoleRunner = new Runner(logger);
 
         //act
-        var resultCode = consoleRunner.EntryPoint(args);
+        var resultCode = consoleRunner.Run(args);
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()
                 .AppendLine($"stdout:{logger[LogLevel.Info]}")
                 .AppendLine($"stderr:{logger[LogLevel.Error]}")
-                .AppendLine($"resultCode:{resultCode}"),
+                .Append($"resultCode:{resultCode}"),
             XunitExtensions.StackTraceScrubber);
     }
 }

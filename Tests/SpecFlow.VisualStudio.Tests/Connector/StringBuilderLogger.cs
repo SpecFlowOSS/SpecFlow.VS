@@ -14,7 +14,7 @@ public class StringBuilderLogger : Logger
         get
         {
             var stringWriter = GetTextWriter(level) as StringWriter;
-            return stringWriter!.GetStringBuilder().ToString();
+            return stringWriter!.GetStringBuilder().ToString().TrimEnd('\r','\n');
         }
     }
 

@@ -31,8 +31,4 @@ StackTrace of NotImplementedException:
   .
   at ... in ...
 StackTrace of AggregateException:
-  at ... in ...
-  .
-  .
-  .
-  at ... in ...
+   at System.SystemExtensions.WithStackTrace(Exception exception) in C:\git\SpecFlow.VS\Tests\SpecFlow.VisualStudio.Tests\SystemExtensions.cs:line 11
