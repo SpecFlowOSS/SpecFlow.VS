@@ -1,7 +1,7 @@
-﻿namespace SpecFlow.VisualStudio.Tests.Connector;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
-[UseApprovalSubdirectory("../ApprovalTestData")]
+[UseApprovalSubdirectory("ApprovalTestData")]
 public class DumpCommandResultTests
 {
     public static IEnumerable<LabeledTestData<Exception>> TestData = new List<LabeledTestData<Exception>>

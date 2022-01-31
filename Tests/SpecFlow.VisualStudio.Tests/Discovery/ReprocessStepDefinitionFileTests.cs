@@ -1,4 +1,6 @@
-﻿#nullable disable
+﻿using FileDetails = SpecFlow.VisualStudio.Common.FileDetails;
+
+#nullable disable
 namespace SpecFlow.VisualStudio.Tests.Discovery;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]

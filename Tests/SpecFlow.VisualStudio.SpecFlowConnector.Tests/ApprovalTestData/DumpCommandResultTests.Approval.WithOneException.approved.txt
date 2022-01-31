@@ -1,0 +1,4 @@
+﻿Error: Message1 -> Message2
+Exception: System.Exception->System.NotImplementedException
+StackTrace of NotImplementedException:
+   at System.SystemExtensions.WithStackTrace(Exception exception) in C:\git\SpecFlow.VS\Tests\SpecFlow.VisualStudio.Tests\SystemExtensions.cs:line 11

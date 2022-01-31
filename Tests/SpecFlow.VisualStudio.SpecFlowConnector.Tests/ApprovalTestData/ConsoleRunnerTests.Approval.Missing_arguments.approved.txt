@@ -1,0 +1,4 @@
+﻿stdout:
+stderr:Error: Command is missing!
+Exception: System.ArgumentException
+resultCode:3

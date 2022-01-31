@@ -1,0 +1,16 @@
+﻿Error: Message1 -> Message2 -> Messasge3
+Exception: System.Exception->System.NotImplementedException->System.InvalidOperationException
+StackTrace of InvalidOperationException:
+  at ... in ...
+  .
+  .
+  .
+  at ... in ...
+StackTrace of NotImplementedException:
+  at ... in ...
+  .
+  .
+  .
+  at ... in ...
+StackTrace of Exception:
+   at System.SystemExtensions.WithStackTrace(Exception exception) in C:\git\SpecFlow.VS\Tests\SpecFlow.VisualStudio.Tests\SystemExtensions.cs:line 11

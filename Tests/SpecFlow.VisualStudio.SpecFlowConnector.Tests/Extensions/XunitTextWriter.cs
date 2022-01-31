@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.VisualStudio.Tests.Connector;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
 
 internal class XunitTextWriter : TextWriter
 {

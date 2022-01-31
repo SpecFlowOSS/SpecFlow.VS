@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.VisualStudio.Tests.Connector;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 public class StringBuilderLogger : Logger
 {
