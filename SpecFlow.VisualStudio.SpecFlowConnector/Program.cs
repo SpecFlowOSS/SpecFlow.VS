@@ -1,4 +1,4 @@
 ﻿var log = new ConsoleLogger();
 
-return new ConsoleRunner(log)
-    .EntryPoint(args);
+return new Runner(log)
+    .Run(args);

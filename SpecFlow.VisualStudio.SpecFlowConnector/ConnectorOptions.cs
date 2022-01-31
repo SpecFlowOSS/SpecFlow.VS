@@ -2,10 +2,10 @@
 
 public record ConnectorOptions(string CommandName, bool DebugMode)
 {
-    public static ConnectorOptions Parse(string[] args)
+    public static Either<Exception, ConnectorOptions> Parse(string[] args)
     {
-        if (args == null || args.Length == 0)
-            throw new ArgumentException("Command is missing!");
+        if (args.Length == 0)
+            return new ArgumentException("Command is missing!");
 
         var commandArgsList = args.Skip(1).ToList();
         int debugArgIndex = commandArgsList.IndexOf("--debug");
@@ -18,13 +18,5 @@ public record ConnectorOptions(string CommandName, bool DebugMode)
 
         var commandArgs = commandArgsList.ToArray();
         return new ConnectorOptions(args[0], debugMode);
-    }
-
-    public ConnectorOptions AttachDebuggerWhenRequired()
-    {
-        if (DebugMode && !Debugger.IsAttached)
-            Debugger.Launch();
-
-        return this;
     }
 }
