@@ -32,6 +32,20 @@ public class DumpCommandResultTests
                 new NotImplementedException("Message2").WithStackTrace(),
                 new InvalidOperationException("Messasge3").WithStackTrace()
             ).WithStackTrace()
+        },
+        new object[]
+        {
+            "NestedAggregateException",
+            new AggregateException("Message1",
+                new NotImplementedException("Message2"
+                    , new AggregateException("Message3"
+                        , new Exception("Message4").WithStackTrace()
+                        ).WithStackTrace()
+                    ).WithStackTrace(),
+                new AggregateException("Message5"
+                    , new InvalidOperationException("Message6").WithStackTrace()
+                    ).WithStackTrace()
+            ).WithStackTrace()
         }
     };
 

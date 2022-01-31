@@ -16,7 +16,7 @@ public static class ExceptionExtensions
                 fullName: $"{accumulate.fullName}->{current.fullName}",
                 stackTrace: $"{current.stackTrace}{Environment.NewLine}{accumulate.stackTrace}")
             )
-            .Map(Blocks)
+            .Map(ToTextBlocks)
             .Map(block => new StringBuilder().AppendLines(block))
             .ToString();
 
@@ -25,11 +25,19 @@ public static class ExceptionExtensions
         while (ex != null)
         {
             yield return ex;
-            ex = ex.InnerException;
+            switch (ex)
+            {
+                case AggregateException aggregateException:
+                    foreach (var e in aggregateException.InnerExceptions.SelectMany(AsEnumerable)) yield return e;
+                    yield break;
+                default:
+                    ex = ex.InnerException;
+                    break;
+            }
         }
     }
 
-    private static IEnumerable<string> Blocks((string, string, string) result)
+    private static IEnumerable<string> ToTextBlocks((string, string, string) result)
     {
         var (messages, fullNames, stackTraces) = result;
         yield return $"Error: {messages}";

@@ -1,5 +1,11 @@
-﻿Error: Message1 -> Message2
-Exception: System.AggregateException->System.NotImplementedException
+﻿Error: Message1 -> Message2 -> Messasge3
+Exception: System.AggregateException->System.NotImplementedException->System.InvalidOperationException
+StackTrace of InvalidOperationException:
+  at ... in ...
+  .
+  .
+  .
+  at ... in ...
 StackTrace of NotImplementedException:
   at ... in ...
   .
