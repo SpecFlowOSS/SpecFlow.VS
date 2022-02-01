@@ -23,6 +23,8 @@ public class TestConsoleLogger : Logger
     protected override TextWriter GetTextWriter(LogLevel level) => _builders.GetOrAdd(level, _ => new StringWriter());
 
     public override string ToString() => new StringBuilder()
-        .AppendLines(_builders.Select(builder => $"{builder.Key} {builder.Value}"))
+        .AppendLines(_builders
+            .OrderByDescending(b=>b.Key)
+            .Select(builder => $"{builder.Key} {builder.Value}"))
         .ToString();
 }

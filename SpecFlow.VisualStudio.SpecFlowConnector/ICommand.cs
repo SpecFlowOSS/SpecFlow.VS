@@ -4,5 +4,5 @@ public record CommandResult(string Json);
 
 public interface ICommand
 {
-    CommandResult Execute();
+    CommandResult Execute(Func<string, Assembly> assemblyFromPath);
 }

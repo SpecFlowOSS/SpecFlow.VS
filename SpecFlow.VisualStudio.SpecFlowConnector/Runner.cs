@@ -11,14 +11,14 @@ public class Runner
         _log = log;
     }
 
-    public int Run(string[] args)
+    public int Run(string[] args, Func<string, Assembly> assemblyFromPath)
     {
         var internalLogger = new StringBuilderLogger();
         try
         {
             return new CommandFactory(internalLogger)
                 .CreateCommand(args)
-                .Map(cmd => cmd.Execute())
+                .Map(cmd => cmd.Execute(assemblyFromPath))
                 .Tie(PrintResult)
                 .Map<Exception, CommandResult,int>(_ => 1)
                 .Reduce(HandleException);

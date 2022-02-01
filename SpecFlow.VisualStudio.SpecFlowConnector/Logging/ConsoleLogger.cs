@@ -15,6 +15,7 @@ public sealed class ConsoleLogger : Logger
     {
         switch (level)
         {
+            case LogLevel.Debug:
             case LogLevel.Error:
             case LogLevel.Warning:
                 return Console.Error;

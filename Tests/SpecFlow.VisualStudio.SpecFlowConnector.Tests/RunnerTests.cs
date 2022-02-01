@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿using SpecFlow.VisualStudio.SpecFlowConnector.Tests.AssemblyLoading;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("ApprovalTestData\\Runner")]
@@ -28,7 +30,7 @@ public class RunnerTests
         var consoleRunner = new Runner(logger);
 
         //act
-        var resultCode = consoleRunner.Run(@case.Data.args);
+        var resultCode = consoleRunner.Run(@case.Data.args, new StubAssembly().Load);
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()
@@ -38,7 +40,7 @@ public class RunnerTests
             XunitExtensions.StackTraceScrubber);
     }
 
-    [Theory(Skip = "We are not failing yet")]
+    [Theory]
     [InlineData("discovery")]
     public void Debug_log_printed_when_fails(string command)
     {
@@ -47,7 +49,7 @@ public class RunnerTests
         var consoleRunner = new Runner(logger);
 
         //act
-        var resultCode = consoleRunner.Run(new []{command, "testAssembly.dll"});
+        var resultCode = consoleRunner.Run(new []{command, "testAssembly.dll"}, s => throw new Exception("unexpected failure"));
 
         //assert
         var output = logger.ToString();

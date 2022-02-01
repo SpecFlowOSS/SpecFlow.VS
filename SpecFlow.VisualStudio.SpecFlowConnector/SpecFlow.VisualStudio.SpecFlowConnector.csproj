@@ -11,8 +11,13 @@
     <_OutputCopyLocation>$(SolutionDir)Connectors\bin\$(configuration)\General-$(TargetFramework)</_OutputCopyLocation>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(TargetFramework)=='net48'">
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Net.Http" />
   </ItemGroup>
 
   <Target Name="CustomAfterBuild" AfterTargets="Build" Condition="$(configuration)=='Debug'">
