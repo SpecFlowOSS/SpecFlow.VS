@@ -1,10 +1,10 @@
 ﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
-public class StringBuilderLogger : Logger
+public class TestConsoleLogger : Logger
 {
     private readonly ConcurrentDictionary<LogLevel, StringWriter> _builders;
 
-    public StringBuilderLogger()
+    public TestConsoleLogger()
     {
         _builders = new ConcurrentDictionary<LogLevel, StringWriter>();
     }
@@ -14,11 +14,15 @@ public class StringBuilderLogger : Logger
         get
         {
             var stringWriter = GetTextWriter(level) as StringWriter;
-            return stringWriter!.GetStringBuilder().ToString().TrimEnd('\r','\n');
+            return stringWriter!.GetStringBuilder().ToString().TrimEnd('\r', '\n');
         }
     }
 
     protected override string Format(Log log) => log.Message;
 
     protected override TextWriter GetTextWriter(LogLevel level) => _builders.GetOrAdd(level, _ => new StringWriter());
+
+    public override string ToString() => new StringBuilder()
+        .AppendLines(_builders.Select(builder => $"{builder.Key} {builder.Value}"))
+        .ToString();
 }

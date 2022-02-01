@@ -3,10 +3,12 @@
 public class DiscoveryCommand : ICommand
 {
     public const string CommandName = "discovery";
+    private readonly ILogger _log;
 
-    public DiscoveryCommand(ConnectorOptions options)
+    public DiscoveryCommand(ConnectorOptions options, ILogger log)
     {
+        _log = log;
     }
 
-    public CommandResult Execute() => new(0, "{}");
+    public CommandResult Execute() => new ("{}");
 }

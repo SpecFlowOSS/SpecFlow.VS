@@ -1,6 +1,6 @@
 ﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
 
-public record CommandResult(int Code, string Json);
+public record CommandResult(string Json);
 
 public interface ICommand
 {

@@ -2,4 +2,4 @@
 {}
 <<<<<<<<<<
 stderr:
-resultCode:0
+resultCode:1

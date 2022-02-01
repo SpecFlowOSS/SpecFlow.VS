@@ -11,4 +11,9 @@ public static class LoggerExtensions
     {
         logger.Log(new Log(LogLevel.Info, message));
     }
+
+    public static void Debug(this ILogger logger, string message)
+    {
+        logger.Log(new Log(LogLevel.Debug, message));
+    }
 }

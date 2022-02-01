@@ -2,7 +2,14 @@
 
 public class CommandFactory
 {
-    public static Either<Exception, ICommand> CreateCommand(string[] args) =>
+    private readonly ILogger _log;
+
+    public CommandFactory(ILogger log)
+    {
+        _log = log;
+    }
+
+    public Either<Exception, ICommand> CreateCommand(string[] args) =>
         args
             .Map(ConnectorOptions.Parse)
             .Tie(AttachDebuggerWhenRequired)
@@ -14,11 +21,11 @@ public class CommandFactory
             Debugger.Launch();
     }
 
-    public static Either<Exception, ICommand> ToCommand(ConnectorOptions options)
+    public Either<Exception, ICommand> ToCommand(ConnectorOptions options)
     {
         return options switch
         {
-            DiscoveryOptions o => new DiscoveryCommand(o),
+            DiscoveryOptions o => new DiscoveryCommand(o, _log),
             _ => new ArgumentException($"Invalid command: {options.GetType().Name}")
         };
     }

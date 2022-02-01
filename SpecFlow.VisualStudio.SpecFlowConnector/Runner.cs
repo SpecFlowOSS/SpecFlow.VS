@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿using SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector;
 
 public class Runner
 {
@@ -11,17 +13,19 @@ public class Runner
 
     public int Run(string[] args)
     {
+        var internalLogger = new StringBuilderLogger();
         try
         {
-            return CommandFactory
+            return new CommandFactory(internalLogger)
                 .CreateCommand(args)
                 .Map(cmd => cmd.Execute())
                 .Tie(PrintResult)
-                .Map(result => result.Code)
+                .Map<Exception, CommandResult,int>(_ => 1)
                 .Reduce(HandleException);
         }
         catch (Exception ex)
         {
+            _log.Debug(internalLogger.ToString());
             return HandleException(ex);
         }
     }

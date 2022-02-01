@@ -24,7 +24,7 @@ public class RunnerTests
     {
         //arrange
         NamerFactory.AdditionalInformation = @case.Label.Replace(' ', '_');
-        var logger = new StringBuilderLogger();
+        var logger = new TestConsoleLogger();
         var consoleRunner = new Runner(logger);
 
         //act
@@ -36,5 +36,23 @@ public class RunnerTests
                 .AppendLine($"stderr:{logger[LogLevel.Error]}")
                 .Append($"resultCode:{resultCode}"),
             XunitExtensions.StackTraceScrubber);
+    }
+
+    [Theory(Skip = "We are not failing yet")]
+    [InlineData("discovery")]
+    public void Debug_log_printed_when_fails(string command)
+    {
+        //arrange
+        var logger = new TestConsoleLogger();
+        var consoleRunner = new Runner(logger);
+
+        //act
+        var resultCode = consoleRunner.Run(new []{command, "testAssembly.dll"});
+
+        //assert
+        var output = logger.ToString();
+        _testOutputHelper.WriteLine(output);
+        output.Should().StartWith("Debug ");
+        output.Should().Contain("Error ");
     }
 }
