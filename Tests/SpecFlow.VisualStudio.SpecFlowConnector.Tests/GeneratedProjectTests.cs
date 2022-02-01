@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using SpecFlow.SampleProjectGenerator;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("ApprovalTestData\\GeneratedProject")]
@@ -16,6 +13,7 @@ public class GeneratedProjectTests
 
     [Theory]
     [InlineData("DS_2.3.2_nunit_1194832604")]
+    [InlineData("DS_3.9.40_nunit_1194832604")]
     public void Approval(string testName)
     {
         //arrange
@@ -34,18 +32,35 @@ public class GeneratedProjectTests
         var projectGenerator = testData.GeneratorOptions.CreateProjectGenerator(s => _testOutputHelper.WriteLine(s));
         projectGenerator.Generate();
 
-        var logger = new TestConsoleLogger();
-        var consoleRunner = new Runner(logger);
         var targetAssemblyFile = FileDetails.FromPath(projectGenerator.TargetFolder, projectGenerator.GetOutputAssemblyPath());
 
+        var logger = new TestConsoleLogger();
+        var consoleRunner = new Runner(logger);
+        var connectorFile = typeof(DiscoveryCommand).Assembly.GetLocation();
+
+        var psiEx = new ProcessStartInfoEx(
+            projectGenerator.TargetFolder,
+            connectorFile,
+            $"{DiscoveryCommand.CommandName} {targetAssemblyFile}"
+        );
+#if NETCOREAPP
+        psiEx = new ProcessStartInfoEx(
+            projectGenerator.TargetFolder,
+            "dotnet",
+            $"{connectorFile} {DiscoveryCommand.CommandName} {targetAssemblyFile}"
+        );
+#endif
+        _testOutputHelper.WriteLine($"{psiEx.ExecutablePath} {psiEx.Arguments}");
         //act
-        var resultCode = consoleRunner.Run(new[]{DiscoveryCommand.CommandName, targetAssemblyFile}, Assembly.LoadFrom);
+
+        var result = new ProcessHelper()
+            .RunProcess(psiEx);
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()
-                .AppendLine($"stdout:{logger[LogLevel.Info]}")
-                .AppendLine($"stderr:{logger[LogLevel.Error]}")
-                .Append($"resultCode:{resultCode}"),
+                .Append($"stdout:{result.StdOutput}")
+                .AppendLine($"stderr:{result.StdError}")
+                .Append($"resultCode:{result.ExitCode}"),
             XunitExtensions.StackTraceScrubber);
     }
 

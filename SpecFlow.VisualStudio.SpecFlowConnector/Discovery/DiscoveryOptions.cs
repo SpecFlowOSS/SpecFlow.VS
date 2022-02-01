@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
 public record DiscoveryOptions(
     bool DebugMode,
@@ -57,7 +55,7 @@ public record DiscoveryOptions(
         var (targetAssemblyFile, configFile) = x;
         return typeof(Runner)
             .Assembly
-            .GetLocalCodeBase()
+            .GetLocation()
             .Map(Directory)
             .Map(connectorFolder => (targetAssemblyFile, configFile, connectorFolder));
     }

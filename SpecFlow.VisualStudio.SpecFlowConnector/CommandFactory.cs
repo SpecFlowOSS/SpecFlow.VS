@@ -1,12 +1,16 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector;
 
 public class CommandFactory
 {
     private readonly ILogger _log;
+    private readonly IFileSystem _fileSystem;
 
-    public CommandFactory(ILogger log)
+    public CommandFactory(ILogger log, IFileSystem fileSystem)
     {
         _log = log;
+        _fileSystem = fileSystem;
     }
 
     public Either<Exception, ICommand> CreateCommand(string[] args) =>
@@ -25,7 +29,7 @@ public class CommandFactory
     {
         return options switch
         {
-            DiscoveryOptions o => new DiscoveryCommand(o, _log),
+            DiscoveryOptions o => new DiscoveryCommand(o, _log, _fileSystem),
             _ => new ArgumentException($"Invalid command: {options.GetType().Name}")
         };
     }

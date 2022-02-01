@@ -1,4 +1,7 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿using System.IO.Abstractions.TestingHelpers;
+using Castle.DynamicProxy.Generators.Emitters;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("ApprovalTestData\\Runner")]
@@ -28,7 +31,7 @@ public class RunnerTests
         var consoleRunner = new Runner(logger);
 
         //act
-        var resultCode = consoleRunner.Run(@case.Data.args, _ => GetType().Assembly);
+        var resultCode = consoleRunner.Run(@case.Data.args, _ => GetType().Assembly, new MockFileSystem());
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()
@@ -47,7 +50,7 @@ public class RunnerTests
         var consoleRunner = new Runner(logger);
 
         //act
-        var resultCode = consoleRunner.Run(new []{command, "testAssembly.dll"}, s => throw new Exception("unexpected failure"));
+        var resultCode = consoleRunner.Run(new []{command, "testAssembly.dll"}, s => throw new Exception("unexpected failure"), new MockFileSystem());
 
         //assert
         var output = logger.ToString();

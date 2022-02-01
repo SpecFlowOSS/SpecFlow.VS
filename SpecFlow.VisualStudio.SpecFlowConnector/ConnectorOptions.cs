@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector;
 
 public record ConnectorOptions(bool DebugMode)
 {

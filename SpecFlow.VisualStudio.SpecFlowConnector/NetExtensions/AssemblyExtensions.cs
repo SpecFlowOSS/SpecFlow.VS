@@ -2,30 +2,14 @@
 
 namespace System.Reflection;
 
-internal static class AssemblyExtensions
+public static class AssemblyExtensions
 {
-    public static Either<Exception, FileDetails> GetLocalCodeBase(this Assembly assembly)
-    {
+    public static FileDetails GetLocation(this Assembly assembly) =>
+        FileDetails.FromPath(
 #if NETFRAMEWORK
-        return GetLocalCodeBase(assembly.CodeBase, Path.DirectorySeparatorChar);
+            new Uri(assembly.CodeBase).LocalPath
 #else
-        return GetLocalCodeBase(assembly.Location, Path.DirectorySeparatorChar);
+            assembly.Location
 #endif
-    }
-
-    private static Either<Exception, FileDetails> GetLocalCodeBase(string codeBase, char directorySeparator)
-    {
-        if (directorySeparator is not ('/' or '\\'))
-            return new ArgumentException(
-                $"Unknown directory separator '{directorySeparator}'; must be one of '/' or '\\'.",
-                nameof(directorySeparator));
-
-        var uri = new Uri(codeBase);
-
-        if (directorySeparator == '/' && uri.IsUnc)
-            return new ArgumentException(
-                $"UNC-style codebase '{codeBase}' is not supported on POSIX-style file systems.", nameof(codeBase));
-
-        return FileDetails.FromPath(uri.LocalPath);
-    }
+        );
 }

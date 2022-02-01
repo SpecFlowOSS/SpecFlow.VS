@@ -1,4 +1,6 @@
 ﻿var log = new ConsoleLogger();
+var fileSystem = new FileSystem();
+
 Assembly AssemblyFromPath(string path)
 {
     return new TestAssemblyLoadContext(typeof(Program).Assembly.Location)
@@ -6,4 +8,4 @@ Assembly AssemblyFromPath(string path)
 }
 
 return new Runner(log)
-    .Run(args, AssemblyFromPath); 
+    .Run(args, AssemblyFromPath, fileSystem); 

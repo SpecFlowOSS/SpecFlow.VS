@@ -11,12 +11,12 @@ public class Runner
         _log = log;
     }
 
-    public int Run(string[] args, Func<string, Assembly> assemblyFromPath)
+    public int Run(string[] args, Func<string, Assembly> assemblyFromPath, IFileSystem fileSystem)
     {
         var internalLogger = new StringBuilderLogger();
         try
         {
-            return new CommandFactory(internalLogger)
+            return new CommandFactory(internalLogger, fileSystem)
                 .CreateCommand(args)
                 .Map(cmd => cmd.Execute(assemblyFromPath))
                 .Tie(PrintResult)
