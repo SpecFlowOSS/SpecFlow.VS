@@ -1,6 +1,4 @@
-﻿using System.Runtime.Loader;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
 
 public class DiscoveryCommand : ICommand
 {

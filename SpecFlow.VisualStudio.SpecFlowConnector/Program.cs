@@ -6,4 +6,4 @@ Assembly AssemblyFromPath(string path)
 }
 
 return new Runner(log)
-    .Run(args, AssemblyFromPath);
+    .Run(args, AssemblyFromPath); 

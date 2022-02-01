@@ -30,7 +30,7 @@ public class RunnerTests
         var consoleRunner = new Runner(logger);
 
         //act
-        var resultCode = consoleRunner.Run(@case.Data.args, new StubAssembly().Load);
+        var resultCode = consoleRunner.Run(@case.Data.args, _ => GetType().Assembly);
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()
