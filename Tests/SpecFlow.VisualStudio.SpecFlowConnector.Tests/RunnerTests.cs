@@ -1,6 +1,4 @@
-﻿using SpecFlow.VisualStudio.SpecFlowConnector.Tests.AssemblyLoading;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("ApprovalTestData\\Runner")]

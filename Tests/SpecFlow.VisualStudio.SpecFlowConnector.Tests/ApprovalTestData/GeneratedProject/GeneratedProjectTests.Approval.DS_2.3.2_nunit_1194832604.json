@@ -1,0 +1,38 @@
+{
+  "Args": [
+    "discovery"
+  ],
+  "GeneratorOptions": {
+    "Force": false,
+    "_TargetFolder": null,
+    "NewProjectFormat": false,
+    "SpecFlowPackageVersion": "2.3.2",
+    "UnitTestProvider": "NUnit",
+    "FeatureFileCount": 3,
+    "ScenarioPerFeatureFileCount": 5,
+    "StepDefPerClassCount": 6,
+    "StepDefinitionPerStepPercent": 70,
+    "ScenarioOutlinePerScenarioPercent": 30,
+    "FallbackNuGetPackageSource": null,
+    "TargetFramework": "net48",
+    "AddGeneratorPlugin": false,
+    "AddRuntimePlugin": false,
+    "PluginName": "unknown",
+    "AddExternalBindingPackage": false,
+    "ExternalBindingPackageName": "unknown",
+    "AddUnicodeBinding": false,
+    "AddAsyncStep": false,
+    "IsBuilt": false,
+    "PlatformTarget": null,
+    "CreatedFor": null,
+    "TargetFolder": "C:\\Users\\santa\\AppData\\Local\\Temp\\Deveroom\\DS_2.3.2_nunit_1194832604",
+    "SpecFlowVersion": {
+      "Major": 2,
+      "Minor": 3,
+      "Build": 2,
+      "Revision": -1,
+      "MajorRevision": -1,
+      "MinorRevision": -1
+    }
+  }
+}
