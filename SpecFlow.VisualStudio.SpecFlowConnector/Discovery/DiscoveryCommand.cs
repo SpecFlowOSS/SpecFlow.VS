@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SpecFlowConnector;
 using SpecFlowConnector.Discovery;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
@@ -28,7 +29,7 @@ public class DiscoveryCommand : ICommand
 
         return new SpecFlowDiscoverer()
             .Discover(bindingRegistry, assembly, _options.ConfigFile)
-            .Map(dr=>new CommandResult(JsonConvert.SerializeObject(dr)));
+            .Map(dr=>new CommandResult(JsonSerialization.SerializeObject(dr)));
     }
 }
 

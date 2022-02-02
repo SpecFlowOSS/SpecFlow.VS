@@ -28,6 +28,10 @@
     <Using Remove="System.Net.Http" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
+  </ItemGroup>
+
   <Target Name="CustomAfterBuild" AfterTargets="Build" Condition="$(configuration)=='Debug'">
 
     <ItemGroup>
