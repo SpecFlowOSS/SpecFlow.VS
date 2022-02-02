@@ -11,7 +11,7 @@ public class RunnerTests
         new LabeledTestData<(string[] args, string expected)>[]
         {
             new("discovery assembly", (new[] {"discovery", "targetAssembly.dll"}, "?")),
-            new("discovery assembly with config", (new[] {"discovery", "targetAssembly.dll", "config.json"}, "?")),
+            new("discovery assembly with configuration", (new[] {"discovery", "targetAssembly.dll", "configuration.json"}, "?")),
         };
 
     private readonly ITestOutputHelper _testOutputHelper;

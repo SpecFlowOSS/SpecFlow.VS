@@ -16,8 +16,11 @@ public class CommandFactory
     public Either<Exception, ICommand> CreateCommand(string[] args) =>
         args
             .Map(ConnectorOptions.Parse)
+            .Tie(DumpOptions)
             .Tie(AttachDebuggerWhenRequired)
             .Map(ToCommand);
+
+    public void DumpOptions(ConnectorOptions options) => _log.Debug(options.ToString());
 
     public static void AttachDebuggerWhenRequired(ConnectorOptions connectorOptions)
     {

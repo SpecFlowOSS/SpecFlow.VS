@@ -1,4 +1,7 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿using System.Diagnostics.Eventing.Reader;
+using System.IO.Abstractions.TestingHelpers;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("ApprovalTestData\\GeneratedProject")]
@@ -32,36 +35,59 @@ public class GeneratedProjectTests
         var projectGenerator = testData.GeneratorOptions.CreateProjectGenerator(s => _testOutputHelper.WriteLine(s));
         projectGenerator.Generate();
 
-        var targetAssemblyFile = FileDetails.FromPath(projectGenerator.TargetFolder, projectGenerator.GetOutputAssemblyPath());
+        var targetAssemblyFile =
+            FileDetails.FromPath(projectGenerator.TargetFolder, projectGenerator.GetOutputAssemblyPath());
 
-        var logger = new TestConsoleLogger();
-        var consoleRunner = new Runner(logger);
         var connectorFile = typeof(DiscoveryCommand).Assembly.GetLocation();
-
-        var psiEx = new ProcessStartInfoEx(
-            projectGenerator.TargetFolder,
-            connectorFile,
-            $"{DiscoveryCommand.CommandName} {targetAssemblyFile}"
-        );
-#if NETCOREAPP
-        psiEx = new ProcessStartInfoEx(
-            projectGenerator.TargetFolder,
-            "dotnet",
-            $"{connectorFile} {DiscoveryCommand.CommandName} {targetAssemblyFile}"
-        );
-#endif
-        _testOutputHelper.WriteLine($"{psiEx.ExecutablePath} {psiEx.Arguments}");
+        
         //act
-
-        var result = new ProcessHelper()
-            .RunProcess(psiEx);
+        ProcessResult result = Debugger.IsAttached 
+            ? InvokeInMemory(targetAssemblyFile)
+            : InvokeAsProcess(projectGenerator, connectorFile, targetAssemblyFile);
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()
                 .Append($"stdout:{result.StdOutput}")
                 .AppendLine($"stderr:{result.StdError}")
                 .Append($"resultCode:{result.ExitCode}"),
-            XunitExtensions.StackTraceScrubber);
+            rawContent => TargetFolderScrubber(rawContent, projectGenerator.TargetFolder)
+                .Map(XunitExtensions.StackTraceScrubber));
+    }
+
+    private static string TargetFolderScrubber(string content, string targetFolder) 
+        => content.Replace(targetFolder, "<<targetFolder>>");
+
+    private static ProcessResult InvokeInMemory(FileDetails targetAssemblyFile)
+    {
+        var logger = new TestConsoleLogger();
+        var consoleRunner = new Runner(logger);
+        var mockFileSystem = new MockFileSystem();
+        var resultCode = consoleRunner.Run(new[] {DiscoveryCommand.CommandName, targetAssemblyFile},
+            Assembly.LoadFrom,
+            mockFileSystem);
+        var result = new ProcessResult(resultCode, logger[LogLevel.Info], logger[LogLevel.Error], TimeSpan.Zero);
+        return result;
+    }
+
+    private ProcessResult InvokeAsProcess(IProjectGenerator projectGenerator, FileDetails connectorFile,
+        FileDetails targetAssemblyFile)
+    {
+        var psiEx = new ProcessStartInfoEx(
+            projectGenerator.TargetFolder,
+            connectorFile,
+            $"{DiscoveryCommand.CommandName} {targetAssemblyFile}"
+        );
+#if NETCOREAPP
+        psiEx = psiEx with
+        {
+            ExecutablePath = "dotnet",
+            Arguments = $"{connectorFile} {DiscoveryCommand.CommandName} {targetAssemblyFile}"
+        };
+#endif
+        _testOutputHelper.WriteLine($"{psiEx.ExecutablePath} {psiEx.Arguments}");
+        var result = new ProcessHelper()
+            .RunProcess(psiEx);
+        return result;
     }
 
     private record GeneratedProjectTestsData(GeneratorOptions GeneratorOptions);

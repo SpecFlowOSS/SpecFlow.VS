@@ -1,36 +1,36 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+﻿namespace SpecFlowConnector.Discovery;
 
-public class SpecFlowDiscovererProvider
+public class BindingRegistryProvider
 {
-    private DiscoveryOptions _options;
     private readonly ILogger _log;
-    private IFileSystem _fileSystem; 
+    private readonly DiscoveryOptions _options;
+    private readonly IFileSystem _fileSystem;
 
-    public SpecFlowDiscovererProvider(DiscoveryOptions options, ILogger log, IFileSystem fileSystem)
+    public BindingRegistryProvider(ILogger log, DiscoveryOptions options, IFileSystem fileSystem)
     {
-        _options = options;
         _log = log;
+        _options = options;
         _fileSystem = fileSystem;
     }
 
-    public ISpecFlowDiscoverer GetDiscoverer()
+    public IBindingRegistryProxy GetBindingRegistry()
     {
         var versionNumber = GetSpecFlowVersion();
-        var discoverer= GetDiscoverer(versionNumber);
-        _log.Debug($"Chosen {discoverer.GetType().Name} for {versionNumber}");
-        return discoverer;
+        var bindingRegistry = GetBindingRegistry(versionNumber);
+        _log.Debug($"Chosen {bindingRegistry.GetType().Name} for {versionNumber}");
+        return bindingRegistry;
     }
 
-    private static ISpecFlowDiscoverer GetDiscoverer(int versionNumber)
+    private IBindingRegistryProxy GetBindingRegistry(int versionNumber)
     {
         return versionNumber switch
         {
-            >= 3_07_013 => new SpecFlowVLatestDiscoverer(),
+            //>= 3_07_013 => new SpecFlowDiscoverer(),
             //>= 3_00_000 => new SpecFlowV30Discoverer(),
             //>= 2_02_000 => new SpecFlowV22Discoverer(),
             //>= 2_01_000 => new SpecFlowV21Discoverer(),
             //>= 2_00_000 => new SpecFlowV20Discoverer(),
-            _ => new SpecFlowV19Discoverer()
+            _ => new BindingRegistryProxyV3_9_22(_fileSystem)
         };
     }
 

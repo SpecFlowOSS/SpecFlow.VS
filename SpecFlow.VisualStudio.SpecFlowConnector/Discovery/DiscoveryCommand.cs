@@ -1,4 +1,7 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+﻿using Newtonsoft.Json;
+using SpecFlowConnector.Discovery;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
 public class DiscoveryCommand : ICommand
 {
@@ -16,10 +19,16 @@ public class DiscoveryCommand : ICommand
 
     public CommandResult Execute(Func<string, Assembly> assemblyFromPath)
     {
-        var discoverer = new SpecFlowDiscovererProvider(_options, _log, _fileSystem)
-            .GetDiscoverer();
+        var bindingRegistry = new BindingRegistryProvider(_log, _options, _fileSystem)
+            .GetBindingRegistry();
 
+        _log.Debug($"Loading {_options.AssemblyFile.FullName}");
         var assembly = assemblyFromPath(_options.AssemblyFile.FullName);
-        return new("{}");
+        _log.Debug($"Loaded: {assembly}");
+
+        return new SpecFlowDiscoverer()
+            .Discover(bindingRegistry, assembly, _options.ConfigFile)
+            .Map(dr=>new CommandResult(JsonConvert.SerializeObject(dr)));
     }
 }
+

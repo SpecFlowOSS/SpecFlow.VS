@@ -3,7 +3,7 @@
 public record DiscoveryOptions(
     bool DebugMode,
     FileDetails AssemblyFile,
-    Option<FileDetails> ConfigFilePath,
+    Option<FileDetails> ConfigFile,
     DirectoryInfo ConnectorFolder
 ) : ConnectorOptions(DebugMode)
 {
@@ -20,7 +20,7 @@ public record DiscoveryOptions(
 
     private static Either<Exception, string[]> ValidateParameterCount(string[] args) => args.Length >= 1
         ? args
-        : new InvalidOperationException("Usage: discovery <test-assembly-path> [<config-file-path>]");
+        : new InvalidOperationException("Usage: discovery <test-assembly-path> [<configuration-file-path>]");
 
     private static Either<Exception, (FileDetails targetAssemblyFile, string[] args)>
         AssemblyPath(string[] args)

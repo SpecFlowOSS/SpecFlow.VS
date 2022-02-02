@@ -1,9 +1,13 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+﻿namespace SpecFlowConnector.Discovery;
 
-public abstract class SpecFlowVDiscoverer :ISpecFlowDiscoverer {
-    public void Dispose()
+public class SpecFlowDiscoverer {
+    
+    public DiscoveryResult Discover(
+        IBindingRegistryProxy bindingRegistry, 
+        Assembly testAssembly,
+        Option<FileDetails> configFile)
     {
+        bindingRegistry.GetStepDefinitions(testAssembly, configFile);
+        return new DiscoveryResult();
     }
-
-    public DiscoveryResult Discover(Assembly testAssembly, ConfigFile config) => throw new NotImplementedException();
 }

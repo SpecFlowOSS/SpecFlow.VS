@@ -9,10 +9,10 @@ public class ConnectorOptionsParseTests
         {
             new("discovery assembly",
                 (new[] {"discovery", "../targetAssembly.dll"},
-                    @"Right(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)DiscoveryOptions { DebugMode = False, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFilePath = None, ConnectorFolder = <<connectorPath>> }")),
-            new("discovery assembly with config",
-                (new[] {"discovery", "../targetAssembly.dll", "../config.json"},
-                    @"Right(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)DiscoveryOptions { DebugMode = False, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFilePath = Some(<<targetPath>>\config.json), ConnectorFolder = <<connectorPath>> }")),
+                    @"Right(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)DiscoveryOptions { DebugMode = False, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFile = None, ConnectorFolder = <<connectorPath>> }")),
+            new("discovery assembly with configuration",
+                (new[] {"discovery", "../targetAssembly.dll", "../configuration.json"},
+                    @"Right(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)DiscoveryOptions { DebugMode = False, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFile = Some(<<targetPath>>\configuration.json), ConnectorFolder = <<connectorPath>> }")),
             new("Missing arguments",
                 (Array.Empty<string>(),
                     @"Left(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)System.ArgumentException: Command is missing!")),
@@ -21,13 +21,13 @@ public class ConnectorOptionsParseTests
                     @"Left(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)System.ArgumentException: Invalid command: xxx")),
             new("debug",
                 (new[] {"discovery", "--debug", "../targetAssembly.dll"},
-                    @"Right(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)DiscoveryOptions { DebugMode = True, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFilePath = None, ConnectorFolder = <<connectorPath>> }")),
+                    @"Right(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)DiscoveryOptions { DebugMode = True, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFile = None, ConnectorFolder = <<connectorPath>> }")),
             new("debug must be after command",
                 (new[] {"--debug", "yyy"},
                     "Left(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)System.ArgumentException: Invalid command: --debug")),
             new("discovery command without arguments",
                 (new[] {"discovery"},
-                    "Left(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)System.InvalidOperationException: Usage: discovery <test-assembly-path> [<config-file-path>]"))
+                    "Left(System.Exception, SpecFlow.VisualStudio.SpecFlowConnector.ConnectorOptions)System.InvalidOperationException: Usage: discovery <test-assembly-path> [<configuration-file-path>]"))
         };
 
     private readonly ITestOutputHelper _testOutputHelper;

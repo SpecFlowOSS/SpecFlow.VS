@@ -13,6 +13,7 @@ public record FileDetails
 
     public string FullName => _file.FullName;
     public string Name => _file.Name;
+    public string Extension => _file.Extension;
 
     public Option<string> DirectoryName =>
         _file.DirectoryName is null

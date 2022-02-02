@@ -20,11 +20,11 @@ public record ConnectorOptions(bool DebugMode)
 
         var commandName = args[0];
         var commandArgs = commandArgsList.ToArray();
-        switch (commandName)
+
+        return commandName switch
         {
-            case DiscoveryCommand.CommandName:
-                return DiscoveryOptions.Parse(commandArgs, debugMode);
-            default: return new ArgumentException($"Invalid command: {commandName}");
-        }
+            DiscoveryCommand.CommandName => DiscoveryOptions.Parse(commandArgs, debugMode),
+            _ => new ArgumentException($"Invalid command: {commandName}")
+        };
     }
 }

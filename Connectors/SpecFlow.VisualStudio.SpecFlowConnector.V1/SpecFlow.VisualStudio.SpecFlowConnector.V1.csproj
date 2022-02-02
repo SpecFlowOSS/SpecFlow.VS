@@ -18,7 +18,7 @@
     <PackageReference Include="SpecFlow.CustomPlugin" Version="3.9.40" />
     <PackageReference Include="MSTest.TestFramework" Version="2.2.7" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference
       Include="..\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
