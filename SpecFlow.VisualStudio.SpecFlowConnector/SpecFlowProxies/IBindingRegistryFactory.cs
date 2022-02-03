@@ -21,8 +21,8 @@ public record StepDefinition(
     string Method,
     string? ParamTypes,
     StepScope? Scope,
-    string? Expression
-    //string? Error,
+    string? Expression,
+    string? Error
     //string? SourceLocation
 );
 

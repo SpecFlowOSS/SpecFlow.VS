@@ -1,17 +1,18 @@
 ﻿namespace SpecFlowConnector.Discovery;
 
-public class SpecFlowDiscoverer {
-    
+public class SpecFlowDiscoverer
+{
     public DiscoveryResult Discover(
-        IBindingRegistryFactory bindingRegistryFactory, 
+        IBindingRegistryFactory bindingRegistryFactory,
         Assembly testAssembly,
         Option<FileDetails> configFile)
     {
         var typeNames = ImmutableDictionary.CreateBuilder<string, string>();
-   
+
         var stepDefinitions = new BindingRegistryAdapterAdapter(bindingRegistryFactory)
             .GetStepDefinitions(testAssembly, configFile)
-            .Select(sdb => CreateStepDefinition(sdb, method => GetParamTypes(method, parameterTypeName => GetKey(typeNames, parameterTypeName))))
+            .Select(sdb => CreateStepDefinition(sdb,
+                method => GetParamTypes(method, parameterTypeName => GetKey(typeNames, parameterTypeName))))
             .ToImmutableHashSet();
 
         return new DiscoveryResult(
@@ -21,17 +22,18 @@ public class SpecFlowDiscoverer {
         );
     }
 
-    private StepDefinition CreateStepDefinition(StepDefinitionBindingAdapter sdb, Func<BindingMethodAdapter, string?> getParameterTypes)
+    private StepDefinition CreateStepDefinition(StepDefinitionBindingAdapter sdb,
+        Func<BindingMethodAdapter, string?> getParameterTypes)
     {
         var stepDefinition = new StepDefinition
         (
             sdb.StepDefinitionType,
-            sdb.Regex.Map(r=>r.ToString()).Reduce((string)null!),
+            sdb.Regex.Map(r => r.ToString()).Reduce((string) null!),
             sdb.Method.ToString(),
             getParameterTypes(sdb.Method),
             GetScope(sdb),
-            GetSourceExpression(sdb)
-            //Error = GetError(sdb)
+            GetSourceExpression(sdb),
+            GetError(sdb)
             //SourceLocation = GetSourceLocation(sdb.Method, warningCollector),
         );
 
@@ -51,7 +53,8 @@ public class SpecFlowDiscoverer {
 
     private string? GetParamTypes(BindingMethodAdapter bindingMethod, Func<string, string> getKey)
     {
-        var paramTypes = string.Join("|", bindingMethod.ParameterTypeNames.Select(parameterTypeName => GetParamType(parameterTypeName, getKey)));
+        var paramTypes = string.Join("|",
+            bindingMethod.ParameterTypeNames.Select(parameterTypeName => GetParamType(parameterTypeName, getKey)));
         return paramTypes.Length == 0 ? null : paramTypes;
     }
 
@@ -70,7 +73,7 @@ public class SpecFlowDiscoverer {
             return null;
 
         return new StepScope(
-            stepDefinitionBinding.BindingScopeTag.Map(tag=>$"@{tag}").Reduce((string)null!),
+            stepDefinitionBinding.BindingScopeTag.Map(tag => $"@{tag}").Reduce((string) null!),
             stepDefinitionBinding.BindingScopeFeatureTitle,
             stepDefinitionBinding.BindingScopeScenarioTitle
         );
@@ -79,7 +82,7 @@ public class SpecFlowDiscoverer {
     private static string? GetSourceExpression(StepDefinitionBindingAdapter sdb)
     {
         const string propertyName = "SourceExpression";
-        return sdb.GetProperty<string>(propertyName).Reduce(()=>GetSpecifiedExpressionFromRegex(sdb)!);
+        return sdb.GetProperty<string>(propertyName).Reduce(() => GetSpecifiedExpressionFromRegex(sdb)!);
     }
 
     private static string? GetSpecifiedExpressionFromRegex(StepDefinitionBindingAdapter sdb)
@@ -95,5 +98,11 @@ public class SpecFlowDiscoverer {
                 return regexString;
             })
             .Reduce((string) null!);
+    }
+
+    private static string? GetError(StepDefinitionBindingAdapter sdb)
+    {
+        const string propertyName = "Error";
+        return sdb.GetProperty<string>(propertyName).Reduce((string) null!);
     }
 }
