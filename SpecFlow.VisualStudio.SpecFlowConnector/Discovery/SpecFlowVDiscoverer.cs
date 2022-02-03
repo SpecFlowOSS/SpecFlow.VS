@@ -26,16 +26,27 @@ public class SpecFlowDiscoverer {
         var stepDefinition = new StepDefinition
         (
             sdb.StepDefinitionType,
-            sdb.Regex.Map(r=>r.ToString()).Reduce(()=>null!),
+            sdb.Regex.Map(r=>r.ToString()).Reduce((string)null!),
             sdb.Method.ToString(),
-            getParameterTypes(sdb.Method)
-        //Scope = GetScope(sdb),
+            getParameterTypes(sdb.Method),
+            GetScope(sdb)
         //SourceLocation = GetSourceLocation(sdb.Method, warningCollector),
         //Expression = GetSourceExpression(sdb),
         //Error = GetError(sdb)
         );
 
         return stepDefinition;
+    }
+
+    private string GetKey(ImmutableDictionary<string, string>.Builder dictionary, string value)
+    {
+        if (!dictionary.TryGetValue(value, out var key))
+        {
+            key = dictionary.Count.ToString();
+            dictionary.Add(value, key);
+        }
+
+        return key;
     }
 
     private string? GetParamTypes(BindingMethodAdapter bindingMethod, Func<string, string> getKey)
@@ -53,14 +64,15 @@ public class SpecFlowDiscoverer {
         return $"#{key}";
     }
 
-    private string GetKey(ImmutableDictionary<string, string>.Builder dictionary, string value)
+    private StepScope? GetScope(StepDefinitionBindingAdapter stepDefinitionBinding)
     {
-        if (!dictionary.TryGetValue(value, out var key))
-        {
-            key = dictionary.Count.ToString();
-            dictionary.Add(value, key);
-        }
+        if (!stepDefinitionBinding.IsScoped)
+            return null;
 
-        return key;
+        return new StepScope(
+            stepDefinitionBinding.BindingScopeTag.Map(tag=>$"@{tag}").Reduce((string)null!),
+            stepDefinitionBinding.BindingScopeFeatureTitle,
+            stepDefinitionBinding.BindingScopeScenarioTitle
+        );
     }
 }

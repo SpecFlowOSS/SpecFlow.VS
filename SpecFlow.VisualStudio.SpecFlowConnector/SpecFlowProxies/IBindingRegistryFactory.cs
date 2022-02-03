@@ -10,7 +10,7 @@ using TechTalk.SpecFlow.Infrastructure;
 namespace SpecFlowConnector.SpecFlowProxies;
 
 public record StepScope(
-    string Tag,
+    string? Tag,
     string FeatureTitle,
     string ScenarioTitle
 );
@@ -19,8 +19,8 @@ public record StepDefinition(
     string Type,
     string? Regex,
     string Method,
-    string? ParamTypes
-    //StepScope Scope,
+    string? ParamTypes,
+    StepScope? Scope
     //string Expression,
     //string Error,
     //string SourceLocation
@@ -37,6 +37,11 @@ public record StepDefinitionBindingAdapter(IStepDefinitionBinding Adaptee)
     public string StepDefinitionType => Adaptee.StepDefinitionType.ToString();
     public Option<Regex> Regex => Adaptee.Regex;
     public BindingMethodAdapter Method { get; } = new BindingMethodAdapter(Adaptee.Method);
+    public bool IsScoped => Adaptee.IsScoped;
+    public Option<string> BindingScopeTag => Adaptee.BindingScope.Tag;
+    public string BindingScopeFeatureTitle => Adaptee.BindingScope.FeatureTitle;
+    public string BindingScopeScenarioTitle => Adaptee.BindingScope.ScenarioTitle;
+
 }
 
 public interface IBindingRegistryAdapter
