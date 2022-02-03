@@ -24,8 +24,8 @@ public class SpecFlowDiscoverer {
         var stepDefinition = new StepDefinition
         (
             sdb.StepDefinitionType,
-            sdb.Regex.Map(r=>r.ToString()).Reduce(()=>null!)
-            //Method = sdb.Method.ToString(),
+            sdb.Regex.Map(r=>r.ToString()).Reduce(()=>null!),
+            sdb.Method
             //ParamTypes = GetParamTypes(sdb.Method),
             //Scope = GetScope(sdb),
             //SourceLocation = GetSourceLocation(sdb.Method, warningCollector),

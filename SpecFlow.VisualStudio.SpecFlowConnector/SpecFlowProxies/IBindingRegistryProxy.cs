@@ -15,8 +15,8 @@ public record StepScope(
 
 public record StepDefinition(
     string Type,
-    string Regex//,
-    //string Method,
+    string Regex,
+    string Method
     //string ParamTypes,
     //StepScope Scope,
     //string Expression,
@@ -29,6 +29,7 @@ public record StepDefinitionBindingProxy(IStepDefinitionBinding StepDefinitionBi
     private readonly IStepDefinitionBinding _stepDefinitionBinding = StepDefinitionBinding;
     public string StepDefinitionType => _stepDefinitionBinding.StepDefinitionType.ToString();
     public Option<Regex> Regex => _stepDefinitionBinding.Regex;
+    public string Method => _stepDefinitionBinding.Method.ToString();
 }
 
 public interface IBindingRegistryProxy
