@@ -1,0 +1,192 @@
+﻿stdout:-> Loading plugin <<targetFolder>>\bin\Debug\net48\DeveroomSample.dll
+-> Loading plugin <<targetFolder>>\bin\Debug\net48\TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll
+-> Using default config
+>>>>>>>>>>
+{
+  "stepDefinitions": [
+    {
+      "type": "When",
+      "regex": "^egestas efficitur tellus$"
+    },
+    {
+      "type": "Given",
+      "regex": "^mauris vel \"(.*)\" felis$"
+    },
+    {
+      "type": "Given",
+      "regex": "^risus ultricies ac$"
+    },
+    {
+      "type": "When",
+      "regex": "^id id neque tempor dapibus$"
+    },
+    {
+      "type": "Then",
+      "regex": "^ante sapien nec$"
+    },
+    {
+      "type": "Then",
+      "regex": "^condimentum lacinia blandit$"
+    },
+    {
+      "type": "Then",
+      "regex": "^vitae suscipit Phasellus (\\d+)$"
+    },
+    {
+      "type": "Given",
+      "regex": "^nunc augue felis cursus$"
+    },
+    {
+      "type": "Given",
+      "regex": "^massa justo lectus pretium Praesent$"
+    },
+    {
+      "type": "When",
+      "regex": "^adipiscing massa molestie$"
+    },
+    {
+      "type": "When",
+      "regex": "^vel sed dolor vestibulum$"
+    },
+    {
+      "type": "When",
+      "regex": "^per mi efficitur Nulla$"
+    },
+    {
+      "type": "Given",
+      "regex": "^orci eu augue (\\d+)$"
+    },
+    {
+      "type": "When",
+      "regex": "^\"(.*)\" sapien nec iaculis massa$"
+    },
+    {
+      "type": "When",
+      "regex": "^est dictum Integer conubia$"
+    },
+    {
+      "type": "Then",
+      "regex": "^ante libero ut$"
+    },
+    {
+      "type": "Then",
+      "regex": "^lorem dictum (\\d+) accumsan$"
+    },
+    {
+      "type": "Then",
+      "regex": "^\"(.*)\" dui a$"
+    },
+    {
+      "type": "Given",
+      "regex": "^sem per vitae$"
+    },
+    {
+      "type": "When",
+      "regex": "^tempus molestie ipsum massa$"
+    },
+    {
+      "type": "Given",
+      "regex": "^\"(.*)\" fermentum vulputate sagittis lobortis$"
+    },
+    {
+      "type": "Given",
+      "regex": "^laoreet \"(.*)\" Quisque lobortis blandit$"
+    },
+    {
+      "type": "When",
+      "regex": "^in elementum \"(.*)\"$"
+    },
+    {
+      "type": "Then",
+      "regex": "^urna (\\d+) suscipit$"
+    },
+    {
+      "type": "Then",
+      "regex": "^tellus taciti Aliquam nunc (\\d+)$"
+    },
+    {
+      "type": "Given",
+      "regex": "^felis nec Suspendisse molestie$"
+    },
+    {
+      "type": "When",
+      "regex": "^nulla nec dui (\\d+)$"
+    },
+    {
+      "type": "Given",
+      "regex": "^id nulla (\\d+)$"
+    },
+    {
+      "type": "Given",
+      "regex": "^vitae Nam Curabitur mi viverra$"
+    },
+    {
+      "type": "When",
+      "regex": "^Lorem eget leo (\\d+) Donec$"
+    },
+    {
+      "type": "When",
+      "regex": "^quis ipsum erat$"
+    },
+    {
+      "type": "Then",
+      "regex": "^\"(.*)\" (\\d+) at (\\d+) suscipit$"
+    },
+    {
+      "type": "Then",
+      "regex": "^Fusce \"(.*)\" sit$"
+    },
+    {
+      "type": "Then",
+      "regex": "^(\\d+) dignissim \"(.*)\"$"
+    },
+    {
+      "type": "Then",
+      "regex": "^(\\d+) luctus (\\d+) in$"
+    },
+    {
+      "type": "When",
+      "regex": "^commodo et conubia$"
+    },
+    {
+      "type": "Given",
+      "regex": "^(\\d+) \"(.*)\" conubia conubia mi$"
+    },
+    {
+      "type": "Given",
+      "regex": "^condimentum commodo nec iaculis$"
+    },
+    {
+      "type": "Given",
+      "regex": "^taciti mollis blandit egestas eu$"
+    },
+    {
+      "type": "Then",
+      "regex": "^nec scelerisque porta (\\d+) iaculis$"
+    },
+    {
+      "type": "Given",
+      "regex": "^(\\d+) eros felis at lorem$"
+    },
+    {
+      "type": "Then",
+      "regex": "^justo sed volutpat id \"(.*)\"$"
+    }
+  ],
+	"sourceFiles": {
+    "0": "<<targetFolder>>\\StepDefinitions\\AptentNequeExErosSteps.cs",
+    "1": "<<targetFolder>>\\StepDefinitions\\MaurisEgetPerEgestasSteps.cs",
+    "2": "<<targetFolder>>\\StepDefinitions\\NequeASedMorbiSteps.cs",
+    "3": "<<targetFolder>>\\StepDefinitions\\NuncAcNullaVenenatisSteps.cs",
+    "4": "<<targetFolder>>\\StepDefinitions\\PlaceratDiamViverraAtSteps.cs",
+    "5": "<<targetFolder>>\\StepDefinitions\\SedEratEfficiturNonSteps.cs",
+    "6": "<<targetFolder>>\\StepDefinitions\\VitaeSedAuctorEtSteps.cs"
+  },
+  "typeNames": {},
+  "specFlowVersion": "C:\\git\\SpecFlow.VS\\Tests\\SpecFlow.VisualStudio.SpecFlowConnector.Tests\\bin\\Debug\\net48\\TechTalk.SpecFlow.dll",
+  "warnings": [],
+  "isFailed": false
+}
+<<<<<<<<<<
+stderr:
+resultCode:0

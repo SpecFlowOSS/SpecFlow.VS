@@ -1,7 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using TechTalk.SpecFlow.Bindings;
-
-namespace SpecFlowConnector.Discovery;
+﻿namespace SpecFlowConnector.Discovery;
 
 public class SpecFlowDiscoverer {
     
@@ -15,13 +12,10 @@ public class SpecFlowDiscoverer {
             .Select(CreateStepDefinition)
             .ToImmutableHashSet();
 
-        string specFlowVersion = typeof(IStepDefinitionBinding).Assembly.Location;
-        
+
         return new DiscoveryResult(
             stepDefinitions,
-            specFlowVersion,
-            null!,
-            ImmutableArray<string>.Empty
+            null!
         );
     }
 

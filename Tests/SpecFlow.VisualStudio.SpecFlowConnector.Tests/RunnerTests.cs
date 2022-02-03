@@ -1,5 +1,6 @@
 ﻿using System.IO.Abstractions.TestingHelpers;
 using Castle.DynamicProxy.Generators.Emitters;
+using SpecFlowConnector;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 

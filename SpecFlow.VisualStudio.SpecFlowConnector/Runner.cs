@@ -1,7 +1,6 @@
 ﻿using SpecFlow.VisualStudio.SpecFlowConnector.Tests;
-using SpecFlowConnector;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector;
+namespace SpecFlowConnector;
 
 public class Runner
 {
@@ -21,7 +20,7 @@ public class Runner
                 .CreateCommand(args)
                 .Map(cmd => cmd.Execute(assemblyFromPath))
                 .Tie(PrintResult)
-                .Map<Exception, CommandResult,int>(_ => 1)
+                .Map<Exception, CommandResult,int>(_ => 0)
                 .Reduce(HandleException);
         }
         catch (Exception ex)

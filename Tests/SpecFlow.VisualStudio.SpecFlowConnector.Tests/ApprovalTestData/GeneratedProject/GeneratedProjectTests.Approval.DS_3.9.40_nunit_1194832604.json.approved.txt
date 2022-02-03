@@ -1,5 +1,0 @@
-﻿stdout:>>>>>>>>>>
-{}
-<<<<<<<<<<
-stderr:
-resultCode:1

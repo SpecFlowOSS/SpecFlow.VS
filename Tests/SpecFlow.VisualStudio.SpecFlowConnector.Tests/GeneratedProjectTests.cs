@@ -1,5 +1,6 @@
-﻿using System.Diagnostics.Eventing.Reader;
-using System.IO.Abstractions.TestingHelpers;
+﻿using System.IO.Abstractions.TestingHelpers;
+using SpecFlowConnector;
+using SpecFlowConnector.Discovery;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 

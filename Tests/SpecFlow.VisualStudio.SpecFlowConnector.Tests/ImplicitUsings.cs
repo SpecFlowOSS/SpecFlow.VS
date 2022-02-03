@@ -6,7 +6,6 @@ global using Moq;
 global using Newtonsoft.Json;
 global using SpecFlow.SampleProjectGenerator;
 global using SpecFlow.VisualStudio.SpecFlowConnector;
-global using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 global using SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
 global using System;
 global using System.Collections.Concurrent;

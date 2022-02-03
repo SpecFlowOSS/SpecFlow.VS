@@ -1,7 +1,6 @@
 ﻿global using Microsoft.Extensions.DependencyModel;
 global using Microsoft.Extensions.DependencyModel.Resolution;
 global using SpecFlow.VisualStudio.SpecFlowConnector;
-global using SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 global using SpecFlowConnector.BoDiProxies;
 global using SpecFlowConnector.SpecFlowProxies;
 global using System;

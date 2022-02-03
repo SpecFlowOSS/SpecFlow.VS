@@ -1,4 +1,6 @@
-﻿var log = new ConsoleLogger();
+﻿using SpecFlowConnector;
+
+var log = new ConsoleLogger();
 var fileSystem = new FileSystem();
 
 Assembly AssemblyFromPath(string path)

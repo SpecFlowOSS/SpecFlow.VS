@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+﻿namespace SpecFlowConnector.Discovery;
 
 public record DiscoveryOptions(
     bool DebugMode,

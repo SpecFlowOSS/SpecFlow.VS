@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using SpecFlowConnector;
-using SpecFlowConnector.Discovery;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
+﻿namespace SpecFlowConnector.Discovery;
 
 public class DiscoveryCommand : ICommand
 {
