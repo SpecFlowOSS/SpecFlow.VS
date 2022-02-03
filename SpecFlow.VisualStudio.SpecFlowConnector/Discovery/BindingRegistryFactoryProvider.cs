@@ -1,27 +1,27 @@
 ﻿namespace SpecFlowConnector.Discovery;
 
-public class BindingRegistryProvider
+public class BindingRegistryFactoryProvider
 {
     private readonly ILogger _log;
     private readonly DiscoveryOptions _options;
     private readonly IFileSystem _fileSystem;
 
-    public BindingRegistryProvider(ILogger log, DiscoveryOptions options, IFileSystem fileSystem)
+    public BindingRegistryFactoryProvider(ILogger log, DiscoveryOptions options, IFileSystem fileSystem)
     {
         _log = log;
         _options = options;
         _fileSystem = fileSystem;
     }
 
-    public IBindingRegistryProxy GetBindingRegistry()
+    public IBindingRegistryFactory Create()
     {
         var versionNumber = GetSpecFlowVersion();
-        var bindingRegistry = GetBindingRegistry(versionNumber);
-        _log.Debug($"Chosen {bindingRegistry.GetType().Name} for {versionNumber}");
-        return bindingRegistry;
+        var factory = GetFactory(versionNumber);
+        _log.Debug($"Chosen {factory.GetType().Name} for {versionNumber}");
+        return factory;
     }
 
-    private IBindingRegistryProxy GetBindingRegistry(int versionNumber)
+    private IBindingRegistryFactory GetFactory(int versionNumber)
     {
         return versionNumber switch
         {
@@ -30,7 +30,7 @@ public class BindingRegistryProvider
             //>= 2_02_000 => new SpecFlowV22Discoverer(),
             //>= 2_01_000 => new SpecFlowV21Discoverer(),
             //>= 2_00_000 => new SpecFlowV20Discoverer(),
-            _ => new BindingRegistryProxyV3_9_22(_fileSystem)
+            _ => new BindingRegistryFactoryV3922(_fileSystem)
         };
     }
 

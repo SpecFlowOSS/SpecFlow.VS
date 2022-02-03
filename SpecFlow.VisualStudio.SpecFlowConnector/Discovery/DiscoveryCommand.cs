@@ -16,15 +16,15 @@ public class DiscoveryCommand : ICommand
 
     public CommandResult Execute(Func<string, Assembly> assemblyFromPath)
     {
-        var bindingRegistry = new BindingRegistryProvider(_log, _options, _fileSystem)
-            .GetBindingRegistry();
+        IBindingRegistryFactory bindingRegistryFactory = new BindingRegistryFactoryProvider(_log, _options, _fileSystem)
+            .Create();
 
         _log.Debug($"Loading {_options.AssemblyFile.FullName}");
         var assembly = assemblyFromPath(_options.AssemblyFile.FullName);
         _log.Debug($"Loaded: {assembly}");
 
         return new SpecFlowDiscoverer()
-            .Discover(bindingRegistry, assembly, _options.ConfigFile)
+            .Discover(bindingRegistryFactory, assembly, _options.ConfigFile)
             .Map(dr=>new CommandResult(JsonSerialization.SerializeObject(dr)));
     }
 }

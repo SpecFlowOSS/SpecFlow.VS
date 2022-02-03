@@ -1,7 +1,9 @@
 ﻿using System.Text.RegularExpressions;
 using BoDi;
+using SpecFlow.VisualStudio.SpecFlowConnector.Models;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Bindings;
+using TechTalk.SpecFlow.Bindings.Reflection;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
 
@@ -15,40 +17,64 @@ public record StepScope(
 
 public record StepDefinition(
     string Type,
-    string Regex,
-    string Method
-    //string ParamTypes,
+    string? Regex,
+    string Method,
+    string? ParamTypes
     //StepScope Scope,
     //string Expression,
     //string Error,
     //string SourceLocation
 );
 
-public record StepDefinitionBindingProxy(IStepDefinitionBinding StepDefinitionBinding)
+public record BindingMethodAdapter(IBindingMethod Adaptee)
 {
-    private readonly IStepDefinitionBinding _stepDefinitionBinding = StepDefinitionBinding;
-    public string StepDefinitionType => _stepDefinitionBinding.StepDefinitionType.ToString();
-    public Option<Regex> Regex => _stepDefinitionBinding.Regex;
-    public string Method => _stepDefinitionBinding.Method.ToString();
+    public override string ToString() => Adaptee.ToString();
+    public IEnumerable<string> ParameterTypeNames => Adaptee.Parameters.Select(p=>p.Type.FullName);
 }
 
-public interface IBindingRegistryProxy
+public record StepDefinitionBindingAdapter(IStepDefinitionBinding Adaptee)
 {
-    IEnumerable<StepDefinitionBindingProxy> GetStepDefinitions(Assembly testAssembly, Option<FileDetails> configFile);
+    public string StepDefinitionType => Adaptee.StepDefinitionType.ToString();
+    public Option<Regex> Regex => Adaptee.Regex;
+    public BindingMethodAdapter Method { get; } = new BindingMethodAdapter(Adaptee.Method);
 }
 
-public abstract class BindingRegistryProxy<TGlobalContainer> : IBindingRegistryProxy
+public interface IBindingRegistryAdapter
 {
-    public IEnumerable<StepDefinitionBindingProxy> GetStepDefinitions(Assembly testAssembly,
-        Option<FileDetails> configFile)
+    IEnumerable<StepDefinitionBindingAdapter> GetStepDefinitions(Assembly testAssembly, Option<FileDetails> configFile);
+}
+
+public class BindingRegistryAdapterAdapter : IBindingRegistryAdapter
+{
+    private readonly IBindingRegistryFactory _bindingRegistryFactory;
+
+
+    public BindingRegistryAdapterAdapter(IBindingRegistryFactory bindingRegistryFactory)
     {
-        var bindingRegistry = GetBindingRegistry(testAssembly, configFile);
-        var stepDefinitionBindings = bindingRegistry.GetStepDefinitions();
-        return stepDefinitionBindings
-            .Select(ToProxy);
+        _bindingRegistryFactory = bindingRegistryFactory;
     }
 
-    protected IBindingRegistry GetBindingRegistry(Assembly testAssembly, Option<FileDetails> configFile)
+    public IEnumerable<StepDefinitionBindingAdapter> GetStepDefinitions(Assembly testAssembly,
+        Option<FileDetails> configFile)
+    {
+        var bindingRegistry = _bindingRegistryFactory.GetBindingRegistry(testAssembly, configFile);
+        var stepDefinitionBindings = bindingRegistry.GetStepDefinitions();
+        return stepDefinitionBindings
+            .Select(Adapt);
+    }
+
+    protected StepDefinitionBindingAdapter Adapt(IStepDefinitionBinding sd) 
+        => new StepDefinitionBindingAdapter(sd);
+}
+
+public interface IBindingRegistryFactory
+{
+    IBindingRegistry GetBindingRegistry(Assembly testAssembly, Option<FileDetails> configFile);
+}
+
+public abstract class BindingRegistryFactory<TGlobalContainer> : IBindingRegistryFactory
+{
+    public IBindingRegistry GetBindingRegistry(Assembly testAssembly, Option<FileDetails> configFile)
     {
         var globalContainer = CreateGlobalContainer(testAssembly, configFile);
         RegisterTypeAs<NoInvokeDependencyProvider.NullBindingInvoker, IBindingInvoker>(globalContainer);
@@ -62,14 +88,13 @@ public abstract class BindingRegistryProxy<TGlobalContainer> : IBindingRegistryP
     protected abstract TGlobalContainer CreateGlobalContainer(Assembly testAssembly, Option<FileDetails> configFile);
     protected abstract void CreateTestRunner(TGlobalContainer globalContainer, Assembly testAssembly);
     protected abstract IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, TGlobalContainer globalContainer);
-    protected abstract StepDefinitionBindingProxy ToProxy(IStepDefinitionBinding sd);
 }
 
-public class BindingRegistryProxyV3_9_22 : BindingRegistryProxy<IObjectContainer>
+public class BindingRegistryFactoryV3922 : BindingRegistryFactory<IObjectContainer>
 {
     private readonly IFileSystem _fileSystem;
 
-    public BindingRegistryProxyV3_9_22(IFileSystem fileSystem)
+    public BindingRegistryFactoryV3922(IFileSystem fileSystem)
     {
         _fileSystem = fileSystem;
     }
@@ -95,8 +120,6 @@ public class BindingRegistryProxyV3_9_22 : BindingRegistryProxy<IObjectContainer
 
     protected override IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, IObjectContainer globalContainer)
         => globalContainer.Resolve<IBindingRegistry>();
-
-    protected override StepDefinitionBindingProxy ToProxy(IStepDefinitionBinding sd) => new StepDefinitionBindingProxy(sd);
 }
 
 public interface IRuntimeConfigurationProviderProxy
