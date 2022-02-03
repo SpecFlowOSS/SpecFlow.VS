@@ -29,10 +29,10 @@ public class SpecFlowDiscoverer {
             sdb.Regex.Map(r=>r.ToString()).Reduce((string)null!),
             sdb.Method.ToString(),
             getParameterTypes(sdb.Method),
-            GetScope(sdb)
-        //SourceLocation = GetSourceLocation(sdb.Method, warningCollector),
-        //Expression = GetSourceExpression(sdb),
-        //Error = GetError(sdb)
+            GetScope(sdb),
+            GetSourceExpression(sdb)
+            //Error = GetError(sdb)
+            //SourceLocation = GetSourceLocation(sdb.Method, warningCollector),
         );
 
         return stepDefinition;
@@ -64,7 +64,7 @@ public class SpecFlowDiscoverer {
         return $"#{key}";
     }
 
-    private StepScope? GetScope(StepDefinitionBindingAdapter stepDefinitionBinding)
+    private static StepScope? GetScope(StepDefinitionBindingAdapter stepDefinitionBinding)
     {
         if (!stepDefinitionBinding.IsScoped)
             return null;
@@ -74,5 +74,26 @@ public class SpecFlowDiscoverer {
             stepDefinitionBinding.BindingScopeFeatureTitle,
             stepDefinitionBinding.BindingScopeScenarioTitle
         );
+    }
+
+    private static string? GetSourceExpression(StepDefinitionBindingAdapter sdb)
+    {
+        const string propertyName = "SourceExpression";
+        return sdb.GetProperty<string>(propertyName).Reduce(()=>GetSpecifiedExpressionFromRegex(sdb)!);
+    }
+
+    private static string? GetSpecifiedExpressionFromRegex(StepDefinitionBindingAdapter sdb)
+    {
+        return sdb.Regex
+            .Map(regex => regex.ToString())
+            .Map(regexString =>
+            {
+                if (regexString.StartsWith("^"))
+                    regexString = regexString.Substring(1);
+                if (regexString.EndsWith("$"))
+                    regexString = regexString.Substring(0, regexString.Length - 1);
+                return regexString;
+            })
+            .Reduce((string) null!);
     }
 }

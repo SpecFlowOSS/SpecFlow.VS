@@ -2,6 +2,8 @@
 
 public sealed class None<T> : Option<T>, IEquatable<None<T>>, IEquatable<None>
 {
+    public static None<T> Value { get; } = new();
+
     public bool Equals(None<T> other) =>
         other?.GetType() == typeof(None<T>);
 

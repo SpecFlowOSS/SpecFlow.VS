@@ -20,10 +20,10 @@ public record StepDefinition(
     string? Regex,
     string Method,
     string? ParamTypes,
-    StepScope? Scope
-    //string Expression,
-    //string Error,
-    //string SourceLocation
+    StepScope? Scope,
+    string? Expression
+    //string? Error,
+    //string? SourceLocation
 );
 
 public record BindingMethodAdapter(IBindingMethod Adaptee)
@@ -41,7 +41,7 @@ public record StepDefinitionBindingAdapter(IStepDefinitionBinding Adaptee)
     public Option<string> BindingScopeTag => Adaptee.BindingScope.Tag;
     public string BindingScopeFeatureTitle => Adaptee.BindingScope.FeatureTitle;
     public string BindingScopeScenarioTitle => Adaptee.BindingScope.ScenarioTitle;
-
+    public virtual Option<T> GetProperty<T>(string parameterName) => None<T>.Value;
 }
 
 public interface IBindingRegistryAdapter
