@@ -29,8 +29,8 @@ public class SpecFlowDiscoverer
 
         return new DiscoveryResult(
             stepDefinitions,
-            typeNames.ToImmutable(),
-            null!
+            sourcePaths.ToImmutable(),
+            typeNames.ToImmutable()
         );
     }
 
@@ -55,13 +55,15 @@ public class SpecFlowDiscoverer
 
     private string GetKey(ImmutableDictionary<string, string>.Builder dictionary, string value)
     {
-        if (!dictionary.TryGetValue(value, out var key))
+        KeyValuePair<string, string> found = dictionary
+            .FirstOrDefault(kvp => kvp.Value == value);
+        if (found.Key is null)
         {
-            key = dictionary.Count.ToString();
-            dictionary.Add(value, key);
+            found = new KeyValuePair<string, string>(dictionary.Count.ToString(), value);
+            dictionary.Add(found);
         }
 
-        return key;
+        return found.Key;
     }
 
     private string? GetParamTypes(BindingMethodAdapter bindingMethod, Func<string, string> getKey)
@@ -92,15 +94,11 @@ public class SpecFlowDiscoverer
         );
     }
 
-    private static string? GetSourceExpression(StepDefinitionBindingAdapter sdb)
-    {
-        const string propertyName = "SourceExpression";
-        return sdb.GetProperty<string>(propertyName).Reduce(() => GetSpecifiedExpressionFromRegex(sdb)!);
-    }
+    private static string? GetSourceExpression(StepDefinitionBindingAdapter sdb) 
+        => sdb.GetProperty<string>("SourceExpression").Reduce(() => GetSpecifiedExpressionFromRegex(sdb)!);
 
-    private static string? GetSpecifiedExpressionFromRegex(StepDefinitionBindingAdapter sdb)
-    {
-        return sdb.Regex
+    private static string? GetSpecifiedExpressionFromRegex(StepDefinitionBindingAdapter sdb) =>
+        sdb.Regex
             .Map(regex => regex.ToString())
             .Map(regexString =>
             {
@@ -111,41 +109,36 @@ public class SpecFlowDiscoverer
                 return regexString;
             })
             .Reduce((string) null!);
-    }
 
-    private static string? GetError(StepDefinitionBindingAdapter sdb)
-    {
-        const string propertyName = "Error";
-        return sdb.GetProperty<string>(propertyName).Reduce((string) null!);
-    }
-    
+    private static string? GetError(StepDefinitionBindingAdapter sdb) 
+        => sdb.GetProperty<string>("Error").Reduce((string) null!);
+
     private Option<string> GetSourceLocation(BindingMethodAdapter bindingMethod, Func<string, string> getSourcePathId)
     {
         return bindingMethod.MethodInfo
-                .Map(mi => (reader: mi.DeclaringType
-                            .Map(declaringType => declaringType!.Assembly)
-                            .Map(assembly => _symbolReaders[assembly].Reduce(() => default!)),
-                        mi.MetadataToken
-                    ))
-                .Map(x => x.reader.ReadMethodSymbol(x.MetadataToken))
-                .Reduce(ImmutableArray<MethodSymbolSequencePoint>.Empty)
-                .Map(sequencePoints => sequencePoints
-                    .Select(sp => (Option<MethodSymbolSequencePoint>) sp)
-                    .DefaultIfEmpty(None.Value)
-                    .Aggregate(
-                        (startSequencePoint: None<MethodSymbolSequencePoint>.Value,
-                            endSequencePoint: None<MethodSymbolSequencePoint>.Value),
-                        (acc, cur) => acc.startSequencePoint is None<MethodSymbolSequencePoint>
-                            ? (cur, cur)
-                            : (acc.startSequencePoint, cur)
-                    )
-                    .Map(x=>x.startSequencePoint is Some<MethodSymbolSequencePoint> some 
-                    ? (Some<(MethodSymbolSequencePoint, MethodSymbolSequencePoint)>)(some.Content, ((Some < MethodSymbolSequencePoint > )x.endSequencePoint).Content)
-                    : None<(MethodSymbolSequencePoint startSequencePoint, MethodSymbolSequencePoint endSequencePoint)>.Value)
+            .Map(mi => (reader: mi.DeclaringType
+                        .Map(declaringType => declaringType!.Assembly)
+                        .Map(assembly => _symbolReaders[assembly].Reduce(() => default!)),
+                    mi.MetadataToken
+                ))
+            .Map(x => x.reader.ReadMethodSymbol(x.MetadataToken))
+            .Reduce(ImmutableArray<MethodSymbolSequencePoint>.Empty)
+            .Map(sequencePoints => sequencePoints
+                .Select(sp => (Option<MethodSymbolSequencePoint>) sp)
+                .DefaultIfEmpty(None.Value)
+                .Aggregate(
+                    (startSequencePoint: None<MethodSymbolSequencePoint>.Value,
+                        endSequencePoint: None<MethodSymbolSequencePoint>.Value),
+                    (acc, cur) => acc.startSequencePoint is None<MethodSymbolSequencePoint>
+                        ? (cur, cur)
+                        : (acc.startSequencePoint, cur)
                 )
-                .Map(border=> $"#{getSourcePathId(border.startSequencePoint.SourcePath)}|{border.startSequencePoint.StartLine}|{border.startSequencePoint.StartColumn}|{border.endSequencePoint.EndLine}|{border.endSequencePoint.EndColumn}")
-
-
-            ;
+                .Map(x => x.startSequencePoint is Some<MethodSymbolSequencePoint> some
+                    ? (some.Content, ((Some<MethodSymbolSequencePoint>) x.endSequencePoint).Content)
+                    : None<(MethodSymbolSequencePoint startSequencePoint, MethodSymbolSequencePoint endSequencePoint)>
+                        .Value)
+            )
+            .Map(border =>
+                $"#{getSourcePathId(border.startSequencePoint.SourcePath)}|{border.startSequencePoint.StartLine}|{border.startSequencePoint.StartColumn}|{border.endSequencePoint.EndLine}|{border.endSequencePoint.EndColumn}");
     }
 }
