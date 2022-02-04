@@ -17,11 +17,14 @@ public class SpecFlowDiscoverer
         Option<FileDetails> configFile)
     {
         var typeNames = ImmutableDictionary.CreateBuilder<string, string>();
+        var sourcePaths = ImmutableDictionary.CreateBuilder<string, string>();
 
         var stepDefinitions = new BindingRegistryAdapterAdapter(bindingRegistryFactory)
             .GetStepDefinitions(testAssembly, configFile)
             .Select(sdb => CreateStepDefinition(sdb,
-                method => GetParamTypes(method, parameterTypeName => GetKey(typeNames, parameterTypeName))))
+                method => GetParamTypes(method, parameterTypeName => GetKey(typeNames, parameterTypeName)),
+                sourcePath => GetKey(sourcePaths, sourcePath))
+            )
             .ToImmutableHashSet();
 
         return new DiscoveryResult(
@@ -32,9 +35,9 @@ public class SpecFlowDiscoverer
     }
 
     private StepDefinition CreateStepDefinition(StepDefinitionBindingAdapter sdb,
-        Func<BindingMethodAdapter, string?> getParameterTypes)
+        Func<BindingMethodAdapter, string?> getParameterTypes, Func<string, string> getSourcePathId)
     {
-        var sourceLocation = GetSourceLocation(sdb.Method);
+        var sourceLocation = GetSourceLocation(sdb.Method, getSourcePathId);
         var stepDefinition = new StepDefinition
         (
             sdb.StepDefinitionType,
@@ -115,12 +118,10 @@ public class SpecFlowDiscoverer
         const string propertyName = "Error";
         return sdb.GetProperty<string>(propertyName).Reduce((string) null!);
     }
-
-
-    private Option<string> GetSourceLocation(BindingMethodAdapter bindingMethod)
+    
+    private Option<string> GetSourceLocation(BindingMethodAdapter bindingMethod, Func<string, string> getSourcePathId)
     {
-        var sourceKey = 1;
-        var runtimeBindingMethod = bindingMethod.MethodInfo
+        return bindingMethod.MethodInfo
                 .Map(mi => (reader: mi.DeclaringType
                             .Map(declaringType => declaringType!.Assembly)
                             .Map(assembly => _symbolReaders[assembly].Reduce(() => default!)),
@@ -142,34 +143,9 @@ public class SpecFlowDiscoverer
                     ? (Some<(MethodSymbolSequencePoint, MethodSymbolSequencePoint)>)(some.Content, ((Some < MethodSymbolSequencePoint > )x.endSequencePoint).Content)
                     : None<(MethodSymbolSequencePoint startSequencePoint, MethodSymbolSequencePoint endSequencePoint)>.Value)
                 )
-                .Map(border=> $"#{sourceKey}|{border.startSequencePoint.StartLine}|{border.startSequencePoint.StartColumn}|{border.endSequencePoint.EndLine}|{border.endSequencePoint.EndColumn}")
+                .Map(border=> $"#{getSourcePathId(border.startSequencePoint.SourcePath)}|{border.startSequencePoint.StartLine}|{border.startSequencePoint.StartColumn}|{border.endSequencePoint.EndLine}|{border.endSequencePoint.EndColumn}")
 
 
             ;
-
-        //.Reduce((Type) null!)
-        //.Map(t => GetOrCreateSymbolReader(t.Assembly));
-        return runtimeBindingMethod.ToString();
-
-        //try
-        //{
-        //    var symbolReader = GetOrCreateSymbolReader(runtimeBindingMethod.MethodInfo.DeclaringType.Assembly,
-        //        warningCollector);
-        //    var methodSymbol = symbolReader.ReadMethodSymbol(runtimeBindingMethod.MethodInfo.MetadataToken);
-        //    var startSequencePoint = methodSymbol?.SequencePoints?.FirstOrDefault(sp => !sp.IsHidden);
-        //    if (startSequencePoint == null)
-        //        return null;
-        //    var sourceKey = GetKey(_sourceFiles, startSequencePoint.SourcePath);
-        //    var sourceLocation = $"#{sourceKey}|{startSequencePoint.StartLine}|{startSequencePoint.StartColumn}";
-        //    var endSequencePoint = methodSymbol.SequencePoints.LastOrDefault(sp => !sp.IsHidden);
-        //    if (endSequencePoint != null)
-        //        sourceLocation = sourceLocation + $"|{endSequencePoint.EndLine}|{endSequencePoint.EndColumn}";
-
-        //    return sourceLocation;
-        //}
-        //catch (Exception ex)
-        //{
-        //    return ex;
-        //}
     }
 }
