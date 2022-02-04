@@ -119,18 +119,32 @@ public class SpecFlowDiscoverer
 
     private Option<string> GetSourceLocation(BindingMethodAdapter bindingMethod)
     {
+        var sourceKey = 1;
         var runtimeBindingMethod = bindingMethod.MethodInfo
-            .Map(mi => (reader: mi.DeclaringType
-                        .Map(declaringType => declaringType!.Assembly)
-                        .Map(assembly => _symbolReaders[assembly].Reduce(() => default!)),
-                    mi.MetadataToken
-                ))
-            .Map(x => x.reader.ReadMethodSymbol(x.MetadataToken))
-            .Reduce(ImmutableArray<MethodSymbolSequencePoint>.Empty)
-            .Map(sequencePoints => sequencePoints
-                .Select(sp => (Option<MethodSymbolSequencePoint>) sp)
-                .DefaultIfEmpty(None.Value)
-                .FirstOrDefault(sp => sp is Some<MethodSymbolSequencePoint> some && !some.Content.IsHidden));
+                .Map(mi => (reader: mi.DeclaringType
+                            .Map(declaringType => declaringType!.Assembly)
+                            .Map(assembly => _symbolReaders[assembly].Reduce(() => default!)),
+                        mi.MetadataToken
+                    ))
+                .Map(x => x.reader.ReadMethodSymbol(x.MetadataToken))
+                .Reduce(ImmutableArray<MethodSymbolSequencePoint>.Empty)
+                .Map(sequencePoints => sequencePoints
+                    .Select(sp => (Option<MethodSymbolSequencePoint>) sp)
+                    .DefaultIfEmpty(None.Value)
+                    .Aggregate(
+                        (startSequencePoint: None<MethodSymbolSequencePoint>.Value,
+                            endSequencePoint: None<MethodSymbolSequencePoint>.Value),
+                        (acc, cur) => acc.startSequencePoint is None<MethodSymbolSequencePoint>
+                            ? (cur, cur)
+                            : (acc.startSequencePoint, cur)
+                    )
+                    .Map(x=>x.startSequencePoint is Some<MethodSymbolSequencePoint> some 
+                    ? (Some<(MethodSymbolSequencePoint, MethodSymbolSequencePoint)>)(some.Content, ((Some < MethodSymbolSequencePoint > )x.endSequencePoint).Content)
+                    : None<(MethodSymbolSequencePoint startSequencePoint, MethodSymbolSequencePoint endSequencePoint)>.Value)
+                )
+                .Map(border=> $"#{sourceKey}|{border.startSequencePoint.StartLine}|{border.startSequencePoint.StartColumn}|{border.endSequencePoint.EndLine}|{border.endSequencePoint.EndColumn}")
+
+
             ;
 
         //.Reduce((Type) null!)
@@ -158,5 +172,4 @@ public class SpecFlowDiscoverer
         //    return ex;
         //}
     }
-
 }
