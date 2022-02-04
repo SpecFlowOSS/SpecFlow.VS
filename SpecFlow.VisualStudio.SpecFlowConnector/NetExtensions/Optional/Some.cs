@@ -28,6 +28,8 @@ public sealed class Some<T> : Option<T>, IEquatable<Some<T>>
     public override Option<TResult> MapOptional<TResult>(Func<T, Option<TResult>> map) =>
         map(Content);
 
+    public override Option<T> Or(Func<Option<T>> or) => this;
+
     public override Option<T> Tie(Action<T> act)
     {
         act(Content);

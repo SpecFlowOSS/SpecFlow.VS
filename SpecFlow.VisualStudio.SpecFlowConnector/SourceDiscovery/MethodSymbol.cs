@@ -1,13 +1,3 @@
 ﻿namespace SpecFlowConnector.SourceDiscovery;
 
-public class MethodSymbol
-{
-    public MethodSymbol(int token, SequencePoint[] sequencePoints)
-    {
-        Token = token;
-        SequencePoints = sequencePoints;
-    }
-
-    public int Token { get; }
-    public SequencePoint[] SequencePoints { get; }
-}
+public record MethodSymbolSequencePoint(int IlOffset, string SourcePath, int StartLine, int EndLine, int StartColumn, int EndColumn);

@@ -124,11 +124,13 @@ public class SpecFlowDiscoverer
 
         var runtimeBindingMethod = bindingMethod.MethodInfo
             .Map(mi => mi.DeclaringType)
-            .Map(t => _symbolReaders[t.Assembly]);
+            .Map(t => _symbolReaders[t.Assembly].Reduce(()=>default!))
+            
+            ;
 
         //.Reduce((Type) null!)
         //.Map(t => GetOrCreateSymbolReader(t.Assembly));
-        return "xyz";
+        return runtimeBindingMethod.ToString();
 
         //try
         //{

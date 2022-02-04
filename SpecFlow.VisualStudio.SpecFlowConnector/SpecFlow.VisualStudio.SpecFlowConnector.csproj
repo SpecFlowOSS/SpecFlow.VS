@@ -11,8 +11,8 @@
     <_OutputCopyLocation>$(SolutionDir)Connectors\bin\$(configuration)\General-$(TargetFramework)</_OutputCopyLocation>
   </PropertyGroup>
 
-
   <ItemGroup>
+    <PackageReference Include="dnlib" Version="3.3.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
     <PackageReference Include="SpecFlow.CustomPlugin" Version="3.9.40" />
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />

@@ -15,6 +15,8 @@ public sealed class None<T> : Option<T>, IEquatable<None<T>>, IEquatable<None>
     public override Option<TResult> MapOptional<TResult>(Func<T, Option<TResult>> map) =>
         None.Value;
 
+    public override Option<T> Or(Func<Option<T>> or) => or();
+
     public override Option<T> Tie(Action<T> act) => this;
 
     public override T Reduce(T whenNone) =>

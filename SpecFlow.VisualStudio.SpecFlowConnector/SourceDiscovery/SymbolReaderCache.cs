@@ -1,4 +1,6 @@
-﻿namespace SpecFlowConnector.SourceDiscovery;
+﻿using SpecFlowConnector.SourceDiscovery.DnLib;
+
+namespace SpecFlowConnector.SourceDiscovery;
 
 public class SymbolReaderCache
 {
@@ -12,15 +14,16 @@ public class SymbolReaderCache
 
     public Option<DeveroomSymbolReader> this[Assembly assembly] => GetOrCreateSymbolReader(assembly);
 
-    private Option<DeveroomSymbolReader> GetOrCreateSymbolReader(Assembly assembly) =>
-        GetOrCreateSymbolReader(assembly, new Uri(assembly.Location).LocalPath);
-
-    private Option<DeveroomSymbolReader> GetOrCreateSymbolReader(Assembly assembly, string assemblyFilePath)
+    private Option<DeveroomSymbolReader> GetOrCreateSymbolReader(Assembly assembly) 
     {
         if (_symbolReaders.TryGetValue(assembly, out var symbolReader))
             return symbolReader;
 
-        return CreateSymbolReader(assemblyFilePath)
+        return CreateSymbolReader(assembly.Location)
+#if NETFRAMEWORK
+            .Or(()=>CreateSymbolReader(new Uri(assembly.CodeBase).LocalPath))
+#endif
+            .Or(()=>CreateSymbolReader(new Uri(assembly.Location).LocalPath))
             .Tie(reader => _symbolReaders.Add(assembly, reader));
     }
 
@@ -32,14 +35,12 @@ public class SymbolReaderCache
             .DefaultIfEmpty(None<DeveroomSymbolReader>.Value)
             .FirstOrDefault()!;
 
-    private static Func<DeveroomSymbolReader>[] SymbolReaderFactories(string path)
+    private IEnumerable<Func<DeveroomSymbolReader>> SymbolReaderFactories(string path)
     {
         return new Func<DeveroomSymbolReader>[]
         {
-            //path => new DnLibDeveroomSymbolReader(path),
+            () => DnLibDeveroomSymbolReader.Create(_log,path)
             //path => new ComDeveroomSymbolReader(path),
-            () => throw new Exception("abcd"),
-            () => throw new Exception("efgh")
         };
     }
 
