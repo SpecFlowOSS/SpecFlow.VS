@@ -23,7 +23,7 @@ public class DiscoveryCommand : ICommand
         var assembly = assemblyFromPath(_options.AssemblyFile.FullName);
         _log.Debug($"Loaded: {assembly}");
 
-        return new SpecFlowDiscoverer()
+        return new SpecFlowDiscoverer(_log)
             .Discover(bindingRegistryFactory, assembly, _options.ConfigFile)
             .Map(dr=>new CommandResult(JsonSerialization.SerializeObject(dr)));
     }

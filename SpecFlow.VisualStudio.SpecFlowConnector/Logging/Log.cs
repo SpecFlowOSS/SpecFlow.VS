@@ -1,5 +1,3 @@
-﻿// ReSharper disable once CheckNamespace
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿namespace SpecFlowConnector.Logging;
 
 public record Log(LogLevel Level, string Message);

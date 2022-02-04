@@ -22,14 +22,15 @@ public record StepDefinition(
     string? ParamTypes,
     StepScope? Scope,
     string? Expression,
-    string? Error
-    //string? SourceLocation
+    string? Error,
+    string SourceLocation
 );
 
 public record BindingMethodAdapter(IBindingMethod Adaptee)
 {
     public override string ToString() => Adaptee.ToString();
     public IEnumerable<string> ParameterTypeNames => Adaptee.Parameters.Select(p=>p.Type.FullName);
+    public Option<MethodInfo> MethodInfo => (Adaptee as RuntimeBindingMethod).MethodInfo;
 }
 
 public record StepDefinitionBindingAdapter(IStepDefinitionBinding Adaptee)

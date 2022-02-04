@@ -1,4 +1,6 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿using SpecFlowConnector.Logging;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 public class TestConsoleLogger : Logger
 {

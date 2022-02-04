@@ -1,0 +1,81 @@
+﻿namespace SpecFlowConnector.SourceDiscovery;
+
+public class SymbolReaderCache
+{
+    private readonly ILogger _log;
+    private readonly Dictionary<Assembly, Option<DeveroomSymbolReader>> _symbolReaders = new(2);
+
+    public SymbolReaderCache(ILogger log)
+    {
+        _log = log;
+    }
+
+    public Option<DeveroomSymbolReader> this[Assembly assembly] => GetOrCreateSymbolReader(assembly);
+
+    private Option<DeveroomSymbolReader> GetOrCreateSymbolReader(Assembly assembly) =>
+        GetOrCreateSymbolReader(assembly, new Uri(assembly.Location).LocalPath);
+
+    private Option<DeveroomSymbolReader> GetOrCreateSymbolReader(Assembly assembly, string assemblyFilePath)
+    {
+        if (_symbolReaders.TryGetValue(assembly, out var symbolReader))
+            return symbolReader;
+
+        return CreateSymbolReader(assemblyFilePath)
+            .Tie(reader => _symbolReaders.Add(assembly, reader));
+    }
+
+    protected Option<DeveroomSymbolReader> CreateSymbolReader(
+        string assemblyFilePath) =>
+        SymbolReaderFactories(assemblyFilePath)
+            .Select(TryCreateReader)
+            .Where(reader => reader is Some<DeveroomSymbolReader>)
+            .DefaultIfEmpty(None<DeveroomSymbolReader>.Value)
+            .FirstOrDefault()!;
+
+    private static Func<DeveroomSymbolReader>[] SymbolReaderFactories(string path)
+    {
+        return new Func<DeveroomSymbolReader>[]
+        {
+            //path => new DnLibDeveroomSymbolReader(path),
+            //path => new ComDeveroomSymbolReader(path),
+            () => throw new Exception("abcd"),
+            () => throw new Exception("efgh")
+        };
+    }
+
+    private Option<DeveroomSymbolReader> TryCreateReader(Func<DeveroomSymbolReader> factory)
+    {
+        try
+        {
+            return factory();
+        }
+        catch (Exception ex)
+        {
+            _log.Info(ex.ToString());
+        }
+
+        return None<DeveroomSymbolReader>.Value;
+    }
+
+    private static bool CreationFailed(Option<DeveroomSymbolReader> reader)
+    {
+        return reader
+            .Map(_ => false)
+            .Reduce(true);
+    }
+
+    private static Option<Exception> CompressWarnings(ImmutableArray<Exception> warnings)
+    {
+        return warnings.Aggregate(
+                (acc, cur) =>
+                {
+                    var exceptions = ImmutableHashSet.CreateBuilder<Exception>();
+                    if (acc is AggregateException ae) exceptions.UnionWith(ae.InnerExceptions);
+
+                    exceptions.Add(cur);
+                    return new AggregateException(exceptions.ToImmutable());
+                })
+            .Map(e => (Option<Exception>)e);
+    }
+
+}

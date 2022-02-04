@@ -1,6 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿namespace SpecFlowConnector.Logging;
 
 public sealed class ConsoleLogger : Logger
 {

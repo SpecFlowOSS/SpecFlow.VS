@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿namespace SpecFlowConnector.Logging;
 
 public static class LoggerExtensions
 {

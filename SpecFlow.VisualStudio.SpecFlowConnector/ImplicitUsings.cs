@@ -2,6 +2,8 @@
 global using Microsoft.Extensions.DependencyModel.Resolution;
 global using SpecFlow.VisualStudio.SpecFlowConnector;
 global using SpecFlowConnector.BoDiProxies;
+global using SpecFlowConnector.Logging;
+global using SpecFlowConnector.SourceDiscovery;
 global using SpecFlowConnector.SpecFlowProxies;
 global using System;
 global using System.Collections.Concurrent;
@@ -12,6 +14,7 @@ global using System.Globalization;
 global using System.IO.Abstractions;
 global using System.Linq;
 global using System.Reflection;
+global using System.Reflection.Metadata;
 global using System.Runtime.InteropServices;
 global using System.Runtime.Loader;
 global using System.Text;

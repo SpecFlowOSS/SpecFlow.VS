@@ -2,7 +2,7 @@
 
 public sealed class None<T> : Option<T>, IEquatable<None<T>>, IEquatable<None>
 {
-    public static None<T> Value { get; } = new();
+    public static Option<T> Value { get; } = new None<T>();
 
     public bool Equals(None<T> other) =>
         other?.GetType() == typeof(None<T>);
@@ -14,6 +14,8 @@ public sealed class None<T> : Option<T>, IEquatable<None<T>>, IEquatable<None>
 
     public override Option<TResult> MapOptional<TResult>(Func<T, Option<TResult>> map) =>
         None.Value;
+
+    public override Option<T> Tie(Action<T> act) => this;
 
     public override T Reduce(T whenNone) =>
         whenNone;
