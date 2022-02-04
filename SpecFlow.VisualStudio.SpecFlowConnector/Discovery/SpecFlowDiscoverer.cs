@@ -44,7 +44,7 @@ public class SpecFlowDiscoverer
             GetScope(sdb),
             GetSourceExpression(sdb),
             GetError(sdb),
-            sourceLocation.Reduce((string)null!)
+            sourceLocation.Reduce((string) null!)
         );
 
         return stepDefinition;
@@ -119,13 +119,18 @@ public class SpecFlowDiscoverer
 
     private Option<string> GetSourceLocation(BindingMethodAdapter bindingMethod)
     {
-        //if (bindingMethod is not RuntimeBindingMethod runtimeBindingMethod ||
-        //    runtimeBindingMethod.MethodInfo.DeclaringType == null) return null;
-
         var runtimeBindingMethod = bindingMethod.MethodInfo
-            .Map(mi => mi.DeclaringType)
-            .Map(t => _symbolReaders[t.Assembly].Reduce(()=>default!))
-            
+            .Map(mi => (reader: mi.DeclaringType
+                        .Map(declaringType => declaringType!.Assembly)
+                        .Map(assembly => _symbolReaders[assembly].Reduce(() => default!)),
+                    mi.MetadataToken
+                ))
+            .Map(x => x.reader.ReadMethodSymbol(x.MetadataToken))
+            .Reduce(ImmutableArray<MethodSymbolSequencePoint>.Empty)
+            .Map(sequencePoints => sequencePoints
+                .Select(sp => (Option<MethodSymbolSequencePoint>) sp)
+                .DefaultIfEmpty(None.Value)
+                .FirstOrDefault(sp => sp is Some<MethodSymbolSequencePoint> some && !some.Content.IsHidden));
             ;
 
         //.Reduce((Type) null!)
