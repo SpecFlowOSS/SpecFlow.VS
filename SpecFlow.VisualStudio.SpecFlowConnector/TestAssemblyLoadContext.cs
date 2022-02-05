@@ -11,8 +11,8 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
 
     public TestAssemblyLoadContext(string path)
     {
-        Assembly = LoadFromAssemblyPath(path);
-        _dependencyContext = DependencyContext.Load(Assembly);
+        TestAssembly = LoadFromAssemblyPath(path);
+        _dependencyContext = DependencyContext.Load(TestAssembly);
         _rids = GetRids(GetRuntimeFallbacks()).ToArray();
 
         _assemblyResolver = new RuntimeCompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
@@ -25,7 +25,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
         });
     }
 
-    public Assembly Assembly { get; }
+    public Assembly TestAssembly { get; }
 
 
     private static string GetFallbackRid()

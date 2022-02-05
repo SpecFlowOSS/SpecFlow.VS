@@ -28,7 +28,8 @@ public class RunnerTests
         var consoleRunner = new Runner(logger);
 
         //act
-        var resultCode = consoleRunner.Run(@case.Data.args, _ => GetType().Assembly, new MockFileSystem());
+        TestAssemblyLoadContext? loadContext = null;
+        var resultCode = consoleRunner.Run(@case.Data.args, path => loadContext ??= new TestAssemblyLoadContext(path), new MockFileSystem());
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()

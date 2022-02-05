@@ -14,13 +14,13 @@ public class DiscoveryCommand : ICommand
         _fileSystem = fileSystem;
     }
 
-    public CommandResult Execute(Func<string, Assembly> assemblyFromPath)
+    public CommandResult Execute(Func<string, TestAssemblyLoadContext> testAssemblyLoadContext)
     {
         IBindingRegistryFactory bindingRegistryFactory = new BindingRegistryFactoryProvider(_log, _options, _fileSystem)
             .Create();
 
         _log.Debug($"Loading {_options.AssemblyFile.FullName}");
-        var assembly = assemblyFromPath(_options.AssemblyFile.FullName);
+        var assembly = testAssemblyLoadContext(_options.AssemblyFile.FullName);
         _log.Debug($"Loaded: {assembly}");
 
         return new SpecFlowDiscoverer(_log)

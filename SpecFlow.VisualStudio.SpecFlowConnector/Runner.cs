@@ -11,14 +11,19 @@ public class Runner
         _log = log;
     }
 
-    public int Run(string[] args, Func<string, Assembly> assemblyFromPath, IFileSystem fileSystem)
+    public int Run(string[] args, Func<string, TestAssemblyLoadContext> testAssemblyLoadContext, IFileSystem fileSystem)
     {
-        var internalLogger = new StringBuilderLogger();
+        var internalLogger =
+#if DEBUG
+            _log;
+#else
+        new StringBuilderLogger();
+#endif
         try
         {
             return new CommandFactory(internalLogger, fileSystem)
                 .CreateCommand(args)
-                .Map(cmd => cmd.Execute(assemblyFromPath))
+                .Map(cmd => cmd.Execute(testAssemblyLoadContext))
                 .Tie(PrintResult)
                 .Map<Exception, CommandResult,int>(_ => 0)
                 .Reduce(HandleException);

@@ -13,14 +13,14 @@ public class SpecFlowDiscoverer
 
     public DiscoveryResult Discover(
         IBindingRegistryFactory bindingRegistryFactory,
-        Assembly testAssembly,
+        TestAssemblyLoadContext testAssemblyLoadContext,
         Option<FileDetails> configFile)
     {
         var typeNames = ImmutableDictionary.CreateBuilder<string, string>();
         var sourcePaths = ImmutableDictionary.CreateBuilder<string, string>();
 
         var stepDefinitions = new BindingRegistryAdapterAdapter(bindingRegistryFactory)
-            .GetStepDefinitions(testAssembly, configFile)
+            .GetStepDefinitions(testAssemblyLoadContext, configFile)
             .Select(sdb => CreateStepDefinition(sdb,
                 method => GetParamTypes(method, parameterTypeName => GetKey(typeNames, parameterTypeName)),
                 sourcePath => GetKey(sourcePaths, sourcePath))

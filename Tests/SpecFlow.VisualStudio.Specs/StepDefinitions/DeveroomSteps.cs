@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using Newtonsoft.Json;
 using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace SpecFlow.VisualStudio.Specs.StepDefinitions;
@@ -197,6 +198,7 @@ public class DeveroomSteps : Steps
         generatorOptions.FallbackNuGetPackageSource = TestFolders.GetInputFilePath("ExternalPackages");
         _projectGenerator = generatorOptions.CreateProjectGenerator(s => _outputHelper.WriteLine(s));
         _projectGenerator.Generate();
+        var json = JsonConvert.SerializeObject(generatorOptions);
     }
 
     private void EnsureProjectGenerated()

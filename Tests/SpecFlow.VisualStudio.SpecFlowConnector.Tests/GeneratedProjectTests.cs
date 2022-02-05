@@ -1,6 +1,4 @@
-﻿using System.IO.Abstractions.TestingHelpers;
-using SpecFlowConnector;
-using SpecFlowConnector.Discovery;
+﻿using SpecFlowConnector.Discovery;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
@@ -20,20 +18,19 @@ public class GeneratedProjectTests
     [InlineData("DS_GPT_3.9.40_nunit_nprj_net6.0_bt_1194832604")]
     [InlineData("DS_GPT_3.9.40_nunit_bt_1194832604")]
     [InlineData("DS_GPT_3.9.40_nunit_nprj_1194832604")]
+    [InlineData("DS_Dis299rk_3.9.40_nunit_bt_1194832604")]
     public void Approval(string testName)
     {
         //arrange
-        testName += ".json";
-        NamerFactory.AdditionalInformation = testName;
-        var namer = Approvals.GetDefaultNamer();
-        var testDataFile = FileDetails.FromPath(namer.SourcePath, namer.Name);
+        var namer = new PresetApprovalNamer(testName + ".json");
+        Approvals.RegisterDefaultNamerCreation(() => namer);
 
-        NamerFactory.AdditionalInformation = testName;
+        var testDataFile = FileDetails.FromPath(namer.SourcePath, namer.Name);
 
         var content = File.ReadAllText(testDataFile);
         var testData = JsonConvert.DeserializeObject<GeneratedProjectTestsData>(content);
 
-        testData.GeneratorOptions.CreatedFor = "GPT";
+        testData.GeneratorOptions.CreatedFor ??= "GPT";
         testData.GeneratorOptions.IsBuilt = true;
         var projectGenerator = testData.GeneratorOptions.CreateProjectGenerator(s => _testOutputHelper.WriteLine(s));
         projectGenerator.Generate();
@@ -42,11 +39,9 @@ public class GeneratedProjectTests
             FileDetails.FromPath(projectGenerator.TargetFolder, projectGenerator.GetOutputAssemblyPath());
 
         var connectorFile = typeof(DiscoveryCommand).Assembly.GetLocation();
-        
+
         //act
-        ProcessResult result = Debugger.IsAttached 
-            ? InvokeInMemory(targetAssemblyFile)
-            : InvokeAsProcess(projectGenerator, connectorFile, targetAssemblyFile);
+        var result = Invoke(targetAssemblyFile, projectGenerator, connectorFile);
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()
@@ -57,23 +52,8 @@ public class GeneratedProjectTests
                 .Map(XunitExtensions.StackTraceScrubber));
     }
 
-    private static string TargetFolderScrubber(string content, string targetFolder) 
-        => content.Replace(targetFolder, "<<targetFolder>>");
-
-    private static ProcessResult InvokeInMemory(FileDetails targetAssemblyFile)
-    {
-        var logger = new TestConsoleLogger();
-        var consoleRunner = new Runner(logger);
-        var mockFileSystem = new MockFileSystem();
-        var resultCode = consoleRunner.Run(new[] {DiscoveryCommand.CommandName, targetAssemblyFile},
-            Assembly.LoadFrom,
-            mockFileSystem);
-        var result = new ProcessResult(resultCode, logger[LogLevel.Info], logger[LogLevel.Error], TimeSpan.Zero);
-        return result;
-    }
-
-    private ProcessResult InvokeAsProcess(IProjectGenerator projectGenerator, FileDetails connectorFile,
-        FileDetails targetAssemblyFile)
+    private ProcessResult Invoke(FileDetails targetAssemblyFile, IProjectGenerator projectGenerator,
+        FileDetails connectorFile)
     {
         var psiEx = new ProcessStartInfoEx(
             projectGenerator.TargetFolder,
@@ -88,6 +68,41 @@ public class GeneratedProjectTests
         };
 #endif
         _testOutputHelper.WriteLine($"{psiEx.ExecutablePath} {psiEx.Arguments}");
+
+        ProcessResult result = Debugger.IsAttached
+            ? InvokeInMemory(psiEx)
+            : InvokeAsProcess(psiEx);
+        return result;
+    }
+
+    private static string TargetFolderScrubber(string content, string targetFolder)
+        => content.Replace(targetFolder, "<<targetFolder>>");
+
+    private static ProcessResult InvokeInMemory(ProcessStartInfoEx psiEx)
+    {
+#if NETCOREAPP
+        var split = psiEx.Arguments.Split(' ', 2);
+        psiEx = psiEx with
+        {
+            ExecutablePath = split[0],
+            Arguments = split[1]
+        };
+#endif
+        TestAssemblyLoadContext? loadContext = null;
+
+        var logger = new TestConsoleLogger();
+        var consoleRunner = new Runner(logger);
+        var mockFileSystem = new MockFileSystem();
+        var resultCode = consoleRunner.Run(
+            psiEx.Arguments.Split(' '),
+            path => loadContext ??= new TestAssemblyLoadContext(path),
+            mockFileSystem);
+        var result = new ProcessResult(resultCode, logger[LogLevel.Info], logger[LogLevel.Error], TimeSpan.Zero);
+        return result;
+    }
+
+    private ProcessResult InvokeAsProcess(ProcessStartInfoEx psiEx)
+    {
         var result = new ProcessHelper()
             .RunProcess(psiEx);
         return result;
