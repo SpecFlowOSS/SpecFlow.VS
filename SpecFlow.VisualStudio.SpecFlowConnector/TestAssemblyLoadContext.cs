@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector;
+namespace SpecFlowConnector;
 
 public class TestAssemblyLoadContext : AssemblyLoadContext
 {
@@ -9,24 +9,20 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
     private readonly DependencyContext _dependencyContext;
     private readonly string[] _rids;
 
-    public TestAssemblyLoadContext(string path)
+    public TestAssemblyLoadContext(Assembly testAssembly)
     {
-        TestAssembly = LoadFromAssemblyPath(path);
-        _dependencyContext = DependencyContext.Load(TestAssembly);
+        _dependencyContext = DependencyContext.Load(testAssembly);
         _rids = GetRids(GetRuntimeFallbacks()).ToArray();
 
         _assemblyResolver = new RuntimeCompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
         {
-            new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)),
+            new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(testAssembly.Location)),
             new ReferenceAssemblyPathResolver(),
             new PackageCompilationAssemblyResolver(),
             new AspNetCoreAssemblyResolver(),
             new NugetCacheAssemblyResolver()
         });
     }
-
-    public Assembly TestAssembly { get; }
-
 
     private static string GetFallbackRid()
     {

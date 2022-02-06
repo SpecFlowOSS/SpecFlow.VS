@@ -6,6 +6,7 @@ using TechTalk.SpecFlow.Bindings;
 using TechTalk.SpecFlow.Bindings.Reflection;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
+using TechTalk.SpecFlow.Tracing;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
@@ -47,7 +48,8 @@ public record StepDefinitionBindingAdapter(IStepDefinitionBinding Adaptee)
 
 public interface IBindingRegistryAdapter
 {
-    IEnumerable<StepDefinitionBindingAdapter> GetStepDefinitions(TestAssemblyLoadContext testAssemblyLoadContext, Option<FileDetails> configFile);
+    IEnumerable<StepDefinitionBindingAdapter> GetStepDefinitions(AssemblyLoadContext assemblyLoadContext,
+        Option<FileDetails> configFile, Assembly testAssembly);
 }
 
 public class BindingRegistryAdapterAdapter : IBindingRegistryAdapter
@@ -60,10 +62,10 @@ public class BindingRegistryAdapterAdapter : IBindingRegistryAdapter
         _bindingRegistryFactory = bindingRegistryFactory;
     }
 
-    public IEnumerable<StepDefinitionBindingAdapter> GetStepDefinitions(TestAssemblyLoadContext testAssemblyLoadContext,
-        Option<FileDetails> configFile)
+    public IEnumerable<StepDefinitionBindingAdapter> GetStepDefinitions(AssemblyLoadContext assemblyLoadContext,
+        Option<FileDetails> configFile, Assembly testAssembly)
     {
-        var bindingRegistry = _bindingRegistryFactory.GetBindingRegistry(testAssemblyLoadContext, configFile);
+        var bindingRegistry = _bindingRegistryFactory.GetBindingRegistry(assemblyLoadContext, testAssembly, configFile);
         var stepDefinitionBindings = bindingRegistry.GetStepDefinitions();
         return stepDefinitionBindings
             .Select(Adapt);
@@ -75,23 +77,26 @@ public class BindingRegistryAdapterAdapter : IBindingRegistryAdapter
 
 public interface IBindingRegistryFactory
 {
-    IBindingRegistry GetBindingRegistry(TestAssemblyLoadContext testAssemblyLoadContext, Option<FileDetails> configFile);
+    IBindingRegistry GetBindingRegistry(AssemblyLoadContext assemblyLoadContext,
+        Assembly testAssembly, Option<FileDetails> configFile);
 }
 
 public abstract class BindingRegistryFactory<TGlobalContainer> : IBindingRegistryFactory
 {
-    public IBindingRegistry GetBindingRegistry(TestAssemblyLoadContext testAssemblyLoadContext, Option<FileDetails> configFile)
+    public IBindingRegistry GetBindingRegistry(AssemblyLoadContext assemblyLoadContext,
+        Assembly testAssembly, Option<FileDetails> configFile)
     {
-        var globalContainer = CreateGlobalContainer(testAssemblyLoadContext, configFile);
+        var globalContainer = CreateGlobalContainer(assemblyLoadContext, configFile, testAssembly);
         RegisterTypeAs<NoInvokeDependencyProvider.NullBindingInvoker, IBindingInvoker>(globalContainer);
         //RegisterTypeAs<FakeTestContext, TestContext>(globalContainer);
-        CreateTestRunner(globalContainer, testAssemblyLoadContext.TestAssembly);
+        CreateTestRunner(globalContainer, testAssembly);
 
-        return ResolveBindingRegistry(testAssemblyLoadContext.TestAssembly, globalContainer);
+        return ResolveBindingRegistry(testAssembly, globalContainer);
     }
 
     protected abstract void RegisterTypeAs<TType, TInterface>(TGlobalContainer globalContainer) where TType : class, TInterface;
-    protected abstract TGlobalContainer CreateGlobalContainer(TestAssemblyLoadContext testAssemblyLoadContext, Option<FileDetails> configFile);
+    protected abstract TGlobalContainer CreateGlobalContainer(AssemblyLoadContext assemblyLoadContext,
+        Option<FileDetails> configFile, Assembly testAssembly);
     protected abstract void CreateTestRunner(TGlobalContainer globalContainer, Assembly testAssembly);
     protected abstract IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, TGlobalContainer globalContainer);
 }
@@ -108,12 +113,14 @@ public class BindingRegistryFactoryV3922 : BindingRegistryFactory<IObjectContain
     protected override void RegisterTypeAs<TType, TInterface>(IObjectContainer globalContainer) 
         => globalContainer.RegisterTypeAs<TType, TInterface>();
 
-    protected override IObjectContainer CreateGlobalContainer(TestAssemblyLoadContext testAssemblyLoadContext, Option<FileDetails> configFile)
+    protected override IObjectContainer CreateGlobalContainer(AssemblyLoadContext assemblyLoadContext,
+        Option<FileDetails> configFile, Assembly testAssembly)
     {
         var containerBuilder = new ContainerBuilder(new SpecFlowV31DependencyProvider(testAssemblyLoadContext));
         IConfigurationLoader configurationLoader = new SpecFlowConfigurationLoader(configFile, _fileSystem);
         var configurationProvider = new DefaultRuntimeConfigurationProvider(configurationLoader);
-        return containerBuilder.CreateGlobalContainer(testAssemblyLoadContext.TestAssembly, configurationProvider);
+        return containerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
+    }
     }
 
     protected override void CreateTestRunner(IObjectContainer globalContainer, Assembly testAssembly)

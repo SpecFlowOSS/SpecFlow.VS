@@ -1,9 +1,15 @@
-﻿namespace SpecFlowConnector.Discovery;
+﻿using SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+
+namespace SpecFlowConnector.Discovery;
 
 public class SpecFlowDiscoverer
 {
     private readonly ILogger _log;
     private readonly SymbolReaderCache _symbolReaders;
+
+    public SpecFlowDiscoverer() : this(new StringBuilderLogger())
+    {
+    }
 
     public SpecFlowDiscoverer(ILogger log)
     {
@@ -11,16 +17,16 @@ public class SpecFlowDiscoverer
         _symbolReaders = new SymbolReaderCache(log);
     }
 
-    public DiscoveryResult Discover(
-        IBindingRegistryFactory bindingRegistryFactory,
-        TestAssemblyLoadContext testAssemblyLoadContext,
+    public DiscoveryResult Discover(IBindingRegistryFactory bindingRegistryFactory,
+        AssemblyLoadContext assemblyLoadContext,
+        Assembly testAssembly,
         Option<FileDetails> configFile)
     {
         var typeNames = ImmutableDictionary.CreateBuilder<string, string>();
         var sourcePaths = ImmutableDictionary.CreateBuilder<string, string>();
 
         var stepDefinitions = new BindingRegistryAdapterAdapter(bindingRegistryFactory)
-            .GetStepDefinitions(testAssemblyLoadContext, configFile)
+            .GetStepDefinitions(assemblyLoadContext, configFile, testAssembly)
             .Select(sdb => CreateStepDefinition(sdb,
                 method => GetParamTypes(method, parameterTypeName => GetKey(typeNames, parameterTypeName)),
                 sourcePath => GetKey(sourcePaths, sourcePath))

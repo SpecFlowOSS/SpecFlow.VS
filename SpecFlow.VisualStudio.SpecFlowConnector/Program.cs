@@ -3,10 +3,7 @@
 var log = new ConsoleLogger();
 var fileSystem = new FileSystem();
 
-TestAssemblyLoadContext TestAssemblyLoadContext(string path)
-{
-    return new TestAssemblyLoadContext(path);
-}
+Assembly TestAssemblyFactory(string path) => Assembly.LoadFrom(path);
 
 return new Runner(log)
-    .Run(args, TestAssemblyLoadContext, fileSystem); 
+    .Run(args, TestAssemblyFactory, fileSystem); 

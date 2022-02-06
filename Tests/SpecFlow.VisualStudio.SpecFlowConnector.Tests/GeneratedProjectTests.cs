@@ -18,7 +18,6 @@ public class GeneratedProjectTests
     [InlineData("DS_GPT_3.9.40_nunit_nprj_net6.0_bt_1194832604")]
     [InlineData("DS_GPT_3.9.40_nunit_bt_1194832604")]
     [InlineData("DS_GPT_3.9.40_nunit_nprj_1194832604")]
-    [InlineData("DS_Dis299rk_3.9.40_nunit_bt_1194832604")]
     public void Approval(string testName)
     {
         //arrange
@@ -88,14 +87,14 @@ public class GeneratedProjectTests
             Arguments = split[1]
         };
 #endif
-        TestAssemblyLoadContext? loadContext = null;
+        Assembly? testAssembly = null;
 
         var logger = new TestConsoleLogger();
         var consoleRunner = new Runner(logger);
         var mockFileSystem = new MockFileSystem();
         var resultCode = consoleRunner.Run(
             psiEx.Arguments.Split(' '),
-            path => loadContext ??= new TestAssemblyLoadContext(path),
+            path => testAssembly ??= Assembly.LoadFrom(path),
             mockFileSystem);
         var result = new ProcessResult(resultCode, logger[LogLevel.Info], logger[LogLevel.Error], TimeSpan.Zero);
         return result;

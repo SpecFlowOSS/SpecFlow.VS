@@ -6,7 +6,7 @@ namespace SpecFlowConnector.SpecFlowProxies;
 
 public class SpecFlowV31DependencyProvider : NoInvokeDependencyProvider
 {
-    private readonly AssemblyLoadContext _loadContext;
+    private readonly AssemblyLoadContext _loadContext; //TODO: szerintem ez nem kell
 
     public SpecFlowV31DependencyProvider(AssemblyLoadContext loadContext)
     {

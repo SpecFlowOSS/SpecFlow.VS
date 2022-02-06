@@ -1,26 +1,26 @@
 ﻿using SpecFlowConnector.Discovery;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector;
+namespace SpecFlowConnector;
 
 public class CommandFactory
 {
     private readonly ILogger _log;
     private readonly IFileSystem _fileSystem;
+    private readonly ConnectorOptions _options;
+    private readonly Assembly _testAssembly;
 
-    public CommandFactory(ILogger log, IFileSystem fileSystem)
+    public CommandFactory(ILogger log, IFileSystem fileSystem, ConnectorOptions options, Assembly testAssembly)
     {
         _log = log;
         _fileSystem = fileSystem;
+        _options = options;
+        _testAssembly = testAssembly;
     }
 
-    public Either<Exception, ICommand> CreateCommand(string[] args) =>
-        args
-            .Map(ConnectorOptions.Parse)
-            .Tie(DumpOptions)
+    public Either<Exception, ICommand> CreateCommand() =>
+        _options
             .Tie(AttachDebuggerWhenRequired)
             .Map(ToCommand);
-
-    public void DumpOptions(ConnectorOptions options) => _log.Debug(options.ToString());
 
     public static void AttachDebuggerWhenRequired(ConnectorOptions connectorOptions)
     {
@@ -32,7 +32,7 @@ public class CommandFactory
     {
         return options switch
         {
-            DiscoveryOptions o => new DiscoveryCommand(o, _log, _fileSystem),
+            DiscoveryOptions o => new DiscoveryCommand(o.ConfigFile, _log, _fileSystem, _testAssembly),
             _ => new ArgumentException($"Invalid command: {options.GetType().Name}")
         };
     }

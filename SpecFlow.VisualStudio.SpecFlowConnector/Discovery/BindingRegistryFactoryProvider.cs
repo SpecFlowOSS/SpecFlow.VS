@@ -3,13 +3,13 @@
 public class BindingRegistryFactoryProvider
 {
     private readonly ILogger _log;
-    private readonly DiscoveryOptions _options;
+    private readonly Assembly _testAssembly;
     private readonly IFileSystem _fileSystem;
 
-    public BindingRegistryFactoryProvider(ILogger log, DiscoveryOptions options, IFileSystem fileSystem)
+    public BindingRegistryFactoryProvider(ILogger log, Assembly testAssembly, IFileSystem fileSystem)
     {
         _log = log;
-        _options = options;
+        _testAssembly = testAssembly;
         _fileSystem = fileSystem;
     }
 
@@ -36,7 +36,7 @@ public class BindingRegistryFactoryProvider
 
     private int GetSpecFlowVersion()
     {
-        var specFlowAssemblyPath = Path.Combine(_options.AssemblyFile.DirectoryName.Reduce("."), "TechTalk.SpecFlow.dll");
+        var specFlowAssemblyPath = Path.Combine(Path.GetDirectoryName(_testAssembly.Location) ?? ".", "TechTalk.SpecFlow.dll");
         if (_fileSystem.File.Exists(specFlowAssemblyPath))
         {
             var specFlowVersion = FileVersionInfo.GetVersionInfo(specFlowAssemblyPath);

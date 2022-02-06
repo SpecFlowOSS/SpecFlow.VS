@@ -1,8 +1,8 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector;
+﻿namespace SpecFlowConnector;
 
 public record CommandResult(string Json);
 
 public interface ICommand
 {
-    CommandResult Execute(Func<string, TestAssemblyLoadContext> testAssemblyLoadContext);
+    CommandResult Execute(AssemblyLoadContext assemblyLoadContext);
 }

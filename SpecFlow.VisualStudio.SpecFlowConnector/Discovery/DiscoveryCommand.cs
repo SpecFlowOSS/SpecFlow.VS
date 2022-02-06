@@ -3,29 +3,28 @@
 public class DiscoveryCommand : ICommand
 {
     public const string CommandName = "discovery";
-    private readonly DiscoveryOptions _options;
+    private readonly Option<FileDetails> _configFile;
     private readonly ILogger _log;
     private readonly IFileSystem _fileSystem;
+    private readonly Assembly _testAssembly;
 
-    public DiscoveryCommand(DiscoveryOptions options, ILogger log, IFileSystem fileSystem)
+    public DiscoveryCommand(Option<FileDetails> configFile, ILogger log, IFileSystem fileSystem, Assembly testAssembly)
     {
-        _options = options;
+        _configFile = configFile;
         _log = log;
         _fileSystem = fileSystem;
+        _testAssembly = testAssembly;
     }
 
-    public CommandResult Execute(Func<string, TestAssemblyLoadContext> testAssemblyLoadContext)
+    public CommandResult Execute(AssemblyLoadContext assemblyLoadContext)
     {
-        IBindingRegistryFactory bindingRegistryFactory = new BindingRegistryFactoryProvider(_log, _options, _fileSystem)
-            .Create();
 
-        _log.Debug($"Loading {_options.AssemblyFile.FullName}");
-        var assembly = testAssemblyLoadContext(_options.AssemblyFile.FullName);
-        _log.Debug($"Loaded: {assembly}");
-
-        return new SpecFlowDiscoverer(_log)
-            .Discover(bindingRegistryFactory, assembly, _options.ConfigFile)
-            .Map(dr=>new CommandResult(JsonSerialization.SerializeObject(dr)));
+        return new BindingRegistryFactoryProvider(_log, _testAssembly, _fileSystem)
+            .Create()
+            .Map(bindingRegistryFactory => new SpecFlowDiscoverer(_log)
+                .Discover(bindingRegistryFactory, assemblyLoadContext, _testAssembly, _configFile)
+                .Map(JsonSerialization.SerializeObject))
+            .Map(serializedDr => new CommandResult(serializedDr));
     }
 }
 
