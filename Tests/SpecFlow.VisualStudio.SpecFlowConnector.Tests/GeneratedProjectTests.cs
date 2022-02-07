@@ -15,20 +15,24 @@ public class GeneratedProjectTests
 
     [Theory]
     [InlineData("DS_2.3.2_nunit_1194832604")]
+    [InlineData("DS_3.9.40_nunit_nprj_net35_bt_992117478")]
+    [InlineData("DS_3.9.40_nunit_nprj_net452_bt_992117478")]
+    [InlineData("DS_3.9.40_nunit_nprj_net461_bt_992117478")]
+    [InlineData("DS_3.9.40_nunit_nprj_net472_bt_992117478")]
+    [InlineData("DS_3.9.40_nunit_bt_992117478")]
+    [InlineData("DS_3.9.40_nunit_bt_1194832604")]
+    [InlineData("DS_3.9.40_nunit_nprj_bt_992117478")]
+#if NET
     [InlineData("DS_3.9.40_nunit_nprj_netcoreapp20_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_netcoreapp21_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_netcoreapp22_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_netcoreapp30_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_netcoreapp31_bt_992117478")]
-    [InlineData("DS_3.9.40_nunit_nprj_net35_bt_992117478")]
-    [InlineData("DS_3.9.40_nunit_nprj_net452_bt_992117478")]
-    [InlineData("DS_3.9.40_nunit_nprj_net461_bt_992117478")]
-    [InlineData("DS_3.9.40_nunit_nprj_net472_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net5.0_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net6.0_bt_992117478")]
-    [InlineData("DS_3.9.40_nunit_bt_992117478")]
-    [InlineData("DS_3.9.40_nunit_bt_1194832604")]
-    [InlineData("DS_3.9.40_nunit_nprj_bt_992117478")]
+    [InlineData("DS_3.9.22_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.9.8_nunit_nprj_net6.0_bt_992117478")]
+#endif
     public void Approval(string testName)
     {
         //arrange

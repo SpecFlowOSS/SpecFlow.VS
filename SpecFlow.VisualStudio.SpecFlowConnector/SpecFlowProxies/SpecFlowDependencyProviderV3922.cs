@@ -4,11 +4,18 @@ using TechTalk.SpecFlow.Plugins;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public class SpecFlowV31DependencyProvider : NoInvokeDependencyProvider
+public class SpecFlowDependencyProviderV398 : SpecFlowDependencyProviderV3922
+{
+    public SpecFlowDependencyProviderV398(AssemblyLoadContext loadContext) : base(loadContext)
+    {
+    }
+}
+
+public class SpecFlowDependencyProviderV3922 : NoInvokeDependencyProvider
 {
     private readonly AssemblyLoadContext _loadContext;
 
-    public SpecFlowV31DependencyProvider(AssemblyLoadContext loadContext)
+    public SpecFlowDependencyProviderV3922(AssemblyLoadContext loadContext)
     {
         _loadContext = loadContext;
     }
