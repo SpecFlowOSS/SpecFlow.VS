@@ -6,10 +6,10 @@ public class CommandFactory
 {
     private readonly ILogger _log;
     private readonly IFileSystem _fileSystem;
-    private readonly ConnectorOptions _options;
+    private readonly DiscoveryOptions _options;
     private readonly Assembly _testAssembly;
 
-    public CommandFactory(ILogger log, IFileSystem fileSystem, ConnectorOptions options, Assembly testAssembly)
+    public CommandFactory(ILogger log, IFileSystem fileSystem, DiscoveryOptions options, Assembly testAssembly)
     {
         _log = log;
         _fileSystem = fileSystem;
@@ -17,7 +17,7 @@ public class CommandFactory
         _testAssembly = testAssembly;
     }
 
-    public Either<Exception, ICommand> CreateCommand() =>
+    public Either<Exception, DiscoveryCommand> CreateCommand() =>
         _options
             .Tie(AttachDebuggerWhenRequired)
             .Map(ToCommand);
@@ -28,16 +28,10 @@ public class CommandFactory
             Debugger.Launch();
     }
 
-    public Either<Exception, ICommand> ToCommand(ConnectorOptions options)
-    {
-        return options switch
-        {
-            DiscoveryOptions o => new DiscoveryCommand(
-                o.ConfigFile?.Map(FileDetails.FromPath) ?? None<FileDetails>.Value,
-                _log, 
-                _fileSystem,
-                _testAssembly),
-            _ => new ArgumentException($"Invalid command: {options.GetType().Name}")
-        };
-    }
+    public Either<Exception, DiscoveryCommand> ToCommand(DiscoveryOptions options) =>
+        new DiscoveryCommand(
+            options.ConfigFile?.Map(FileDetails.FromPath) ?? None<FileDetails>.Value,
+            _log, 
+            _fileSystem,
+            _testAssembly);
 }

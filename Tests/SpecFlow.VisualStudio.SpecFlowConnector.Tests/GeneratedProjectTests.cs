@@ -91,10 +91,10 @@ public class GeneratedProjectTests
 
         var logger = new TestConsoleLogger();
         var consoleRunner = new Runner(logger);
-        var mockFileSystem = new MockFileSystem();
+        var mockFileSystem = new FileSystem();
         var resultCode = consoleRunner.Run(
             psiEx.Arguments.Split(' '),
-            path => testAssembly ??= Assembly.LoadFrom(path),
+            (ctx, path) => testAssembly ??= ctx.LoadFromAssemblyPath(path),
             mockFileSystem);
         var result = new ProcessResult(resultCode, logger[LogLevel.Info], logger[LogLevel.Error], TimeSpan.Zero);
         return result;

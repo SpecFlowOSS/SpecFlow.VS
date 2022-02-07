@@ -1,4 +1,4 @@
-﻿using SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿using SpecFlowConnector.Tests;
 
 namespace SpecFlowConnector.Discovery;
 

@@ -1,8 +1,10 @@
-﻿using TechTalk.SpecFlow.Tracing;
+﻿using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Plugins;
+using TechTalk.SpecFlow.Tracing;
 
 #nullable disable
 
-namespace TechTalk.SpecFlow.Plugins;
+namespace SpecFlowConnector.Discovery;
 
 public class RuntimePluginLoader_Patch : IRuntimePluginLoader
 {

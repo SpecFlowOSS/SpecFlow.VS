@@ -29,7 +29,7 @@ public class RunnerTests
 
         //act
         Assembly? testAssembly = null;
-        var resultCode = consoleRunner.Run(@case.Data.args, path => testAssembly ??= Assembly.LoadFrom(path), new MockFileSystem());
+        var resultCode = consoleRunner.Run(@case.Data.args, (ctx, path) => testAssembly ??= GetType().Assembly, new MockFileSystem());
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()
@@ -48,7 +48,7 @@ public class RunnerTests
         var consoleRunner = new Runner(logger);
 
         //act
-        var resultCode = consoleRunner.Run(new []{command, "testAssembly.dll"}, s => throw new Exception("unexpected failure"), new MockFileSystem());
+        var resultCode = consoleRunner.Run(new []{command, "testAssembly.dll"}, (ctx, path) => throw new Exception("unexpected failure"), new MockFileSystem());
 
         //assert
         var output = logger.ToString();

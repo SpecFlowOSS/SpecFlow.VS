@@ -1,6 +1,6 @@
 ﻿namespace SpecFlowConnector.Discovery;
 
-public class DiscoveryCommand : ICommand
+public class DiscoveryCommand
 {
     public const string CommandName = "discovery";
     private readonly Option<FileDetails> _configFile;
@@ -16,15 +16,12 @@ public class DiscoveryCommand : ICommand
         _testAssembly = testAssembly;
     }
 
-    public CommandResult Execute(AssemblyLoadContext assemblyLoadContext)
+    public DiscoveryResult Execute(AssemblyLoadContext assemblyLoadContext)
     {
-
         return new BindingRegistryFactoryProvider(_log, _testAssembly, _fileSystem)
             .Create()
             .Map(bindingRegistryFactory => new SpecFlowDiscoverer(_log)
-                .Discover(bindingRegistryFactory, assemblyLoadContext, _testAssembly, _configFile)
-                .Map(JsonSerialization.SerializeObject))
-            .Map(serializedDr => new CommandResult(serializedDr));
+                .Discover(bindingRegistryFactory, assemblyLoadContext, _testAssembly, _configFile));
     }
 }
 

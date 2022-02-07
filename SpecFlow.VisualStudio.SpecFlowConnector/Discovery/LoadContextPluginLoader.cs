@@ -1,4 +1,5 @@
-﻿using TechTalk.SpecFlow.Plugins;
+﻿using SpecFlowConnector.Discovery;
+using TechTalk.SpecFlow.Plugins;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 

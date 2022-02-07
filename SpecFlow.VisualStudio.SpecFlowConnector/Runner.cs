@@ -1,8 +1,6 @@
-﻿using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using Newtonsoft.Json;
-using SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿using Newtonsoft.Json;
 using SpecFlowConnector.Discovery;
+using SpecFlowConnector.Tests;
 
 namespace SpecFlowConnector;
 
@@ -15,7 +13,8 @@ public class Runner
         _log = log;
     }
 
-    public int Run(string[] args, Func<string, Assembly> testAssemblyFactory, IFileSystem fileSystem)
+    public int Run(string[] args, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory,
+        IFileSystem fileSystem)
     {
         var internalLogger =
 #if DEBUG
@@ -28,7 +27,8 @@ public class Runner
             return args
                 .Map(ConnectorOptions.Parse)
                 .Tie(DumpOptions)
-                .Map(options => ReflectionExecutor.Execute((DiscoveryOptions)options, fileSystem, testAssemblyFactory, _log))
+                .Map(options =>
+                    ReflectionExecutor.Execute((DiscoveryOptions) options, fileSystem, testAssemblyFactory, _log))
                 .Tie(PrintResult)
                 .Map<Exception, string, int>(_ => 0)
                 .Reduce(HandleException);
@@ -57,17 +57,15 @@ public class Runner
 
 public class ReflectionExecutor
 {
+    public record RunnerResult(DiscoveryResult? DiscoveryResult, string log);
+    
     public static string Execute(DiscoveryOptions options, IFileSystem fileSystem,
-        Func<string, Assembly> testAssemblyFactory, ILogger _log)
+        Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log)
     {
-        //_log.Debug($"Loading {options.AssemblyFile.FullName}");
-        //var testAssembly = testAssemblyFactory(options.AssemblyFile);
-        //_log.Debug($"Loaded: {testAssembly}");
-
-        //var testAssemblyContext = new TestAssemblyLoadContext(testAssembly);
-
-        var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile);
+        _log.Debug($"Loading {options.AssemblyFile}");
+        var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile, testAssemblyFactory);
         var testAssembly = testAssemblyContext.Assembly;
+        _log.Debug($"Loaded: {testAssembly}");
 
         var executorType = typeof(ReflectionExecutor);
         string executorTypeName = executorType.FullName!;
@@ -79,12 +77,22 @@ public class ReflectionExecutor
         var optionsJson = JsonConvert.SerializeObject(options);
 
         return executorInstance.ReflectionCallMethod<string>(
-            nameof(Execute),
-            new[] {typeof(string), typeof(IFileSystem), typeof(Assembly), typeof(AssemblyLoadContext) },
-            optionsJson, fileSystem, testAssembly, testAssemblyContext);
+                nameof(Execute),
+                new[] {typeof(string), typeof(IFileSystem), typeof(Assembly), typeof(AssemblyLoadContext)},
+                optionsJson, fileSystem, testAssembly, testAssemblyContext)
+            .Map(JsonConvert.DeserializeObject<RunnerResult>)
+            .Map(result =>
+            {
+                var (discoveryResult, log) = result;
+                _log.Info(log);
+                return discoveryResult;
+            })
+            .Map(dr=>JsonConvert.SerializeObject(dr, Formatting.Indented))
+            .Map(JsonSerialization.MarkResult);
     }
 
-    private string Execute(string optionsJson, IFileSystem fileSystem, Assembly testAssembly, AssemblyLoadContext assemblyLoadContext)
+    private string Execute(string optionsJson, IFileSystem fileSystem, Assembly testAssembly,
+        AssemblyLoadContext assemblyLoadContext)
     {
         var log = new StringBuilderLogger();
         var options = JsonConvert.DeserializeObject<DiscoveryOptions>(optionsJson);
@@ -92,7 +100,14 @@ public class ReflectionExecutor
         return new CommandFactory(log, fileSystem, options, testAssembly)
             .Map(factory => factory.CreateCommand())
             .Map(cmd => cmd.Execute(assemblyLoadContext))
-            .Map(result => JsonSerialization.MarkResult(result.Json))
-            .Reduce(ex => ex.ToString());
+            .Reduce(ex =>
+            {
+                log.Error(ex.ToString());
+                return null!;
+            })
+            .Map(dr => new RunnerResult(dr, log.ToString()))
+            .Map(JsonConvert.SerializeObject);
     }
 }
+
+

@@ -9,32 +9,17 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
     private readonly DependencyContext _dependencyContext;
     private readonly string[] _rids;
 
-    public TestAssemblyLoadContext(string path)
+    public Assembly Assembly { get; }
+
+    public TestAssemblyLoadContext(string path, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory)
     {
-        Assembly = LoadFromAssemblyPath(path);
+        Assembly = testAssemblyFactory(this, path);
         _dependencyContext = DependencyContext.Load(Assembly);
         _rids = GetRids(GetRuntimeFallbacks()).ToArray();
 
         _assemblyResolver = new RuntimeCompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
         {
             new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(Assembly.Location)),
-            new ReferenceAssemblyPathResolver(),
-            new PackageCompilationAssemblyResolver(),
-            new AspNetCoreAssemblyResolver(),
-            new NugetCacheAssemblyResolver()
-        });
-    }
-
-    public Assembly Assembly { get; }
-
-    public TestAssemblyLoadContext(Assembly testAssembly)
-    {
-        _dependencyContext = DependencyContext.Load(testAssembly);
-        _rids = GetRids(GetRuntimeFallbacks()).ToArray();
-
-        _assemblyResolver = new RuntimeCompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
-        {
-            new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(testAssembly.Location)),
             new ReferenceAssemblyPathResolver(),
             new PackageCompilationAssemblyResolver(),
             new AspNetCoreAssemblyResolver(),
