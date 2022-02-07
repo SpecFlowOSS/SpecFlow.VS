@@ -28,7 +28,7 @@ public class Runner
                 .Map(ConnectorOptions.Parse)
                 .Tie(DumpOptions)
                 .Map(options =>
-                    ReflectionExecutor.Execute((DiscoveryOptions) options, fileSystem, testAssemblyFactory, _log))
+                    ReflectionExecutor.Execute((DiscoveryOptions) options, testAssemblyFactory, _log))
                 .Tie(PrintResult)
                 .Map<Exception, string, int>(_ => 0)
                 .Reduce(HandleException);
@@ -59,8 +59,7 @@ public class ReflectionExecutor
 {
     public record RunnerResult(DiscoveryResult? DiscoveryResult, string log);
     
-    public static string Execute(DiscoveryOptions options, IFileSystem fileSystem,
-        Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log)
+    public static string Execute(DiscoveryOptions options, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log)
     {
         _log.Debug($"Loading {options.AssemblyFile}");
         var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile, testAssemblyFactory);
@@ -76,10 +75,14 @@ public class ReflectionExecutor
 
         var optionsJson = JsonConvert.SerializeObject(options);
 
+        var m = reflectedType.GetMethods();
+        var mi = m[1];
+        mi.Invoke(executorInstance, new object[]{ optionsJson, testAssembly, testAssemblyContext});
+
         return executorInstance.ReflectionCallMethod<string>(
                 nameof(Execute),
-                new[] {typeof(string), typeof(IFileSystem), typeof(Assembly), typeof(AssemblyLoadContext)},
-                optionsJson, fileSystem, testAssembly, testAssemblyContext)
+                new[] {typeof(string), typeof(Assembly), typeof(AssemblyLoadContext)},
+                optionsJson, testAssembly, testAssemblyContext as AssemblyLoadContext)
             .Map(JsonConvert.DeserializeObject<RunnerResult>)
             .Map(result =>
             {
@@ -91,13 +94,13 @@ public class ReflectionExecutor
             .Map(JsonSerialization.MarkResult);
     }
 
-    private string Execute(string optionsJson, IFileSystem fileSystem, Assembly testAssembly,
+    public string Execute(string optionsJson,  Assembly testAssembly,
         AssemblyLoadContext assemblyLoadContext)
     {
         var log = new StringBuilderLogger();
         var options = JsonConvert.DeserializeObject<DiscoveryOptions>(optionsJson);
 
-        return new CommandFactory(log, fileSystem, options, testAssembly)
+        return new CommandFactory(log, null, options, testAssembly)
             .Map(factory => factory.CreateCommand())
             .Map(cmd => cmd.Execute(assemblyLoadContext))
             .Reduce(ex =>

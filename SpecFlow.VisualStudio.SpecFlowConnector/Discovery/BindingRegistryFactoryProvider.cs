@@ -38,7 +38,7 @@ public class BindingRegistryFactoryProvider
     {
         //C:\Users\santa\AppData\Local\Temp\Deveroom\DS_GPT_3.9.40_nunit_nprj_net6.0_bt_1194832604\bin\Debug\net6.0\TechTalk.SpecFlow.dll
         var specFlowAssemblyPath = Path.Combine(Path.GetDirectoryName(_testAssembly.Location) ?? ".", "TechTalk.SpecFlow.dll");
-        if (_fileSystem.File.Exists(specFlowAssemblyPath))
+        //if (_fileSystem.File.Exists(specFlowAssemblyPath))
         {
             var specFlowVersion = FileVersionInfo.GetVersionInfo(specFlowAssemblyPath);
             var versionNumber = (specFlowVersion.FileMajorPart * 100 + specFlowVersion.FileMinorPart) * 1000 +

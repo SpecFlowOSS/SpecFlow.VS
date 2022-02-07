@@ -14,7 +14,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
     public TestAssemblyLoadContext(string path, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory)
     {
         Assembly = testAssemblyFactory(this, path);
-        _dependencyContext = DependencyContext.Load(Assembly);
+        _dependencyContext = DependencyContext.Load(Assembly) ?? DependencyContext.Default;
         _rids = GetRids(GetRuntimeFallbacks()).ToArray();
 
         _assemblyResolver = new RuntimeCompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
@@ -147,6 +147,12 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
 
     protected override Assembly Load(AssemblyName assemblyName)
     {
+        //if (_dependencyContext is null)
+        //{
+        //    var a = Assembly.Load(assemblyName);
+        //    return LoadFromAssemblyPath(a.Location);
+        //}
+
         var runtimeLibrary = FindRuntimeLibrary(assemblyName);
         var assembly = TryLoadFromAssembly(runtimeLibrary);
         if (assembly != null)
