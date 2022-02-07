@@ -1,0 +1,38 @@
+﻿{
+  "StepDefinitions": [
+    {
+      "Type": "Given",
+      "Regex": "^quam Donec porta Sed$",
+      "Method": "IntegerANecHimenaeosSteps.GivenCursusMolestieRisusUltricies(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "quam Donec porta Sed",
+      "Error": null,
+      "SourceLocation": "#0|10|9|12|10"
+    },
+    {
+      "Type": "Then",
+      "Regex": "^per ipsum (\\d+)$",
+      "Method": "IntegerANecHimenaeosSteps.ThenAcTortorEgestasVel(Int32)",
+      "ParamTypes": "i",
+      "Scope": null,
+      "Expression": "per ipsum (\\d+)",
+      "Error": null,
+      "SourceLocation": "#0|16|9|18|10"
+    },
+    {
+      "Type": "When",
+      "Regex": "^sapien (\\d+) ante nulla$",
+      "Method": "IntegerANecHimenaeosSteps.WhenEnimRisusCongueEt(Int32)",
+      "ParamTypes": "i",
+      "Scope": null,
+      "Expression": "sapien (\\d+) ante nulla",
+      "Error": null,
+      "SourceLocation": "#0|22|9|24|10"
+    }
+  ],
+  "SourceFiles": {
+    "0": "<<targetFolder>>\\StepDefinitions\\IntegerANecHimenaeosSteps.cs"
+  },
+  "TypeNames": {}
+}
