@@ -2,42 +2,36 @@
 
 public record DiscoveryOptions(
     bool DebugMode,
-    FileDetails AssemblyFile,
-    Option<FileDetails> ConfigFile,
-    DirectoryInfo ConnectorFolder
+    string AssemblyFile,
+    string? ConfigFile,
+    string ConnectorFolder
 ) : ConnectorOptions(DebugMode)
 {
     public static Either<Exception, ConnectorOptions> Parse(string[] args, bool debugMode)
     {
         return args
             .Map(ValidateParameterCount)
-            .Map(AssemblyPath)
-            .Map(ConfigPath)
+            .Map(validArgs => (testAssemblyFile: AssemblyPath(validArgs), configFile: ConfigPath(validArgs)))
             .Map(ValidateTargetFolder)
             .Map(GetConnectorFolder)
-            .Map(x=>new DiscoveryOptions(debugMode, x.targetAssemblyFile, x.configFile, x.connectorFolder) as ConnectorOptions);
+            .Map(parsed => new DiscoveryOptions(
+                debugMode,
+                parsed.targetAssemblyFile.FullName,
+                parsed.configFile.Map(file=>file.FullName).Reduce((string?)null!),
+                parsed.connectorFolder.FullName
+            ) as ConnectorOptions);
     }
 
     private static Either<Exception, string[]> ValidateParameterCount(string[] args) => args.Length >= 1
         ? args
         : new InvalidOperationException("Usage: discovery <test-assembly-path> [<configuration-file-path>]");
 
-    private static Either<Exception, (FileDetails targetAssemblyFile, string[] args)>
-        AssemblyPath(string[] args)
-    {
-        return (FileDetails.FromPath(args[0]), args);
-    }
+    private static FileDetails AssemblyPath(string[] args) => FileDetails.FromPath(args[0]);
 
-    private static Either<Exception, (FileDetails targetAssemblyFile, Option<FileDetails> configFile)>
-        ConfigPath((FileDetails , string[] ) x)
-    {
-        var (targetAssemblyFile, args) = x;
-        return (targetAssemblyFile,
-                args.Length < 2 || string.IsNullOrWhiteSpace(args[1])
-                    ? None.Value
-                    : FileDetails.FromPath(args[1])
-            );
-    }
+    private static Option<FileDetails> ConfigPath(string[] args) =>
+        args.Length < 2 || string.IsNullOrWhiteSpace(args[1])
+            ? None.Value
+            : FileDetails.FromPath(args[1]);
 
     private static Either<Exception, (FileDetails targetAssemblyFile, Option<FileDetails> configFile)>
         ValidateTargetFolder((FileDetails , Option<FileDetails> ) x)

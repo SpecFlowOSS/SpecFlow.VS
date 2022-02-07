@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using Newtonsoft.Json;
 using SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 using SpecFlowConnector.Discovery;
 
@@ -74,21 +76,18 @@ public class ReflectionExecutor
 
         var executorInstance = Activator.CreateInstance(reflectedType);
 
-        var configFileJson = JsonConvert.SerializeObject(options.ConfigFile);
+        var optionsJson = JsonConvert.SerializeObject(options);
+
         return executorInstance.ReflectionCallMethod<string>(
             nameof(Execute),
             new[] {typeof(string), typeof(IFileSystem), typeof(Assembly), typeof(AssemblyLoadContext) },
-            configFileJson, fileSystem, testAssembly, testAssemblyContext);
-
-        return new ReflectionExecutor().Execute(configFileJson, fileSystem, testAssembly, testAssemblyContext);
+            optionsJson, fileSystem, testAssembly, testAssemblyContext);
     }
 
     private string Execute(string optionsJson, IFileSystem fileSystem, Assembly testAssembly, AssemblyLoadContext assemblyLoadContext)
     {
         var log = new StringBuilderLogger();
-        //Option<FileDetails> configFile = JsonConvert.DeserializeObject<Option<FileDetails>>(optionsJson);
-
-        var options = new DiscoveryOptions(false, FileDetails.FromPath(testAssembly.FullName), None.Value, default);
+        var options = JsonConvert.DeserializeObject<DiscoveryOptions>(optionsJson);
 
         return new CommandFactory(log, fileSystem, options, testAssembly)
             .Map(factory => factory.CreateCommand())

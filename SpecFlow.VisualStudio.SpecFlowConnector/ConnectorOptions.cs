@@ -1,6 +1,6 @@
 ﻿using SpecFlowConnector.Discovery;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector;
+namespace SpecFlowConnector;
 
 public record ConnectorOptions(bool DebugMode)
 {

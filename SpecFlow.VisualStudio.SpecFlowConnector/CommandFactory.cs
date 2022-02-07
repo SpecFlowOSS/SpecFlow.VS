@@ -32,7 +32,11 @@ public class CommandFactory
     {
         return options switch
         {
-            DiscoveryOptions o => new DiscoveryCommand(o.ConfigFile, _log, _fileSystem, _testAssembly),
+            DiscoveryOptions o => new DiscoveryCommand(
+                o.ConfigFile?.Map(FileDetails.FromPath) ?? None<FileDetails>.Value,
+                _log, 
+                _fileSystem,
+                _testAssembly),
             _ => new ArgumentException($"Invalid command: {options.GetType().Name}")
         };
     }
