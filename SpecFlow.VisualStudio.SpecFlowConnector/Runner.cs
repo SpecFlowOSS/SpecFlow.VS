@@ -58,11 +58,15 @@ public class ReflectionExecutor
     public static string Execute(DiscoveryOptions options, IFileSystem fileSystem,
         Func<string, Assembly> testAssemblyFactory, ILogger _log)
     {
-        _log.Debug($"Loading {options.AssemblyFile.FullName}");
-        var testAssembly = testAssemblyFactory(options.AssemblyFile);
-        _log.Debug($"Loaded: {testAssembly}");
+        //_log.Debug($"Loading {options.AssemblyFile.FullName}");
+        //var testAssembly = testAssemblyFactory(options.AssemblyFile);
+        //_log.Debug($"Loaded: {testAssembly}");
 
-        var testAssemblyContext = new TestAssemblyLoadContext(testAssembly);
+        //var testAssemblyContext = new TestAssemblyLoadContext(testAssembly);
+
+        var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile);
+        var testAssembly = testAssemblyContext.Assembly;
+
         var executorType = typeof(ReflectionExecutor);
         string executorTypeName = executorType.FullName!;
         var executorAssembly = testAssemblyContext.LoadFromAssemblyPath(executorType.Assembly.Location);

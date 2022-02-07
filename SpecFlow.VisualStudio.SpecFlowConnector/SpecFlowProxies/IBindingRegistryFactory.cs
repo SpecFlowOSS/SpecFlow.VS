@@ -116,11 +116,26 @@ public class BindingRegistryFactoryV3922 : BindingRegistryFactory<IObjectContain
     protected override IObjectContainer CreateGlobalContainer(AssemblyLoadContext assemblyLoadContext,
         Option<FileDetails> configFile, Assembly testAssembly)
     {
-        var containerBuilder = new ContainerBuilder(new SpecFlowV31DependencyProvider(testAssemblyLoadContext));
+        var dependencyProvider = new SpecFlowV31DependencyProvider(assemblyLoadContext);
+        var containerBuilder = new ContainerBuilderThatResetsTraceListener(dependencyProvider);
         IConfigurationLoader configurationLoader = new SpecFlowConfigurationLoader(configFile, _fileSystem);
         var configurationProvider = new DefaultRuntimeConfigurationProvider(configurationLoader);
         return containerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
     }
+
+    private class ContainerBuilderThatResetsTraceListener : ContainerBuilder
+    {
+        public ContainerBuilderThatResetsTraceListener(IDefaultDependencyProvider defaultDependencyProvider = null) :
+            base(defaultDependencyProvider)
+        {
+        }
+
+        public override IObjectContainer CreateTestThreadContainer(IObjectContainer globalContainer)
+        {
+            var testThreadContainer = base.CreateTestThreadContainer(globalContainer);
+            testThreadContainer.ReflectionRegisterTypeAs<NullListener, ITraceListener>();
+            return testThreadContainer;
+        }
     }
 
     protected override void CreateTestRunner(IObjectContainer globalContainer, Assembly testAssembly)
