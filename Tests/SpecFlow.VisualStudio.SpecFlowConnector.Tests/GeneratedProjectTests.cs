@@ -48,6 +48,8 @@ public class GeneratedProjectTests
                 .AppendLine($"stderr:{result.StdError}")
                 .Append($"resultCode:{result.ExitCode}"),
             rawContent => TargetFolderScrubber(rawContent, projectGenerator.TargetFolder)
+                .Map(r => Regex.Replace(r, "(.*\r\n)*>>>>>>>>>>\r\n", ""))
+                .Map(r => Regex.Replace(r, "<<<<<<<<<<(.*[\r\n])*.*", ""))
                 .Map(XunitExtensions.StackTraceScrubber));
     }
 
@@ -74,8 +76,10 @@ public class GeneratedProjectTests
         return result;
     }
 
-    private static string TargetFolderScrubber(string content, string targetFolder)
-        => content.Replace(targetFolder, "<<targetFolder>>");
+    private static string TargetFolderScrubber(string content, string targetFolder) =>
+        content
+            .Replace(targetFolder, "<<targetFolder>>")
+            .Replace(targetFolder.Replace("\\", "\\\\"), "<<targetFolder>>");
 
     private static ProcessResult InvokeInMemory(ProcessStartInfoEx psiEx)
     {

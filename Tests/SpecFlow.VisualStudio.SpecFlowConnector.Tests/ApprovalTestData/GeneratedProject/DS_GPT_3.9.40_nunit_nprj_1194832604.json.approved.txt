@@ -1,345 +1,434 @@
-﻿stdout:-> Loading plugin <<targetFolder>>\bin\Debug\net48\DeveroomSample.dll
--> Missing [assembly:RuntimePlugin] attribute in DeveroomSample, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null. Please check http://go.specflow.org/doc-plugins for details.
--> Loading plugin <<targetFolder>>\bin\Debug\net48\TechTalk.SpecFlow.NUnit.SpecFlowPlugin.dll
--> Using default config
-Creating DnLibDeveroomSymbolReader
->>>>>>>>>>
-{
-  "stepDefinitions": [
+﻿{
+  "StepDefinitions": [
     {
-      "type": "When",
-      "regex": "^sagittis viverra \"(.*)\"$",
-      "method": "LectusEuUrnaBlanditSteps.WhenUltriciesElitAccumsanEfficitur(String)",
-      "paramTypes": "s",
-      "expression": "sagittis viverra \"(.*)\"",
-      "sourceLocation": "#3|40|9|42|10"
+      "Type": "Given",
+      "Regex": "^in elit (\\d+) Lorem$",
+      "Method": "AtUrnaInLuctusSteps.GivenQuisqueExVestibulumLectus(Int32)",
+      "ParamTypes": "i",
+      "Scope": null,
+      "Expression": "in elit (\\d+) Lorem",
+      "Error": null,
+      "SourceLocation": "#0|10|9|12|10"
     },
     {
-      "type": "Given",
-      "regex": "^rhoncus \"(.*)\" et$",
-      "method": "LectusEuUrnaBlanditSteps.GivenMolestieSitLeoDolor(String, String)",
-      "paramTypes": "s|s",
-      "expression": "rhoncus \"(.*)\" et",
-      "sourceLocation": "#3|22|9|24|10"
+      "Type": "Then",
+      "Regex": "^justo fermentum ut$",
+      "Method": "AtUrnaInLuctusSteps.ThenFinibusVitaePerRisus(Table)",
+      "ParamTypes": "st",
+      "Scope": null,
+      "Expression": "justo fermentum ut",
+      "Error": null,
+      "SourceLocation": "#0|16|9|18|10"
     },
     {
-      "type": "Given",
-      "regex": "^Cras malesuada ultricies egestas$",
-      "method": "LigulaDonecVestibulumDuisSteps.GivenMassaDonecElementumElementum()",
-      "expression": "Cras malesuada ultricies egestas",
-      "sourceLocation": "#4|10|9|12|10"
+      "Type": "Then",
+      "Regex": "^in \"(.*)\" (\\d+)$",
+      "Method": "AtUrnaInLuctusSteps.ThenLobortisEleifendAnteSed(String, Int32, String)",
+      "ParamTypes": "s|i|s",
+      "Scope": null,
+      "Expression": "in \"(.*)\" (\\d+)",
+      "Error": null,
+      "SourceLocation": "#0|22|9|24|10"
     },
     {
-      "type": "When",
-      "regex": "^augue blandit tristique$",
-      "method": "CommodoPlaceratPretiumTellusSteps.WhenAmetFelisJustoLibero()",
-      "expression": "augue blandit tristique",
-      "sourceLocation": "#1|10|9|12|10"
+      "Type": "Given",
+      "Regex": "^ipsum (\\d+) sit$",
+      "Method": "AtUrnaInLuctusSteps.GivenIntegerScelerisqueCondimentumEros(Int32, Table)",
+      "ParamTypes": "i|st",
+      "Scope": null,
+      "Expression": "ipsum (\\d+) sit",
+      "Error": null,
+      "SourceLocation": "#0|28|9|30|10"
     },
     {
-      "type": "Given",
-      "regex": "^non vel (\\d+)$",
-      "method": "FermentumUtIdVenenatisSteps.GivenPerSapienLacusNunc(Int32, Table)",
-      "paramTypes": "i|st",
-      "expression": "non vel (\\d+)",
-      "sourceLocation": "#2|34|9|36|10"
+      "Type": "Then",
+      "Regex": "^dapibus Nam auctor$",
+      "Method": "AtUrnaInLuctusSteps.ThenAcPerBlanditTempor()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "dapibus Nam auctor",
+      "Error": null,
+      "SourceLocation": "#0|34|9|36|10"
     },
     {
-      "type": "Then",
-      "regex": "^Donec Donec felis massa$",
-      "method": "FermentumUtIdVenenatisSteps.ThenPerBlanditOrciUt(Table)",
-      "paramTypes": "st",
-      "expression": "Donec Donec felis massa",
-      "sourceLocation": "#2|28|9|30|10"
+      "Type": "Then",
+      "Regex": "^euismod Fusce torquent malesuada$",
+      "Method": "AtUrnaInLuctusSteps.ThenScelerisqueAAmetPraesent()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "euismod Fusce torquent malesuada",
+      "Error": null,
+      "SourceLocation": "#0|40|9|42|10"
     },
     {
-      "type": "Then",
-      "regex": "^bibendum sit (\\d+) elementum volutpat$",
-      "method": "LigulaDonecVestibulumDuisSteps.ThenElementumLectusDictumEget(Int32)",
-      "paramTypes": "i",
-      "expression": "bibendum sit (\\d+) elementum volutpat",
-      "sourceLocation": "#4|34|9|36|10"
+      "Type": "When",
+      "Regex": "^augue blandit tristique$",
+      "Method": "CommodoPlaceratPretiumTellusSteps.WhenAmetFelisJustoLibero()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "augue blandit tristique",
+      "Error": null,
+      "SourceLocation": "#1|10|9|12|10"
     },
     {
-      "type": "Then",
-      "regex": "^Quisque ligula accumsan scelerisque nulla$",
-      "method": "TempusNecNibhAcSteps.ThenOdioCurabiturCommodoMollis()",
-      "expression": "Quisque ligula accumsan scelerisque nulla",
-      "sourceLocation": "#6|34|9|36|10"
+      "Type": "When",
+      "Regex": "^Aliquam nibh imperdiet dignissim$",
+      "Method": "CommodoPlaceratPretiumTellusSteps.WhenIaculisPerDuisPlacerat()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "Aliquam nibh imperdiet dignissim",
+      "Error": null,
+      "SourceLocation": "#1|16|9|18|10"
     },
     {
-      "type": "Given",
-      "regex": "^nec blandit tortor$",
-      "method": "CommodoPlaceratPretiumTellusSteps.GivenErosMiMolestieCondimentum()",
-      "expression": "nec blandit tortor",
-      "sourceLocation": "#1|22|9|24|10"
+      "Type": "Given",
+      "Regex": "^nec blandit tortor$",
+      "Method": "CommodoPlaceratPretiumTellusSteps.GivenErosMiMolestieCondimentum()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "nec blandit tortor",
+      "Error": null,
+      "SourceLocation": "#1|22|9|24|10"
     },
     {
-      "type": "Then",
-      "regex": "^sem id tincidunt egestas$",
-      "method": "CommodoPlaceratPretiumTellusSteps.ThenInHendreritLiberoSem()",
-      "expression": "sem id tincidunt egestas",
-      "sourceLocation": "#1|28|9|30|10"
+      "Type": "Then",
+      "Regex": "^sem id tincidunt egestas$",
+      "Method": "CommodoPlaceratPretiumTellusSteps.ThenInHendreritLiberoSem()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "sem id tincidunt egestas",
+      "Error": null,
+      "SourceLocation": "#1|28|9|30|10"
     },
     {
-      "type": "When",
-      "regex": "^sapien vitae \"(.*)\" \"(.*)\" molestie$",
-      "method": "LectusEuUrnaBlanditSteps.WhenAliquamSapienFelisVulputate(String, String)",
-      "paramTypes": "s|s",
-      "expression": "sapien vitae \"(.*)\" \"(.*)\" molestie",
-      "sourceLocation": "#3|10|9|12|10"
+      "Type": "When",
+      "Regex": "^id Donec dignissim elit \"(.*)\"$",
+      "Method": "CommodoPlaceratPretiumTellusSteps.WhenEuismodSuspendisseTorquentAugue(String, Table)",
+      "ParamTypes": "s|st",
+      "Scope": null,
+      "Expression": "id Donec dignissim elit \"(.*)\"",
+      "Error": null,
+      "SourceLocation": "#1|34|9|36|10"
     },
     {
-      "type": "Given",
-      "regex": "^molestie elit fermentum dignissim$",
-      "method": "LectusEuUrnaBlanditSteps.GivenSitMetusBibendumScelerisque()",
-      "expression": "molestie elit fermentum dignissim",
-      "sourceLocation": "#3|28|9|30|10"
+      "Type": "Then",
+      "Regex": "^cursus amet cursus sit$",
+      "Method": "CommodoPlaceratPretiumTellusSteps.ThenElementumSedEgestasEt()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "cursus amet cursus sit",
+      "Error": null,
+      "SourceLocation": "#1|40|9|42|10"
     },
     {
-      "type": "Given",
-      "regex": "^commodo dapibus (\\d+)$",
-      "method": "LectusEuUrnaBlanditSteps.GivenSemperVitaeMaecenasPurus(Int32, Table)",
-      "paramTypes": "i|st",
-      "expression": "commodo dapibus (\\d+)",
-      "sourceLocation": "#3|34|9|36|10"
+      "Type": "When",
+      "Regex": "^erat Donec amet$",
+      "Method": "FermentumUtIdVenenatisSteps.WhenElitEleifendSitQuisque()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "erat Donec amet",
+      "Error": null,
+      "SourceLocation": "#2|10|9|12|10"
     },
     {
-      "type": "Then",
-      "regex": "^fermentum \"(.*)\" in sociosqu$",
-      "method": "MetusIdPlaceratTellusSteps.ThenVestibulumEtDictumAuctor(String)",
-      "paramTypes": "s",
-      "expression": "fermentum \"(.*)\" in sociosqu",
-      "sourceLocation": "#5|10|9|12|10"
+      "Type": "When",
+      "Regex": "^Vestibulum eleifend elit$",
+      "Method": "FermentumUtIdVenenatisSteps.WhenMaurisInRisusErat()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "Vestibulum eleifend elit",
+      "Error": null,
+      "SourceLocation": "#2|16|9|18|10"
     },
     {
-      "type": "When",
-      "regex": "^porttitor scelerisque in$",
-      "method": "MetusIdPlaceratTellusSteps.WhenNecPurusMolestieMassa()",
-      "expression": "porttitor scelerisque in",
-      "sourceLocation": "#5|22|9|24|10"
+      "Type": "When",
+      "Regex": "^amet tortor \"(.*)\"$",
+      "Method": "FermentumUtIdVenenatisSteps.WhenNonNostraVestibulumCursus(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "amet tortor \"(.*)\"",
+      "Error": null,
+      "SourceLocation": "#2|22|9|24|10"
     },
     {
-      "type": "Given",
-      "regex": "^scelerisque risus egestas Quisque orci$",
-      "method": "TempusNecNibhAcSteps.GivenPellentesqueAugueSagittisQuam()",
-      "expression": "scelerisque risus egestas Quisque orci",
-      "sourceLocation": "#6|28|9|30|10"
+      "Type": "Then",
+      "Regex": "^Donec Donec felis massa$",
+      "Method": "FermentumUtIdVenenatisSteps.ThenPerBlanditOrciUt(Table)",
+      "ParamTypes": "st",
+      "Scope": null,
+      "Expression": "Donec Donec felis massa",
+      "Error": null,
+      "SourceLocation": "#2|28|9|30|10"
     },
     {
-      "type": "Then",
-      "regex": "^justo fermentum ut$",
-      "method": "AtUrnaInLuctusSteps.ThenFinibusVitaePerRisus(Table)",
-      "paramTypes": "st",
-      "expression": "justo fermentum ut",
-      "sourceLocation": "#0|16|9|18|10"
+      "Type": "Given",
+      "Regex": "^non vel (\\d+)$",
+      "Method": "FermentumUtIdVenenatisSteps.GivenPerSapienLacusNunc(Int32, Table)",
+      "ParamTypes": "i|st",
+      "Scope": null,
+      "Expression": "non vel (\\d+)",
+      "Error": null,
+      "SourceLocation": "#2|34|9|36|10"
     },
     {
-      "type": "Then",
-      "regex": "^Class urna in libero$",
-      "method": "FermentumUtIdVenenatisSteps.ThenIpsumAtIntegerTortor()",
-      "expression": "Class urna in libero",
-      "sourceLocation": "#2|40|9|42|10"
+      "Type": "Then",
+      "Regex": "^Class urna in libero$",
+      "Method": "FermentumUtIdVenenatisSteps.ThenIpsumAtIntegerTortor()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "Class urna in libero",
+      "Error": null,
+      "SourceLocation": "#2|40|9|42|10"
     },
     {
-      "type": "When",
-      "regex": "^efficitur tincidunt iaculis eget$",
-      "method": "LigulaDonecVestibulumDuisSteps.WhenLaoreetEtLobortisNulla(Table)",
-      "paramTypes": "st",
-      "expression": "efficitur tincidunt iaculis eget",
-      "sourceLocation": "#4|22|9|24|10"
+      "Type": "When",
+      "Regex": "^sapien vitae \"(.*)\" \"(.*)\" molestie$",
+      "Method": "LectusEuUrnaBlanditSteps.WhenAliquamSapienFelisVulputate(String, String)",
+      "ParamTypes": "s|s",
+      "Scope": null,
+      "Expression": "sapien vitae \"(.*)\" \"(.*)\" molestie",
+      "Error": null,
+      "SourceLocation": "#3|10|9|12|10"
     },
     {
-      "type": "Then",
-      "regex": "^in \"(.*)\" (\\d+)$",
-      "method": "AtUrnaInLuctusSteps.ThenLobortisEleifendAnteSed(String, Int32, String)",
-      "paramTypes": "s|i|s",
-      "expression": "in \"(.*)\" (\\d+)",
-      "sourceLocation": "#0|22|9|24|10"
+      "Type": "When",
+      "Regex": "^litora dolor nulla$",
+      "Method": "LectusEuUrnaBlanditSteps.WhenVitaeLiberoDignissimElit()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "litora dolor nulla",
+      "Error": null,
+      "SourceLocation": "#3|16|9|18|10"
     },
     {
-      "type": "When",
-      "regex": "^amet tortor \"(.*)\"$",
-      "method": "FermentumUtIdVenenatisSteps.WhenNonNostraVestibulumCursus(String)",
-      "paramTypes": "s",
-      "expression": "amet tortor \"(.*)\"",
-      "sourceLocation": "#2|22|9|24|10"
+      "Type": "Given",
+      "Regex": "^rhoncus \"(.*)\" et$",
+      "Method": "LectusEuUrnaBlanditSteps.GivenMolestieSitLeoDolor(String, String)",
+      "ParamTypes": "s|s",
+      "Scope": null,
+      "Expression": "rhoncus \"(.*)\" et",
+      "Error": null,
+      "SourceLocation": "#3|22|9|24|10"
     },
     {
-      "type": "Given",
-      "regex": "^\"(.*)\" scelerisque ultricies sociosqu$",
-      "method": "MetusIdPlaceratTellusSteps.GivenPorttitorDiamSodalesFelis(String)",
-      "paramTypes": "s",
-      "expression": "\"(.*)\" scelerisque ultricies sociosqu",
-      "sourceLocation": "#5|16|9|18|10"
+      "Type": "Given",
+      "Regex": "^molestie elit fermentum dignissim$",
+      "Method": "LectusEuUrnaBlanditSteps.GivenSitMetusBibendumScelerisque()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "molestie elit fermentum dignissim",
+      "Error": null,
+      "SourceLocation": "#3|28|9|30|10"
     },
     {
-      "type": "Then",
-      "regex": "^congue elementum Lorem$",
-      "method": "TempusNecNibhAcSteps.ThenAmetQuisDapibusNec(Table)",
-      "paramTypes": "st",
-      "expression": "congue elementum Lorem",
-      "sourceLocation": "#6|10|9|12|10"
+      "Type": "Given",
+      "Regex": "^commodo dapibus (\\d+)$",
+      "Method": "LectusEuUrnaBlanditSteps.GivenSemperVitaeMaecenasPurus(Int32, Table)",
+      "ParamTypes": "i|st",
+      "Scope": null,
+      "Expression": "commodo dapibus (\\d+)",
+      "Error": null,
+      "SourceLocation": "#3|34|9|36|10"
     },
     {
-      "type": "When",
-      "regex": "^erat Donec amet$",
-      "method": "FermentumUtIdVenenatisSteps.WhenElitEleifendSitQuisque()",
-      "expression": "erat Donec amet",
-      "sourceLocation": "#2|10|9|12|10"
+      "Type": "When",
+      "Regex": "^sagittis viverra \"(.*)\"$",
+      "Method": "LectusEuUrnaBlanditSteps.WhenUltriciesElitAccumsanEfficitur(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "sagittis viverra \"(.*)\"",
+      "Error": null,
+      "SourceLocation": "#3|40|9|42|10"
     },
     {
-      "type": "When",
-      "regex": "^id sodales erat Curabitur$",
-      "method": "LigulaDonecVestibulumDuisSteps.WhenMolestieAtPerPhasellus()",
-      "expression": "id sodales erat Curabitur",
-      "sourceLocation": "#4|16|9|18|10"
+      "Type": "Given",
+      "Regex": "^Cras malesuada ultricies egestas$",
+      "Method": "LigulaDonecVestibulumDuisSteps.GivenMassaDonecElementumElementum()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "Cras malesuada ultricies egestas",
+      "Error": null,
+      "SourceLocation": "#4|10|9|12|10"
     },
     {
-      "type": "Then",
-      "regex": "^dictum a in eu$",
-      "method": "TempusNecNibhAcSteps.ThenUtDapibusUrnaMorbi()",
-      "expression": "dictum a in eu",
-      "sourceLocation": "#6|16|9|18|10"
+      "Type": "When",
+      "Regex": "^id sodales erat Curabitur$",
+      "Method": "LigulaDonecVestibulumDuisSteps.WhenMolestieAtPerPhasellus()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "id sodales erat Curabitur",
+      "Error": null,
+      "SourceLocation": "#4|16|9|18|10"
     },
     {
-      "type": "Then",
-      "regex": "^dapibus Nam auctor$",
-      "method": "AtUrnaInLuctusSteps.ThenAcPerBlanditTempor()",
-      "expression": "dapibus Nam auctor",
-      "sourceLocation": "#0|34|9|36|10"
+      "Type": "When",
+      "Regex": "^efficitur tincidunt iaculis eget$",
+      "Method": "LigulaDonecVestibulumDuisSteps.WhenLaoreetEtLobortisNulla(Table)",
+      "ParamTypes": "st",
+      "Scope": null,
+      "Expression": "efficitur tincidunt iaculis eget",
+      "Error": null,
+      "SourceLocation": "#4|22|9|24|10"
     },
     {
-      "type": "Given",
-      "regex": "^(\\d+) elit (\\d+)$",
-      "method": "MetusIdPlaceratTellusSteps.GivenLectusLeoBibendumIn(Int32, Int32)",
-      "paramTypes": "i|i",
-      "expression": "(\\d+) elit (\\d+)",
-      "sourceLocation": "#5|28|9|30|10"
+      "Type": "Then",
+      "Regex": "^pharetra nostra auctor purus pharetra$",
+      "Method": "LigulaDonecVestibulumDuisSteps.ThenBlanditIdMagnaSemper()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "pharetra nostra auctor purus pharetra",
+      "Error": null,
+      "SourceLocation": "#4|28|9|30|10"
     },
     {
-      "type": "Given",
-      "regex": "^(\\d+) eget Nulla \"(.*)\"$",
-      "method": "TempusNecNibhAcSteps.GivenDuisLaoreetAmetDiam(Int32, String)",
-      "paramTypes": "i|s",
-      "expression": "(\\d+) eget Nulla \"(.*)\"",
-      "sourceLocation": "#6|40|9|42|10"
+      "Type": "Then",
+      "Regex": "^bibendum sit (\\d+) elementum volutpat$",
+      "Method": "LigulaDonecVestibulumDuisSteps.ThenElementumLectusDictumEget(Int32)",
+      "ParamTypes": "i",
+      "Scope": null,
+      "Expression": "bibendum sit (\\d+) elementum volutpat",
+      "Error": null,
+      "SourceLocation": "#4|34|9|36|10"
     },
     {
-      "type": "Then",
-      "regex": "^pharetra nostra auctor purus pharetra$",
-      "method": "LigulaDonecVestibulumDuisSteps.ThenBlanditIdMagnaSemper()",
-      "expression": "pharetra nostra auctor purus pharetra",
-      "sourceLocation": "#4|28|9|30|10"
+      "Type": "When",
+      "Regex": "^porta sem leo \"(.*)\" Morbi$",
+      "Method": "LigulaDonecVestibulumDuisSteps.WhenAtCondimentumEuFermentum(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "porta sem leo \"(.*)\" Morbi",
+      "Error": null,
+      "SourceLocation": "#4|40|9|42|10"
     },
     {
-      "type": "When",
-      "regex": "^litora dolor nulla$",
-      "method": "LectusEuUrnaBlanditSteps.WhenVitaeLiberoDignissimElit()",
-      "expression": "litora dolor nulla",
-      "sourceLocation": "#3|16|9|18|10"
+      "Type": "Then",
+      "Regex": "^fermentum \"(.*)\" in sociosqu$",
+      "Method": "MetusIdPlaceratTellusSteps.ThenVestibulumEtDictumAuctor(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "fermentum \"(.*)\" in sociosqu",
+      "Error": null,
+      "SourceLocation": "#5|10|9|12|10"
     },
     {
-      "type": "When",
-      "regex": "^elementum (\\d+) Integer \"(.*)\" vitae$",
-      "method": "MetusIdPlaceratTellusSteps.WhenBibendumLiberoAliquetMolestie(Int32, String)",
-      "paramTypes": "i|s",
-      "expression": "elementum (\\d+) Integer \"(.*)\" vitae",
-      "sourceLocation": "#5|34|9|36|10"
+      "Type": "Given",
+      "Regex": "^\"(.*)\" scelerisque ultricies sociosqu$",
+      "Method": "MetusIdPlaceratTellusSteps.GivenPorttitorDiamSodalesFelis(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "\"(.*)\" scelerisque ultricies sociosqu",
+      "Error": null,
+      "SourceLocation": "#5|16|9|18|10"
     },
     {
-      "type": "Then",
-      "regex": "^cursus amet cursus sit$",
-      "method": "CommodoPlaceratPretiumTellusSteps.ThenElementumSedEgestasEt()",
-      "expression": "cursus amet cursus sit",
-      "sourceLocation": "#1|40|9|42|10"
+      "Type": "When",
+      "Regex": "^porttitor scelerisque in$",
+      "Method": "MetusIdPlaceratTellusSteps.WhenNecPurusMolestieMassa()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "porttitor scelerisque in",
+      "Error": null,
+      "SourceLocation": "#5|22|9|24|10"
     },
     {
-      "type": "When",
-      "regex": "^id Donec dignissim elit \"(.*)\"$",
-      "method": "CommodoPlaceratPretiumTellusSteps.WhenEuismodSuspendisseTorquentAugue(String, Table)",
-      "paramTypes": "s|st",
-      "expression": "id Donec dignissim elit \"(.*)\"",
-      "sourceLocation": "#1|34|9|36|10"
+      "Type": "Given",
+      "Regex": "^(\\d+) elit (\\d+)$",
+      "Method": "MetusIdPlaceratTellusSteps.GivenLectusLeoBibendumIn(Int32, Int32)",
+      "ParamTypes": "i|i",
+      "Scope": null,
+      "Expression": "(\\d+) elit (\\d+)",
+      "Error": null,
+      "SourceLocation": "#5|28|9|30|10"
     },
     {
-      "type": "Then",
-      "regex": "^euismod Fusce torquent malesuada$",
-      "method": "AtUrnaInLuctusSteps.ThenScelerisqueAAmetPraesent()",
-      "expression": "euismod Fusce torquent malesuada",
-      "sourceLocation": "#0|40|9|42|10"
+      "Type": "When",
+      "Regex": "^elementum (\\d+) Integer \"(.*)\" vitae$",
+      "Method": "MetusIdPlaceratTellusSteps.WhenBibendumLiberoAliquetMolestie(Int32, String)",
+      "ParamTypes": "i|s",
+      "Scope": null,
+      "Expression": "elementum (\\d+) Integer \"(.*)\" vitae",
+      "Error": null,
+      "SourceLocation": "#5|34|9|36|10"
     },
     {
-      "type": "Given",
-      "regex": "^in elit (\\d+) Lorem$",
-      "method": "AtUrnaInLuctusSteps.GivenQuisqueExVestibulumLectus(Int32)",
-      "paramTypes": "i",
-      "expression": "in elit (\\d+) Lorem",
-      "sourceLocation": "#0|10|9|12|10"
+      "Type": "Then",
+      "Regex": "^gravida (\\d+) sem a$",
+      "Method": "MetusIdPlaceratTellusSteps.ThenAVenenatisInterdumA(Int32)",
+      "ParamTypes": "i",
+      "Scope": null,
+      "Expression": "gravida (\\d+) sem a",
+      "Error": null,
+      "SourceLocation": "#5|40|9|42|10"
     },
     {
-      "type": "When",
-      "regex": "^tristique libero amet (\\d+)$",
-      "method": "TempusNecNibhAcSteps.WhenMiLectusQuisDapibus(Int32)",
-      "paramTypes": "i",
-      "expression": "tristique libero amet (\\d+)",
-      "sourceLocation": "#6|22|9|24|10"
+      "Type": "Then",
+      "Regex": "^congue elementum Lorem$",
+      "Method": "TempusNecNibhAcSteps.ThenAmetQuisDapibusNec(Table)",
+      "ParamTypes": "st",
+      "Scope": null,
+      "Expression": "congue elementum Lorem",
+      "Error": null,
+      "SourceLocation": "#6|10|9|12|10"
     },
     {
-      "type": "When",
-      "regex": "^porta sem leo \"(.*)\" Morbi$",
-      "method": "LigulaDonecVestibulumDuisSteps.WhenAtCondimentumEuFermentum(String)",
-      "paramTypes": "s",
-      "expression": "porta sem leo \"(.*)\" Morbi",
-      "sourceLocation": "#4|40|9|42|10"
+      "Type": "Then",
+      "Regex": "^dictum a in eu$",
+      "Method": "TempusNecNibhAcSteps.ThenUtDapibusUrnaMorbi()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "dictum a in eu",
+      "Error": null,
+      "SourceLocation": "#6|16|9|18|10"
     },
     {
-      "type": "Then",
-      "regex": "^gravida (\\d+) sem a$",
-      "method": "MetusIdPlaceratTellusSteps.ThenAVenenatisInterdumA(Int32)",
-      "paramTypes": "i",
-      "expression": "gravida (\\d+) sem a",
-      "sourceLocation": "#5|40|9|42|10"
+      "Type": "When",
+      "Regex": "^tristique libero amet (\\d+)$",
+      "Method": "TempusNecNibhAcSteps.WhenMiLectusQuisDapibus(Int32)",
+      "ParamTypes": "i",
+      "Scope": null,
+      "Expression": "tristique libero amet (\\d+)",
+      "Error": null,
+      "SourceLocation": "#6|22|9|24|10"
     },
     {
-      "type": "Given",
-      "regex": "^ipsum (\\d+) sit$",
-      "method": "AtUrnaInLuctusSteps.GivenIntegerScelerisqueCondimentumEros(Int32, Table)",
-      "paramTypes": "i|st",
-      "expression": "ipsum (\\d+) sit",
-      "sourceLocation": "#0|28|9|30|10"
+      "Type": "Given",
+      "Regex": "^scelerisque risus egestas Quisque orci$",
+      "Method": "TempusNecNibhAcSteps.GivenPellentesqueAugueSagittisQuam()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "scelerisque risus egestas Quisque orci",
+      "Error": null,
+      "SourceLocation": "#6|28|9|30|10"
     },
     {
-      "type": "When",
-      "regex": "^Aliquam nibh imperdiet dignissim$",
-      "method": "CommodoPlaceratPretiumTellusSteps.WhenIaculisPerDuisPlacerat()",
-      "expression": "Aliquam nibh imperdiet dignissim",
-      "sourceLocation": "#1|16|9|18|10"
+      "Type": "Then",
+      "Regex": "^Quisque ligula accumsan scelerisque nulla$",
+      "Method": "TempusNecNibhAcSteps.ThenOdioCurabiturCommodoMollis()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "Quisque ligula accumsan scelerisque nulla",
+      "Error": null,
+      "SourceLocation": "#6|34|9|36|10"
     },
     {
-      "type": "When",
-      "regex": "^Vestibulum eleifend elit$",
-      "method": "FermentumUtIdVenenatisSteps.WhenMaurisInRisusErat()",
-      "expression": "Vestibulum eleifend elit",
-      "sourceLocation": "#2|16|9|18|10"
+      "Type": "Given",
+      "Regex": "^(\\d+) eget Nulla \"(.*)\"$",
+      "Method": "TempusNecNibhAcSteps.GivenDuisLaoreetAmetDiam(Int32, String)",
+      "ParamTypes": "i|s",
+      "Scope": null,
+      "Expression": "(\\d+) eget Nulla \"(.*)\"",
+      "Error": null,
+      "SourceLocation": "#6|40|9|42|10"
     }
   ],
-  "sourceFiles": {
-    "5": "C:\\Users\\santa\\AppData\\Local\\Temp\\Deveroom\\DS_GPT_3.9.40_nunit_nprj_bt_1194832604\\StepDefinitions\\MetusIdPlaceratTellusSteps.cs",
-    "4": "C:\\Users\\santa\\AppData\\Local\\Temp\\Deveroom\\DS_GPT_3.9.40_nunit_nprj_bt_1194832604\\StepDefinitions\\LigulaDonecVestibulumDuisSteps.cs",
-    "6": "C:\\Users\\santa\\AppData\\Local\\Temp\\Deveroom\\DS_GPT_3.9.40_nunit_nprj_bt_1194832604\\StepDefinitions\\TempusNecNibhAcSteps.cs",
-    "1": "C:\\Users\\santa\\AppData\\Local\\Temp\\Deveroom\\DS_GPT_3.9.40_nunit_nprj_bt_1194832604\\StepDefinitions\\CommodoPlaceratPretiumTellusSteps.cs",
-    "0": "C:\\Users\\santa\\AppData\\Local\\Temp\\Deveroom\\DS_GPT_3.9.40_nunit_nprj_bt_1194832604\\StepDefinitions\\AtUrnaInLuctusSteps.cs",
-    "3": "C:\\Users\\santa\\AppData\\Local\\Temp\\Deveroom\\DS_GPT_3.9.40_nunit_nprj_bt_1194832604\\StepDefinitions\\LectusEuUrnaBlanditSteps.cs",
-    "2": "C:\\Users\\santa\\AppData\\Local\\Temp\\Deveroom\\DS_GPT_3.9.40_nunit_nprj_bt_1194832604\\StepDefinitions\\FermentumUtIdVenenatisSteps.cs"
+  "SourceFiles": {
+    "0": "<<targetFolder>>\\StepDefinitions\\AtUrnaInLuctusSteps.cs",
+    "1": "<<targetFolder>>\\StepDefinitions\\CommodoPlaceratPretiumTellusSteps.cs",
+    "2": "<<targetFolder>>\\StepDefinitions\\FermentumUtIdVenenatisSteps.cs",
+    "3": "<<targetFolder>>\\StepDefinitions\\LectusEuUrnaBlanditSteps.cs",
+    "4": "<<targetFolder>>\\StepDefinitions\\LigulaDonecVestibulumDuisSteps.cs",
+    "5": "<<targetFolder>>\\StepDefinitions\\MetusIdPlaceratTellusSteps.cs",
+    "6": "<<targetFolder>>\\StepDefinitions\\TempusNecNibhAcSteps.cs"
   },
-  "typeNames": {}
+  "TypeNames": {}
 }
-<<<<<<<<<<
-stderr:DiscoveryOptions { DebugMode = False, AssemblyFile = <<targetFolder>>\bin\Debug\net48\DeveroomSample.dll, ConfigFile = None, ConnectorFolder = C:\Users\santa\AppData\Local\Temp\ReSharperTestRunner_l4kzexyu\ucskw2pc }
-Loading <<targetFolder>>\bin\Debug\net48\DeveroomSample.dll
-Loaded: DeveroomSample, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-Found SpecFlow V309040 at <<targetFolder>>\bin\Debug\net48\TechTalk.SpecFlow.dll
-Chosen BindingRegistryFactoryV3922 for 309040
-
-resultCode:0

@@ -7,10 +7,6 @@ public class SpecFlowDiscoverer
     private readonly ILogger _log;
     private readonly SymbolReaderCache _symbolReaders;
 
-    public SpecFlowDiscoverer() : this(new StringBuilderLogger())
-    {
-    }
-
     public SpecFlowDiscoverer(ILogger log)
     {
         _log = log;
@@ -22,8 +18,8 @@ public class SpecFlowDiscoverer
         Assembly testAssembly,
         Option<FileDetails> configFile)
     {
-        var typeNames = ImmutableDictionary.CreateBuilder<string, string>();
-        var sourcePaths = ImmutableDictionary.CreateBuilder<string, string>();
+        var typeNames = ImmutableSortedDictionary.CreateBuilder<string, string>();
+        var sourcePaths = ImmutableSortedDictionary.CreateBuilder<string, string>();
 
         var stepDefinitions = new BindingRegistryAdapterAdapter(bindingRegistryFactory)
             .GetStepDefinitions(assemblyLoadContext, configFile, testAssembly)
@@ -31,7 +27,8 @@ public class SpecFlowDiscoverer
                 method => GetParamTypes(method, parameterTypeName => GetKey(typeNames, parameterTypeName)),
                 sourcePath => GetKey(sourcePaths, sourcePath))
             )
-            .ToImmutableHashSet();
+            .OrderBy(sd=>sd.SourceLocation)
+            .ToImmutableArray();
 
         return new DiscoveryResult(
             stepDefinitions,
@@ -59,7 +56,7 @@ public class SpecFlowDiscoverer
         return stepDefinition;
     }
 
-    private string GetKey(ImmutableDictionary<string, string>.Builder dictionary, string value)
+    private string GetKey(ImmutableSortedDictionary<string, string>.Builder dictionary, string value)
     {
         KeyValuePair<string, string> found = dictionary
             .FirstOrDefault(kvp => kvp.Value == value);

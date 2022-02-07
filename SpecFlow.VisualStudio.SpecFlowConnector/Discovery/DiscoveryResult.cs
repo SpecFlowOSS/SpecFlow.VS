@@ -1,7 +1,7 @@
 ﻿namespace SpecFlowConnector.Discovery;
 
 public record DiscoveryResult(
-        ImmutableHashSet<StepDefinition> StepDefinitions,
-        ImmutableDictionary<string, string> SourceFiles,
-        ImmutableDictionary<string, string> TypeNames
+        ImmutableArray<StepDefinition> StepDefinitions,
+        ImmutableSortedDictionary<string, string> SourceFiles,
+        ImmutableSortedDictionary<string, string> TypeNames
         );

@@ -147,12 +147,6 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
 
     protected override Assembly Load(AssemblyName assemblyName)
     {
-        //if (_dependencyContext is null)
-        //{
-        //    var a = Assembly.Load(assemblyName);
-        //    return LoadFromAssemblyPath(a.Location);
-        //}
-
         var runtimeLibrary = FindRuntimeLibrary(assemblyName);
         var assembly = TryLoadFromAssembly(runtimeLibrary);
         if (assembly != null)

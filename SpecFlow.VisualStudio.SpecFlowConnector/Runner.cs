@@ -75,10 +75,6 @@ public class ReflectionExecutor
 
         var optionsJson = JsonConvert.SerializeObject(options);
 
-        var m = reflectedType.GetMethods();
-        var mi = m[1];
-        mi.Invoke(executorInstance, new object[]{ optionsJson, testAssembly, testAssemblyContext});
-
         return executorInstance.ReflectionCallMethod<string>(
                 nameof(Execute),
                 new[] {typeof(string), typeof(Assembly), typeof(AssemblyLoadContext)},
@@ -108,6 +104,10 @@ public class ReflectionExecutor
                 log.Error(ex.ToString());
                 return null!;
             })
+            //.Map(dr=>new DiscoveryResult(
+            //    dr.StepDefinitions.OrderBy(sd=>sd.SourceLocation).ToImmutableHashSet(),
+            //    dr.SourceFiles.OrderBy(sf=>sf.Key).ToImmutableDictionary(),
+            //    dr.TypeNames.OrderBy(tn=>tn.Key).ToImmutableDictionary()))
             .Map(dr => new RunnerResult(dr, log.ToString()))
             .Map(JsonConvert.SerializeObject);
     }
