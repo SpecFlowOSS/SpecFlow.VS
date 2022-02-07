@@ -15,9 +15,10 @@ public class GeneratedProjectTests
 
     [Theory]
     [InlineData("DS_2.3.2_nunit_1194832604")]
-    [InlineData("DS_GPT_3.9.40_nunit_nprj_net6.0_bt_1194832604")]
-    [InlineData("DS_GPT_3.9.40_nunit_bt_1194832604")]
-    [InlineData("DS_GPT_3.9.40_nunit_nprj_1194832604")]
+    [InlineData("DS_3.9.40_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.9.40_nunit_bt_992117478")]
+    [InlineData("DS_3.9.40_nunit_bt_1194832604")]
+    [InlineData("DS_3.9.40_nunit_nprj_bt_992117478")]
     public void Approval(string testName)
     {
         //arrange
@@ -29,7 +30,6 @@ public class GeneratedProjectTests
         var content = File.ReadAllText(testDataFile);
         var testData = JsonConvert.DeserializeObject<GeneratedProjectTestsData>(content);
 
-        testData.GeneratorOptions.CreatedFor ??= "GPT";
         testData.GeneratorOptions.IsBuilt = true;
         var projectGenerator = testData.GeneratorOptions.CreateProjectGenerator(s => _testOutputHelper.WriteLine(s));
         projectGenerator.Generate();

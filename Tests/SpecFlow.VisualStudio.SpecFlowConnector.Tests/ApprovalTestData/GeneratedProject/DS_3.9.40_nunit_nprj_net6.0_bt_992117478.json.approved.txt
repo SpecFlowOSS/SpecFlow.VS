@@ -1,0 +1,38 @@
+﻿{
+  "StepDefinitions": [
+    {
+      "Type": "Then",
+      "Regex": "^cursus augue Suspendisse eros tortor$",
+      "Method": "InPortaVariusASteps.ThenBlanditQuisqueNonConubia()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "cursus augue Suspendisse eros tortor",
+      "Error": null,
+      "SourceLocation": "#0|10|9|12|10"
+    },
+    {
+      "Type": "Given",
+      "Regex": "^Suspendisse Nulla \"(.*)\" risus$",
+      "Method": "InPortaVariusASteps.GivenAuctorNullaNecEu(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "Suspendisse Nulla \"(.*)\" risus",
+      "Error": null,
+      "SourceLocation": "#0|16|9|18|10"
+    },
+    {
+      "Type": "When",
+      "Regex": "^lobortis (\\d+) taciti (\\d+)$",
+      "Method": "InPortaVariusASteps.WhenLoremPellentesqueNamSuspendisse(Int32, Int32)",
+      "ParamTypes": "i|i",
+      "Scope": null,
+      "Expression": "lobortis (\\d+) taciti (\\d+)",
+      "Error": null,
+      "SourceLocation": "#0|22|9|24|10"
+    }
+  ],
+  "SourceFiles": {
+    "0": "<<targetFolder>>\\StepDefinitions\\InPortaVariusASteps.cs"
+  },
+  "TypeNames": {}
+}

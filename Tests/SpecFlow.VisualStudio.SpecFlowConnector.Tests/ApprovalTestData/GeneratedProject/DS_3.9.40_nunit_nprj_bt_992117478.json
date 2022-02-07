@@ -1,0 +1,9 @@
+{
+    "GeneratorOptions": {
+        "featureFileCount": 1,
+        "scenarioPerFeatureFileCount": 1,
+        "newProjectFormat": true,
+        "targetFramework": "net48",
+        "SpecFlowPackageVersion": "3.9.40"
+    }
+}

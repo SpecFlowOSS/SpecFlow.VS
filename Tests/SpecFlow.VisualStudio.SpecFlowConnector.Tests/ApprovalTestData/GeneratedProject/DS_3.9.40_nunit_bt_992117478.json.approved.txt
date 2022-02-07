@@ -1,0 +1,38 @@
+﻿{
+  "StepDefinitions": [
+    {
+      "Type": "Then",
+      "Regex": "^tellus \"(.*)\" nulla$",
+      "Method": "IdNecAtLigulaSteps.ThenErosAtCongueMollis(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "tellus \"(.*)\" nulla",
+      "Error": null,
+      "SourceLocation": "#0|10|9|12|10"
+    },
+    {
+      "Type": "Given",
+      "Regex": "^Curabitur sem in$",
+      "Method": "IdNecAtLigulaSteps.GivenInMassaDiamDui()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "Curabitur sem in",
+      "Error": null,
+      "SourceLocation": "#0|16|9|18|10"
+    },
+    {
+      "Type": "When",
+      "Regex": "^nostra ullamcorper tortor in$",
+      "Method": "IdNecAtLigulaSteps.WhenAugueAugueLaoreetNulla()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "nostra ullamcorper tortor in",
+      "Error": null,
+      "SourceLocation": "#0|22|9|24|10"
+    }
+  ],
+  "SourceFiles": {
+    "0": "<<targetFolder>>\\StepDefinitions\\IdNecAtLigulaSteps.cs"
+  },
+  "TypeNames": {}
+}
