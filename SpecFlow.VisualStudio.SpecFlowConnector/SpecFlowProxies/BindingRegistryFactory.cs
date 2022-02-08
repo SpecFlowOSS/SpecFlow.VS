@@ -4,7 +4,7 @@ using TechTalk.SpecFlow.Infrastructure;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public abstract class BindingRegistryFactory<TGlobalContainer> : IBindingRegistryFactory
+public abstract class BindingRegistryFactory : IBindingRegistryFactory
 {
     public IBindingRegistry GetBindingRegistry(AssemblyLoadContext assemblyLoadContext,
         Assembly testAssembly, Option<FileDetails> configFile) =>
@@ -13,23 +13,21 @@ public abstract class BindingRegistryFactory<TGlobalContainer> : IBindingRegistr
                 .Map(CreateContainerBuilder), configFile
                 .Map<Option<FileDetails>, IConfigurationLoader>(CreateConfigurationLoader)
                 .Map(CreateConfigurationProvider))
-            .Tie(RegisterTypeAs<NoInvokeDependencyProvider.NullBindingInvoker, IBindingInvoker>)
             .Tie(container => CreateTestRunner(container, testAssembly))
             .Map(container => ResolveBindingRegistry(testAssembly, container));
 
+    protected abstract object CreateObjectContainer(Assembly testAssembly, ContainerBuilder containerBuilder,
+        IRuntimeConfigurationProvider configurationProvider);
+
     protected abstract IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext);
+
     protected abstract ContainerBuilder CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider);
+
     protected abstract IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile);
 
     protected abstract IRuntimeConfigurationProvider CreateConfigurationProvider(
         IConfigurationLoader configurationLoader);
 
-    protected abstract TGlobalContainer CreateObjectContainer(Assembly testAssembly, ContainerBuilder containerBuilder,
-        IRuntimeConfigurationProvider configurationProvider);
-
-    protected abstract void RegisterTypeAs<TType, TInterface>(TGlobalContainer globalContainer)
-        where TType : class, TInterface;
-
-    protected abstract void CreateTestRunner(TGlobalContainer globalContainer, Assembly testAssembly);
-    protected abstract IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, TGlobalContainer globalContainer);
+    protected abstract void CreateTestRunner(object globalContainer, Assembly testAssembly);
+    protected abstract IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, object globalContainer);
 }

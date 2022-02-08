@@ -26,12 +26,9 @@ public class BindingRegistryFactoryProvider
         return versionNumber switch
         {
             >= 3_09_022 => new BindingRegistryFactoryVLatest(_fileSystem),
-            >= 3_07_013 => new BindingRegistryFactoryBeforeV3922(_fileSystem),
-            //>= 3_00_000 => new SpecFlowV30Discoverer(),
-            //>= 2_02_000 => new SpecFlowV22Discoverer(),
-            //>= 2_01_000 => new SpecFlowV21Discoverer(),
-            //>= 2_00_000 => new SpecFlowV20Discoverer(),
-            _ => new BindingRegistryFactoryVLatest(_fileSystem)
+            >= 3_07_013 => new BindingRegistryFactoryBeforeV309022(_fileSystem),
+            >= 3_00_213 => new BindingRegistryFactoryBeforeV307013(_fileSystem),
+            _ => new BindingRegistryFactoryBeforeV300213(_fileSystem)
         };
     }
 

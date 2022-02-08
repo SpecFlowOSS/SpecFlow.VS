@@ -1,0 +1,38 @@
+﻿{
+  "StepDefinitions": [
+    {
+      "Type": "When",
+      "Regex": "^urna massa \"(.*)\" sollicitudin$",
+      "Method": "LectusDignissimEuFelisSteps.WhenEgetRisusEuAccumsan(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "urna massa \"(.*)\" sollicitudin",
+      "Error": null,
+      "SourceLocation": "#0|10|9|12|10"
+    },
+    {
+      "Type": "Given",
+      "Regex": "^ut et \"(.*)\"$",
+      "Method": "LectusDignissimEuFelisSteps.GivenLoremSapienQuisqueVitae(String)",
+      "ParamTypes": "s",
+      "Scope": null,
+      "Expression": "ut et \"(.*)\"",
+      "Error": null,
+      "SourceLocation": "#0|16|9|18|10"
+    },
+    {
+      "Type": "Then",
+      "Regex": "^molestie augue auctor eu$",
+      "Method": "LectusDignissimEuFelisSteps.ThenTristiqueAnteLiberoUt(Table)",
+      "ParamTypes": "st",
+      "Scope": null,
+      "Expression": "molestie augue auctor eu",
+      "Error": null,
+      "SourceLocation": "#0|22|9|24|10"
+    }
+  ],
+  "SourceFiles": {
+    "0": "<<targetFolder>>\\StepDefinitions\\LectusDignissimEuFelisSteps.cs"
+  },
+  "TypeNames": {}
+}

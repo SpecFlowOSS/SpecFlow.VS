@@ -2,9 +2,9 @@
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public class BindingRegistryFactoryBeforeV3922 : BindingRegistryFactoryVLatest
+public class BindingRegistryFactoryBeforeV309022 : BindingRegistryFactoryVLatest
 {
-    public BindingRegistryFactoryBeforeV3922(IFileSystem fileSystem) : base(fileSystem)
+    public BindingRegistryFactoryBeforeV309022(IFileSystem fileSystem) : base(fileSystem)
     {
     }
 

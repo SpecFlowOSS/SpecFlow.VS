@@ -7,7 +7,7 @@ using TechTalk.SpecFlow.Tracing;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public class BindingRegistryFactoryVLatest : BindingRegistryFactory<IObjectContainer>
+public class BindingRegistryFactoryVLatest : BindingRegistryFactory
 {
     private readonly IFileSystem _fileSystem;
 
@@ -16,19 +16,39 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory<IObjectConta
         _fileSystem = fileSystem;
     }
 
-    protected override void RegisterTypeAs<TType, TInterface>(IObjectContainer globalContainer) 
-        => globalContainer.RegisterTypeAs<TType, TInterface>();
+    protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
+        new SpecFlowDependencyProviderVLatest(assemblyLoadContext);
 
-    protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>  new SpecFlowDependencyProviderVLatest(assemblyLoadContext);
+    protected override IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile) =>
+        new SpecFlowConfigurationLoader(configFile, _fileSystem);
 
-    protected override IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile) => new SpecFlowConfigurationLoader(configFile, _fileSystem);
-    protected override IRuntimeConfigurationProvider CreateConfigurationProvider(IConfigurationLoader configurationLoader) => new DefaultRuntimeConfigurationProvider(configurationLoader);
+    protected override IRuntimeConfigurationProvider
+        CreateConfigurationProvider(IConfigurationLoader configurationLoader) =>
+        new DefaultRuntimeConfigurationProvider(configurationLoader);
 
-    protected override ContainerBuilder CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider) => new ContainerBuilderThatResetsTraceListener(dependencyProvider);
+    protected override ContainerBuilder CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider) =>
+        new ContainerBuilderThatResetsTraceListener(dependencyProvider);
 
-    protected override IObjectContainer CreateObjectContainer(Assembly testAssembly, ContainerBuilder containerBuilder,
+    protected override object CreateObjectContainer(Assembly testAssembly, ContainerBuilder containerBuilder,
         IRuntimeConfigurationProvider configurationProvider) =>
         containerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
+
+    protected override void CreateTestRunner(object globalContainer, Assembly testAssembly)
+        => CreateTestRunner((IObjectContainer) globalContainer, testAssembly);
+
+    protected virtual void CreateTestRunner(IObjectContainer globalContainer, Assembly testAssembly)
+    {
+        var testRunnerManager = (TestRunnerManager)globalContainer.Resolve<ITestRunnerManager>();
+
+        testRunnerManager.Initialize(testAssembly);
+        testRunnerManager.CreateTestRunner(0);
+    }
+
+    protected override IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, object globalContainer)
+        => ResolveBindingRegistry(testAssembly, (IObjectContainer)globalContainer);
+
+    protected virtual IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, IObjectContainer globalContainer)
+        => globalContainer.Resolve<IBindingRegistry>();
 
     private class ContainerBuilderThatResetsTraceListener : ContainerBuilder
     {
@@ -44,15 +64,4 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory<IObjectConta
             return testThreadContainer;
         }
     }
-
-    protected override void CreateTestRunner(IObjectContainer globalContainer, Assembly testAssembly)
-    {
-        var testRunnerManager = (TestRunnerManager)globalContainer.Resolve<ITestRunnerManager>();
-
-        testRunnerManager.Initialize(testAssembly);
-        testRunnerManager.CreateTestRunner(0);
-    }
-
-    protected override IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, IObjectContainer globalContainer)
-        => globalContainer.Resolve<IBindingRegistry>();
 }

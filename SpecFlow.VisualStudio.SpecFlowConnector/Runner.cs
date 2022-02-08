@@ -57,9 +57,8 @@ public class Runner
 
 public class ReflectionExecutor
 {
-    public record RunnerResult(DiscoveryResult? DiscoveryResult, string log);
-    
-    public static string Execute(DiscoveryOptions options, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log)
+    public static string Execute(DiscoveryOptions options,
+        Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log)
     {
         _log.Debug($"Loading {options.AssemblyFile}");
         var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile, testAssemblyFactory);
@@ -78,7 +77,7 @@ public class ReflectionExecutor
         return executorInstance.ReflectionCallMethod<string>(
                 nameof(Execute),
                 new[] {typeof(string), typeof(Assembly), typeof(AssemblyLoadContext)},
-                optionsJson, testAssembly, testAssemblyContext as AssemblyLoadContext)
+                optionsJson, testAssembly, testAssemblyContext)
             .Map(JsonConvert.DeserializeObject<RunnerResult>)
             .Map(result =>
             {
@@ -86,31 +85,40 @@ public class ReflectionExecutor
                 _log.Info(log);
                 return discoveryResult;
             })
-            .Map(dr=>JsonConvert.SerializeObject(dr, Formatting.Indented))
+            .Map(dr => JsonConvert.SerializeObject(dr, Formatting.Indented))
             .Map(JsonSerialization.MarkResult);
     }
 
-    public string Execute(string optionsJson,  Assembly testAssembly,
+    public string Execute(string optionsJson, Assembly testAssembly,
         AssemblyLoadContext assemblyLoadContext)
     {
         var log = new StringBuilderLogger();
         var options = JsonConvert.DeserializeObject<DiscoveryOptions>(optionsJson);
 
-        return new CommandFactory(log, null, options, testAssembly)
-            .Map(factory => factory.CreateCommand())
-            .Map(cmd => cmd.Execute(assemblyLoadContext))
+        return Execute(log, options, testAssembly, assemblyLoadContext)
             .Reduce(ex =>
             {
                 log.Error(ex.ToString());
                 return null!;
             })
-            //.Map(dr=>new DiscoveryResult(
-            //    dr.StepDefinitions.OrderBy(sd=>sd.SourceLocation).ToImmutableHashSet(),
-            //    dr.SourceFiles.OrderBy(sf=>sf.Key).ToImmutableDictionary(),
-            //    dr.TypeNames.OrderBy(tn=>tn.Key).ToImmutableDictionary()))
             .Map(dr => new RunnerResult(dr, log.ToString()))
             .Map(JsonConvert.SerializeObject);
     }
+
+    private Either<Exception, DiscoveryResult> Execute(ILogger log, DiscoveryOptions options, Assembly testAssembly,
+        AssemblyLoadContext assemblyLoadContext)
+    {
+        try
+        {
+            return new CommandFactory(log, new FileSystem(), options, testAssembly)
+                .Map(factory => factory.CreateCommand())
+                .Map(cmd => cmd.Execute(assemblyLoadContext));
+        }
+        catch (Exception ex)
+        {
+            return ex;
+        }
+    }
+
+    public record RunnerResult(DiscoveryResult? DiscoveryResult, string Log);
 }
-
-

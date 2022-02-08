@@ -1,0 +1,38 @@
+﻿{
+  "StepDefinitions": [
+    {
+      "Type": "Given",
+      "Regex": "^quis ipsum erat$",
+      "Method": "MassaPlaceratFaucibusRisusSteps.GivenInMolestieTempusMolestie()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "quis ipsum erat",
+      "Error": null,
+      "SourceLocation": "#0|10|9|12|10"
+    },
+    {
+      "Type": "Then",
+      "Regex": "^vitae eu diam$",
+      "Method": "MassaPlaceratFaucibusRisusSteps.ThenIpsumMassaEratBlandit()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "vitae eu diam",
+      "Error": null,
+      "SourceLocation": "#0|16|9|18|10"
+    },
+    {
+      "Type": "When",
+      "Regex": "^diam condimentum lacinia blandit tincidunt$",
+      "Method": "MassaPlaceratFaucibusRisusSteps.WhenMollisNostraCurabiturDictum()",
+      "ParamTypes": null,
+      "Scope": null,
+      "Expression": "diam condimentum lacinia blandit tincidunt",
+      "Error": null,
+      "SourceLocation": "#0|22|9|24|10"
+    }
+  ],
+  "SourceFiles": {
+    "0": "<<targetFolder>>\\StepDefinitions\\MassaPlaceratFaucibusRisusSteps.cs"
+  },
+  "TypeNames": {}
+}

@@ -1,7 +1,5 @@
 {
-  "Args": [
-    "discovery"
-  ],
+  "ConfigFile": "DeveroomSample.dll.config",
   "GeneratorOptions": {
     "Force": false,
     "_TargetFolder": null,

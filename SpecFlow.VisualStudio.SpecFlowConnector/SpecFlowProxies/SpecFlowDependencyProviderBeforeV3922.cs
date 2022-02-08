@@ -12,7 +12,6 @@ public class SpecFlowDependencyProviderBeforeV3922 : SpecFlowDependencyProviderV
 
     protected override void RegisterRuntimePluginLoader(ObjectContainer globalContainer)
     {
-        var methods =  typeof(IRuntimePluginLoader).GetMethods().ToArray();
         var pluginLoaderType = new DynamicRuntimePluginLoaderFactory().Create();
         globalContainer.ReflectionRegisterTypeAs(pluginLoaderType, typeof(IRuntimePluginLoader));
     }

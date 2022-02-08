@@ -32,6 +32,14 @@ public class GeneratedProjectTests
     [InlineData("DS_3.9.40_nunit_nprj_net6.0_bt_992117478")]
     [InlineData("DS_3.9.22_nunit_nprj_net6.0_bt_992117478")]
     [InlineData("DS_3.9.8_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.8.14_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.7.38_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.7.13_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.6.23_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.5.14_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.5.5_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.3.30_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.1.97_nunit_nprj_net6.0_bt_992117478")]
 #endif
     public void Approval(string testName)
     {
@@ -50,11 +58,14 @@ public class GeneratedProjectTests
 
         var targetAssemblyFile =
             FileDetails.FromPath(projectGenerator.TargetFolder, projectGenerator.GetOutputAssemblyPath());
+        var outputFolder = Path.GetDirectoryName(targetAssemblyFile)!;
 
         var connectorFile = typeof(DiscoveryCommand).Assembly.GetLocation();
 
+        Option<FileDetails> configFile = testData.ConfigFile?.Map(s => FileDetails.FromPath(outputFolder, s)) ?? None<FileDetails>.Value;
+
         //act
-        var result = Invoke(targetAssemblyFile, projectGenerator, connectorFile);
+        var result = Invoke(targetAssemblyFile, projectGenerator, connectorFile, configFile);
 
         //assert
         _testOutputHelper.ApprovalsVerify(new StringBuilder()
@@ -68,20 +79,26 @@ public class GeneratedProjectTests
     }
 
     private ProcessResult Invoke(FileDetails targetAssemblyFile, IProjectGenerator projectGenerator,
-        FileDetails connectorFile)
+        FileDetails connectorFile, Option<FileDetails> configFile)
     {
         var psiEx = new ProcessStartInfoEx(
             projectGenerator.TargetFolder,
             connectorFile,
-            $"{DiscoveryCommand.CommandName} {targetAssemblyFile}"
+            string.Empty
         );
 #if NETCOREAPP
         psiEx = psiEx with
         {
             ExecutablePath = "dotnet",
-            Arguments = $"{connectorFile} {DiscoveryCommand.CommandName} {targetAssemblyFile}"
+            Arguments = $"{connectorFile} "
         };
 #endif
+        psiEx = psiEx with
+        {
+            Arguments = psiEx.Arguments +
+                        $"{DiscoveryCommand.CommandName} {targetAssemblyFile} {configFile.Map(cf => cf.FullName).Reduce(string.Empty)}"
+        };
+
         _testOutputHelper.WriteLine($"{psiEx.ExecutablePath} {psiEx.Arguments}");
 
         ProcessResult result = Debugger.IsAttached
@@ -125,5 +142,5 @@ public class GeneratedProjectTests
         return result;
     }
 
-    private record GeneratedProjectTestsData(GeneratorOptions GeneratorOptions);
+    private record GeneratedProjectTestsData(string? ConfigFile, GeneratorOptions GeneratorOptions);
 }
