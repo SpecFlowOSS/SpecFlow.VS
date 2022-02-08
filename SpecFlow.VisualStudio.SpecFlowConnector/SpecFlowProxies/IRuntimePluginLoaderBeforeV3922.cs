@@ -3,7 +3,7 @@ using TechTalk.SpecFlow.Tracing;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public interface IRuntimePluginLoader398 : IRuntimePluginLoader
+public interface IRuntimePluginLoaderBeforeV3922 : IRuntimePluginLoader
 {
     IRuntimePlugin LoadPlugin(string pluginAssemblyName, ITraceListener traceListener);
 }

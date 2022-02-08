@@ -1,23 +1,28 @@
-﻿using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.Plugins;
+﻿#nullable disable
 using TechTalk.SpecFlow.Tracing;
 
-#nullable disable
+// ReSharper disable once CheckNamespace
+namespace TechTalk.SpecFlow.Plugins;
 
-namespace SpecFlowConnector.Discovery;
-
-public class RuntimePluginLoader_Patch : IRuntimePluginLoader
+public abstract class RuntimePluginLoaderPatch : IRuntimePluginLoader
 {
-    public IRuntimePlugin LoadPlugin(string pluginAssemblyName, ITraceListener traceListener,
-        bool traceMissingPluginAttribute) => LoadPlugin(pluginAssemblyName, traceListener);
-
-    public IRuntimePlugin LoadPlugin(string pluginAssemblyName, ITraceListener traceListener)
+    #region Copy-Pasted code from SpecFlow
+    public IRuntimePlugin LoadPlugin(string pluginAssemblyName, ITraceListener traceListener, bool _)
     {
-        //var assemblyName = string.Format(ASSEMBLY_NAME_PATTERN, pluginDescriptor.Name);
         Assembly assembly;
         try
         {
+
+            #endregion
+
+            #region Patch
+
             assembly = LoadAssembly(pluginAssemblyName);
+
+            #endregion
+
+            #region Copy-Pasted code from SpecFlow
+
         }
         catch (Exception ex)
         {
@@ -57,6 +62,7 @@ public class RuntimePluginLoader_Patch : IRuntimePluginLoader
 
         return plugin;
     }
+    #endregion
 
-    protected virtual Assembly LoadAssembly(string pluginAssemblyName) => Assembly.LoadFrom(pluginAssemblyName);
+    protected abstract Assembly LoadAssembly(string pluginAssemblyName);
 }

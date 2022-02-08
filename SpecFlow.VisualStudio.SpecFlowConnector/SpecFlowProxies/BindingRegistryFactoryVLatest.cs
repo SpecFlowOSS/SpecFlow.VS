@@ -7,28 +7,11 @@ using TechTalk.SpecFlow.Tracing;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public class BindingRegistryFactoryV3713 : BindingRegistryFactoryV3922
-{
-    public BindingRegistryFactoryV3713(IFileSystem fileSystem) : base(fileSystem)
-    {
-    }
-
-
-    //public override void RegisterGlobalContainerDefaults(ObjectContainer globalContainer)
-    //{
-    //    base.RegisterGlobalContainerDefaults(globalContainer);
-    //    globalContainer.RegisterInstanceAs(_loadContext);
-
-    //    var pluginLoaderType = new DynamicRuntimePluginLoaderFactory().Create();
-    //    globalContainer.ReflectionRegisterTypeAs(pluginLoaderType, typeof(IRuntimePluginLoader));
-    //}
-}
-
-public class BindingRegistryFactoryV3922 : BindingRegistryFactory<IObjectContainer>
+public class BindingRegistryFactoryVLatest : BindingRegistryFactory<IObjectContainer>
 {
     private readonly IFileSystem _fileSystem;
 
-    public BindingRegistryFactoryV3922(IFileSystem fileSystem)
+    public BindingRegistryFactoryVLatest(IFileSystem fileSystem)
     {
         _fileSystem = fileSystem;
     }
@@ -36,7 +19,7 @@ public class BindingRegistryFactoryV3922 : BindingRegistryFactory<IObjectContain
     protected override void RegisterTypeAs<TType, TInterface>(IObjectContainer globalContainer) 
         => globalContainer.RegisterTypeAs<TType, TInterface>();
 
-    protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>  new SpecFlowDependencyProviderV3922(assemblyLoadContext);
+    protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>  new SpecFlowDependencyProviderVLatest(assemblyLoadContext);
 
     protected override IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile) => new SpecFlowConfigurationLoader(configFile, _fileSystem);
     protected override IRuntimeConfigurationProvider CreateConfigurationProvider(IConfigurationLoader configurationLoader) => new DefaultRuntimeConfigurationProvider(configurationLoader);
