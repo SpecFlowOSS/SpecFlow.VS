@@ -34,13 +34,12 @@ public class BindingRegistryFactoryProvider
 
     private int GetSpecFlowVersion()
     {
-        //C:\Users\santa\AppData\Local\Temp\Deveroom\DS_GPT_3.9.40_nunit_nprj_net6.0_bt_1194832604\bin\Debug\net6.0\TechTalk.SpecFlow.dll
         var specFlowAssemblyPath =
             Path.Combine(Path.GetDirectoryName(_testAssembly.Location) ?? ".", "TechTalk.SpecFlow.dll");
         if (File.Exists(specFlowAssemblyPath))
             return GetSpecFlowVersion(specFlowAssemblyPath);
         foreach (var otherSpecFlowFile in Directory.EnumerateFiles(
-                     Path.GetDirectoryName(specFlowAssemblyPath), "*SpecFlow*.dll"))
+                     Path.GetDirectoryName(specFlowAssemblyPath)!, "*SpecFlow*.dll"))
         {
             var ver = GetSpecFlowVersion(otherSpecFlowFile);
             if (ver >= 2_00_000) return ver;
@@ -53,7 +52,8 @@ public class BindingRegistryFactoryProvider
     private int GetSpecFlowVersion(string specFlowAssemblyPath)
     {
         var specFlowVersion = FileVersionInfo.GetVersionInfo(specFlowAssemblyPath);
-        var versionNumber = (specFlowVersion.FileMajorPart * 100 + specFlowVersion.FileMinorPart) * 1000 +
+        var versionNumber = (specFlowVersion.FileMajorPart * 100 +
+                             specFlowVersion.FileMinorPart) * 1000 +
                             specFlowVersion.FileBuildPart;
         _log.Debug($"Found SpecFlow V{versionNumber} at {specFlowAssemblyPath}");
         return versionNumber;

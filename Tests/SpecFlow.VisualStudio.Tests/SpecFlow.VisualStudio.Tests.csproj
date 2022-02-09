@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.csproj" />
     <ProjectReference Include="..\..\SpecFlow.VisualStudio\SpecFlow.VisualStudio.csproj" />
     <ProjectReference Include="..\SpecFlow.VisualStudio.VsxStubs\SpecFlow.VisualStudio.VsxStubs.csproj" />
   </ItemGroup>

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <AssemblyName>specflow-vs</AssemblyName>
-    <TargetFrameworks>net48;net6.0</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Key.snk</AssemblyOriginatorKeyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -18,15 +18,6 @@
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
     <PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
     <PackageReference Include="System.Security.Permissions" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="$(TargetFramework)=='net48'">
-    <!--<Reference Include="ISymWrapper" />-->
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Using Remove="System.Net.Http" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,15 +9,15 @@ public static class TypeShortcuts
     public static readonly Dictionary<string, string> FromShortcut = new()
     {
         {"s", StringType},
-        {"c", typeof(char).FullName},
-        {"b", typeof(bool).FullName},
-        {"bt", typeof(byte).FullName},
+        {"c", typeof(char).FullName!},
+        {"b", typeof(bool).FullName!},
+        {"bt", typeof(byte).FullName!},
         {"i", Int32Type},
-        {"sh", typeof(short).FullName},
-        {"l", typeof(long).FullName},
-        {"f", typeof(float).FullName},
-        {"d", typeof(double).FullName},
-        {"m", typeof(decimal).FullName},
+        {"sh", typeof(short).FullName!},
+        {"l", typeof(long).FullName!},
+        {"f", typeof(float).FullName!},
+        {"d", typeof(double).FullName!},
+        {"m", typeof(decimal).FullName!},
         {"st", SpecFlowTableType}
     };
 
