@@ -2,11 +2,11 @@
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public abstract class LoadContextPluginLoaderBeforeV3922 : RuntimePluginLoaderPatch
+public abstract class LoadContextPluginLoaderBeforeV309022 : RuntimePluginLoaderPatch
 {
     private readonly AssemblyLoadContext _loadContext;
 
-    protected LoadContextPluginLoaderBeforeV3922(AssemblyLoadContext loadContext)
+    protected LoadContextPluginLoaderBeforeV309022(AssemblyLoadContext loadContext)
     {
         _loadContext = loadContext;
     }

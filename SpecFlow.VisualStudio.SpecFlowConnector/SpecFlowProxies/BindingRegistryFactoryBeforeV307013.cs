@@ -10,5 +10,5 @@ public class BindingRegistryFactoryBeforeV307013 : BindingRegistryFactoryBeforeV
     }
 
     protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
-        new SpecFlowDependencyProviderBeforeV3713(assemblyLoadContext);
+        new SpecFlowDependencyProviderBeforeV307013(assemblyLoadContext);
 }

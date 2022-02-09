@@ -29,6 +29,13 @@ public class Runner
                 .Tie(DumpOptions)
                 .Map(options =>
                     ReflectionExecutor.Execute((DiscoveryOptions) options, testAssemblyFactory, _log))
+                //.Map(result=>result.MapLeft(errorMessage => new Exception(errorMessage)))
+                .Map(result => result.Reduce(errorMessage => new DiscoveryResult(ImmutableArray<StepDefinition>.Empty,
+                        ImmutableSortedDictionary<string, string>.Empty,
+                        ImmutableSortedDictionary<string, string>.Empty,
+                        errorMessage)))
+                .Map<Exception, DiscoveryResult, string>(result => JsonConvert.SerializeObject(result, Formatting.Indented))
+                .Map(JsonSerialization.MarkResult)
                 .Tie(PrintResult)
                 .Map<Exception, string, int>(_ => 0)
                 .Reduce(HandleException);
@@ -57,7 +64,7 @@ public class Runner
 
 public class ReflectionExecutor
 {
-    public static string Execute(DiscoveryOptions options,
+    public static Either<string, DiscoveryResult> Execute(DiscoveryOptions options,
         Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log)
     {
         _log.Debug($"Loading {options.AssemblyFile}");
@@ -83,10 +90,8 @@ public class ReflectionExecutor
             {
                 var (discoveryResult, log) = result;
                 _log.Info(log);
-                return discoveryResult;
-            })
-            .Map(dr => JsonConvert.SerializeObject(dr, Formatting.Indented))
-            .Map(JsonSerialization.MarkResult);
+                return discoveryResult ?? (Either<string, DiscoveryResult>) log;
+            });
     }
 
     public string Execute(string optionsJson, Assembly testAssembly,

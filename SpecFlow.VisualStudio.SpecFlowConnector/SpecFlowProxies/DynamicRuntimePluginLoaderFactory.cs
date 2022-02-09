@@ -9,8 +9,8 @@ public class DynamicRuntimePluginLoaderFactory
 {
     public Type Create()
     {
-        Type interfaceType = typeof(IRuntimePluginLoaderBeforeV3922);
-        Type baseType = typeof(LoadContextPluginLoaderBeforeV3922);
+        Type interfaceType = typeof(IRuntimePluginLoaderBeforeV309022);
+        Type baseType = typeof(LoadContextPluginLoaderBeforeV309022);
         MethodInfo baseMethod = baseType.GetMethod(nameof(IRuntimePluginLoader.LoadPlugin))!;
 
         var typeBuilder = BuildTypeBuilder(baseType, interfaceType);
@@ -78,7 +78,7 @@ public class DynamicRuntimePluginLoaderFactory
     private static void EmitLoadPluginMethod(TypeBuilder typeBuilder, MethodInfo baseMethod, Type interfaceType)
     {
         MethodBuilder methodBuilder =
-            typeBuilder.DefineMethod(nameof(IRuntimePluginLoaderBeforeV3922.LoadPlugin),
+            typeBuilder.DefineMethod(nameof(IRuntimePluginLoaderBeforeV309022.LoadPlugin),
                 MethodAttributes.Public | MethodAttributes.Virtual,
                 typeof(IRuntimePlugin),
                 new[] {typeof(string), typeof(ITraceListener)});
@@ -90,7 +90,7 @@ public class DynamicRuntimePluginLoaderFactory
         methodIl.EmitCall(OpCodes.Call, baseMethod, null);
         methodIl.Emit(OpCodes.Ret);
 
-        MethodInfo loadPluginMethodInfo = interfaceType.GetMethod(nameof(IRuntimePluginLoaderBeforeV3922.LoadPlugin))!;
+        MethodInfo loadPluginMethodInfo = interfaceType.GetMethod(nameof(IRuntimePluginLoaderBeforeV309022.LoadPlugin))!;
         typeBuilder.DefineMethodOverride(methodBuilder, loadPluginMethodInfo);
     }
 }

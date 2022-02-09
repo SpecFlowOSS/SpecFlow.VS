@@ -3,9 +3,9 @@ using TechTalk.SpecFlow.Bindings;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public class SpecFlowDependencyProviderBeforeV3713 : SpecFlowDependencyProviderBeforeV3922
+public class SpecFlowDependencyProviderBeforeV307013 : SpecFlowDependencyProviderBeforeV309022
 {
-    public SpecFlowDependencyProviderBeforeV3713(AssemblyLoadContext loadContext) : base(loadContext)
+    public SpecFlowDependencyProviderBeforeV307013(AssemblyLoadContext loadContext) : base(loadContext)
     {
     }
 

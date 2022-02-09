@@ -9,8 +9,13 @@ public class NoInvokeDependencyProvider : DefaultDependencyProvider
 {
     public override void RegisterGlobalContainerDefaults(ObjectContainer container)
     {
-        base.RegisterGlobalContainerDefaults(container);
+        BaseRegisterGlobalContainerDefaults(container);
         RegisterBindingInvoker(container);
+    }
+
+    protected virtual void BaseRegisterGlobalContainerDefaults(ObjectContainer container)
+    {
+        base.RegisterGlobalContainerDefaults(container);
     }
 
     protected virtual void RegisterBindingInvoker(ObjectContainer container)

@@ -8,11 +8,16 @@ public abstract class BindingRegistryFactory : IBindingRegistryFactory
 {
     public IBindingRegistry GetBindingRegistry(AssemblyLoadContext assemblyLoadContext,
         Assembly testAssembly, Option<FileDetails> configFile) =>
-        CreateObjectContainer(testAssembly, assemblyLoadContext
-                .Map(CreateDependencyProvider)
-                .Map(CreateContainerBuilder), configFile
-                .Map<Option<FileDetails>, IConfigurationLoader>(CreateConfigurationLoader)
-                .Map(CreateConfigurationProvider))
+        CreateObjectContainer(
+                testAssembly,
+                assemblyLoadContext
+                    .Map(CreateDependencyProvider)
+                    .Map(CreateContainerBuilder),
+                configFile
+                    .Map<Option<FileDetails>,
+                        IConfigurationLoader>(CreateConfigurationLoader)
+                    .Map(CreateConfigurationProvider)
+            )
             .Tie(container => CreateTestRunner(container, testAssembly))
             .Map(container => ResolveBindingRegistry(testAssembly, container));
 

@@ -10,9 +10,9 @@ public static class ReflectionExtensions
         return ReflectionCallMethod<T>(obj, methodName, args?.Select(a => a.GetType()).ToArray() ?? new Type[0], args);
     }
 
-    public static void ReflectionCallMethod(this object obj, string methodName, params object[] args)
+    public static object ReflectionCallMethod(this object obj, string methodName, params object[] args)
     {
-        ReflectionCallMethod<object>(obj, methodName, args);
+       return ReflectionCallMethod<object>(obj, methodName, args);
     }
 
     public static void ReflectionCallMethod(this object obj, string methodName, Type[] parameterTypes,

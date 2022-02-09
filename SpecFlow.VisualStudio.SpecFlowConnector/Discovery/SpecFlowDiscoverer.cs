@@ -33,7 +33,8 @@ public class SpecFlowDiscoverer
         return new DiscoveryResult(
             stepDefinitions,
             sourcePaths.ToImmutable(),
-            typeNames.ToImmutable()
+            typeNames.ToImmutable(),
+            null!
         );
     }
 

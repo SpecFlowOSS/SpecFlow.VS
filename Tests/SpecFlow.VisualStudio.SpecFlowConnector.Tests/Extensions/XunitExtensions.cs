@@ -34,7 +34,7 @@ public static class XunitExtensions
         {
             testOutputHelper.WriteLine("--------------------------------");
             testOutputHelper.WriteLine(s);
-            testOutputHelper.WriteLine(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+            testOutputHelper.WriteLine("********************************");
             s = scrubber(s);
             testOutputHelper.WriteLine(s);
             return s;

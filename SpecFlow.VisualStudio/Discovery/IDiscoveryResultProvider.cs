@@ -25,7 +25,7 @@ public class DiscoveryResultProvider : IDiscoveryResultProvider
         OutProcSpecFlowConnector connector = OutProcSpecFlowConnectorFactory.CreateGeneric(_projectScope);
         var result = RunDiscovery(testAssemblyPath, configFilePath, projectSettings, connector);
 
-        return result;
+        //return result;
         if (!result.IsFailed)
             return result;
 
