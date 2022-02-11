@@ -7,6 +7,7 @@ namespace TechTalk.SpecFlow.Plugins;
 public abstract class RuntimePluginLoaderPatch : IRuntimePluginLoader
 {
     #region Copy-Pasted code from SpecFlow
+
     public IRuntimePlugin LoadPlugin(string pluginAssemblyName, ITraceListener traceListener, bool _)
     {
         Assembly assembly;
@@ -62,6 +63,7 @@ public abstract class RuntimePluginLoaderPatch : IRuntimePluginLoader
 
         return plugin;
     }
+
     #endregion
 
     protected abstract Assembly LoadAssembly(string pluginAssemblyName);

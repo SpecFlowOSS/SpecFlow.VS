@@ -49,7 +49,7 @@ public class Runner
 
     private int HandleException(Exception ex)
     {
-        return ex.Tie(e => _log.Error(e.Dump()))
+        return ex.Tie(e => _log.Error(e.ToString()))
             .Map(e => e is ArgumentException ? 3 : 4);
     }
 }

@@ -1,6 +1,4 @@
-﻿using SpecFlowConnector.Tests;
-
-namespace SpecFlowConnector.Discovery;
+﻿namespace SpecFlowConnector.Discovery;
 
 public class SpecFlowDiscoverer
 {
@@ -27,7 +25,7 @@ public class SpecFlowDiscoverer
                 method => GetParamTypes(method, parameterTypeName => GetKey(typeNames, parameterTypeName)),
                 sourcePath => GetKey(sourcePaths, sourcePath))
             )
-            .OrderBy(sd=>sd.SourceLocation)
+            .OrderBy(sd => sd.SourceLocation)
             .ToImmutableArray();
 
         return new DiscoveryResult(
@@ -98,7 +96,7 @@ public class SpecFlowDiscoverer
         );
     }
 
-    private static string? GetSourceExpression(StepDefinitionBindingAdapter sdb) 
+    private static string? GetSourceExpression(StepDefinitionBindingAdapter sdb)
         => sdb.GetProperty<string>("SourceExpression").Reduce(() => GetSpecifiedExpressionFromRegex(sdb)!);
 
     private static string? GetSpecifiedExpressionFromRegex(StepDefinitionBindingAdapter sdb) =>
@@ -114,7 +112,7 @@ public class SpecFlowDiscoverer
             })
             .Reduce((string) null!);
 
-    private static string? GetError(StepDefinitionBindingAdapter sdb) 
+    private static string? GetError(StepDefinitionBindingAdapter sdb)
         => sdb.GetProperty<string>("Error").Reduce((string) null!);
 
     private Option<string> GetSourceLocation(BindingMethodAdapter bindingMethod, Func<string, string> getSourcePathId)
