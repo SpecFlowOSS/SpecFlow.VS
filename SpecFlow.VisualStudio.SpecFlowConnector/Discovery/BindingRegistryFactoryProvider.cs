@@ -17,7 +17,7 @@ public class BindingRegistryFactoryProvider
     {
         var versionNumber = GetSpecFlowVersion();
         var factory = GetFactory(versionNumber);
-        _log.Debug($"Chosen {factory.GetType().Name} for {versionNumber}");
+        _log.Info($"Chosen {factory.GetType().Name} for {versionNumber}");
         return factory;
     }
 
@@ -45,7 +45,7 @@ public class BindingRegistryFactoryProvider
             if (ver >= 2_00_000) return ver;
         }
 
-        _log.Debug($"Not found {specFlowAssemblyPath}");
+        _log.Info($"Not found {specFlowAssemblyPath}");
         return int.MaxValue;
     }
 
@@ -55,7 +55,7 @@ public class BindingRegistryFactoryProvider
         var versionNumber = (specFlowVersion.FileMajorPart * 100 +
                              specFlowVersion.FileMinorPart) * 1000 +
                             specFlowVersion.FileBuildPart;
-        _log.Debug($"Found SpecFlow V{versionNumber} at {specFlowAssemblyPath}");
+        _log.Info($"Found SpecFlow V{versionNumber} at {specFlowAssemblyPath}");
         return versionNumber;
     }
 }

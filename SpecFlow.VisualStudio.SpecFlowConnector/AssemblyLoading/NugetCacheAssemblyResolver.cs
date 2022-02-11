@@ -4,6 +4,9 @@ public class NugetCacheAssemblyResolver : ICompilationAssemblyResolver
 {
     public bool TryResolveAssemblyPaths(CompilationLibrary library, List<string> assemblies)
     {
+        if (library.Path == null)
+            return false;
+
         var nugetCachePath = NugetCacheExpandedPath();
         var directory = Path.Combine(nugetCachePath, library.Path, "lib");
         if (!Directory.Exists(directory))

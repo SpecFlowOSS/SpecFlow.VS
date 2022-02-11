@@ -10,5 +10,5 @@ public class StringWriterLogger : Logger<StringWriter>
 
     protected override StringWriter GetTextWriter(LogLevel level) => _writer ??= CreateWriter();
 
-    public override string ToString() => GetTextWriter(LogLevel.Debug).GetStringBuilder().ToString();
+    public override string ToString() => GetTextWriter(LogLevel.Info).GetStringBuilder().ToString();
 }

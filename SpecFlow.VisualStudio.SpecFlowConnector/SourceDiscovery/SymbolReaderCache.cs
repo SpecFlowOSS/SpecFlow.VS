@@ -30,10 +30,8 @@ public class SymbolReaderCache
     protected Option<DeveroomSymbolReader> CreateSymbolReader(
         string assemblyFilePath) =>
         SymbolReaderFactories(assemblyFilePath)
-            .Select(TryCreateReader)
-            .Where(reader => reader is Some<DeveroomSymbolReader>)
-            .DefaultIfEmpty(None<DeveroomSymbolReader>.Value)
-            .FirstOrDefault()!;
+            .SelectOptional(TryCreateReader)
+            .FirstOrNone();
 
     private IEnumerable<Func<DeveroomSymbolReader>> SymbolReaderFactories(string path)
     {

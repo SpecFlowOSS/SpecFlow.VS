@@ -128,8 +128,7 @@ public class SpecFlowDiscoverer
             .Map(x => x.reader.ReadMethodSymbol(x.MetadataToken))
             .Reduce(ImmutableArray<MethodSymbolSequencePoint>.Empty)
             .Map(sequencePoints => sequencePoints
-                .Select(sp => (Option<MethodSymbolSequencePoint>) sp)
-                .DefaultIfEmpty(None.Value)
+                .SelectOptional(sp => (Option<MethodSymbolSequencePoint>) sp)
                 .Aggregate(
                     (startSequencePoint: None<MethodSymbolSequencePoint>.Value,
                         endSequencePoint: None<MethodSymbolSequencePoint>.Value),

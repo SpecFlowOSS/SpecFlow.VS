@@ -13,9 +13,9 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
     {
         _log = log;
         TestAssembly = testAssemblyFactory(this, path);
-        _log.Debug($"{TestAssembly} loaded");
+        _log.Info($"{TestAssembly} loaded");
         _dependencyContext = DependencyContext.Load(TestAssembly) ?? DependencyContext.Default;
-        _log.Debug($"{_dependencyContext} loaded");
+        _log.Info($"{_dependencyContext} loaded");
         _rids = GetRids(GetRuntimeFallbacks()).ToArray();
 
         _assemblyResolver = new RuntimeCompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
@@ -76,27 +76,24 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
 
     protected override Assembly Load(AssemblyName assemblyName)
     {
-        _log.Debug($"Loading {assemblyName}");
+        _log.Info($"Loading {assemblyName}");
         return FindRuntimeLibrary(assemblyName)
             .MapOptional(LoadFromAssembly)
+            .Tie(lib => _log.Info($"Found runtime library:{lib}"))
             .Or(() =>
             {
-                var lib = _dependencyContext.CompileLibraries.Where(
+                return _dependencyContext.CompileLibraries.Where(
                         compileLibrary =>
                             string.Equals(compileLibrary.Name, assemblyName.Name, StringComparison.OrdinalIgnoreCase))
-                    .Select(LoadFromAssembly)
-                    .Where(a => a is Some<Assembly>)
-                    .DefaultIfEmpty(None.Value)
-                    .First();
-                _log.Debug($"Found compilation library:{lib}");
-                return lib;
+                    .SelectOptional(LoadFromAssembly)
+                    .FirstOrNone()
+                    .Tie(lib => _log.Info($"Found compilation library:{lib}"));
             })
             .Or(() =>
             {
-                var lib = GetFallbackCompilationLibrary(assemblyName)
-                    .Map(LoadFromAssembly);
-                _log.Debug($"Found fallback library:{lib}");
-                return lib;
+               return GetFallbackCompilationLibrary(assemblyName)
+                    .Map(LoadFromAssembly)
+                    .Tie(lib => _log.Info($"Found fallback library:{lib}"));
             })
             .Reduce(() => null!);
     }
@@ -106,7 +103,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
         if (assemblyName.Name == null)
             return None.Value;
 
-        var lib = _dependencyContext.RuntimeLibraries
+        return _dependencyContext.RuntimeLibraries
             .Select(runtimeLibrary =>
                 (runtimeLibrary, foundAssets: SelectAssets(runtimeLibrary.RuntimeAssemblyGroups)
                     .Where(asset => asset.Contains(assemblyName.Name, StringComparison.OrdinalIgnoreCase)
@@ -114,7 +111,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
                                         StringComparison.OrdinalIgnoreCase)
                     ).ToList()))
             .Where(filtered => filtered.foundAssets.Any())
-            .Select(filtered =>
+            .SelectOptional(filtered =>
             {
                 var (runtimeLibrary, foundAssets) = filtered;
                 return (Option < CompilationLibrary >) new CompilationLibrary(
@@ -126,10 +123,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
                     runtimeLibrary.Dependencies,
                     runtimeLibrary.Serviceable);
             })
-            .DefaultIfEmpty(None<CompilationLibrary>.Value)
-            .First();
-        _log.Debug($"Found compilation library from runtime libraries:{lib}");
-        return lib;
+            .FirstOrNone();
     }
 
     private IEnumerable<string> SelectAssets(IReadOnlyList<RuntimeAssetGroup> runtimeAssetGroups)

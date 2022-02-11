@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace CodingHelmet.Optional.Extensions;
-
+﻿// ReSharper disable once CheckNamespace
 public static class EnumerableExtensions
 {
     public static Option<T> FirstOrNone<T>(this IEnumerable<T> sequence) =>
@@ -10,8 +6,7 @@ public static class EnumerableExtensions
             .DefaultIfEmpty(new None<T>())
             .First();
 
-    public static Option<T> FirstOrNone<T>(
-        this IEnumerable<T> sequence, Func<T, bool> predicate) =>
+    public static Option<T> FirstOrNone<T>(this IEnumerable<T> sequence, Func<T, bool> predicate) =>
         sequence.Where(predicate).FirstOrNone();
 
     public static IEnumerable<TResult> SelectOptional<T, TResult>(

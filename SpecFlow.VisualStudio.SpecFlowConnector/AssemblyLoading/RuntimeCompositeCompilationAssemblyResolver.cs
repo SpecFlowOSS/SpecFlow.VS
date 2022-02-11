@@ -19,7 +19,7 @@ public class RuntimeCompositeCompilationAssemblyResolver : ICompilationAssemblyR
                 if (resolver.TryResolveAssemblyPaths(library, assemblies) &&
                     assemblies.Any(a => !IsRefsPath(a)))
                 {
-                    _log.Debug($"Resolved with {resolver}");
+                    _log.Info($"Resolved with {resolver}");
                     return true;
                 }
             }

@@ -11,17 +11,11 @@ public sealed class ConsoleLogger : Logger<TextWriter>
 
     protected override TextWriter GetTextWriter(LogLevel level)
     {
-        switch (level)
+        return level switch
         {
-            case LogLevel.Debug:
-            case LogLevel.Error:
-            case LogLevel.Warning:
-                return Console.Error;
-            case LogLevel.Info:
-            case LogLevel.Verbose:
-                return Console.Out;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(level), level, null);
-        }
+            LogLevel.Error => Console.Error,
+            LogLevel.Info => Console.Out,
+            _ => throw new ArgumentOutOfRangeException(nameof(level), level, null)
+        };
     }
 }

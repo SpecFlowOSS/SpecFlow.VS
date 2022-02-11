@@ -41,7 +41,7 @@ public class Runner
         }
     }
 
-    public void DumpOptions(ConnectorOptions options) => _log.Debug(options.ToString());
+    public void DumpOptions(ConnectorOptions options) => _log.Info(options.ToString());
 
 
     private void PrintResult(string result)
@@ -61,7 +61,7 @@ public class ReflectionExecutor
     public static Either<string, DiscoveryResult> Execute(DiscoveryOptions options,
         Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log)
     {
-        _log.Debug($"Loading {options.AssemblyFile}");
+        _log.Info($"Loading {options.AssemblyFile}");
         var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile, testAssemblyFactory, _log);
         var testAssembly = testAssemblyContext.TestAssembly;
 
