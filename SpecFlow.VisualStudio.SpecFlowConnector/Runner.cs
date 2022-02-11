@@ -1,4 +1,5 @@
 ﻿using SpecFlowConnector.AssemblyLoading;
+using SpecFlowConnector.Optional.Extensions;
 using SpecFlowConnector.Tests;
 
 namespace SpecFlowConnector;
@@ -61,21 +62,14 @@ public class ReflectionExecutor
     {
         _log.Info($"Loading {options.AssemblyFile}");
         var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile, testAssemblyFactory, _log);
-        var testAssembly = testAssemblyContext.TestAssembly;
 
-        var executorType = typeof(ReflectionExecutor);
-        string executorTypeName = executorType.FullName!;
-        var executorAssembly = testAssemblyContext.LoadFromAssemblyPath(executorType.Assembly.Location);
-        var reflectedType = executorAssembly.GetType(executorTypeName)!;
-
-        var executorInstance = Activator.CreateInstance(reflectedType);
-
-        var optionsJson = JsonSerialization.SerializeObject(options);
-
-        return executorInstance.ReflectionCallMethod<string>(
+        return typeof(ReflectionExecutor)
+            .Map(t=>(typeName:t.FullName!, assembly: testAssemblyContext.LoadFromAssemblyPath(t.Assembly.Location)))
+            .Map(x=>x.assembly.GetType(x.typeName)!)
+            .Map(CreateInstance)
+            .Map(instance=>instance.ReflectionCallMethod<string>(
                 nameof(Execute),
-                new[] {typeof(string), typeof(Assembly), typeof(AssemblyLoadContext)},
-                optionsJson, testAssembly, testAssemblyContext)
+                JsonSerialization.SerializeObject(options), testAssemblyContext.TestAssembly, (AssemblyLoadContext)testAssemblyContext)
             .Map(s => JsonSerialization.DeserializeObject<RunnerResult>(s)
                 .Reduce(new RunnerResult(null!, $"Unable to deserialize{s}")))
             .Map(result =>
@@ -83,8 +77,12 @@ public class ReflectionExecutor
                 var (discoveryResult, log) = result;
                 _log.Info(log);
                 return discoveryResult ?? (Either<string, DiscoveryResult>) log;
-            });
+            }))
+            .Reduce(reflectedType => $"Could not create instance from:{reflectedType}");
     }
+
+    private static Either<Type, object> CreateInstance(Type reflectedType) => 
+        Activator.CreateInstance(reflectedType) ?? reflectedType;
 
     public string Execute(string optionsJson, Assembly testAssembly,
         AssemblyLoadContext assemblyLoadContext)

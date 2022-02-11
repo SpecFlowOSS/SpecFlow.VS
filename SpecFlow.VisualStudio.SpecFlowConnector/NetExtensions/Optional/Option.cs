@@ -7,7 +7,7 @@ public abstract class Option<T>
         ? new None<T>() 
         : new Some<T>(value);
 
-    public static implicit operator Option<T>(None none) => new None<T>();
+    public static implicit operator Option<T>(None _) => new None<T>();
 
     public abstract Option<TResult> Map<TResult>(Func<T, TResult> map);
     public abstract Option<TResult> MapOptional<TResult>(Func<T, Option<TResult>> map);

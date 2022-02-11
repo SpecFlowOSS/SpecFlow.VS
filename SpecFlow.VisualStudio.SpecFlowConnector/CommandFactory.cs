@@ -15,7 +15,7 @@ public class CommandFactory
         _testAssembly = testAssembly;
     }
 
-    public Either<Exception, DiscoveryCommand> CreateCommand() =>
+    public DiscoveryCommand CreateCommand() =>
         _options
             .Tie(AttachDebuggerWhenRequired)
             .Map(ToCommand);
@@ -26,8 +26,8 @@ public class CommandFactory
             Debugger.Launch();
     }
 
-    public Either<Exception, DiscoveryCommand> ToCommand(DiscoveryOptions options) =>
-        new DiscoveryCommand(
+    public DiscoveryCommand ToCommand(DiscoveryOptions options) =>
+        new (
             options.ConfigFile?.Map(FileDetails.FromPath) ?? None<FileDetails>.Value,
             _log,
             _fileSystem,

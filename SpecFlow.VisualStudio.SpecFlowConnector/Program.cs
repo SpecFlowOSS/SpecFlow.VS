@@ -1,4 +1,5 @@
 ﻿using SpecFlowConnector;
+using SpecFlowConnector.Optional.Extensions;
 
 var log = new ConsoleLogger();
 var fileSystem = new FileSystem();
