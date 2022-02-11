@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SpecFlowConnector.AssemblyLoading;
 using SpecFlowConnector.Discovery;
 using SpecFlowConnector.Tests;
 
@@ -20,7 +21,7 @@ public class Runner
 #if DEBUG
             _log;
 #else
-        new StringBuilderLogger();
+        new StringWriterLogger();
 #endif
         try
         {
@@ -68,9 +69,8 @@ public class ReflectionExecutor
         Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log)
     {
         _log.Debug($"Loading {options.AssemblyFile}");
-        var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile, testAssemblyFactory);
-        var testAssembly = testAssemblyContext.Assembly;
-        _log.Debug($"Loaded: {testAssembly}");
+        var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile, testAssemblyFactory, _log);
+        var testAssembly = testAssemblyContext.TestAssembly;
 
         var executorType = typeof(ReflectionExecutor);
         string executorTypeName = executorType.FullName!;
@@ -97,7 +97,7 @@ public class ReflectionExecutor
     public string Execute(string optionsJson, Assembly testAssembly,
         AssemblyLoadContext assemblyLoadContext)
     {
-        var log = new StringBuilderLogger();
+        var log = new StringWriterLogger();
         var options = JsonConvert.DeserializeObject<DiscoveryOptions>(optionsJson);
 
         return Execute(log, options, testAssembly, assemblyLoadContext)

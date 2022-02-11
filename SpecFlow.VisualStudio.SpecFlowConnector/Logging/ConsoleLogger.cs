@@ -1,6 +1,6 @@
 ﻿namespace SpecFlowConnector.Logging;
 
-public sealed class ConsoleLogger : Logger
+public sealed class ConsoleLogger : Logger<TextWriter>
 {
     public ConsoleLogger()
     {

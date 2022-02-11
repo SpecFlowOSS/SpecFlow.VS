@@ -1,8 +1,6 @@
-﻿using SpecFlowConnector.Logging;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
-
-public class TestConsoleLogger : Logger
+public class TestConsoleLogger : Logger<TextWriter>
 {
     private readonly ConcurrentDictionary<LogLevel, StringWriter> _builders;
 
