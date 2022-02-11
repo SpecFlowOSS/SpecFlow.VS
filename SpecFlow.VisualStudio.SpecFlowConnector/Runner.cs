@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using SpecFlowConnector.AssemblyLoading;
-using SpecFlowConnector.Discovery;
+﻿using SpecFlowConnector.AssemblyLoading;
 using SpecFlowConnector.Tests;
 
 namespace SpecFlowConnector;
@@ -26,10 +24,10 @@ public class Runner
                     ReflectionExecutor.Execute((DiscoveryOptions) options, testAssemblyFactory, _log))
                 //.Map(result=>result.MapLeft(errorMessage => new Exception(errorMessage)))
                 .Map(result => result.Reduce(errorMessage => new DiscoveryResult(ImmutableArray<StepDefinition>.Empty,
-                        ImmutableSortedDictionary<string, string>.Empty,
-                        ImmutableSortedDictionary<string, string>.Empty,
-                        errorMessage)))
-                .Map<Exception, DiscoveryResult, string>(result => JsonConvert.SerializeObject(result, Formatting.Indented))
+                    ImmutableSortedDictionary<string, string>.Empty,
+                    ImmutableSortedDictionary<string, string>.Empty,
+                    errorMessage)))
+                .Map<Exception, DiscoveryResult, string>(JsonSerialization.SerializeObject)
                 .Map(JsonSerialization.MarkResult)
                 .Tie(PrintResult)
                 .Map<Exception, string, int>(_ => 0)
@@ -72,13 +70,14 @@ public class ReflectionExecutor
 
         var executorInstance = Activator.CreateInstance(reflectedType);
 
-        var optionsJson = JsonConvert.SerializeObject(options);
+        var optionsJson = JsonSerialization.SerializeObject(options);
 
         return executorInstance.ReflectionCallMethod<string>(
                 nameof(Execute),
                 new[] {typeof(string), typeof(Assembly), typeof(AssemblyLoadContext)},
                 optionsJson, testAssembly, testAssemblyContext)
-            .Map(JsonConvert.DeserializeObject<RunnerResult>)
+            .Map(s => JsonSerialization.DeserializeObject<RunnerResult>(s)
+                .Reduce(new RunnerResult(null!, $"Unable to deserialize{s}")))
             .Map(result =>
             {
                 var (discoveryResult, log) = result;
@@ -91,16 +90,17 @@ public class ReflectionExecutor
         AssemblyLoadContext assemblyLoadContext)
     {
         var log = new StringWriterLogger();
-        var options = JsonConvert.DeserializeObject<DiscoveryOptions>(optionsJson);
-
-        return Execute(log, options, testAssembly, assemblyLoadContext)
-            .Reduce(ex =>
-            {
-                log.Error(ex.ToString());
-                return null!;
-            })
-            .Map(dr => new RunnerResult(dr, log.ToString()))
-            .Map(JsonConvert.SerializeObject);
+        return JsonSerialization.DeserializeObject<DiscoveryOptions>(optionsJson)
+            .Map(options => Execute(log, options, testAssembly, assemblyLoadContext)
+                .Reduce(ex =>
+                {
+                    log.Error(ex.ToString());
+                    return null!;
+                })
+                .Map(dr => new RunnerResult(dr, log.ToString()))
+                .Map(JsonSerialization.SerializeObject)
+            )
+            .Reduce($"Unable to deserialize {optionsJson}");
     }
 
     private Either<Exception, DiscoveryResult> Execute(ILogger log, DiscoveryOptions options, Assembly testAssembly,

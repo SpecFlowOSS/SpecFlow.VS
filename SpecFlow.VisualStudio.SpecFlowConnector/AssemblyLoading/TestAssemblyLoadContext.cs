@@ -10,6 +10,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
     private readonly string[] _rids;
 
     public TestAssemblyLoadContext(string path, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger log)
+        : base(path)
     {
         _log = log;
         TestAssembly = testAssemblyFactory(this, path);

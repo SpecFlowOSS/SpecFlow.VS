@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
@@ -11,14 +10,14 @@ public class SpecFlow21ConfigurationLoader : SpecFlowConfigurationLoader
 
     protected override string ConvertToJsonSpecFlow3Style(string configFileContent)
     {
-        var content = JsonConvert.DeserializeObject<JObject>(configFileContent);
+        var content = JsonDocument.Parse(configFileContent);
 
-        if (!content.TryGetValue("specFlow", out var specFlowObject))
+        if (!content.RootElement.TryGetProperty("specFlow", out var specFlowObject))
             return configFileContent;
 
-        var configObject = new JObject(specFlowObject.First);
+        var configObject = specFlowObject.EnumerateArray().First();
 
-        var modifiedContent = JsonConvert.SerializeObject(configObject, Formatting.Indented);
+        var modifiedContent = JsonSerializer.Serialize(configObject, new JsonSerializerOptions{WriteIndented = true});
         return modifiedContent;
     }
 }

@@ -8,7 +8,7 @@ namespace SpecFlowConnector.SpecFlowProxies;
 
 public class BindingRegistryFactoryVLatest : BindingRegistryFactory
 {
-    private readonly IFileSystem _fileSystem;
+    protected readonly IFileSystem _fileSystem;
 
     public BindingRegistryFactoryVLatest(IFileSystem fileSystem)
     {

@@ -16,6 +16,9 @@ public class BindingRegistryFactoryBeforeV300213 : BindingRegistryFactoryBeforeV
     {
     }
 
+    protected override IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile) =>
+        new SpecFlow21ConfigurationLoader(configFile, _fileSystem);
+
     protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext)
     {
         _defaultDependencyProvider = new SpecFlowDependencyProviderBeforeV300213(assemblyLoadContext);
@@ -27,6 +30,7 @@ public class BindingRegistryFactoryBeforeV300213 : BindingRegistryFactoryBeforeV
         ContainerBuilder containerBuilder,
         IRuntimeConfigurationProvider configurationProvider)
     {
+
         var globalContainer = containerBuilder.ReflectionCallMethod<object>(nameof(ContainerBuilder.CreateGlobalContainer),
             configurationProvider);
         _defaultDependencyProvider.ReflectionCallMethod(nameof(IDefaultDependencyProvider.RegisterGlobalContainerDefaults), new []{typeof(object)}, globalContainer);

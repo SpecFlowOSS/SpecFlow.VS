@@ -1,38 +1,30 @@
 ﻿{
-  "StepDefinitions": [
+  "stepDefinitions": [
     {
-      "Type": "Then",
-      "Regex": "^tellus \"(.*)\" nulla$",
-      "Method": "IdNecAtLigulaSteps.ThenErosAtCongueMollis(String)",
-      "ParamTypes": "s",
-      "Scope": null,
-      "Expression": "tellus \"(.*)\" nulla",
-      "Error": null,
-      "SourceLocation": "#0|10|9|12|10"
+      "type": "Then",
+      "regex": "^tellus \u0022(.*)\u0022 nulla$",
+      "method": "IdNecAtLigulaSteps.ThenErosAtCongueMollis(String)",
+      "paramTypes": "s",
+      "expression": "tellus \u0022(.*)\u0022 nulla",
+      "sourceLocation": "#0|10|9|12|10"
     },
     {
-      "Type": "Given",
-      "Regex": "^Curabitur sem in$",
-      "Method": "IdNecAtLigulaSteps.GivenInMassaDiamDui()",
-      "ParamTypes": null,
-      "Scope": null,
-      "Expression": "Curabitur sem in",
-      "Error": null,
-      "SourceLocation": "#0|16|9|18|10"
+      "type": "Given",
+      "regex": "^Curabitur sem in$",
+      "method": "IdNecAtLigulaSteps.GivenInMassaDiamDui()",
+      "expression": "Curabitur sem in",
+      "sourceLocation": "#0|16|9|18|10"
     },
     {
-      "Type": "When",
-      "Regex": "^nostra ullamcorper tortor in$",
-      "Method": "IdNecAtLigulaSteps.WhenAugueAugueLaoreetNulla()",
-      "ParamTypes": null,
-      "Scope": null,
-      "Expression": "nostra ullamcorper tortor in",
-      "Error": null,
-      "SourceLocation": "#0|22|9|24|10"
+      "type": "When",
+      "regex": "^nostra ullamcorper tortor in$",
+      "method": "IdNecAtLigulaSteps.WhenAugueAugueLaoreetNulla()",
+      "expression": "nostra ullamcorper tortor in",
+      "sourceLocation": "#0|22|9|24|10"
     }
   ],
-  "SourceFiles": {
+  "sourceFiles": {
     "0": "<<targetFolder>>\\StepDefinitions\\IdNecAtLigulaSteps.cs"
   },
-  "TypeNames": {}
+  "typeNames": {}
 }

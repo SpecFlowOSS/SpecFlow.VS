@@ -1,38 +1,32 @@
 ﻿{
-  "StepDefinitions": [
+  "stepDefinitions": [
     {
-      "Type": "When",
-      "Regex": "^urna massa \"(.*)\" sollicitudin$",
-      "Method": "LectusDignissimEuFelisSteps.WhenEgetRisusEuAccumsan(String)",
-      "ParamTypes": "s",
-      "Scope": null,
-      "Expression": "urna massa \"(.*)\" sollicitudin",
-      "Error": null,
-      "SourceLocation": "#0|10|9|12|10"
+      "type": "When",
+      "regex": "^urna massa \u0022(.*)\u0022 sollicitudin$",
+      "method": "LectusDignissimEuFelisSteps.WhenEgetRisusEuAccumsan(String)",
+      "paramTypes": "s",
+      "expression": "urna massa \u0022(.*)\u0022 sollicitudin",
+      "sourceLocation": "#0|10|9|12|10"
     },
     {
-      "Type": "Given",
-      "Regex": "^ut et \"(.*)\"$",
-      "Method": "LectusDignissimEuFelisSteps.GivenLoremSapienQuisqueVitae(String)",
-      "ParamTypes": "s",
-      "Scope": null,
-      "Expression": "ut et \"(.*)\"",
-      "Error": null,
-      "SourceLocation": "#0|16|9|18|10"
+      "type": "Given",
+      "regex": "^ut et \u0022(.*)\u0022$",
+      "method": "LectusDignissimEuFelisSteps.GivenLoremSapienQuisqueVitae(String)",
+      "paramTypes": "s",
+      "expression": "ut et \u0022(.*)\u0022",
+      "sourceLocation": "#0|16|9|18|10"
     },
     {
-      "Type": "Then",
-      "Regex": "^molestie augue auctor eu$",
-      "Method": "LectusDignissimEuFelisSteps.ThenTristiqueAnteLiberoUt(Table)",
-      "ParamTypes": "st",
-      "Scope": null,
-      "Expression": "molestie augue auctor eu",
-      "Error": null,
-      "SourceLocation": "#0|22|9|24|10"
+      "type": "Then",
+      "regex": "^molestie augue auctor eu$",
+      "method": "LectusDignissimEuFelisSteps.ThenTristiqueAnteLiberoUt(Table)",
+      "paramTypes": "st",
+      "expression": "molestie augue auctor eu",
+      "sourceLocation": "#0|22|9|24|10"
     }
   ],
-  "SourceFiles": {
+  "sourceFiles": {
     "0": "<<targetFolder>>\\StepDefinitions\\LectusDignissimEuFelisSteps.cs"
   },
-  "TypeNames": {}
+  "typeNames": {}
 }

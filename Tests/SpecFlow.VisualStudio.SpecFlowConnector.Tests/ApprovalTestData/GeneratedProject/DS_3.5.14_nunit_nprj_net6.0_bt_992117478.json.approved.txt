@@ -1,38 +1,32 @@
 ﻿{
-  "StepDefinitions": [
+  "stepDefinitions": [
     {
-      "Type": "When",
-      "Regex": "^sapien urna iaculis (\\d+)$",
-      "Method": "DolorUtImperdietFermentumSteps.WhenQuisElitMiCursus(Int32)",
-      "ParamTypes": "i",
-      "Scope": null,
-      "Expression": "sapien urna iaculis (\\d+)",
-      "Error": null,
-      "SourceLocation": "#0|10|9|12|10"
+      "type": "When",
+      "regex": "^sapien urna iaculis (\\d\u002B)$",
+      "method": "DolorUtImperdietFermentumSteps.WhenQuisElitMiCursus(Int32)",
+      "paramTypes": "i",
+      "expression": "sapien urna iaculis (\\d\u002B)",
+      "sourceLocation": "#0|10|9|12|10"
     },
     {
-      "Type": "Given",
-      "Regex": "^(\\d+) porta scelerisque ante Mauris$",
-      "Method": "DolorUtImperdietFermentumSteps.GivenMolestieUrnaEtiamMolestie(Int32)",
-      "ParamTypes": "i",
-      "Scope": null,
-      "Expression": "(\\d+) porta scelerisque ante Mauris",
-      "Error": null,
-      "SourceLocation": "#0|16|9|18|10"
+      "type": "Given",
+      "regex": "^(\\d\u002B) porta scelerisque ante Mauris$",
+      "method": "DolorUtImperdietFermentumSteps.GivenMolestieUrnaEtiamMolestie(Int32)",
+      "paramTypes": "i",
+      "expression": "(\\d\u002B) porta scelerisque ante Mauris",
+      "sourceLocation": "#0|16|9|18|10"
     },
     {
-      "Type": "Then",
-      "Regex": "^dapibus leo lacus venenatis (\\d+)$",
-      "Method": "DolorUtImperdietFermentumSteps.ThenNecAtLigulaUt(Int32)",
-      "ParamTypes": "i",
-      "Scope": null,
-      "Expression": "dapibus leo lacus venenatis (\\d+)",
-      "Error": null,
-      "SourceLocation": "#0|22|9|24|10"
+      "type": "Then",
+      "regex": "^dapibus leo lacus venenatis (\\d\u002B)$",
+      "method": "DolorUtImperdietFermentumSteps.ThenNecAtLigulaUt(Int32)",
+      "paramTypes": "i",
+      "expression": "dapibus leo lacus venenatis (\\d\u002B)",
+      "sourceLocation": "#0|22|9|24|10"
     }
   ],
-  "SourceFiles": {
+  "sourceFiles": {
     "0": "<<targetFolder>>\\StepDefinitions\\DolorUtImperdietFermentumSteps.cs"
   },
-  "TypeNames": {}
+  "typeNames": {}
 }

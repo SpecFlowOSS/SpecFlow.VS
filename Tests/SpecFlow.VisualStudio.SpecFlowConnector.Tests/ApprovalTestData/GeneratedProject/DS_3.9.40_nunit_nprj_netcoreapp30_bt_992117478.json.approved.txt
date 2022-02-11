@@ -1,38 +1,32 @@
 ﻿{
-  "StepDefinitions": [
+  "stepDefinitions": [
     {
-      "Type": "Given",
-      "Regex": "^quam Donec porta Sed$",
-      "Method": "IntegerANecHimenaeosSteps.GivenCursusMolestieRisusUltricies(String)",
-      "ParamTypes": "s",
-      "Scope": null,
-      "Expression": "quam Donec porta Sed",
-      "Error": null,
-      "SourceLocation": "#0|10|9|12|10"
+      "type": "Given",
+      "regex": "^quam Donec porta Sed$",
+      "method": "IntegerANecHimenaeosSteps.GivenCursusMolestieRisusUltricies(String)",
+      "paramTypes": "s",
+      "expression": "quam Donec porta Sed",
+      "sourceLocation": "#0|10|9|12|10"
     },
     {
-      "Type": "Then",
-      "Regex": "^per ipsum (\\d+)$",
-      "Method": "IntegerANecHimenaeosSteps.ThenAcTortorEgestasVel(Int32)",
-      "ParamTypes": "i",
-      "Scope": null,
-      "Expression": "per ipsum (\\d+)",
-      "Error": null,
-      "SourceLocation": "#0|16|9|18|10"
+      "type": "Then",
+      "regex": "^per ipsum (\\d\u002B)$",
+      "method": "IntegerANecHimenaeosSteps.ThenAcTortorEgestasVel(Int32)",
+      "paramTypes": "i",
+      "expression": "per ipsum (\\d\u002B)",
+      "sourceLocation": "#0|16|9|18|10"
     },
     {
-      "Type": "When",
-      "Regex": "^sapien (\\d+) ante nulla$",
-      "Method": "IntegerANecHimenaeosSteps.WhenEnimRisusCongueEt(Int32)",
-      "ParamTypes": "i",
-      "Scope": null,
-      "Expression": "sapien (\\d+) ante nulla",
-      "Error": null,
-      "SourceLocation": "#0|22|9|24|10"
+      "type": "When",
+      "regex": "^sapien (\\d\u002B) ante nulla$",
+      "method": "IntegerANecHimenaeosSteps.WhenEnimRisusCongueEt(Int32)",
+      "paramTypes": "i",
+      "expression": "sapien (\\d\u002B) ante nulla",
+      "sourceLocation": "#0|22|9|24|10"
     }
   ],
-  "SourceFiles": {
+  "sourceFiles": {
     "0": "<<targetFolder>>\\StepDefinitions\\IntegerANecHimenaeosSteps.cs"
   },
-  "TypeNames": {}
+  "typeNames": {}
 }
