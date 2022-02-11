@@ -46,7 +46,7 @@ public class SpecFlowDiscoverer
         (
             sdb.StepDefinitionType,
             sdb.Regex.Map(r => r.ToString()).Reduce((string) null!),
-            sdb.Method.ToString(),
+            sdb.Method.ToString()!,
             getParameterTypes(sdb.Method),
             GetScope(sdb),
             GetSourceExpression(sdb),

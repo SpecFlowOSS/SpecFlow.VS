@@ -34,9 +34,12 @@ public class AssemblyLoadingTests
                 log))
             .ToList();
 
+        var a = loadContexts[0].LoadFromAssemblyName(new AssemblyName( "Microsoft.AspNetCore.Antiforgery"){Version = new Version(6,0)});
+
         var loadedAssemblies = loadContexts
             .SelectMany(lc => _assemblies.Select(a => lc.LoadFromAssemblyName(a.GetName())))
             .ToList();
+
 
         //assert
         loadedAssemblies.Should().HaveCountGreaterThan(0);
@@ -44,5 +47,23 @@ public class AssemblyLoadingTests
             .BeEquivalentTo(_assemblies.Select(a => a.Location), "same dlls are loaded");
         loadContexts.Select(lc => lc.TestAssembly).Should()
             .NotBeEquivalentTo(_assemblies, "assemblies re loaded into different context");
+    }
+
+    [Fact]
+    public void Loads_From_AspNetCoreAssembly()
+    {
+        //arrange
+        var log = new TestOutputHelperLogger(_testOutputHelper);
+
+        var loadContext = new TestAssemblyLoadContext(
+            GetType().Assembly.Location,
+            (assemblyLoadContext, path) => assemblyLoadContext.LoadFromAssemblyPath(path),
+            log);
+
+        //act
+        var loadedAssembly = loadContext.LoadFromAssemblyName(new AssemblyName("Microsoft.AspNetCore.Antiforgery") { Version = new Version(6, 0) });
+
+        //assert
+        loadedAssembly.GetName().Name.Should().Be("Microsoft.AspNetCore.Antiforgery");
     }
 }

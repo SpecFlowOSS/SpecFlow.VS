@@ -1,6 +1,4 @@
-﻿using SpecFlowConnector.Discovery;
-
-namespace SpecFlowConnector;
+﻿namespace SpecFlowConnector;
 
 public record ConnectorOptions(bool DebugMode)
 {

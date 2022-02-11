@@ -1,11 +1,9 @@
-﻿using SpecFlowConnector.Discovery;
-
-namespace SpecFlowConnector;
+﻿namespace SpecFlowConnector;
 
 public class CommandFactory
 {
-    private readonly ILogger _log;
     private readonly IFileSystem _fileSystem;
+    private readonly ILogger _log;
     private readonly DiscoveryOptions _options;
     private readonly Assembly _testAssembly;
 
@@ -31,7 +29,7 @@ public class CommandFactory
     public Either<Exception, DiscoveryCommand> ToCommand(DiscoveryOptions options) =>
         new DiscoveryCommand(
             options.ConfigFile?.Map(FileDetails.FromPath) ?? None<FileDetails>.Value,
-            _log, 
+            _log,
             _fileSystem,
             _testAssembly);
 }

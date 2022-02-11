@@ -3,7 +3,6 @@ using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Bindings;
 using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
-using TechTalk.SpecFlow.Tracing;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
@@ -38,30 +37,15 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory
 
     protected virtual void CreateTestRunner(IObjectContainer globalContainer, Assembly testAssembly)
     {
-        var testRunnerManager = (TestRunnerManager)globalContainer.Resolve<ITestRunnerManager>();
+        var testRunnerManager = (TestRunnerManager) globalContainer.Resolve<ITestRunnerManager>();
 
         testRunnerManager.Initialize(testAssembly);
         testRunnerManager.CreateTestRunner(0);
     }
 
     protected override IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, object globalContainer)
-        => ResolveBindingRegistry(testAssembly, (IObjectContainer)globalContainer);
+        => ResolveBindingRegistry(testAssembly, (IObjectContainer) globalContainer);
 
     protected virtual IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, IObjectContainer globalContainer)
         => globalContainer.Resolve<IBindingRegistry>();
-
-    private class ContainerBuilderThatResetsTraceListener : ContainerBuilder
-    {
-        public ContainerBuilderThatResetsTraceListener(IDefaultDependencyProvider defaultDependencyProvider = null) :
-            base(defaultDependencyProvider)
-        {
-        }
-
-        public override IObjectContainer CreateTestThreadContainer(IObjectContainer globalContainer)
-        {
-            var testThreadContainer = base.CreateTestThreadContainer(globalContainer);
-            testThreadContainer.ReflectionRegisterTypeAs<NullListener, ITraceListener>();
-            return testThreadContainer;
-        }
-    }
 }

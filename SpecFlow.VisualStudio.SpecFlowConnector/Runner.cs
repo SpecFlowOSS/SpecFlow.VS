@@ -17,12 +17,6 @@ public class Runner
     public int Run(string[] args, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory,
         IFileSystem fileSystem)
     {
-        var internalLogger =
-#if DEBUG
-            _log;
-#else
-        new StringWriterLogger();
-#endif
         try
         {
             return args
@@ -43,7 +37,6 @@ public class Runner
         }
         catch (Exception ex)
         {
-            _log.Debug(internalLogger.ToString());
             return HandleException(ex);
         }
     }

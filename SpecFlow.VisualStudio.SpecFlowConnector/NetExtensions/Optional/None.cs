@@ -4,10 +4,10 @@ public sealed class None<T> : Option<T>, IEquatable<None<T>>, IEquatable<None>
 {
     public static Option<T> Value { get; } = new None<T>();
 
-    public bool Equals(None<T> other) =>
+    public bool Equals(None<T>? other) =>
         other?.GetType() == typeof(None<T>);
 
-    public bool Equals(None other) => true;
+    public bool Equals(None? other) => true;
 
     public override Option<TResult> Map<TResult>(Func<T, TResult> map) =>
         None.Value;
@@ -27,12 +27,12 @@ public sealed class None<T> : Option<T>, IEquatable<None<T>>, IEquatable<None>
 
     public override Option<TNew> OfType<TNew>() => new None<TNew>();
 
-    public override bool Equals(object obj) =>
-        !(obj is null) && (obj is None<T> || obj is None);
+    public override bool Equals(object? obj) =>
+        obj is not null && (obj is None<T> || obj is None);
 
     public override int GetHashCode() => 0;
 
-    public static bool operator ==(None<T> a, None<T> b) =>
+    public static bool operator ==(None<T>? a, None<T>? b) =>
         a?.Equals(b) ?? b is null;
 
     public static bool operator !=(None<T> a, None<T> b) => !(a == b);
@@ -48,14 +48,14 @@ public sealed class None : IEquatable<None>
 
     public static None Value { get; } = new();
 
-    public bool Equals(None other) => true;
+    public bool Equals(None? other) => true;
 
     public override string ToString() => "None";
 
-    public override bool Equals(object obj) =>
-        !(obj is null) && (obj is None || IsGenericNone(obj.GetType()));
+    public override bool Equals(object? obj) =>
+        obj is not null && (obj is None || IsGenericNone(obj.GetType()));
 
-    private bool IsGenericNone(Type type) =>
+    private static bool IsGenericNone(Type type) =>
         type.GenericTypeArguments.Length == 1 &&
         typeof(None<>).MakeGenericType(type.GenericTypeArguments[0]) == type;
 

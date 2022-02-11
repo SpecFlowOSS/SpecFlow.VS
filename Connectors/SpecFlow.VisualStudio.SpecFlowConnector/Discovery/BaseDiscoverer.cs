@@ -13,8 +13,6 @@ public abstract class BaseDiscoverer : RemoteContextObject, ISpecFlowDiscoverer,
         {
             var bindingRegistry = GetBindingRegistry(testAssembly, configFilePath);
 
-            bindingRegistry.GetStepDefinitions().ToArray();
-
             var result = new DiscoveryResult();
             var warningCollector = new WarningCollector();
 

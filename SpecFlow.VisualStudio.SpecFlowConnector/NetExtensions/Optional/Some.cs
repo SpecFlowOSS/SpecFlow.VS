@@ -12,7 +12,7 @@ public sealed class Some<T> : Option<T>, IEquatable<Some<T>>
     private string ContentToString =>
         Content?.ToString() ?? "<null>";
 
-    public bool Equals(Some<T> other) =>
+    public bool Equals(Some<T>? other) =>
         other?.GetType() == typeof(Some<T>) &&
         EqualityComparer<T>.Default.Equals(Content, other.Content);
 
@@ -44,19 +44,19 @@ public sealed class Some<T> : Option<T>, IEquatable<Some<T>>
 
     public override Option<TNew> OfType<TNew>() =>
         typeof(T).IsAssignableFrom(typeof(TNew))
-            ? new Some<TNew>(Content as TNew)
+            ? new Some<TNew>((Content as TNew)!)
             : new None<TNew>();
 
     public override string ToString() =>
         $"Some({ContentToString})";
 
-    public override bool Equals(object obj) =>
+    public override bool Equals(object? obj) =>
         Equals(obj as Some<T>);
 
     public override int GetHashCode() =>
         Content?.GetHashCode() ?? 0;
 
-    public static bool operator ==(Some<T> a, Some<T> b) =>
+    public static bool operator ==(Some<T>? a, Some<T>? b) =>
         a?.Equals(b) ?? b is null;
 
     public static bool operator !=(Some<T> a, Some<T> b) => !(a == b);
