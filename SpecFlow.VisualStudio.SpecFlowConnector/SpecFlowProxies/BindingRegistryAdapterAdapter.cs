@@ -2,7 +2,7 @@
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public class BindingRegistryAdapterAdapter : IBindingRegistryAdapter
+public class BindingRegistryAdapterAdapter
 {
     private readonly IBindingRegistryFactory _bindingRegistryFactory;
 

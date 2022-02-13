@@ -4,12 +4,6 @@ namespace SpecFlowConnector.SpecFlowProxies;
 
 public static class BoDiReflectionExtensions
 {
-    public static bool ReflectionIsRegistered<T>(this object container, string name)
-    {
-        return container.ReflectionCallMethod<bool>(nameof(IObjectContainer.IsRegistered),
-            new[] {typeof(string)}, name);
-    }
-
     public static T ReflectionResolve<T>(this object container)
     {
         return container.ReflectionCallMethod<T>(nameof(IObjectContainer.Resolve),

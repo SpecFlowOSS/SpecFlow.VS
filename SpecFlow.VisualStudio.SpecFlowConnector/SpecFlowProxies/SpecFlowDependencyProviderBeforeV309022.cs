@@ -1,6 +1,4 @@
-﻿using BoDi;
-using SpecFlowConnector.Discovery;
-using TechTalk.SpecFlow.Plugins;
+﻿using TechTalk.SpecFlow.Plugins;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 

@@ -1,6 +1,4 @@
-﻿using System.Configuration;
-using System.Xml;
-using TechTalk.SpecFlow.Configuration;
+﻿using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Configuration.AppConfig;
 using TechTalk.SpecFlow.Configuration.JsonConfig;
 using TechTalk.SpecFlow.Tracing;

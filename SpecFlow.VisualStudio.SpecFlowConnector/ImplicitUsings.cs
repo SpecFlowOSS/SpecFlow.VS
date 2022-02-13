@@ -1,6 +1,11 @@
-﻿global using Microsoft.Extensions.DependencyModel;
+﻿global using BoDi;
+global using Microsoft.Extensions.DependencyModel;
 global using Microsoft.Extensions.DependencyModel.Resolution;
 global using SpecFlow.VisualStudio.SpecFlowConnector;
+global using SpecFlowConnector;
+global using SpecFlowConnector.AssemblyLoading;
+global using SpecFlowConnector.Optional.Extensions;
+global using SpecFlowConnector.Tests;
 global using SpecFlowConnector.Discovery;
 global using SpecFlowConnector.Logging;
 global using SpecFlowConnector.SourceDiscovery;
@@ -9,14 +14,16 @@ global using System;
 global using System.Collections.Concurrent;
 global using System.Collections.Generic;
 global using System.Collections.Immutable;
+global using System.Configuration;
 global using System.Diagnostics;
 global using System.Globalization;
 global using System.IO.Abstractions;
 global using System.Linq;
 global using System.Reflection;
+global using System.Reflection.Emit;
 global using System.Runtime.InteropServices;
 global using System.Runtime.Loader;
 global using System.Text;
+global using System.Text.RegularExpressions;
 global using System.Threading.Tasks;
-#if !NETFRAMEWORK
-#endif
+global using System.Xml;

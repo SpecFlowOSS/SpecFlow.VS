@@ -42,14 +42,9 @@ public class DynamicRuntimePluginLoaderFactory
 
     private static AssemblyBuilder BuildAssemblyBuilder(AssemblyName assemblyName)
     {
-#if NETFRAMEWORK
-        var appDomain = AppDomain.CurrentDomain;
-        var assemblyBuilder = appDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
-#else
         var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
             assemblyName,
             AssemblyBuilderAccess.Run);
-#endif
         return assemblyBuilder;
     }
 

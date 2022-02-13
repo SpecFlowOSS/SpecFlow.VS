@@ -1,22 +1,20 @@
-﻿using BoDi;
-using SpecFlowConnector.Discovery;
-using TechTalk.SpecFlow.Plugins;
+﻿using TechTalk.SpecFlow.Plugins;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
 public class SpecFlowDependencyProviderVLatest : NoInvokeDependencyProvider
 {
-    protected readonly AssemblyLoadContext _loadContext;
+    protected readonly AssemblyLoadContext LoadContext;
 
     public SpecFlowDependencyProviderVLatest(AssemblyLoadContext loadContext)
     {
-        _loadContext = loadContext;
+        LoadContext = loadContext;
     }
 
     public override void RegisterGlobalContainerDefaults(ObjectContainer globalContainer)
     {
         base.RegisterGlobalContainerDefaults(globalContainer);
-        globalContainer.RegisterInstanceAs(_loadContext);
+        globalContainer.RegisterInstanceAs(LoadContext);
         RegisterRuntimePluginLoader(globalContainer);
     }
 

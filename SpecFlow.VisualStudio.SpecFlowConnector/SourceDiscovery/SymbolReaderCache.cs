@@ -20,9 +20,6 @@ public class SymbolReaderCache
             return symbolReader;
 
         return CreateSymbolReader(assembly.Location)
-#if NETFRAMEWORK
-            .Or(()=>CreateSymbolReader(new Uri(assembly.CodeBase).LocalPath))
-#endif
             .Or(()=>CreateSymbolReader(new Uri(assembly.Location).LocalPath))
             .Tie(reader => _symbolReaders.Add(assembly, reader));
     }
@@ -50,31 +47,9 @@ public class SymbolReaderCache
         }
         catch (Exception ex)
         {
-            _log.Info(ex.ToString());
+            _log.Error(ex.ToString());
         }
 
         return None<DeveroomSymbolReader>.Value;
     }
-
-    private static bool CreationFailed(Option<DeveroomSymbolReader> reader)
-    {
-        return reader
-            .Map(_ => false)
-            .Reduce(true);
-    }
-
-    private static Option<Exception> CompressWarnings(ImmutableArray<Exception> warnings)
-    {
-        return warnings.Aggregate(
-                (acc, cur) =>
-                {
-                    var exceptions = ImmutableHashSet.CreateBuilder<Exception>();
-                    if (acc is AggregateException ae) exceptions.UnionWith(ae.InnerExceptions);
-
-                    exceptions.Add(cur);
-                    return new AggregateException(exceptions.ToImmutable());
-                })
-            .Map(e => (Option<Exception>)e);
-    }
-
 }

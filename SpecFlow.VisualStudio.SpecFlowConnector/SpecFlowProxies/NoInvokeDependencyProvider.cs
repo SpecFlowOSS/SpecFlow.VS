@@ -1,5 +1,4 @@
-﻿using BoDi;
-using TechTalk.SpecFlow.Bindings;
+﻿using TechTalk.SpecFlow.Bindings;
 using TechTalk.SpecFlow.Infrastructure;
 using TechTalk.SpecFlow.Tracing;
 

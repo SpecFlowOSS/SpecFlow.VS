@@ -1,5 +1,4 @@
-﻿using SpecFlow.VisualStudio.SpecFlowConnector.Models;
-using TechTalk.SpecFlow.Bindings;
+﻿using TechTalk.SpecFlow.Bindings;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 

@@ -17,7 +17,7 @@ public class BindingRegistryFactoryBeforeV300213 : BindingRegistryFactoryBeforeV
     }
 
     protected override IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile) =>
-        new SpecFlow21ConfigurationLoader(configFile, _fileSystem);
+        new SpecFlow21ConfigurationLoader(configFile, FileSystem);
 
     protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext)
     {

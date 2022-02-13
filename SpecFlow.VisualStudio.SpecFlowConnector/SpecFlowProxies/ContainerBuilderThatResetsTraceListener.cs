@@ -1,5 +1,4 @@
-﻿using BoDi;
-using TechTalk.SpecFlow.Infrastructure;
+﻿using TechTalk.SpecFlow.Infrastructure;
 using TechTalk.SpecFlow.Tracing;
 
 namespace SpecFlowConnector.SpecFlowProxies;
