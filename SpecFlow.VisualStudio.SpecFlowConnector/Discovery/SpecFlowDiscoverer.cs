@@ -3,11 +3,13 @@
 public class SpecFlowDiscoverer
 {
     private readonly ILogger _log;
+    private readonly IAnalyticsContainer _analytics;
     private readonly SymbolReaderCache _symbolReaders;
 
-    public SpecFlowDiscoverer(ILogger log)
+    public SpecFlowDiscoverer(ILogger log, IAnalyticsContainer analytics)
     {
         _log = log;
+        _analytics = analytics;
         _symbolReaders = new SymbolReaderCache(log);
     }
 
@@ -28,10 +30,15 @@ public class SpecFlowDiscoverer
             .OrderBy(sd => sd.SourceLocation)
             .ToImmutableArray();
 
+        _analytics.AddAnalyticsProperty("StepDefinitions", stepDefinitions.Length.ToString());
+        _analytics.AddAnalyticsProperty("SourcePaths", sourcePaths.Count.ToString());
+        _analytics.AddAnalyticsProperty("TypeNames", typeNames.Count.ToString());
+
         return new DiscoveryResult(
             stepDefinitions,
             sourcePaths.ToImmutable(),
             typeNames.ToImmutable(),
+            _analytics.ToImmutable(),
             null!
         );
     }

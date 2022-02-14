@@ -28,5 +28,16 @@
   "sourceFiles": {
     "0": "<<targetFolder>>\\StepDefinitions\\ConubiaDonecEgestasQuisqueSteps.cs"
   },
-  "typeNames": {}
+  "typeNames": {},
+  "analyticsProperties": {
+    "Connector": "<connector>",
+    "ImageRuntimeVersion": "v4.0.30319",
+    "SFFile": "TechTalk.SpecFlow.dll",
+    "SFFileVersion": "3.5.5.38082",
+    "SFProductVersion": "3.5.5\u002Bc2944f96aa",
+    "SourcePaths": "1",
+    "StepDefinitions": "3",
+    "TargetFramework": ".NETCoreApp,Version=v6.0",
+    "TypeNames": "0"
+  }
 }

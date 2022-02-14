@@ -273,4 +273,7 @@ public class MonitoringService : IMonitoringService
             {"NotificationId", notification.Id},
             {"URL", notification.LinkUrl}
         };
+
+    public void TransmitEvent(IAnalyticsEvent runtimeEvent) 
+        => _analyticsTransmitter.TransmitEvent(runtimeEvent);
 }

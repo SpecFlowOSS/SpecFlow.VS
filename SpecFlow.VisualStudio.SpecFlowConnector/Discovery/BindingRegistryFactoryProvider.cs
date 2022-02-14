@@ -3,14 +3,16 @@
 public class BindingRegistryFactoryProvider
 {
     private readonly IFileSystem _fileSystem;
+    private readonly IAnalyticsContainer _analytics;
     private readonly ILogger _log;
     private readonly Assembly _testAssembly;
 
-    public BindingRegistryFactoryProvider(ILogger log, Assembly testAssembly, IFileSystem fileSystem)
+    public BindingRegistryFactoryProvider(ILogger log, Assembly testAssembly, IFileSystem fileSystem, IAnalyticsContainer analytics)
     {
         _log = log;
         _testAssembly = testAssembly;
         _fileSystem = fileSystem;
+        _analytics = analytics;
     }
 
     public IBindingRegistryFactory Create()
@@ -38,6 +40,7 @@ public class BindingRegistryFactoryProvider
             Path.Combine(Path.GetDirectoryName(_testAssembly.Location) ?? ".", "TechTalk.SpecFlow.dll");
         if (File.Exists(specFlowAssemblyPath))
             return GetSpecFlowVersion(specFlowAssemblyPath);
+
         foreach (var otherSpecFlowFile in Directory.EnumerateFiles(
                      Path.GetDirectoryName(specFlowAssemblyPath)!, "*SpecFlow*.dll"))
         {
@@ -46,6 +49,7 @@ public class BindingRegistryFactoryProvider
         }
 
         _log.Info($"Not found {specFlowAssemblyPath}");
+        _analytics.AddAnalyticsProperty("SFFile", "Not found");
         return int.MaxValue;
     }
 
@@ -55,7 +59,12 @@ public class BindingRegistryFactoryProvider
         var versionNumber = (specFlowVersion.FileMajorPart * 100 +
                              specFlowVersion.FileMinorPart) * 1000 +
                             specFlowVersion.FileBuildPart;
+
         _log.Info($"Found SpecFlow V{versionNumber} at {specFlowAssemblyPath}");
+        _analytics.AddAnalyticsProperty("SFFile", specFlowVersion.InternalName ?? specFlowVersion.FileName);
+        _analytics.AddAnalyticsProperty("SFFileVersion", specFlowVersion.FileVersion ?? "Unknown");
+        _analytics.AddAnalyticsProperty("SFProductVersion", specFlowVersion.ProductVersion ?? "Unknown");
+
         return versionNumber;
     }
 }

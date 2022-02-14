@@ -11,6 +11,7 @@ global using SpecFlowConnector.Logging;
 global using SpecFlowConnector.SourceDiscovery;
 global using SpecFlowConnector.SpecFlowProxies;
 global using System;
+global using System.Collections;
 global using System.Collections.Concurrent;
 global using System.Collections.Generic;
 global using System.Collections.Immutable;

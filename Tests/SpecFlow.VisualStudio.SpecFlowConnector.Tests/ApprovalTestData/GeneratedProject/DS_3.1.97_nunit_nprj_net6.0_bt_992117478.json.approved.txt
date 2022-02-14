@@ -25,5 +25,16 @@
   "sourceFiles": {
     "0": "<<targetFolder>>\\StepDefinitions\\MassaPlaceratFaucibusRisusSteps.cs"
   },
-  "typeNames": {}
+  "typeNames": {},
+  "analyticsProperties": {
+    "Connector": "<connector>",
+    "ImageRuntimeVersion": "v4.0.30319",
+    "SFFile": "TechTalk.SpecFlow.dll",
+    "SFFileVersion": "3.1.97.53089",
+    "SFProductVersion": "3.1.97\u002B61cf6cfefb",
+    "SourcePaths": "1",
+    "StepDefinitions": "3",
+    "TargetFramework": ".NETCoreApp,Version=v6.0",
+    "TypeNames": "0"
+  }
 }

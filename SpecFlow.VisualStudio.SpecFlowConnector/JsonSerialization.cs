@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SpecFlowConnector;
 
-internal static class JsonSerialization
+public static class JsonSerialization
 {
     private const string StartMarker = ">>>>>>>>>>";
     private const string EndMarker = "<<<<<<<<<<";

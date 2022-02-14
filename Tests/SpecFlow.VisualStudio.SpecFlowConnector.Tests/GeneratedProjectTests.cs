@@ -15,14 +15,13 @@ public class GeneratedProjectTests
 
     [Theory]
     [InlineData("DS_2.3.2_nunit_1194832604")]
-    [InlineData("DS_3.9.40_nunit_nprj_net35_bt_992117478")]
-    [InlineData("DS_3.9.40_nunit_nprj_net452_bt_992117478")]
+    //[InlineData("DS_3.9.40_nunit_nprj_net35_bt_992117478")]
+    //[InlineData("DS_3.9.40_nunit_nprj_net452_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net461_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net472_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_bt_1194832604")]
     [InlineData("DS_3.9.40_nunit_nprj_bt_992117478")]
-#if NET
     [InlineData("DS_3.9.40_nunit_nprj_netcoreapp20_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_netcoreapp21_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_netcoreapp22_bt_992117478")]
@@ -40,7 +39,6 @@ public class GeneratedProjectTests
     [InlineData("DS_3.5.5_nunit_nprj_net6.0_bt_992117478")]
     [InlineData("DS_3.3.30_nunit_nprj_net6.0_bt_992117478")]
     [InlineData("DS_3.1.97_nunit_nprj_net6.0_bt_992117478")]
-#endif
     public void Approval(string testName)
     {
         //arrange
@@ -62,7 +60,8 @@ public class GeneratedProjectTests
 
         var connectorFile = typeof(DiscoveryCommand).Assembly.GetLocation();
 
-        Option<FileDetails> configFile = testData.ConfigFile?.Map(s => FileDetails.FromPath(outputFolder, s)) ?? None<FileDetails>.Value;
+        Option<FileDetails> configFile = testData.ConfigFile?.Map(s => FileDetails.FromPath(outputFolder, s)) ??
+                                         None<FileDetails>.Value;
 
         //act
         var result = Invoke(targetAssemblyFile, projectGenerator, connectorFile, configFile);
@@ -73,6 +72,8 @@ public class GeneratedProjectTests
                 .AppendLine($"stderr:{result.StdError}")
                 .Append($"resultCode:{result.ExitCode}"),
             rawContent => TargetFolderScrubber(rawContent, projectGenerator.TargetFolder)
+                .Map(r => r.Replace(typeof(DiscoveryCommand).Assembly.ToString(), "<connector>"))
+                .Map(r => Regex.Replace(r, "errorMessage\": \".+\"", "errorMessage\": \"<errorMessage>\""))
                 .Map(r => Regex.Replace(r, "(.*\r\n)*>>>>>>>>>>\r\n", ""))
                 .Map(r => Regex.Replace(r, "<<<<<<<<<<(.*[\r\n])*.*", ""))
                 .Map(XunitExtensions.StackTraceScrubber));

@@ -6,13 +6,15 @@ public class CommandFactory
     private readonly ILogger _log;
     private readonly DiscoveryOptions _options;
     private readonly Assembly _testAssembly;
+    private readonly IAnalyticsContainer _analytics;
 
-    public CommandFactory(ILogger log, IFileSystem fileSystem, DiscoveryOptions options, Assembly testAssembly)
+    public CommandFactory(ILogger log, IFileSystem fileSystem, DiscoveryOptions options, Assembly testAssembly, IAnalyticsContainer analytics)
     {
         _log = log;
         _fileSystem = fileSystem;
         _options = options;
         _testAssembly = testAssembly;
+        _analytics = analytics;
     }
 
     public DiscoveryCommand CreateCommand() =>
@@ -31,5 +33,6 @@ public class CommandFactory
             options.ConfigFile?.Map(FileDetails.FromPath) ?? None<FileDetails>.Value,
             _log,
             _fileSystem,
-            _testAssembly);
+            _testAssembly,
+            _analytics);
 }

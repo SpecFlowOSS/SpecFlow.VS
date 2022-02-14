@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using SpecFlow.VisualStudio.Connectors;
-
-namespace SpecFlow.VisualStudio.Discovery;
+﻿namespace SpecFlow.VisualStudio.Discovery;
 
 public interface IDiscoveryResultProvider
 {
@@ -12,10 +8,12 @@ public interface IDiscoveryResultProvider
 public class DiscoveryResultProvider : IDiscoveryResultProvider
 {
     private readonly IProjectScope _projectScope;
+    private readonly IMonitoringService _monitoringService;
 
-    public DiscoveryResultProvider(IProjectScope projectScope)
+    public DiscoveryResultProvider(IProjectScope projectScope, IMonitoringService monitoringService)
     {
         _projectScope = projectScope;
+        _monitoringService = monitoringService;
     }
 
     private IDeveroomLogger Logger => _projectScope.IdeScope.Logger;
@@ -23,9 +21,10 @@ public class DiscoveryResultProvider : IDiscoveryResultProvider
     public DiscoveryResult RunDiscovery(string testAssemblyPath, string configFilePath, ProjectSettings projectSettings)
     {
         OutProcSpecFlowConnector connector = OutProcSpecFlowConnectorFactory.CreateGeneric(_projectScope);
-        var result = RunDiscovery(testAssemblyPath, configFilePath, projectSettings, connector);
+        DiscoveryResult result = RunDiscovery(testAssemblyPath, configFilePath, projectSettings, connector);
 
-        //return result;
+        _monitoringService.TransmitEvent(new DiscoveryResultEvent(result));
+
         if (!result.IsFailed)
             return result;
 

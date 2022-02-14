@@ -1,4 +1,6 @@
-﻿namespace SpecFlowConnector;
+﻿using System.Runtime.Versioning;
+
+namespace SpecFlowConnector;
 
 public class Runner
 {
@@ -14,15 +16,18 @@ public class Runner
     {
         try
         {
+            var analytics = new AnalyticsContainer();
+            analytics.AddAnalyticsProperty("Connector", GetType().Assembly.ToString());
             return args
                 .Map(ConnectorOptions.Parse)
                 .Tie(DumpOptions)
                 .Map(options =>
-                    ReflectionExecutor.Execute((DiscoveryOptions) options, testAssemblyFactory, _log))
+                    ReflectionExecutor.Execute((DiscoveryOptions) options, testAssemblyFactory, _log, analytics))
                 //.Map(result=>result.MapLeft(errorMessage => new Exception(errorMessage)))
                 .Map(result => result.Reduce(errorMessage => new DiscoveryResult(ImmutableArray<StepDefinition>.Empty,
                     ImmutableSortedDictionary<string, string>.Empty,
                     ImmutableSortedDictionary<string, string>.Empty,
+                    analytics,
                     errorMessage)))
                 .Map<Exception, DiscoveryResult, string>(JsonSerialization.SerializeObject)
                 .Map(JsonSerialization.MarkResult)
@@ -54,10 +59,16 @@ public class Runner
 public class ReflectionExecutor
 {
     public static Either<string, DiscoveryResult> Execute(DiscoveryOptions options,
-        Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log)
+        Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log, IAnalyticsContainer analytics)
     {
         _log.Info($"Loading {options.AssemblyFile}");
         var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile, testAssemblyFactory, _log);
+
+        analytics.AddAnalyticsProperty("ImageRuntimeVersion", testAssemblyContext.TestAssembly.ImageRuntimeVersion);
+        testAssemblyContext.TestAssembly.CustomAttributes
+                .Where(a => a.AttributeType == typeof(TargetFrameworkAttribute))
+                .FirstOrNone()
+                .Tie(tf => analytics.AddAnalyticsProperty("TargetFramework", tf.ConstructorArguments.First().ToString().Trim('\"')));
 
         return typeof(ReflectionExecutor)
             .Map(t => (typeName: t.FullName!, assembly: testAssemblyContext.LoadFromAssemblyPath(t.Assembly.Location)))
@@ -65,7 +76,8 @@ public class ReflectionExecutor
             .Map(CreateInstance)
             .Map(instance => instance.ReflectionCallMethod<string>(
                     nameof(Execute),
-                    JsonSerialization.SerializeObject(options), testAssemblyContext.TestAssembly, testAssemblyContext)
+                    JsonSerialization.SerializeObject(options), testAssemblyContext.TestAssembly, testAssemblyContext,
+                    analytics)
                 .Map(s => JsonSerialization.DeserializeObject<RunnerResult>(s)
                     .Reduce(new RunnerResult(null!, $"Unable to deserialize{s}")))
                 .Map(result =>
@@ -81,15 +93,21 @@ public class ReflectionExecutor
         Activator.CreateInstance(reflectedType) ?? reflectedType;
 
     public string Execute(string optionsJson, Assembly testAssembly,
-        AssemblyLoadContext assemblyLoadContext)
+        AssemblyLoadContext assemblyLoadContext, IDictionary<string, string> analyticsProperties)
     {
+        var analytics = new AnalyticsContainer(analyticsProperties);
         var log = new StringWriterLogger();
         return JsonSerialization.DeserializeObject<DiscoveryOptions>(optionsJson)
-            .Map(options => Execute(log, options, testAssembly, assemblyLoadContext)
+            .Map(options => Execute(log, options, testAssembly, assemblyLoadContext, analytics)
                 .Reduce(ex =>
                 {
-                    log.Error(ex.ToString());
-                    return null!;
+                    var errorMessage = ex.ToString();
+                    log.Error(errorMessage);
+                    return new DiscoveryResult(ImmutableArray<StepDefinition>.Empty,
+                        ImmutableSortedDictionary<string, string>.Empty,
+                        ImmutableSortedDictionary<string, string>.Empty,
+                        analytics,
+                        errorMessage);
                 })
                 .Map(dr => new RunnerResult(dr, log.ToString()))
                 .Map(JsonSerialization.SerializeObject)
@@ -98,11 +116,11 @@ public class ReflectionExecutor
     }
 
     private Either<Exception, DiscoveryResult> Execute(ILogger log, DiscoveryOptions options, Assembly testAssembly,
-        AssemblyLoadContext assemblyLoadContext)
+        AssemblyLoadContext assemblyLoadContext, IAnalyticsContainer analytics)
     {
         try
         {
-            return new CommandFactory(log, new FileSystem(), options, testAssembly)
+            return new CommandFactory(log, new FileSystem(), options, testAssembly, analytics)
                 .Map(factory => factory.CreateCommand())
                 .Map(cmd => cmd.Execute(assemblyLoadContext));
         }
