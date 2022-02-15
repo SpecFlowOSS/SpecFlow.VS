@@ -19,20 +19,22 @@ public class DeveroomSteps : Steps
     {
         _outputHelper = outputHelper;
         _stubIdeScope = stubIdeScope;
+
         _stubIdeScope.Setup(s =>
                 s.FireAndForgetOnBackgroundThread(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<string>()))
-            //.Callback((Func<CancellationToken, Task> action, string _) => action(_stubIdeScope.BackgroundTaskTokenSource.Token));
-            .Callback(async (Func<CancellationToken, Task> action, string _) =>
+            .Callback(FireAndForgetCallBack);
+
+        async void FireAndForgetCallBack(Func<CancellationToken, Task> action, string _)
+        {
+            try
             {
-                try
-                {
-                    await action(_stubIdeScope.BackgroundTaskTokenSource.Token);
-                }
-                catch (Exception ex)
-                {
-                    outputHelper.WriteLine(ex.ToString());
-                }
-            });
+                await action(_stubIdeScope.BackgroundTaskTokenSource.Token);
+            }
+            catch (Exception ex)
+            {
+                outputHelper.WriteLine(ex.ToString());
+            }
+        }
     }
 
     private IProjectGenerator ProjectGenerator
