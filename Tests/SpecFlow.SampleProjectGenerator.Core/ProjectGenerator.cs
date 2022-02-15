@@ -206,10 +206,13 @@ public abstract class ProjectGenerator : IProjectGenerator
 
     private bool GitReset()
     {
+        ExecGit("status");
+        ExecGit("log");
         var exitCode = ExecGit("reset", "--hard");
         ExecGit("clean", "-fdx", "-e", "packages");
         ExecGit("status");
-        //if (exitCode != 0)
+        ExecGit("log");
+        if (exitCode != 0)
             _consoleWriteLine($"Git status exit code: {exitCode}");
         return exitCode == 0;
     }
@@ -222,8 +225,12 @@ public abstract class ProjectGenerator : IProjectGenerator
 
     private void GitCommitAll()
     {
+        ExecGit("status");
+        ExecGit("log");
         ExecGit("add", ".");
         ExecGit("commit", "-q", "-m", "init");
+        ExecGit("status");
+        ExecGit("log");
     }
 
     private void InstallNUnit(string packagesFolder, string projectFilePath)
