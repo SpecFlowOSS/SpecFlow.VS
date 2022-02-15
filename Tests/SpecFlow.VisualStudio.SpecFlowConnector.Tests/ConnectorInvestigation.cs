@@ -2,24 +2,21 @@
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("ApprovalTestData")]
-public class RunnerTests : ApprovalTestBase
+public class ConnectorInvestigation : ApprovalTestBase
 {
-    public static IEnumerable<LabeledTestData<(string[] args, string expected)>> TestCases =
-        new LabeledTestData<(string[] args, string expected)>[]
-        {
-            new("discovery assembly", (new[] {"discovery", "targetAssembly.dll"}, "?")),
-            new("discovery assembly with configuration",
-                (new[] {"discovery", "targetAssembly.dll", "configuration.json"}, "?"))
-        };
-
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public RunnerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    public ConnectorInvestigation(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
-        _testOutputHelper = testOutputHelper;
     }
-
-    [Theory]
+    /*
+    This is not a real test, but allows us to investigate connector related issues. 
+    Usage: 
+        1 - create a json file in "<local repo>\SpecFlow.VS\Tests\SpecFlow.VisualStudio.SpecFlowConnector.Tests\ApprovalTestData\ConnectorInvestigation\" folder
+        2 - add the file name as inline data
+        3 - uncomment the Theory attribute to let te xUnit discover
+        4 - run or debug the test
+    There is a sample "SpecFlow.VisualStudio.Specs.json" file in the folder which points to the solution's tests
+    */
+    //[Theory]
     [InlineData("SpecFlow.VisualStudio.Specs")]
     public void Approval(string testName)
     {
