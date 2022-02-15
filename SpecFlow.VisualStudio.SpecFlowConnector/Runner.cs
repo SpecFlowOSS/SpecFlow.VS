@@ -11,8 +11,7 @@ public class Runner
         _log = log;
     }
 
-    public int Run(string[] args, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory,
-        IFileSystem fileSystem)
+    public int Run(string[] args, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory)
     {
         try
         {
@@ -122,7 +121,7 @@ public class ReflectionExecutor
     {
         try
         {
-            return new CommandFactory(log, new FileSystem(), options, testAssembly, analytics)
+            return new CommandFactory(log, options, testAssembly, analytics)
                 .Map(factory => factory.CreateCommand())
                 .Map(cmd => cmd.Execute(assemblyLoadContext));
         }

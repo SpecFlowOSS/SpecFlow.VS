@@ -7,18 +7,11 @@ namespace SpecFlowConnector.SpecFlowProxies;
 
 public class BindingRegistryFactoryVLatest : BindingRegistryFactory
 {
-    protected readonly IFileSystem FileSystem;
-
-    public BindingRegistryFactoryVLatest(IFileSystem fileSystem)
-    {
-        FileSystem = fileSystem;
-    }
-
     protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
         new SpecFlowDependencyProviderVLatest(assemblyLoadContext);
 
     protected override IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile) =>
-        new SpecFlowConfigurationLoader(configFile, FileSystem);
+        new SpecFlowConfigurationLoader(configFile);
 
     protected override IRuntimeConfigurationProvider
         CreateConfigurationProvider(IConfigurationLoader configurationLoader) =>

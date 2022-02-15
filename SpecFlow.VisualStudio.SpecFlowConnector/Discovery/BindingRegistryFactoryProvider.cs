@@ -3,19 +3,16 @@
 public class BindingRegistryFactoryProvider
 {
     private readonly IAnalyticsContainer _analytics;
-    private readonly IFileSystem _fileSystem;
     private readonly ILogger _log;
     private readonly Assembly _testAssembly;
 
     public BindingRegistryFactoryProvider(
         ILogger log,
         Assembly testAssembly,
-        IFileSystem fileSystem,
         IAnalyticsContainer analytics)
     {
         _log = log;
         _testAssembly = testAssembly;
-        _fileSystem = fileSystem;
         _analytics = analytics;
     }
 
@@ -31,10 +28,10 @@ public class BindingRegistryFactoryProvider
     {
         return versionNumber switch
         {
-            >= 3_09_022 => new BindingRegistryFactoryVLatest(_fileSystem),
-            >= 3_07_013 => new BindingRegistryFactoryBeforeV309022(_fileSystem),
-            >= 3_00_213 => new BindingRegistryFactoryBeforeV307013(_fileSystem),
-            _ => new BindingRegistryFactoryBeforeV300213(_fileSystem)
+            >= 3_09_022 => new BindingRegistryFactoryVLatest(),
+            >= 3_07_013 => new BindingRegistryFactoryBeforeV309022(),
+            >= 3_00_213 => new BindingRegistryFactoryBeforeV307013(),
+            _ => new BindingRegistryFactoryBeforeV300213()
         };
     }
 

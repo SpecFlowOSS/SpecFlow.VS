@@ -63,8 +63,7 @@ public class ApprovalTestBase
         var mockFileSystem = new FileSystem();
         var resultCode = consoleRunner.Run(
             psiEx.Arguments.Split(' '),
-            (ctx, path) => testAssembly ??= ctx.LoadFromAssemblyPath(path),
-            mockFileSystem);
+            (ctx, path) => testAssembly ??= ctx.LoadFromAssemblyPath(path));
         var result = new ProcessResult(resultCode, logger[LogLevel.Info], logger[LogLevel.Error], TimeSpan.Zero);
         return result;
     }

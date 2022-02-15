@@ -9,12 +9,8 @@ public class BindingRegistryFactoryBeforeV300213 : BindingRegistryFactoryBeforeV
 {
     private IDefaultDependencyProvider _defaultDependencyProvider = null!;
 
-    public BindingRegistryFactoryBeforeV300213(IFileSystem fileSystem) : base(fileSystem)
-    {
-    }
-
     protected override IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile) =>
-        new SpecFlow21ConfigurationLoader(configFile, FileSystem);
+        new SpecFlow21ConfigurationLoader(configFile);
 
     protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext)
     {
