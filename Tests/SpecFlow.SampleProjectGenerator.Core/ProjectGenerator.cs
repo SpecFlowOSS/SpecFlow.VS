@@ -1,6 +1,7 @@
 ﻿#nullable disable
 
 using System.Diagnostics;
+using SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
 
 namespace SpecFlow.SampleProjectGenerator;
 
@@ -430,6 +431,12 @@ public abstract class ProjectGenerator : IProjectGenerator
     {
         var arguments = string.Join(" ", args);
         _consoleWriteLine($"{tool} {arguments}");
+
+        var psi = new ProcessStartInfoEx(workingDirectory, tool, arguments);
+        var ph = new ProcessHelper();
+        ProcessResult result = ph.RunProcess(psi, _consoleWriteLine);
+        return result.ExitCode;
+
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
