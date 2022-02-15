@@ -109,6 +109,61 @@ steps:
     projects: '**/*[Ss]pecs/*.csproj'
     arguments: '--configuration $(BuildConfiguration) --runtime win-x64'
     testRunTitle: 'Deveroom Specs'
-    publishTestResults: true
   condition: succeededOrFailed()
 
+- task: CopyFiles@2
+  displayName: 'Copy dlls and changelog'
+  inputs:
+    SourceFolder: '$(system.defaultworkingdirectory)'
+    Contents: |
+     **\bin\$(buildConfiguration)\**
+     Changelog.md
+    TargetFolder: '$(build.artifactstagingdirectory)\drop'
+  condition: succeededOrFailed()
+
+- task: CopyFiles@2
+  displayName: 'Copy marketplace scripts'
+  inputs:
+    SourceFolder: '$(system.defaultworkingdirectory)'
+    Contents: |
+     publish*.ps1
+     .marketplace\**
+    TargetFolder: '$(build.artifactstagingdirectory)\marketplace'
+  condition: succeededOrFailed()
+
+- task: CopyFiles@2
+  displayName: 'Copy NuGet folder'
+  inputs:
+    SourceFolder: 'd:\a\1\Nuget'
+    Contents: '**'
+    TargetFolder: '$(build.artifactstagingdirectory)\drop\NuGet'
+  condition: succeededOrFailed()
+
+- task: CopyFiles@2
+  displayName: 'Copy VSIX'
+  inputs:
+    SourceFolder: '$(system.defaultworkingdirectory)'
+    Contents: '**\bin\$(buildConfiguration)\**\*.vsix'
+    TargetFolder: '$(build.artifactstagingdirectory)\vsix'
+    flattenFolders: true
+  condition: succeededOrFailed()
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)\drop'
+  condition: succeededOrFailed()
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: marketplace'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)\marketplace'
+    ArtifactName: marketplace
+  condition: succeededOrFailed()
+ 
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: vsix'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)\vsix'
+    ArtifactName: vsix
+  condition: succeededOrFailed()
