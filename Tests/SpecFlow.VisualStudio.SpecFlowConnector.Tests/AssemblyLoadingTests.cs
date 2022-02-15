@@ -21,7 +21,22 @@ public class AssemblyLoadingTests
         Directory
             .EnumerateFiles(path, searchPattern, SearchOption.AllDirectories)
             .Select(Path.GetFullPath)
-            .Select(Assembly.LoadFrom);
+            .Select(TryLoad)
+            .Where(a => a is Some<Assembly>)
+            .SelectOptional(a => a);
+
+    private static Option<Assembly> TryLoad(string path)
+    {
+
+        try
+        {
+            return Assembly.LoadFrom(path);
+        }
+        catch (Exception)
+        {
+            return None.Value;
+        }
+    }
 
     [Fact]
     public void Load_Assemblies()
@@ -34,16 +49,12 @@ public class AssemblyLoadingTests
                 log))
             .ToList();
 
-        var a = loadContexts[0].LoadFromAssemblyName(new AssemblyName("Microsoft.AspNetCore.Antiforgery")
-            {Version = new Version(6, 0)});
-
         var loadedAssemblies = loadContexts
             .SelectMany(lc => _assemblies.Select(a => lc.LoadFromAssemblyName(a.GetName())))
             .ToList();
 
-
         //assert
-        loadedAssemblies.Should().HaveCountGreaterThan(0);
+        loadedAssemblies.Should().HaveCountGreaterThan(1);
         loadContexts.Select(lc => lc.TestAssembly.Location).Should()
             .BeEquivalentTo(_assemblies.Select(a => a.Location), "same dlls are loaded");
         loadContexts.Select(lc => lc.TestAssembly).Should()
