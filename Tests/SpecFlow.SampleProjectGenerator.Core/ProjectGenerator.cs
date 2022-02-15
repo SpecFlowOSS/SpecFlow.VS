@@ -209,7 +209,7 @@ public abstract class ProjectGenerator : IProjectGenerator
         var exitCode = ExecGit("reset", "--hard");
         ExecGit("clean", "-fdx", "-e", "packages");
         ExecGit("status");
-        if (exitCode != 0)
+        //if (exitCode != 0)
             _consoleWriteLine($"Git status exit code: {exitCode}");
         return exitCode == 0;
     }
@@ -439,11 +439,15 @@ public abstract class ProjectGenerator : IProjectGenerator
                 Arguments = arguments,
                 CreateNoWindow = true,
                 UseShellExecute = false,
-                RedirectStandardError = true
+                RedirectStandardError = true,
+                RedirectStandardOutput = true
             }
         };
         process.Start();
         var output = process.StandardError.ReadToEnd();
+        if (!string.IsNullOrWhiteSpace(output))
+            _consoleWriteLine(output);
+        output = process.StandardOutput.ReadToEnd();
         if (!string.IsNullOrWhiteSpace(output))
             _consoleWriteLine(output);
         process.WaitForExit();
