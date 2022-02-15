@@ -5,7 +5,7 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 public class AssemblyLoadingTests
 {
     private readonly List<Assembly> _assemblies =
-        AssembliesInDir("..\\..\\..\\..\\SpecFlow.VisualStudio.Specs\\bin\\Debug\\net472", "Spec*.dll")
+        AssembliesInDir("..\\..\\..\\..\\SpecFlow.VisualStudio.Specs\\bin\\Debug", "Spec*.dll")
             .Union(AssembliesInDir(".", "Spec*.dll"))
             .Union(new[] {typeof(AssemblyLoadingTests).Assembly})
             .ToList();
@@ -18,10 +18,12 @@ public class AssemblyLoadingTests
     }
 
     private static IEnumerable<Assembly> AssembliesInDir(string path, string searchPattern) =>
-        Directory
-            .EnumerateFiles(path, searchPattern)
-            .Select(Path.GetFullPath)
-            .Select(Assembly.LoadFrom);
+        true//Directory.Exists(path)
+            ? Directory
+                .EnumerateFiles(path, searchPattern, SearchOption.AllDirectories)
+                .Select(s => Path.GetFullPath(s))
+                .Select(Assembly.LoadFrom)
+            : Array.Empty<Assembly>();
 
     [Fact]
     public void Load_Assemblies()

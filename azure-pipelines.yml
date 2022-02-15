@@ -52,16 +52,6 @@ steps:
   inputs:
     command: 'custom'
     arguments: 'install .\Tests\SpecFlowPackages\Packages.config'
-
-- ${{each thing in parameters.thingsArray}}:
-  - task: DotNetCoreCLI@2
-    displayName: Run Unit Tests ${{thing}}
-    inputs:
-      command: test
-      projects: '**/SpecFlow.VisualStudio.Tests/*.csproj'
-      arguments: '--configuration $(BuildConfiguration) --no-build'
-      testRunTitle: Unit Tests ${{thing}}
-    condition: succeededOrFailed()
     
 - ${{each thing in parameters.thingsArray}}:
   - task: DotNetCoreCLI@2
@@ -71,6 +61,16 @@ steps:
       projects: '**/SpecFlow.VisualStudio.SpecFlowConnector.Tests/*.csproj'
       arguments: '--configuration $(BuildConfiguration) --no-build'
       testRunTitle: Connector Tests ${{thing}}
+    condition: succeededOrFailed()
+
+- ${{each thing in parameters.thingsArray}}:
+  - task: DotNetCoreCLI@2
+    displayName: Run Unit Tests ${{thing}}
+    inputs:
+      command: test
+      projects: '**/SpecFlow.VisualStudio.Tests/*.csproj'
+      arguments: '--configuration $(BuildConfiguration) --no-build'
+      testRunTitle: Unit Tests ${{thing}}
     condition: succeededOrFailed()
     
 # - ${{each thing in parameters.thingsArray}}:

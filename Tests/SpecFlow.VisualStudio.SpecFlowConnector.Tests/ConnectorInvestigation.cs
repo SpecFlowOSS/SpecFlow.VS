@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿#pragma warning disable xUnit1008
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("ApprovalTestData")]

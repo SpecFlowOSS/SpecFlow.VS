@@ -43,7 +43,9 @@ public class GeneratedProjectTests : ApprovalTestBase
         var testData = ArrangeTestData<GeneratedProjectTestsData>(testName);
 
         testData.GeneratorOptions.IsBuilt = true;
+        testData.GeneratorOptions._TargetFolder = Path.Combine(TempFolder, @"DeveroomTest\DS_{options}");
         var projectGenerator = testData.GeneratorOptions.CreateProjectGenerator(s => _testOutputHelper.WriteLine(s));
+        
         projectGenerator.Generate();
 
         //act
@@ -52,6 +54,15 @@ public class GeneratedProjectTests : ApprovalTestBase
 
         //assert
         Assert(result, projectGenerator.TargetFolder);
+    }
+
+    public static string TempFolder
+    {
+        get
+        {
+            var configuredFolder = Environment.GetEnvironmentVariable("SPECFLOW_TEST_TEMP");
+            return configuredFolder ?? Path.GetTempPath();
+        }
     }
 
     private record GeneratedProjectTestsData(string? ConfigFile, GeneratorOptions GeneratorOptions);
