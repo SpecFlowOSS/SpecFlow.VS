@@ -2,8 +2,8 @@
 
 public record DiscoveryResultEvent : GenericEvent
 {
-    public DiscoveryResultEvent(ConnectorResult discoveryResult) : base("DiscoveryResult", discoveryResult.AnalyticsProperties)
+    public DiscoveryResultEvent(ConnectorResult discoveryResult) : base("DiscoveryResult",
+        discoveryResult.AnalyticsProperties)
     {
-
     }
 }

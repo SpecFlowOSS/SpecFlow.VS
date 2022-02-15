@@ -66,9 +66,11 @@ public class ReflectionExecutor
 
         analytics.AddAnalyticsProperty("ImageRuntimeVersion", testAssemblyContext.TestAssembly.ImageRuntimeVersion);
         testAssemblyContext.TestAssembly.CustomAttributes
-                .Where(a => a.AttributeType == typeof(TargetFrameworkAttribute))
-                .FirstOrNone()
-                .Tie(tf => analytics.AddAnalyticsProperty("TargetFramework", tf.ConstructorArguments.First().ToString().Trim('\"')));
+            .Where(a => a.AttributeType == typeof(TargetFrameworkAttribute))
+            .FirstOrNone()
+            .Tie(tf => analytics
+                .AddAnalyticsProperty("TargetFramework", tf.ConstructorArguments.First().ToString().Trim('\"'))
+            );
 
         return typeof(ReflectionExecutor)
             .Map(t => (typeName: t.FullName!, assembly: testAssemblyContext.LoadFromAssemblyPath(t.Assembly.Location)))

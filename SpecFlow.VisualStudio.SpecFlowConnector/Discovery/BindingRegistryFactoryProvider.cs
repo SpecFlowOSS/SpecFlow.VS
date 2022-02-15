@@ -2,12 +2,16 @@
 
 public class BindingRegistryFactoryProvider
 {
-    private readonly IFileSystem _fileSystem;
     private readonly IAnalyticsContainer _analytics;
+    private readonly IFileSystem _fileSystem;
     private readonly ILogger _log;
     private readonly Assembly _testAssembly;
 
-    public BindingRegistryFactoryProvider(ILogger log, Assembly testAssembly, IFileSystem fileSystem, IAnalyticsContainer analytics)
+    public BindingRegistryFactoryProvider(
+        ILogger log,
+        Assembly testAssembly,
+        IFileSystem fileSystem,
+        IAnalyticsContainer analytics)
     {
         _log = log;
         _testAssembly = testAssembly;

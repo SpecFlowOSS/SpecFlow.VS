@@ -180,7 +180,7 @@ public class DeveroomTagParser : IDeveroomTagParser
                     match));
                 if (!(scenarioDefinition is ScenarioOutline) || !step.Text.Contains("<"))
                 {
-                        var parameterMatch = match.Items.First(m => m.ParameterMatch != null).ParameterMatch;
+                    var parameterMatch = match.Items.First(m => m.ParameterMatch != null).ParameterMatch;
                     AddParameterTags(fileSnapshot, parameterMatch, stepTag, step);
                 }
             }

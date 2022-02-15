@@ -24,7 +24,7 @@ public class TestConsoleLogger : Logger<TextWriter>
 
     public override string ToString() => new StringBuilder()
         .AppendLines(_builders
-            .OrderByDescending(b=>b.Key)
+            .OrderByDescending(b => b.Key)
             .Select(builder => $"{builder.Key} {builder.Value}"))
         .ToString();
 }

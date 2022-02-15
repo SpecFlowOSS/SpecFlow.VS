@@ -11,5 +11,6 @@ public class LoadContextPluginLoaderVLatest : RuntimePluginLoaderPatch
         _loadContext = loadContext;
     }
 
-    protected override Assembly LoadAssembly(string pluginAssemblyName) => _loadContext.LoadFromAssemblyPath(pluginAssemblyName);
+    protected override Assembly LoadAssembly(string pluginAssemblyName) =>
+        _loadContext.LoadFromAssemblyPath(pluginAssemblyName);
 }

@@ -2,8 +2,8 @@
 
 public class RuntimeCompositeCompilationAssemblyResolver : ICompilationAssemblyResolver
 {
-    private readonly ICompilationAssemblyResolver[] _resolvers;
     private readonly ILogger _log;
+    private readonly ICompilationAssemblyResolver[] _resolvers;
 
     public RuntimeCompositeCompilationAssemblyResolver(ICompilationAssemblyResolver[] resolvers, ILogger log)
     {

@@ -4,13 +4,13 @@ namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 public class AssemblyLoadingTests
 {
-    private ITestOutputHelper _testOutputHelper;
-
     private readonly List<Assembly> _assemblies =
         AssembliesInDir("..\\..\\..\\..\\SpecFlow.VisualStudio.Specs\\bin\\Debug\\net472", "Spec*.dll")
             .Union(AssembliesInDir(".", "Spec*.dll"))
             .Union(new[] {typeof(AssemblyLoadingTests).Assembly})
             .ToList();
+
+    private readonly ITestOutputHelper _testOutputHelper;
 
     public AssemblyLoadingTests(ITestOutputHelper testOutputHelper)
     {
@@ -34,7 +34,8 @@ public class AssemblyLoadingTests
                 log))
             .ToList();
 
-        var a = loadContexts[0].LoadFromAssemblyName(new AssemblyName( "Microsoft.AspNetCore.Antiforgery"){Version = new Version(6,0)});
+        var a = loadContexts[0].LoadFromAssemblyName(new AssemblyName("Microsoft.AspNetCore.Antiforgery")
+            {Version = new Version(6, 0)});
 
         var loadedAssemblies = loadContexts
             .SelectMany(lc => _assemblies.Select(a => lc.LoadFromAssemblyName(a.GetName())))
@@ -61,7 +62,8 @@ public class AssemblyLoadingTests
             log);
 
         //act
-        var loadedAssembly = loadContext.LoadFromAssemblyName(new AssemblyName("Microsoft.AspNetCore.Antiforgery") { Version = new Version(6, 0) });
+        var loadedAssembly = loadContext.LoadFromAssemblyName(new AssemblyName("Microsoft.AspNetCore.Antiforgery")
+            {Version = new Version(6, 0)});
 
         //assert
         loadedAssembly.GetName().Name.Should().Be("Microsoft.AspNetCore.Antiforgery");

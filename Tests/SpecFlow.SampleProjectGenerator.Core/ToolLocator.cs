@@ -40,10 +40,11 @@ public static class ToolLocator
         if (currentAssemblyFolder != null)
             yield return Path.Combine(currentAssemblyFolder, $"Tools-{tool}");
 
-        var currentAssemblyLocation = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
+        var currentAssemblyLocation =
+            Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
         if (currentAssemblyLocation != null)
             yield return Path.Combine(currentAssemblyFolder, $"Tools-{tool}");
-        
+
         var path = Environment.GetEnvironmentVariable("PATH");
         if (path != null)
             foreach (var pathElement in path.Split(';').Where(p => !string.IsNullOrWhiteSpace(p)).Select(p => p.Trim()))

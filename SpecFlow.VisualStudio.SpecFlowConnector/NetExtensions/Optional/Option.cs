@@ -2,10 +2,10 @@
 
 public abstract class Option<T>
 {
-    public static implicit operator Option<T>(T? value) => 
+    public static implicit operator Option<T>(T? value) =>
         value is null
-        ? new None<T>() 
-        : new Some<T>(value);
+            ? new None<T>()
+            : new Some<T>(value);
 
     public static implicit operator Option<T>(None _) => new None<T>();
 

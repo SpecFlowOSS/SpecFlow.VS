@@ -1,7 +1,8 @@
 ﻿// ReSharper disable once CheckNamespace
+
 namespace ApprovalTests.Namers;
 
-class ShortenedUnitTestFrameworkNamer : UnitTestFrameworkNamer
+internal class ShortenedUnitTestFrameworkNamer : UnitTestFrameworkNamer
 {
     public override string Name => base.Name.Replace(stackTraceParser.ApprovalName + ".", "");
 

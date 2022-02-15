@@ -238,6 +238,9 @@ public class MonitoringService : IMonitoringService
             additionalProps));
     }
 
+    public void TransmitEvent(IAnalyticsEvent runtimeEvent)
+        => _analyticsTransmitter.TransmitEvent(runtimeEvent);
+
 
     private ImmutableDictionary<string, object> GetProjectSettingsProps(ProjectSettings settings)
     {
@@ -273,7 +276,4 @@ public class MonitoringService : IMonitoringService
             {"NotificationId", notification.Id},
             {"URL", notification.LinkUrl}
         };
-
-    public void TransmitEvent(IAnalyticsEvent runtimeEvent) 
-        => _analyticsTransmitter.TransmitEvent(runtimeEvent);
 }

@@ -7,8 +7,8 @@ public interface IDiscoveryResultProvider
 
 public class DiscoveryResultProvider : IDiscoveryResultProvider
 {
-    private readonly IProjectScope _projectScope;
     private readonly IMonitoringService _monitoringService;
+    private readonly IProjectScope _projectScope;
 
     public DiscoveryResultProvider(IProjectScope projectScope, IMonitoringService monitoringService)
     {

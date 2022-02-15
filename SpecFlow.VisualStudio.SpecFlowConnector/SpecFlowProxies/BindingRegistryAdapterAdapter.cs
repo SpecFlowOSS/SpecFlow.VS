@@ -21,6 +21,5 @@ public class BindingRegistryAdapterAdapter
             .Select(Adapt);
     }
 
-    protected StepDefinitionBindingAdapter Adapt(IStepDefinitionBinding sd) 
-        => new StepDefinitionBindingAdapter(sd);
+    protected StepDefinitionBindingAdapter Adapt(IStepDefinitionBinding sd) => new(sd);
 }

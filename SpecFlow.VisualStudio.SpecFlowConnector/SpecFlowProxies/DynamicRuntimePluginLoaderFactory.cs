@@ -1,6 +1,4 @@
-﻿using System.Reflection.Emit;
-using SpecFlowConnector.Discovery;
-using TechTalk.SpecFlow.Plugins;
+﻿using TechTalk.SpecFlow.Plugins;
 using TechTalk.SpecFlow.Tracing;
 
 namespace SpecFlowConnector.SpecFlowProxies;
@@ -85,7 +83,8 @@ public class DynamicRuntimePluginLoaderFactory
         methodIl.EmitCall(OpCodes.Call, baseMethod, null);
         methodIl.Emit(OpCodes.Ret);
 
-        MethodInfo loadPluginMethodInfo = interfaceType.GetMethod(nameof(IRuntimePluginLoaderBeforeV309022.LoadPlugin))!;
+        MethodInfo loadPluginMethodInfo =
+            interfaceType.GetMethod(nameof(IRuntimePluginLoaderBeforeV309022.LoadPlugin))!;
         typeBuilder.DefineMethodOverride(methodBuilder, loadPluginMethodInfo);
     }
 }

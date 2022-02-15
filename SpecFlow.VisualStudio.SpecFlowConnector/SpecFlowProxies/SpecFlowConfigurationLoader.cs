@@ -18,7 +18,7 @@ public class SpecFlowConfigurationLoader : IConfigurationLoader
 
     public SpecFlowConfiguration Load(SpecFlowConfiguration? specFlowConfiguration)
     {
-       return _configFile.Map(configFile =>
+        return _configFile.Map(configFile =>
         {
             var extension = configFile.Extension.ToLowerInvariant();
             var configFileContent = _fileSystem.File.ReadAllText(configFile);
@@ -45,7 +45,7 @@ public class SpecFlowConfigurationLoader : IConfigurationLoader
                 }
                 default: throw new ConfigurationErrorsException($"Invalid config type: {_configFile}");
             }
-        }).Reduce(()=> LoadDefaultConfiguration(specFlowConfiguration));
+        }).Reduce(() => LoadDefaultConfiguration(specFlowConfiguration));
     }
 
     public void TraceConfigSource(ITraceListener traceListener, SpecFlowConfiguration specFlowConfiguration)

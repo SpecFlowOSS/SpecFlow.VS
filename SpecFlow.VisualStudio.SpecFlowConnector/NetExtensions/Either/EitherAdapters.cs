@@ -12,7 +12,7 @@ public static class EitherAdapters
         Func<TLeft, TNewLeft> map) =>
         either is Left<TLeft, TRight> left
             ? map(left)
-            : (TLeft)(Left<TLeft, TRight>)either;
+            : (TLeft) (Left<TLeft, TRight>) either;
 
     public static Either<TLeft, TNewRight> Map<TLeft, TRight, TNewRight>(this Either<TLeft, TRight> either,
         Func<TRight, Either<TLeft, TNewRight>> map) =>

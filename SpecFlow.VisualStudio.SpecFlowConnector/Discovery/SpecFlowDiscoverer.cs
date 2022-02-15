@@ -2,8 +2,8 @@
 
 public class SpecFlowDiscoverer
 {
-    private readonly ILogger _log;
     private readonly IAnalyticsContainer _analytics;
+    private readonly ILogger _log;
     private readonly SymbolReaderCache _symbolReaders;
 
     public SpecFlowDiscoverer(ILogger log, IAnalyticsContainer analytics)

@@ -4,12 +4,15 @@ namespace SpecFlowConnector.AssemblyLoading;
 
 public class TestAssemblyLoadContext : AssemblyLoadContext
 {
-    private readonly ILogger _log;
     private readonly ICompilationAssemblyResolver _assemblyResolver;
     private readonly DependencyContext _dependencyContext;
+    private readonly ILogger _log;
     private readonly string[] _rids;
 
-    public TestAssemblyLoadContext(string path, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger log)
+    public TestAssemblyLoadContext(
+        string path,
+        Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory,
+        ILogger log)
         : base(path)
     {
         _log = log;
@@ -92,7 +95,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
             })
             .Or(() =>
             {
-               return GetFallbackCompilationLibrary(assemblyName)
+                return GetFallbackCompilationLibrary(assemblyName)
                     .Map(LoadFromAssembly)
                     .Tie(lib => _log.Info($"Found fallback library:{lib}"));
             })
@@ -115,7 +118,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
             .SelectOptional(filtered =>
             {
                 var (runtimeLibrary, foundAssets) = filtered;
-                return (Option < CompilationLibrary >) new CompilationLibrary(
+                return (Option<CompilationLibrary>) new CompilationLibrary(
                     runtimeLibrary.Type,
                     runtimeLibrary.Name,
                     runtimeLibrary.Version,

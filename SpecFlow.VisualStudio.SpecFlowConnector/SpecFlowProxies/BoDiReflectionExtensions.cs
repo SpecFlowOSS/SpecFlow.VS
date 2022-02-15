@@ -1,6 +1,4 @@
-﻿using BoDi;
-
-namespace SpecFlowConnector.SpecFlowProxies;
+﻿namespace SpecFlowConnector.SpecFlowProxies;
 
 public static class BoDiReflectionExtensions
 {

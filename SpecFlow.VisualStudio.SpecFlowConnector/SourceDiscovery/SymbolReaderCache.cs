@@ -14,13 +14,13 @@ public class SymbolReaderCache
 
     public Option<DeveroomSymbolReader> this[Assembly assembly] => GetOrCreateSymbolReader(assembly);
 
-    private Option<DeveroomSymbolReader> GetOrCreateSymbolReader(Assembly assembly) 
+    private Option<DeveroomSymbolReader> GetOrCreateSymbolReader(Assembly assembly)
     {
         if (_symbolReaders.TryGetValue(assembly, out var symbolReader))
             return symbolReader;
 
         return CreateSymbolReader(assembly.Location)
-            .Or(()=>CreateSymbolReader(new Uri(assembly.Location).LocalPath))
+            .Or(() => CreateSymbolReader(new Uri(assembly.Location).LocalPath))
             .Tie(reader => _symbolReaders.Add(assembly, reader));
     }
 
@@ -34,7 +34,7 @@ public class SymbolReaderCache
     {
         return new Func<DeveroomSymbolReader>[]
         {
-            () => DnLibDeveroomSymbolReader.Create(_log,path)
+            () => DnLibDeveroomSymbolReader.Create(_log, path)
             //path => new ComDeveroomSymbolReader(path),
         };
     }

@@ -1,6 +1,6 @@
 ﻿namespace SpecFlowConnector.Logging;
 
-public abstract class Logger<T> : ILogger where T:TextWriter
+public abstract class Logger<T> : ILogger where T : TextWriter
 {
     public void Log(Log log)
     {

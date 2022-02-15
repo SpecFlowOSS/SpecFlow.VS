@@ -4,7 +4,8 @@ namespace SpecFlowConnector.SpecFlowProxies;
 
 public class SpecFlow21ConfigurationLoader : SpecFlowConfigurationLoader
 {
-    public SpecFlow21ConfigurationLoader(Option<FileDetails> configFile, IFileSystem fileSystem) : base(configFile, fileSystem)
+    public SpecFlow21ConfigurationLoader(Option<FileDetails> configFile, IFileSystem fileSystem) : base(configFile,
+        fileSystem)
     {
     }
 
@@ -17,7 +18,7 @@ public class SpecFlow21ConfigurationLoader : SpecFlowConfigurationLoader
 
         var configObject = specFlowObject.EnumerateArray().First();
 
-        var modifiedContent = JsonSerializer.Serialize(configObject, new JsonSerializerOptions{WriteIndented = true});
+        var modifiedContent = JsonSerializer.Serialize(configObject, new JsonSerializerOptions {WriteIndented = true});
         return modifiedContent;
     }
 }

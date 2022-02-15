@@ -3,6 +3,8 @@
 [DebuggerDisplay("{_analyticsProperties}")]
 public class AnalyticsContainer : IDictionary<string, string>, IAnalyticsContainer
 {
+    private readonly IDictionary<string, string> _analyticsProperties;
+
     public AnalyticsContainer()
     {
         _analyticsProperties = new Dictionary<string, string>();
@@ -12,11 +14,6 @@ public class AnalyticsContainer : IDictionary<string, string>, IAnalyticsContain
     {
         _analyticsProperties = analyticsProperties;
     }
-
-    public static implicit operator ImmutableSortedDictionary<string, string>(AnalyticsContainer container) 
-        => container.ToImmutableSortedDictionary();
-
-    private readonly IDictionary<string, string> _analyticsProperties;
 
     public void AddAnalyticsProperty(string key, string value)
     {
@@ -76,4 +73,7 @@ public class AnalyticsContainer : IDictionary<string, string>, IAnalyticsContain
 
     public ICollection<string> Keys => _analyticsProperties.Keys;
     public ICollection<string> Values => _analyticsProperties.Values;
+
+    public static implicit operator ImmutableSortedDictionary<string, string>(AnalyticsContainer container)
+        => container.ToImmutableSortedDictionary();
 }

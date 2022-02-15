@@ -1,4 +1,5 @@
 ﻿// ReSharper disable once CheckNamespace
+
 public static class EnumerableExtensions
 {
     public static Option<T> FirstOrNone<T>(this IEnumerable<T> sequence) =>

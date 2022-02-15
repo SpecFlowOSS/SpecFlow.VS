@@ -2,13 +2,18 @@
 
 public class CommandFactory
 {
+    private readonly IAnalyticsContainer _analytics;
     private readonly IFileSystem _fileSystem;
     private readonly ILogger _log;
     private readonly DiscoveryOptions _options;
     private readonly Assembly _testAssembly;
-    private readonly IAnalyticsContainer _analytics;
 
-    public CommandFactory(ILogger log, IFileSystem fileSystem, DiscoveryOptions options, Assembly testAssembly, IAnalyticsContainer analytics)
+    public CommandFactory(
+        ILogger log,
+        IFileSystem fileSystem,
+        DiscoveryOptions options,
+        Assembly testAssembly,
+        IAnalyticsContainer analytics)
     {
         _log = log;
         _fileSystem = fileSystem;
@@ -29,7 +34,7 @@ public class CommandFactory
     }
 
     public DiscoveryCommand ToCommand(DiscoveryOptions options) =>
-        new (
+        new(
             options.ConfigFile?.Map(FileDetails.FromPath) ?? None<FileDetails>.Value,
             _log,
             _fileSystem,

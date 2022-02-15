@@ -4,7 +4,8 @@ public static class ReflectionExtensions
 {
     public static T ReflectionCallMethod<T>(this object obj, string methodName, params object[]? args)
     {
-        return ReflectionCallMethod<T>(obj, methodName, args?.Select(a => a.GetType()).ToArray() ?? Type.EmptyTypes, args);
+        return ReflectionCallMethod<T>(obj, methodName, args?.Select(a => a.GetType()).ToArray() ?? Type.EmptyTypes,
+            args);
     }
 
     public static void ReflectionCallMethod(this object obj, string methodName, Type[] parameterTypes,
@@ -23,10 +24,10 @@ public static class ReflectionExtensions
         if (methodInfo == null)
             throw new ArgumentException($"Cannot find method {methodName} on type {objType.FullName}");
         var invoke = methodInfo.Invoke(obj, args);
-        
+
         if (invoke is T result) return result;
-            
-        if(methodInfo.ReturnType != typeof(void))
+
+        if (methodInfo.ReturnType != typeof(void))
             throw new InvalidCastException($"'{invoke?.GetType()}' is not {typeof(T)}");
 
         return default!;

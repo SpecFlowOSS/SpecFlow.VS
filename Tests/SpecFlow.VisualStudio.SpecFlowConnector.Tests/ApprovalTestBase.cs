@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 public class ApprovalTestBase
 {
@@ -89,7 +86,7 @@ public class ApprovalTestBase
         _testOutputHelper.ApprovalsVerify(new StringBuilder().Append((string?) $"stdout:{result.StdOutput}")
                 .AppendLine((string?) $"stderr:{result.StdError}")
                 .Append($"resultCode:{result.ExitCode}"),
-            rawContent =>rawContent
+            rawContent => rawContent
                 .Map(r => TargetFolderScrubber(r, targetFolder))
                 .Map(r => r.Replace(typeof(DiscoveryCommand).Assembly.ToString(), "<connector>"))
                 .Map(r => Regex.Replace(r, "errorMessage\": \".+\"", "errorMessage\": \"<errorMessage>\""))
@@ -98,7 +95,7 @@ public class ApprovalTestBase
                 .Map(XunitExtensions.StackTraceScrubber)
                 .Map(ScrubVolatileParts)
                 .Map(scrubber)
-            );
+        );
     }
 
     private static string TargetFolderScrubber(string content, string targetFolder) =>
@@ -123,9 +120,9 @@ public class ApprovalTestBase
     {
         return content
             .Map(r => JsonSerialization.DeserializeObject<DiscoveryResult>(r)
-                .Map(dr => dr with { StepDefinitions = ImmutableArray<StepDefinition>.Empty })
-                .Map(dr => dr with { SourceFiles = ImmutableSortedDictionary<string, string>.Empty })
-                .Map(dr => dr with { TypeNames = ImmutableSortedDictionary<string, string>.Empty })
+                .Map(dr => dr with {StepDefinitions = ImmutableArray<StepDefinition>.Empty})
+                .Map(dr => dr with {SourceFiles = ImmutableSortedDictionary<string, string>.Empty})
+                .Map(dr => dr with {TypeNames = ImmutableSortedDictionary<string, string>.Empty})
                 .Map(JsonSerialization.SerializeObject)
                 .Reduce($"Cannot deserialize:{r}"));
     }

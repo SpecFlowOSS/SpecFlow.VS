@@ -46,7 +46,7 @@ public class ProcessHelper
         if (!processResult)
             process.Kill(
 #if !NETFRAMEWORK
-                    true
+                true
 #endif
             );
 

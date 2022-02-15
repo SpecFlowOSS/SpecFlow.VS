@@ -3,13 +3,18 @@
 public class DiscoveryCommand
 {
     public const string CommandName = "discovery";
-    private readonly Option<FileDetails> _configFile;
-    private readonly ILogger _log;
-    private readonly IFileSystem _fileSystem;
-    private readonly Assembly _testAssembly;
     private readonly IAnalyticsContainer _analytics;
+    private readonly Option<FileDetails> _configFile;
+    private readonly IFileSystem _fileSystem;
+    private readonly ILogger _log;
+    private readonly Assembly _testAssembly;
 
-    public DiscoveryCommand(Option<FileDetails> configFile, ILogger log, IFileSystem fileSystem, Assembly testAssembly, IAnalyticsContainer analytics)
+    public DiscoveryCommand(
+        Option<FileDetails> configFile,
+        ILogger log,
+        IFileSystem fileSystem,
+        Assembly testAssembly,
+        IAnalyticsContainer analytics)
     {
         _configFile = configFile;
         _log = log;
@@ -26,4 +31,3 @@ public class DiscoveryCommand
                 .Discover(bindingRegistryFactory, assemblyLoadContext, _testAssembly, _configFile));
     }
 }
-

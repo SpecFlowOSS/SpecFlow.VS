@@ -1,7 +1,7 @@
 ﻿namespace SpecFlowConnector.SourceDiscovery;
 
 public record MethodSymbolSequencePoint(
-    int IlOffset, 
+    int IlOffset,
     string SourcePath,
     int StartLine,
     int EndLine,

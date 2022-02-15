@@ -47,13 +47,12 @@ public class GeneratedProjectTests : ApprovalTestBase
         projectGenerator.Generate();
 
         //act
-        var result = Invoke(projectGenerator.TargetFolder, projectGenerator.GetOutputAssemblyPath(), testData.ConfigFile);
+        var result = Invoke(projectGenerator.TargetFolder, projectGenerator.GetOutputAssemblyPath(),
+            testData.ConfigFile);
 
         //assert
         Assert(result, projectGenerator.TargetFolder);
     }
 
     private record GeneratedProjectTestsData(string? ConfigFile, GeneratorOptions GeneratorOptions);
-
-
 }

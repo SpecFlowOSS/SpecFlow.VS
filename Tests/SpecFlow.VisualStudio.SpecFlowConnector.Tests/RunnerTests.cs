@@ -1,16 +1,15 @@
-﻿using ApprovalTests.Namers.StackTraceParsers;
-
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("ApprovalTestData")]
-public class RunnerTests  : ApprovalTestBase
+public class RunnerTests : ApprovalTestBase
 {
     public static IEnumerable<LabeledTestData<(string[] args, string expected)>> TestCases =
         new LabeledTestData<(string[] args, string expected)>[]
         {
             new("discovery assembly", (new[] {"discovery", "targetAssembly.dll"}, "?")),
-            new("discovery assembly with configuration", (new[] {"discovery", "targetAssembly.dll", "configuration.json"}, "?")),
+            new("discovery assembly with configuration",
+                (new[] {"discovery", "targetAssembly.dll", "configuration.json"}, "?"))
         };
 
     private readonly ITestOutputHelper _testOutputHelper;
