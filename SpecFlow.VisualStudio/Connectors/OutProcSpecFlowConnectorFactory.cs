@@ -5,6 +5,21 @@ namespace SpecFlow.VisualStudio.Connectors;
 
 public static class OutProcSpecFlowConnectorFactory
 {
+    public static OutProcSpecFlowConnector CreateGeneric(IProjectScope projectScope)
+    {
+        var ideScope = projectScope.IdeScope;
+        var projectSettings = projectScope.GetProjectSettings();
+        var deveroomConfiguration = projectScope.GetDeveroomConfiguration();
+        var processorArchitecture = GetProcessorArchitecture(deveroomConfiguration, projectSettings);
+        return new GenericOutProcSpecFlowConnector(
+            deveroomConfiguration,
+            ideScope.Logger,
+            projectSettings.TargetFrameworkMoniker,
+            projectScope.IdeScope.GetExtensionFolder(),
+            processorArchitecture,
+            projectSettings.SpecFlowVersion);
+    }
+
     public static OutProcSpecFlowConnector Create(IProjectScope projectScope)
     {
         var ideScope = projectScope.IdeScope;

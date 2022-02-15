@@ -1,7 +1,4 @@
 ﻿#nullable disable
-using System;
-using System.Linq;
-using SpecFlow.VisualStudio.Connectors;
 
 namespace SpecFlow.VisualStudio.Generation;
 

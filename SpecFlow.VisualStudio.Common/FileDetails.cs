@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-namespace SpecFlow.VisualStudio.Common;
+﻿namespace SpecFlow.VisualStudio.Common;
 
 public record FileDetails
 {

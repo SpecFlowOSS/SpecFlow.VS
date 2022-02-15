@@ -1,0 +1,8 @@
+﻿Error: Message1 -> Message2
+Exception: System.Exception->System.NotImplementedException
+StackTrace of NotImplementedException:
+  at ... in ...
+  .
+  .
+  .
+  at ... in ...

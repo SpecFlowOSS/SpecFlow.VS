@@ -47,6 +47,15 @@ steps:
     publishTestResults: true
 
 - task: DotNetCoreCLI@2
+  displayName: Run Connector Tests
+  inputs:
+    command: test
+    projects: '**/SpecFlow.VisualStudio.SpecFlowConnector.Tests/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) --no-build'
+    testRunTitle: Connector Tests
+  condition: succeededOrFailed()
+
+- task: DotNetCoreCLI@2
   displayName: Run SpecFlow Scenarios
   inputs:
     command: test

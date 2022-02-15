@@ -1,0 +1,9 @@
+﻿namespace SpecFlowConnector.Discovery;
+
+public record DiscoveryResult(
+    ImmutableArray<StepDefinition> StepDefinitions,
+    ImmutableSortedDictionary<string, string> SourceFiles,
+    ImmutableSortedDictionary<string, string> TypeNames,
+    ImmutableSortedDictionary<string, string> AnalyticsProperties,
+    string? ErrorMessage
+);

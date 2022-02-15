@@ -59,8 +59,6 @@ public class NullVsIdeScope : IVsIdeScope
         return false;
     }
 
-    public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer) => null;
-
     public void FireAndForget(Func<Task> action, Action<Exception> onException,
         [CallerMemberName] string callerName = "???")
     {
@@ -84,6 +82,8 @@ public class NullVsIdeScope : IVsIdeScope
     }
 
     public IProjectScope GetProjectScope(Project project) => throw new NotImplementedException();
+
+    public SyntaxTree GetSyntaxTree(ITextBuffer textBuffer) => null;
 
     public static IMonitoringService GetNullMonitoringService() => new NullMonitoringService();
 
@@ -218,6 +218,10 @@ public class NullVsIdeScope : IVsIdeScope
         }
 
         public void MonitorUpgradeDialogDismissed(Dictionary<string, object> additionalProps)
+        {
+        }
+
+        public void TransmitEvent(IAnalyticsEvent runtimeEvent)
         {
         }
     }

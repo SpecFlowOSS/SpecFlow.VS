@@ -122,7 +122,7 @@ public class OutProcSpecFlowConnector
         return generationResult;
     }
 
-    private string GetConnectorPath(List<string> arguments)
+    protected virtual string GetConnectorPath(List<string> arguments)
     {
         var connectorsFolder = GetConnectorsFolder();
 
@@ -151,7 +151,7 @@ public class OutProcSpecFlowConnector
         return Path.Combine(programFiles, "dotnet");
     }
 
-    private string GetDotNetExecCommand(List<string> arguments, string executableFolder, string executableFile)
+    protected string GetDotNetExecCommand(List<string> arguments, string executableFolder, string executableFile)
     {
         arguments.Add("exec");
         arguments.Add(Path.Combine(executableFolder, executableFile));
@@ -160,7 +160,7 @@ public class OutProcSpecFlowConnector
 
     private string GetDotNetCommand() => Path.Combine(GetDotNetInstallLocation(), "dotnet.exe");
 
-    private string GetConnectorsFolder()
+    protected string GetConnectorsFolder()
     {
         var connectorsFolder = Path.Combine(_extensionFolder, "Connectors");
         if (Directory.Exists(connectorsFolder))

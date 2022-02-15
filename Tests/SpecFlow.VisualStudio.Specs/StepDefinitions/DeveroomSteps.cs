@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using Newtonsoft.Json;
 using ScenarioBlock = SpecFlow.VisualStudio.Editor.Services.Parser.ScenarioBlock;
 
 namespace SpecFlow.VisualStudio.Specs.StepDefinitions;
@@ -18,10 +19,22 @@ public class DeveroomSteps : Steps
     {
         _outputHelper = outputHelper;
         _stubIdeScope = stubIdeScope;
+
         _stubIdeScope.Setup(s =>
                 s.FireAndForgetOnBackgroundThread(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<string>()))
-            .Callback((Func<CancellationToken, Task> action, string _) =>
-                action(_stubIdeScope.BackgroundTaskTokenSource.Token));
+            .Callback(FireAndForgetCallBack);
+
+        async void FireAndForgetCallBack(Func<CancellationToken, Task> action, string _)
+        {
+            try
+            {
+                await action(_stubIdeScope.BackgroundTaskTokenSource.Token);
+            }
+            catch (Exception ex)
+            {
+                outputHelper.WriteLine(ex.ToString());
+            }
+        }
     }
 
     private IProjectGenerator ProjectGenerator
@@ -187,6 +200,7 @@ public class DeveroomSteps : Steps
         generatorOptions.FallbackNuGetPackageSource = TestFolders.GetInputFilePath("ExternalPackages");
         _projectGenerator = generatorOptions.CreateProjectGenerator(s => _outputHelper.WriteLine(s));
         _projectGenerator.Generate();
+        var json = JsonConvert.SerializeObject(generatorOptions);
     }
 
     private void EnsureProjectGenerated()

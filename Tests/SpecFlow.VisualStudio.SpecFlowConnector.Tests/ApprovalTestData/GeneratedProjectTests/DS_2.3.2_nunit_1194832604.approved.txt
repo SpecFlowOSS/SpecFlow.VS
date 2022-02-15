@@ -1,0 +1,14 @@
+﻿{
+  "stepDefinitions": [],
+  "sourceFiles": {},
+  "typeNames": {},
+  "analyticsProperties": {
+    "Connector": "<connector>",
+    "ImageRuntimeVersion": "v4.0.30319",
+    "SFFile": "TechTalk.SpecFlow.dll",
+    "SFFileVersion": "2.3.2",
+    "SFProductVersion": "2.3.2",
+    "TargetFramework": ".NETFramework,Version=v4.8"
+  },
+  "errorMessage": "<errorMessage>"
+}
