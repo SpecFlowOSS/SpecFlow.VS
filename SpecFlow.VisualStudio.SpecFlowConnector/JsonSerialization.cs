@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace SpecFlowConnector;
@@ -22,31 +23,13 @@ public static class JsonSerialization
         return deserializeObject;
     }
 
-    public static JsonSerializerOptions GetJsonSerializerSettings()
-    {
-        var serializerSettings = new JsonSerializerOptions
+    public static JsonSerializerOptions GetJsonSerializerSettings() =>
+        new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             WriteIndented = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
-//        var contractResolver = new CamelCasePropertyNamesContractResolver();
-//        contractResolver.NamingStrategy.ProcessDictionaryKeys = false;
-//        serializerSettings.ContractResolver = contractResolver;
-//        serializerSettings.Converters = new List<JsonConverter>
-//        {
-//            new StringEnumConverter
-//            {
-//#if OLD_JSONNET_API
-//                CamelCaseText = true
-//#else
-//                //NamingStrategy = new CamelCaseNamingStrategy()
-//#endif
-//            }
-//        };
-//        serializerSettings.Formatting = indented ? Formatting.Indented : Formatting.None;
-//        serializerSettings.NullValueHandling = NullValueHandling.Ignore;
-        return serializerSettings;
-    }
 }
 

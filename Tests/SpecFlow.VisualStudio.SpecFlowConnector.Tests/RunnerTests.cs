@@ -1,8 +1,10 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿using ApprovalTests.Namers.StackTraceParsers;
+
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
-[UseApprovalSubdirectory("ApprovalTestData\\Runner")]
-public class RunnerTests
+[UseApprovalSubdirectory("ApprovalTestData")]
+public class RunnerTests  : ApprovalTestBase
 {
     public static IEnumerable<LabeledTestData<(string[] args, string expected)>> TestCases =
         new LabeledTestData<(string[] args, string expected)>[]
@@ -13,47 +15,24 @@ public class RunnerTests
 
     private readonly ITestOutputHelper _testOutputHelper;
 
-    public RunnerTests(ITestOutputHelper testOutputHelper)
+    public RunnerTests(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
     }
 
     [Theory]
-    [LabeledMemberData(nameof(TestCases))]
-    public void Approval(LabeledTestData<(string[] args, string expected)> @case)
+    [InlineData("SpecFlow.VisualStudio.Specs")]
+    public void Approval(string testName)
     {
         //arrange
-        NamerFactory.AdditionalInformation = @case.Label.Replace(' ', '_');
-        var logger = new TestConsoleLogger();
-        var consoleRunner = new Runner(logger);
+        var testData = ArrangeTestData<RunnerTestData>(testName);
 
         //act
-        Assembly? testAssembly = null;
-        var resultCode = consoleRunner.Run(@case.Data.args, (ctx, path) => testAssembly ??= GetType().Assembly, new MockFileSystem());
+        var result = Invoke(testData.TargetFolder, testData.TestAssembly, testData.ConfigFile);
 
         //assert
-        _testOutputHelper.ApprovalsVerify(new StringBuilder()
-                .AppendLine($"stdout:{logger[LogLevel.Info]}")
-                .AppendLine($"stderr:{logger[LogLevel.Error]}")
-                .Append($"resultCode:{resultCode}"),
-            XunitExtensions.StackTraceScrubber);
+        Assert(result, testData.TargetFolder);
     }
 
-    [Theory]
-    [InlineData("discovery")]
-    public void Debug_log_printed_when_fails(string command)
-    {
-        //arrange
-        var logger = new TestConsoleLogger();
-        var consoleRunner = new Runner(logger);
-
-        //act
-        var resultCode = consoleRunner.Run(new []{command, "testAssembly.dll"}, (ctx, path) => throw new Exception("unexpected failure"), new MockFileSystem());
-
-        //assert
-        var output = logger.ToString();
-        _testOutputHelper.WriteLine(output);
-        output.Should().StartWith("Debug ");
-        output.Should().Contain("Error ");
-    }
+    private record RunnerTestData(string TargetFolder, string TestAssembly, string? ConfigFile);
 }

@@ -1,9 +1,0 @@
-{
-    "GeneratorOptions": {
-        "featureFileCount": 1,
-        "scenarioPerFeatureFileCount": 1,
-        "newProjectFormat": true,
-        "targetFramework": "net6.0",
-        "SpecFlowPackageVersion": "3.1.97"
-    }
-}
