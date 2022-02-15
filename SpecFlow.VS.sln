@@ -75,6 +75,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector", "SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.csproj", "{5E709910-1ECC-4AC3-8C02-E600DB4662C4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.Tests", "Tests\SpecFlow.VisualStudio.SpecFlowConnector.Tests\SpecFlow.VisualStudio.SpecFlowConnector.Tests.csproj", "{A956E1B4-1D72-4557-AE59-A1463FA27B76}"
+	ProjectSection(ProjectDependencies) = postProject
+		{14A1CF32-83E1-4B67-88E2-3EBFE9F5071C} = {14A1CF32-83E1-4B67-88E2-3EBFE9F5071C}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

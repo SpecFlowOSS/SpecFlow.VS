@@ -25,6 +25,12 @@ public class RunnerTests : ApprovalTestBase
     {
         //arrange
         var testData = ArrangeTestData<RunnerTestData>(testName);
+#if DEBUG
+        var targetFolder = testData.TargetFolder.Replace("$(BuildConfiguration)", "Debug");
+#else
+        var targetFolder = testData.TargetFolder.Replace("$(BuildConfiguration)", "Release");
+#endif
+        testData = testData with {TargetFolder = targetFolder};
 
         //act
         var result = Invoke(testData.TargetFolder, testData.TestAssembly, testData.ConfigFile);

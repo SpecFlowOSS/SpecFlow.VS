@@ -113,6 +113,7 @@ public class ApprovalTestBase
 
         var content = File.ReadAllText(testDataFile);
         var testData = JsonSerializer.Deserialize<T>(content);
+        Debug.Assert(testData != null, nameof(testData) + " != null");
         return testData;
     }
 
