@@ -46,18 +46,18 @@ public class OutProcSpecFlowConnector
         if (!File.Exists(connectorPath))
             return new DiscoveryResult
             {
-                ErrorMessage = $"Error during binding discovery. Unable to find connector: {connectorPath}"
+                ErrorMessage = $"Error during binding discovery. Unable to find connector: {connectorPath}",
+                AnalyticsProperties = new Dictionary<string, object>()
             };
 
         var result = ProcessHelper.RunProcess(workingDirectory, connectorPath, arguments, encoding: Encoding.UTF8);
+
         if (result.ExitCode != 0)
         {
             var errorMessage = result.HasErrors ? result.StandardError : "Unknown error.";
 
-            return new DiscoveryResult
-            {
-                ErrorMessage = GetDetailedErrorMessage(result, errorMessage, BindingDiscoveryCommandName)
-            };
+            return Deserialize(result,
+                dr => GetDetailedErrorMessage(result, errorMessage + dr.ErrorMessage, BindingDiscoveryCommandName));
         }
 
         _logger.LogVerbose($"{workingDirectory}>{connectorPath} {string.Join(" ", arguments)}");
@@ -66,11 +66,36 @@ public class OutProcSpecFlowConnector
         _logger.LogVerbose(result.StandardOut);
 #endif
 
-        var discoveryResult = JsonSerialization.DeserializeObjectWithMarker<DiscoveryResult>(result.StandardOut);
-        if (discoveryResult.IsFailed)
-            discoveryResult.ErrorMessage =
-                GetDetailedErrorMessage(result, discoveryResult.ErrorMessage, BindingDiscoveryCommandName);
+        var discoveryResult = Deserialize(result, dr => dr.IsFailed
+            ? GetDetailedErrorMessage(result, dr.ErrorMessage, BindingDiscoveryCommandName)
+            : dr.ErrorMessage
+        );
 
+        return discoveryResult;
+    }
+
+    private static DiscoveryResult Deserialize(ProcessHelper.RunProcessResult result,
+        Func<DiscoveryResult, string> formatErrorMessage)
+    {
+        DiscoveryResult discoveryResult;
+        try
+        {
+            discoveryResult = JsonSerialization.DeserializeObjectWithMarker<DiscoveryResult>(result.StandardOut)
+                              ?? new DiscoveryResult
+                              {
+                                  ErrorMessage = $"Cannot deserialize: {result.StandardOut}"
+                              };
+        }
+        catch (Exception e)
+        {
+            discoveryResult = new DiscoveryResult
+            {
+                ErrorMessage = e.ToString()
+            };
+        }
+
+        discoveryResult.ErrorMessage = formatErrorMessage(discoveryResult);
+        discoveryResult.AnalyticsProperties ??= new Dictionary<string, object>();
         return discoveryResult;
     }
 
