@@ -24,7 +24,7 @@
     <ProjectReference Include="..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
   </ItemGroup>
 
-  <Target Name="CustomAfterBuild" AfterTargets="Build" Condition="$(configuration)=='Debug'">
+  <Target Name="CustomAfterBuild" AfterTargets="Build" >
 
     <ItemGroup>
       <_FilesToCopy Include="$(OutputPath)\*" />
