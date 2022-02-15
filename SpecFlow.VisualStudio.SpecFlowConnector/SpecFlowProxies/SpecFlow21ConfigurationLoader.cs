@@ -4,8 +4,7 @@ namespace SpecFlowConnector.SpecFlowProxies;
 
 public class SpecFlow21ConfigurationLoader : SpecFlowConfigurationLoader
 {
-    public SpecFlow21ConfigurationLoader(Option<FileDetails> configFile, IFileSystem fileSystem) : base(configFile,
-        fileSystem)
+    public SpecFlow21ConfigurationLoader(Option<FileDetails> configFile) : base(configFile)
     {
     }
 

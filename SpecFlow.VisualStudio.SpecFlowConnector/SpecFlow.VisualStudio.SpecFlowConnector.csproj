@@ -16,7 +16,6 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.1.0" />
     <PackageReference Include="SpecFlow.CustomPlugin" Version="3.9.40" />
     <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
-    <PackageReference Include="System.IO.Abstractions" Version="13.2.47" />
     <PackageReference Include="System.Security.Permissions" Version="6.0.0" />
   </ItemGroup>
 
@@ -24,7 +23,7 @@
     <ProjectReference Include="..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Models\SpecFlow.VisualStudio.SpecFlowConnector.Models.csproj" />
   </ItemGroup>
 
-  <Target Name="CustomAfterBuild" AfterTargets="Build" Condition="$(configuration)=='Debug'">
+  <Target Name="CustomAfterBuild" AfterTargets="Build" >
 
     <ItemGroup>
       <_FilesToCopy Include="$(OutputPath)\*" />

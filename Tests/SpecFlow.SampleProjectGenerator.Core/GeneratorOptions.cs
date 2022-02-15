@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using System.Text;
 using CommandLine;
 
 namespace SpecFlow.SampleProjectGenerator;

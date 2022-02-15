@@ -63,8 +63,7 @@ public class ApprovalTestBase
         var mockFileSystem = new FileSystem();
         var resultCode = consoleRunner.Run(
             psiEx.Arguments.Split(' '),
-            (ctx, path) => testAssembly ??= ctx.LoadFromAssemblyPath(path),
-            mockFileSystem);
+            (ctx, path) => testAssembly ??= ctx.LoadFromAssemblyPath(path));
         var result = new ProcessResult(resultCode, logger[LogLevel.Info], logger[LogLevel.Error], TimeSpan.Zero);
         return result;
     }
@@ -85,7 +84,8 @@ public class ApprovalTestBase
     {
         _testOutputHelper.ApprovalsVerify(new StringBuilder().Append((string?) $"stdout:{result.StdOutput}")
                 .AppendLine((string?) $"stderr:{result.StdError}")
-                .Append($"resultCode:{result.ExitCode}"),
+                .AppendLine($"resultCode:{result.ExitCode}")
+                .Append($"time:{result.ExecutionTime}"),
             rawContent => rawContent
                 .Map(r => TargetFolderScrubber(r, targetFolder))
                 .Map(r => r.Replace(typeof(DiscoveryCommand).Assembly.ToString(), "<connector>"))

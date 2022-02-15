@@ -8,12 +8,10 @@ namespace SpecFlowConnector.SpecFlowProxies;
 public class SpecFlowConfigurationLoader : IConfigurationLoader
 {
     private readonly Option<FileDetails> _configFile;
-    private readonly IFileSystem _fileSystem;
 
-    public SpecFlowConfigurationLoader(Option<FileDetails> configFile, IFileSystem fileSystem)
+    public SpecFlowConfigurationLoader(Option<FileDetails> configFile)
     {
         _configFile = configFile;
-        _fileSystem = fileSystem;
     }
 
     public SpecFlowConfiguration Load(SpecFlowConfiguration? specFlowConfiguration)
@@ -21,7 +19,7 @@ public class SpecFlowConfigurationLoader : IConfigurationLoader
         return _configFile.Map(configFile =>
         {
             var extension = configFile.Extension.ToLowerInvariant();
-            var configFileContent = _fileSystem.File.ReadAllText(configFile);
+            var configFileContent = File.ReadAllText(configFile);
             switch (extension)
             {
                 case ".config":

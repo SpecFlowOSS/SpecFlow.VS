@@ -1,4 +1,5 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
+﻿#pragma warning disable xUnit1008
+namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests;
 
 [UseReporter /*(typeof(VisualStudioReporter))*/]
 [UseApprovalSubdirectory("ApprovalTestData")]
@@ -7,6 +8,7 @@ public class ConnectorInvestigation : ApprovalTestBase
     public ConnectorInvestigation(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
     }
+
     /*
     This is not a real test, but allows us to investigate connector related issues. 
     Usage: 

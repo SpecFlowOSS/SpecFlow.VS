@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
+﻿namespace SpecFlow.SampleProjectGenerator;
 
 public record ProcessStartInfoEx(
     string WorkingDirectory,

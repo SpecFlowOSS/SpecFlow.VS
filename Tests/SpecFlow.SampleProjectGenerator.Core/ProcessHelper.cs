@@ -1,4 +1,4 @@
-﻿namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
+﻿namespace SpecFlow.SampleProjectGenerator;
 
 public class ProcessHelper
 {
@@ -44,11 +44,7 @@ public class ProcessHelper
         bool processResult = process.WaitForExit(timeOutInMilliseconds);
 
         if (!processResult)
-            process.Kill(
-#if !NETFRAMEWORK
-                true
-#endif
-            );
+            process.Kill();
 
         var waitForOutputs = timeout - sw.Elapsed;
         if (waitForOutputs <= TimeSpan.Zero || waitForOutputs > TimeSpan.FromMinutes(1))
@@ -70,5 +66,15 @@ public class ProcessHelper
             else
                 outputWaiter.Signal();
         }
+    }
+
+    public ProcessResult RunProcess(ProcessStartInfoEx psiEx, Action<string> consoleWriteLine)
+    {
+        var result = RunProcess(psiEx);
+        consoleWriteLine($"stdOut:{result.StdOutput}");
+        consoleWriteLine($"stdErr:{result.StdError}");
+        consoleWriteLine($"code:{result.ExitCode}");
+        consoleWriteLine($"time:{result.ExecutionTime}");
+        return result;
     }
 }
