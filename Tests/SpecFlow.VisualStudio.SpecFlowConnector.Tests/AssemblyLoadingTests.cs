@@ -36,7 +36,6 @@ public class AssemblyLoadingTests
             return None.Value;
         }
     }
-    }
 
     [Fact]
     public void Load_Assemblies()

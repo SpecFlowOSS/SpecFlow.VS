@@ -65,14 +65,5 @@ public class GeneratedProjectTests : ApprovalTestBase
         Assert(result, projectGenerator.TargetFolder);
     }
 
-    public static string TempFolder
-    {
-        get
-        {
-            var configuredFolder = Environment.GetEnvironmentVariable("SPECFLOW_TEST_TEMP");
-            return configuredFolder ?? Path.GetTempPath();
-        }
-    }
-
     private record GeneratedProjectTestsData(string? ConfigFile, GeneratorOptions GeneratorOptions);
 }

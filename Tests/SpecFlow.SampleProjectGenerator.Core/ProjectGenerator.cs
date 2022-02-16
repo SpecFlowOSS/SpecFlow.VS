@@ -1,6 +1,5 @@
 ﻿#nullable disable
 
-using SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
 namespace SpecFlow.SampleProjectGenerator;
 
 public abstract class ProjectGenerator : IProjectGenerator
