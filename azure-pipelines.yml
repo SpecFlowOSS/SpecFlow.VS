@@ -83,15 +83,14 @@ steps:
     condition: succeededOrFailed()
     
 - ${{each thing in parameters.thingsarray}}:
-  - task: dotnetcorecli@2
-    displayname: run specflow scenarios ${{thing}}
+  - task: DotNetCoreCLI@2
+    displayName: Run SpecFlow Scenarios ${{thing}}
     inputs:
       command: test
-      projects: '**/*[ss]pecs/*.csproj'
-      arguments: '--configuration $(buildconfiguration) --runtime win-x64'
-      testruntitle: deveroom specs ${{thing}}
-      publishtestresults: true
-    condition: succeededorfailed()
+      projects: '**/*[Ss]pecs/*.csproj'
+      arguments: '--configuration $(BuildConfiguration) --runtime win-x64'
+      testRunTitle: 'Deveroom Specs ${{thing}}'
+    condition: succeededOrFailed()
 
 - task: DotNetCoreCLI@2
   displayName: Run Unit Tests
