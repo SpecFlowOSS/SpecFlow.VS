@@ -233,7 +233,7 @@ public abstract class ProjectGenerator : IProjectGenerator
         ExecGit("status");
         ExecGit("log");
         ExecGit("add", ".");
-        ExecGit("commit", "-q", "-m", "init");
+        ExecGit("commit", "--author=\"SpecFlow<specflow@tricentis.com>\"", "-q", "-m", "init");
         ExecGit("status");
         ExecGit("log");
     }
@@ -442,12 +442,6 @@ public abstract class ProjectGenerator : IProjectGenerator
     {
         var arguments = string.Join(" ", args);
         _consoleWriteLine($"{tool} {arguments}");
-
-        var psi = new ProcessStartInfoEx(workingDirectory, tool, arguments);
-        var ph = new ProcessHelper();
-        ProcessResult result = ph.RunProcess(psi, _consoleWriteLine);
-        return result.ExitCode;
-
 
         var psi = new ProcessStartInfoEx(workingDirectory, tool, arguments);
         var ph = new ProcessHelper();
