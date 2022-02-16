@@ -24,7 +24,6 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  MSBUILDSINGLELOADCONTEXT: '1'
 
 steps:     
 - task: DotNetCoreCLI@2

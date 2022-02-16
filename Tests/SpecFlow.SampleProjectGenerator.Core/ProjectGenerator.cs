@@ -83,6 +83,8 @@ public abstract class ProjectGenerator : IProjectGenerator
 
         if (_options.IsBuilt)
         {
+            EnsureEnvironmentVariables();
+
             BuildProject();
 
             File.WriteAllText(Path.Combine(_options.TargetFolder, ".gitignore"), "");
@@ -90,6 +92,16 @@ public abstract class ProjectGenerator : IProjectGenerator
 
         GitInit();
         _consoleWriteLine(string.Join(",", Directory.GetFiles(TargetFolder, "*.*", SearchOption.AllDirectories)));
+    }
+
+    private void EnsureEnvironmentVariables()
+    {
+        if (_options.SpecFlowVersion.Major == 3 && _options.SpecFlowVersion.Minor < 2)
+        {
+            //MSBUILDSINGLELOADCONTEXT is required for some SpecFlow versions.
+            //See https://stackoverflow.com/questions/60755395/specflow-generatefeaturefilecodebehindtask-has-failed-unexpectedly
+            Environment.SetEnvironmentVariable("MSBUILDSINGLELOADCONTEXT", "1");
+        }
     }
 
     protected virtual void SetTargetFramework(string projectFilePath)
