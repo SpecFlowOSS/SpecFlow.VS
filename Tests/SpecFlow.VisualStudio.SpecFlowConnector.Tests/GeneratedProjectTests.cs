@@ -54,6 +54,8 @@ public class GeneratedProjectTests : ApprovalTestBase
 
         //assert
         Assert(result, projectGenerator.TargetFolder);
+
+        throw new Exception("xxxxx");
     }
 
     public static string TempFolder
