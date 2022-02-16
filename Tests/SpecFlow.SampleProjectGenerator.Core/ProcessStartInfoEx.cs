@@ -1,6 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿namespace SpecFlow.SampleProjectGenerator;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
 
 public record ProcessStartInfoEx(
     string WorkingDirectory,

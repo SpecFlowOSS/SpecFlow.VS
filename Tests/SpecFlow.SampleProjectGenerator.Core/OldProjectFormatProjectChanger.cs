@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace SpecFlow.SampleProjectGenerator;

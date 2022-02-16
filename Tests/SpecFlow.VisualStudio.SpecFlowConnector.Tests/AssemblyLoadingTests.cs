@@ -27,7 +27,6 @@ public class AssemblyLoadingTests
 
     private static Option<Assembly> TryLoad(string path)
     {
-
         try
         {
             return Assembly.LoadFrom(path);
@@ -36,6 +35,7 @@ public class AssemblyLoadingTests
         {
             return None.Value;
         }
+    }
     }
 
     [Fact]

@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
+﻿namespace SpecFlow.SampleProjectGenerator;
 using System.Text;
 
-namespace SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
 
 public class ProcessHelper
 {
@@ -74,9 +73,9 @@ public class ProcessHelper
     public ProcessResult RunProcess(ProcessStartInfoEx psiEx, Action<string> consoleWriteLine)
     {
         var result = RunProcess(psiEx);
-        consoleWriteLine($"stdOut:{result.StdOutput    }");
-        consoleWriteLine($"stdErr:{result.StdError     }");
-        consoleWriteLine($"code:{result.ExitCode     }");
+        consoleWriteLine($"stdOut:{result.StdOutput}");
+        consoleWriteLine($"stdErr:{result.StdError}");
+        consoleWriteLine($"code:{result.ExitCode}");
         consoleWriteLine($"time:{result.ExecutionTime}");
         return result;
     }

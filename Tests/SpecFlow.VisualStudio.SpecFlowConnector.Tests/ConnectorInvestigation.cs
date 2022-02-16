@@ -8,6 +8,7 @@ public class ConnectorInvestigation : ApprovalTestBase
     public ConnectorInvestigation(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
     {
     }
+
     /*
     This is not a real test, but allows us to investigate connector related issues. 
     Usage: 

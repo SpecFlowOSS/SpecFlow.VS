@@ -1,8 +1,6 @@
 ﻿#nullable disable
 
-using System.Diagnostics;
 using SpecFlow.VisualStudio.SpecFlowConnector.Tests.Extensions;
-
 namespace SpecFlow.SampleProjectGenerator;
 
 public abstract class ProjectGenerator : IProjectGenerator
@@ -450,24 +448,10 @@ public abstract class ProjectGenerator : IProjectGenerator
         ProcessResult result = ph.RunProcess(psi, _consoleWriteLine);
         return result.ExitCode;
 
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                WorkingDirectory = workingDirectory,
-                FileName = tool,
-                Arguments = arguments,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardError = true
-            }
-        };
-        process.Start();
-        var output = process.StandardError.ReadToEnd();
-        if (!string.IsNullOrWhiteSpace(output))
-            _consoleWriteLine(output);
-        process.WaitForExit();
 
-        return process.ExitCode;
+        var psi = new ProcessStartInfoEx(workingDirectory, tool, arguments);
+        var ph = new ProcessHelper();
+        ProcessResult result = ph.RunProcess(psi, _consoleWriteLine);
+        return result.ExitCode;
     }
 }
