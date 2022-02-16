@@ -232,7 +232,7 @@ public abstract class ProjectGenerator : IProjectGenerator
         ExecGit("status");
         ExecGit("log");
         ExecGit("add", ".");
-        ExecGit("commit", "--author=\"SpecFlow<specflow@tricentis.com>\"", "-q", "-m", "init");
+        ExecGit("-c user.name='SpecFlow'", "-c user.email='specflow@tricentis.com'", "commit", "-q", "-m", "init");
         ExecGit("status");
         ExecGit("log");
     }

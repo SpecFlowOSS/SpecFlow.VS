@@ -1,5 +1,5 @@
 param (
-	[string]$configuration = "Release"
+	[string]$configuration = "Debug"
 )
 
 $outputFolder = "$PSScriptRoot\bin\$configuration"
