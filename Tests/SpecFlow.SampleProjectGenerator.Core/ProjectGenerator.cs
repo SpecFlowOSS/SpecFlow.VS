@@ -29,6 +29,7 @@ public abstract class ProjectGenerator : IProjectGenerator
     public void Generate()
     {
         _consoleWriteLine(_options.TargetFolder);
+        _consoleWriteLine(TargetFolder);
         if (!_options.Force &&
             Directory.Exists(Path.Combine(_options.TargetFolder, ".git")) &&
             File.Exists(Path.Combine(_options.TargetFolder, "DeveroomSample.csproj")))
@@ -91,6 +92,7 @@ public abstract class ProjectGenerator : IProjectGenerator
         }
 
         GitInit();
+        _consoleWriteLine(string.Join(",", Directory.GetFiles(TargetFolder, "*.*", SearchOption.AllDirectories)));
     }
 
     protected virtual void SetTargetFramework(string projectFilePath)
@@ -105,7 +107,11 @@ public abstract class ProjectGenerator : IProjectGenerator
         FeatureFiles.AddRange(Directory.GetFiles(_options.TargetFolder, "*.feature", SearchOption.AllDirectories));
         var projectFilePath = Directory.GetFiles(TargetFolder, "*.csproj").FirstOrDefault();
         if (projectFilePath == null)
+        {
+            _consoleWriteLine(string.Join(",", Directory.GetFiles(TargetFolder, "*.*", SearchOption.AllDirectories)));
             throw new Exception("Unable to detect project file");
+        }
+
         var projectChanger = CreateProjectChanger(projectFilePath);
         InstalledNuGetPackages.AddRange(projectChanger.GetInstalledNuGetPackages(GetPackagesFolder()));
     }
