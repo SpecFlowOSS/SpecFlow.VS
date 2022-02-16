@@ -24,6 +24,7 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  MSBUILDSINGLELOADCONTEXT: '1'
 
 steps:
 - task: PowerShell@2
@@ -130,7 +131,7 @@ steps:
   condition: succeededOrFailed()
 
 - task: CopyFiles@2
-  displayName: 'Copy marketplace scripts'
+  displayName: 'Copy tests'
   inputs:
     SourceFolder: 'C:\Users\VssAdministrator\AppData\Local\Temp\DeveroomTest\DS_3.1.97_nunit_nprj_net6.0_bt_992117478'
     Contents: '**'
