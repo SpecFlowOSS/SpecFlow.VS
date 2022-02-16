@@ -82,12 +82,22 @@ public abstract class ProjectGenerator : IProjectGenerator
 
         if (_options.IsBuilt)
         {
+            EnsureEnvironmentVariables();
+
             BuildProject();
 
             File.WriteAllText(Path.Combine(_options.TargetFolder, ".gitignore"), "");
         }
 
         GitInit();
+    }
+
+    private void EnsureEnvironmentVariables()
+    {
+        if (_options.SpecFlowVersion.Major == 3 && _options.SpecFlowVersion.Minor < 2)
+            //MSBUILDSINGLELOADCONTEXT is required for some SpecFlow versions.
+            //See https://stackoverflow.com/questions/60755395/specflow-generatefeaturefilecodebehindtask-has-failed-unexpectedly
+            Environment.SetEnvironmentVariable("MSBUILDSINGLELOADCONTEXT", "1");
     }
 
     protected virtual void SetTargetFramework(string projectFilePath)
@@ -206,7 +216,6 @@ public abstract class ProjectGenerator : IProjectGenerator
     {
         var exitCode = ExecGit("reset", "--hard");
         ExecGit("clean", "-fdx", "-e", "packages");
-        ExecGit("status");
         if (exitCode != 0)
             _consoleWriteLine($"Git status exit code: {exitCode}");
         return exitCode == 0;
@@ -221,7 +230,7 @@ public abstract class ProjectGenerator : IProjectGenerator
     private void GitCommitAll()
     {
         ExecGit("add", ".");
-        ExecGit("commit", "-q", "-m", "init");
+        ExecGit("-c user.name='SpecFlow'", "-c user.email='specflow@tricentis.com'", "commit", "-q", "-m", "init");
     }
 
     private void InstallNUnit(string packagesFolder, string projectFilePath)

@@ -8,18 +8,8 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  MSBUILDSINGLELOADCONTEXT: '1'
 
 steps:
-- task: PowerShell@2
-  displayName: 'Set git user info'
-  inputs:
-    targetType: 'inline'
-    script: |
-      git config --global user.email "specflow@tricentis.com"
-      git config --global user.name "SpecFlow"
-      git config --list
-      
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:
