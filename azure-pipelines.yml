@@ -27,33 +27,12 @@ variables:
 
 steps:
 - task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
-      git config --list
-      
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
-      where git
-      
-- task: PowerShell@2
+  displayName: 'Set git user info'
   inputs:
     targetType: 'inline'
     script: |
       git config --global user.email "specflow@tricentis.com"
-      
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
       git config --global user.name "SpecFlow"
-
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
       git config --list
       
 - task: DotNetCoreCLI@2
