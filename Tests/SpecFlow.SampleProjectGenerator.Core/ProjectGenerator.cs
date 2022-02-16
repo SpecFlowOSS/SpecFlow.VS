@@ -28,7 +28,6 @@ public abstract class ProjectGenerator : IProjectGenerator
 
     public void Generate()
     {
-        ExecGit("config --list");
         _consoleWriteLine(_options.TargetFolder);
         _consoleWriteLine(TargetFolder);
         if (!_options.Force &&
