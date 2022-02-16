@@ -132,6 +132,14 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy marketplace scripts'
   inputs:
+    SourceFolder: 'C:\Users\VssAdministrator\AppData\Local\Temp\DeveroomTest\DS_3.1.97_nunit_nprj_net6.0_bt_992117478'
+    Contents: '**'
+    TargetFolder: '$(build.artifactstagingdirectory)\marketplace\DeveroomTest'
+  condition: succeededOrFailed()
+
+- task: CopyFiles@2
+  displayName: 'Copy marketplace scripts'
+  inputs:
     SourceFolder: '$(system.defaultworkingdirectory)'
     Contents: |
      publish*.ps1
