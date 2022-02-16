@@ -21,22 +21,23 @@ public class DnLibDeveroomSymbolReader : DeveroomSymbolReader
         return new DnLibDeveroomSymbolReader(moduleDefMd);
     }
 
-    public override IEnumerable<MethodSymbolSequencePoint> ReadMethodSymbol(int token)
-    {
-        var method = _moduleDefMd.ResolveMethod((uint) (token & 0x00FFFFFF));
-
-        return method
-            .Map(GetStateClassType)
-            .Map(stateClassType => stateClassType.Methods
-                    .SelectMany(GetSequencePointsFromMethodBody)
-                    .Union(GetSequencePointsFromMethodBody(method))
-                    .OrderBy(sp => sp.StartLine)
-                as IEnumerable<MethodSymbolSequencePoint>
+    public override IEnumerable<MethodSymbolSequencePoint> ReadMethodSymbol(int token) =>
+        _moduleDefMd
+            .ResolveMethod((uint) (token & 0x00FFFFFF))
+            .AsOption()
+            .Map(method => method
+                .Map(GetStateClassType)
+                .Map(stateClassType => stateClassType.Methods
+                        .SelectMany(GetSequencePointsFromMethodBody)
+                        .Union(GetSequencePointsFromMethodBody(method))
+                        .OrderBy(sp => sp.StartLine)
+                    as IEnumerable<MethodSymbolSequencePoint>
+                )
+                .Reduce(GetSequencePointsFromMethodBody(method))
             )
-            .Reduce(GetSequencePointsFromMethodBody(method));
-    }
+            .Reduce(ImmutableArray<MethodSymbolSequencePoint>.Empty);
 
-    private Option<TypeDef> GetStateClassType(MethodDef method) =>
+    private static Option<TypeDef> GetStateClassType(MethodDef method) =>
         method
             .CustomDebugInfos
             .OfType<PdbStateMachineTypeNameCustomDebugInfo>()
@@ -57,19 +58,27 @@ public class DnLibDeveroomSymbolReader : DeveroomSymbolReader
                 .Reduce(None<TypeDef>.Value)
             );
 
-    private IEnumerable<MethodSymbolSequencePoint> GetSequencePointsFromMethodBody(MethodDef methodDef)
-    {
-        var methodBody = methodDef?.MethodBody as CilBody;
-        if (methodBody == null)
-            yield break;
+    private IEnumerable<MethodSymbolSequencePoint> GetSequencePointsFromMethodBody(MethodDef methodDef) =>
+        methodDef
+            .AsOption()
+            .MapOptional<CilBody>(md => md.MethodBody as CilBody)
+            .Map(mb => mb
+                .Instructions
+                .Where(IsRelevant)
+                .Select(i => new MethodSymbolSequencePoint(
+                    (int) i.Offset,
+                    GetSourcePath(i.SequencePoint.Document),
+                    i.SequencePoint.StartLine,
+                    i.SequencePoint.EndLine,
+                    i.SequencePoint.StartColumn,
+                    i.SequencePoint.EndColumn)
+                ))
+            .Reduce(() => ImmutableArray<MethodSymbolSequencePoint>.Empty);
 
-        var relevantInstructions = methodBody.Instructions.Where(i => i.SequencePoint != null);
-        var sequencePoints = relevantInstructions.Select(i => new MethodSymbolSequencePoint((int) i.Offset,
-            GetSourcePath(i.SequencePoint.Document), i.SequencePoint.StartLine,
-            i.SequencePoint.EndLine, i.SequencePoint.StartColumn, i.SequencePoint.EndColumn));
-        foreach (var sequencePoint in sequencePoints)
-            yield return sequencePoint;
-    }
+    public static bool IsRelevant(Instruction instruction)
+        => instruction.SequencePoint is not null &&
+           instruction.SequencePoint.StartLine != SequencePointConstants.HIDDEN_LINE &&
+           instruction.SequencePoint.StartColumn != SequencePointConstants.HIDDEN_COLUMN;
 
     private string GetSourcePath(PdbDocument document) => document.Url;
 

@@ -104,6 +104,14 @@ public abstract class ProjectGenerator : IProjectGenerator
         }
     }
 
+    private void EnsureEnvironmentVariables()
+    {
+        if (_options.SpecFlowVersion.Major == 3 && _options.SpecFlowVersion.Minor < 2)
+            //MSBUILDSINGLELOADCONTEXT is required for some SpecFlow versions.
+            //See https://stackoverflow.com/questions/60755395/specflow-generatefeaturefilecodebehindtask-has-failed-unexpectedly
+            Environment.SetEnvironmentVariable("MSBUILDSINGLELOADCONTEXT", "1");
+    }
+
     protected virtual void SetTargetFramework(string projectFilePath)
     {
         var projectChanger = CreateProjectChanger(projectFilePath);
@@ -226,7 +234,6 @@ public abstract class ProjectGenerator : IProjectGenerator
         ExecGit("log");
         var exitCode = ExecGit("reset", "--hard");
         ExecGit("clean", "-fdx", "-e", "packages");
-        ExecGit("status");
         ExecGit("log");
         if (exitCode != 0)
             _consoleWriteLine($"Git status exit code: {exitCode}");

@@ -122,9 +122,9 @@ public class SpecFlowDiscoverer
     private static string? GetError(StepDefinitionBindingAdapter sdb)
         => sdb.GetProperty<string>("Error").Reduce((string) null!);
 
-    private Option<string> GetSourceLocation(BindingMethodAdapter bindingMethod, Func<string, string> getSourcePathId)
-    {
-        return bindingMethod.MethodInfo
+    private Option<string>
+        GetSourceLocation(BindingMethodAdapter bindingMethod, Func<string, string> getSourcePathId) =>
+        bindingMethod.MethodInfo
             .Map(mi => (reader: mi.DeclaringType
                         .Map(declaringType => declaringType!.Assembly)
                         .Map(assembly => _symbolReaders[assembly].Reduce(() => default!)),
@@ -133,7 +133,6 @@ public class SpecFlowDiscoverer
             .Map(x => x.reader.ReadMethodSymbol(x.MetadataToken))
             .Reduce(ImmutableArray<MethodSymbolSequencePoint>.Empty)
             .Map(sequencePoints => sequencePoints
-                .SelectOptional(sp => (Option<MethodSymbolSequencePoint>) sp)
                 .Aggregate(
                     (startSequencePoint: None<MethodSymbolSequencePoint>.Value,
                         endSequencePoint: None<MethodSymbolSequencePoint>.Value),
@@ -148,5 +147,4 @@ public class SpecFlowDiscoverer
             )
             .Map(border =>
                 $"#{getSourcePathId(border.startSequencePoint.SourcePath)}|{border.startSequencePoint.StartLine}|{border.startSequencePoint.StartColumn}|{border.endSequencePoint.EndLine}|{border.endSequencePoint.EndColumn}");
-    }
 }

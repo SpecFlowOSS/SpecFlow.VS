@@ -14,11 +14,12 @@ public class ConnectorInvestigation : ApprovalTestBase
     Usage: 
         1 - create a json file in "<local repo>\SpecFlow.VS\Tests\SpecFlow.VisualStudio.SpecFlowConnector.Tests\ApprovalTestData\ConnectorInvestigation\" folder
         2 - add the file name as inline data
-        3 - uncomment the Theory attribute to let te xUnit discover
+        3 - unskip the Theory attribute to let te xUnit discover
         4 - run or debug the test
     There is a sample "SpecFlow.VisualStudio.Specs.json" file in the folder which points to the solution's tests
     */
     //[Theory]
+    [Theory(Skip = "Use for investigation")]
     [InlineData("SpecFlow.VisualStudio.Specs")]
     public void Approval(string testName)
     {

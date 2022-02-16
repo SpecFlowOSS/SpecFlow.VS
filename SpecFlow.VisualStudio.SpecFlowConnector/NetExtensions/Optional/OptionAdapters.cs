@@ -6,4 +6,6 @@ public static class OptionAdapters
         option is Some<TRight> some
             ? some.Content
             : none();
+
+    public static Option<T> AsOption<T>(this T? @this) => @this;
 }
