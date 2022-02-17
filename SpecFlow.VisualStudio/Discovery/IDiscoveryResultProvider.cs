@@ -7,13 +7,11 @@ public interface IDiscoveryResultProvider
 
 public class DiscoveryResultProvider : IDiscoveryResultProvider
 {
-    private readonly IMonitoringService _monitoringService;
     private readonly IProjectScope _projectScope;
 
-    public DiscoveryResultProvider(IProjectScope projectScope, IMonitoringService monitoringService)
+    public DiscoveryResultProvider(IProjectScope projectScope)
     {
         _projectScope = projectScope;
-        _monitoringService = monitoringService;
     }
 
     private IDeveroomLogger Logger => _projectScope.IdeScope.Logger;
