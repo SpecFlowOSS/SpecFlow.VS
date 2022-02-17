@@ -104,14 +104,6 @@ public abstract class ProjectGenerator : IProjectGenerator
         }
     }
 
-    private void EnsureEnvironmentVariables()
-    {
-        if (_options.SpecFlowVersion.Major == 3 && _options.SpecFlowVersion.Minor < 2)
-            //MSBUILDSINGLELOADCONTEXT is required for some SpecFlow versions.
-            //See https://stackoverflow.com/questions/60755395/specflow-generatefeaturefilecodebehindtask-has-failed-unexpectedly
-            Environment.SetEnvironmentVariable("MSBUILDSINGLELOADCONTEXT", "1");
-    }
-
     protected virtual void SetTargetFramework(string projectFilePath)
     {
         var projectChanger = CreateProjectChanger(projectFilePath);
