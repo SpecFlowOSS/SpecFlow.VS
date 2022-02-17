@@ -106,8 +106,10 @@ public class OutProcSpecFlowConnector
         discoveryResult.AnalyticsProperties["ConnectorExitCode"] = result.ExitCode;
         if (!string.IsNullOrEmpty(discoveryResult.SpecFlowVersion))
             discoveryResult.AnalyticsProperties["SpecFlowVersion"] = discoveryResult.SpecFlowVersion;
+
         if (!string.IsNullOrEmpty(discoveryResult.ErrorMessage))
-            discoveryResult.AnalyticsProperties["Error"] = ErrorAnonymizer.AnonymizeErrorMessage(discoveryResult.ErrorMessage);
+            discoveryResult.AnalyticsProperties["Error"] =
+                ErrorAnonymizer.AnonymizeErrorMessage(discoveryResult.ErrorMessage);
 
         _monitoringService.TransmitEvent(new DiscoveryResultEvent(discoveryResult));
 
