@@ -13,13 +13,15 @@ public class OutProcSpecFlowConnector
     private readonly DeveroomConfiguration _configuration;
     private readonly string _extensionFolder;
     private readonly IDeveroomLogger _logger;
+    private readonly IMonitoringService _monitoringService;
     private readonly ProcessorArchitectureSetting _processorArchitecture;
     private readonly NuGetVersion _specFlowVersion;
     private readonly TargetFrameworkMoniker _targetFrameworkMoniker;
 
     public OutProcSpecFlowConnector(DeveroomConfiguration configuration, IDeveroomLogger logger,
         TargetFrameworkMoniker targetFrameworkMoniker, string extensionFolder,
-        ProcessorArchitectureSetting processorArchitecture, NuGetVersion specFlowVersion)
+        ProcessorArchitectureSetting processorArchitecture, NuGetVersion specFlowVersion,
+        IMonitoringService monitoringService)
     {
         _configuration = configuration;
         _logger = logger;
@@ -27,6 +29,7 @@ public class OutProcSpecFlowConnector
         _extensionFolder = extensionFolder;
         _processorArchitecture = processorArchitecture;
         _specFlowVersion = specFlowVersion;
+        _monitoringService = monitoringService;
     }
 
     private bool DebugConnector => _configuration.DebugConnector ||
@@ -74,7 +77,7 @@ public class OutProcSpecFlowConnector
         return discoveryResult;
     }
 
-    private static DiscoveryResult Deserialize(ProcessHelper.RunProcessResult result,
+    private DiscoveryResult Deserialize(ProcessHelper.RunProcessResult result,
         Func<DiscoveryResult, string> formatErrorMessage)
     {
         DiscoveryResult discoveryResult;
@@ -96,6 +99,20 @@ public class OutProcSpecFlowConnector
 
         discoveryResult.ErrorMessage = formatErrorMessage(discoveryResult);
         discoveryResult.AnalyticsProperties ??= new Dictionary<string, object>();
+
+        discoveryResult.AnalyticsProperties["ProjectTargetFramework"] = _targetFrameworkMoniker;
+        discoveryResult.AnalyticsProperties["ProjectSpecFlowVersion"] = _specFlowVersion;
+        discoveryResult.AnalyticsProperties["ConnectorArguments"] = result.Arguments;
+        discoveryResult.AnalyticsProperties["ConnectorExitCode"] = result.ExitCode;
+        if (!string.IsNullOrEmpty(discoveryResult.SpecFlowVersion))
+            discoveryResult.AnalyticsProperties["SpecFlowVersion"] = discoveryResult.SpecFlowVersion;
+
+        if (!string.IsNullOrEmpty(discoveryResult.ErrorMessage))
+            discoveryResult.AnalyticsProperties["Error"] =
+                ErrorAnonymizer.AnonymizeErrorMessage(discoveryResult.ErrorMessage);
+
+        _monitoringService.TransmitEvent(new DiscoveryResultEvent(discoveryResult));
+
         return discoveryResult;
     }
 

@@ -7,33 +7,27 @@ public interface IDiscoveryResultProvider
 
 public class DiscoveryResultProvider : IDiscoveryResultProvider
 {
-    private readonly IMonitoringService _monitoringService;
     private readonly IProjectScope _projectScope;
 
-    public DiscoveryResultProvider(IProjectScope projectScope, IMonitoringService monitoringService)
+    public DiscoveryResultProvider(IProjectScope projectScope)
     {
         _projectScope = projectScope;
-        _monitoringService = monitoringService;
     }
 
     private IDeveroomLogger Logger => _projectScope.IdeScope.Logger;
 
     public DiscoveryResult RunDiscovery(string testAssemblyPath, string configFilePath, ProjectSettings projectSettings)
     {
-        OutProcSpecFlowConnector connector = OutProcSpecFlowConnectorFactory.CreateGeneric(_projectScope);
-        DiscoveryResult result = RunDiscovery(testAssemblyPath, configFilePath, projectSettings, connector);
+        if (projectSettings.SpecFlowVersion.Version.Major >= 3)
+        {
+            DiscoveryResult result = RunDiscovery(testAssemblyPath, configFilePath, projectSettings,
+                OutProcSpecFlowConnectorFactory.CreateGeneric(_projectScope));
 
-        _monitoringService.TransmitEvent(new DiscoveryResultEvent(result));
+            if (!result.IsFailed)
+                return result;
+        }
 
-        if (!result.IsFailed)
-            return result;
-
-        Logger.LogWarning(result.ErrorMessage);
-
-        connector = GetConnector(projectSettings);
-        result = RunDiscovery(testAssemblyPath, configFilePath, projectSettings, connector);
-
-        return result;
+        return RunDiscovery(testAssemblyPath, configFilePath, projectSettings, GetConnector(projectSettings));
     }
 
     public DiscoveryResult RunDiscovery(string testAssemblyPath, string configFilePath, ProjectSettings projectSettings,
