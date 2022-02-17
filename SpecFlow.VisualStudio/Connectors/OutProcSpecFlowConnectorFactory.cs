@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace SpecFlow.VisualStudio.Connectors;
+﻿namespace SpecFlow.VisualStudio.Connectors;
 
 public static class OutProcSpecFlowConnectorFactory
 {
@@ -17,7 +14,8 @@ public static class OutProcSpecFlowConnectorFactory
             projectSettings.TargetFrameworkMoniker,
             projectScope.IdeScope.GetExtensionFolder(),
             processorArchitecture,
-            projectSettings.SpecFlowVersion);
+            projectSettings.SpecFlowVersion,
+            ideScope.MonitoringService);
     }
 
     public static OutProcSpecFlowConnector Create(IProjectScope projectScope)
@@ -32,7 +30,8 @@ public static class OutProcSpecFlowConnectorFactory
             projectSettings.TargetFrameworkMoniker,
             projectScope.IdeScope.GetExtensionFolder(),
             processorArchitecture,
-            projectSettings.SpecFlowVersion);
+            projectSettings.SpecFlowVersion,
+            ideScope.MonitoringService);
     }
 
     private static ProcessorArchitectureSetting GetProcessorArchitecture(DeveroomConfiguration deveroomConfiguration,

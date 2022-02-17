@@ -1,5 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Improove step definition discovery
+
 ﻿# v2022.1.4 - 2022-01-25
 
 * Fix: (#40) Typing performance issue

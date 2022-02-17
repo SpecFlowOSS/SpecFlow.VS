@@ -10,14 +10,16 @@ public class GenericOutProcSpecFlowConnector : OutProcSpecFlowConnector
         TargetFrameworkMoniker targetFrameworkMoniker,
         string extensionFolder,
         ProcessorArchitectureSetting processorArchitecture,
-        NuGetVersion specFlowVersion)
+        NuGetVersion specFlowVersion,
+        IMonitoringService monitoringService)
         : base(
             configuration,
             logger,
             targetFrameworkMoniker,
             extensionFolder,
             processorArchitecture,
-            specFlowVersion)
+            specFlowVersion,
+            monitoringService)
     {
     }
 
