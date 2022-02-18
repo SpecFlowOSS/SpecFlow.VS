@@ -14,10 +14,14 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory
     protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
         new SpecFlowDependencyProviderVLatest(assemblyLoadContext);
 
-    protected override IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile) =>
+    protected override object CreateConfigurationLoader(Option<FileDetails> configFile) =>
         new SpecFlowConfigurationLoader(configFile);
 
     protected override IRuntimeConfigurationProvider
+        CreateConfigurationProvider(object configurationLoader) =>
+        CreateConfigurationProvider((IConfigurationLoader)configurationLoader);
+
+    protected virtual IRuntimeConfigurationProvider
         CreateConfigurationProvider(IConfigurationLoader configurationLoader) =>
         new DefaultRuntimeConfigurationProvider(configurationLoader);
 

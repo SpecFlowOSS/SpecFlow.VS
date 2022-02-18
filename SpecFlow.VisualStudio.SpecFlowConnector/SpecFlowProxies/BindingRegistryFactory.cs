@@ -22,7 +22,7 @@ public abstract class BindingRegistryFactory : IBindingRegistryFactory
                     .Map(CreateContainerBuilder),
                 configFile
                     .Map<Option<FileDetails>,
-                        IConfigurationLoader>(CreateConfigurationLoader)
+                        object>(CreateConfigurationLoader)
                     .Map(CreateConfigurationProvider)
             )
             .Tie(container => CreateTestRunner(container, testAssembly))
@@ -35,10 +35,10 @@ public abstract class BindingRegistryFactory : IBindingRegistryFactory
 
     protected abstract ContainerBuilder CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider);
 
-    protected abstract IConfigurationLoader CreateConfigurationLoader(Option<FileDetails> configFile);
+    protected abstract object CreateConfigurationLoader(Option<FileDetails> configFile);
 
     protected abstract IRuntimeConfigurationProvider CreateConfigurationProvider(
-        IConfigurationLoader configurationLoader);
+        object configurationLoader);
 
     protected abstract void CreateTestRunner(object globalContainer, Assembly testAssembly);
     protected abstract IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, object globalContainer);
