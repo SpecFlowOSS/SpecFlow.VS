@@ -31,7 +31,8 @@ public class ConnectorInvestigation : ApprovalTestBase
 #else
         var targetFolder = testData.TargetFolder.Replace("$(BuildConfiguration)", "Release");
 #endif
-        targetFolder = targetFolder.Replace("$(ApprovalTestData)", "..\\..\\..\\ApprovalTestData\\ConnectorInvestigation");
+        targetFolder =
+            targetFolder.Replace("$(ApprovalTestData)", "..\\..\\..\\ApprovalTestData\\ConnectorInvestigation");
         testData = testData with {TargetFolder = targetFolder};
 
         //act
