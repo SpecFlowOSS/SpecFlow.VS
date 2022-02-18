@@ -222,7 +222,7 @@ public class DeveroomSteps : Steps
         discoveryService.BindingRegistryCache.Changed += (_, _) => initialized.Set();
         if (discoveryService.BindingRegistryCache.Value != ProjectBindingRegistry.Invalid) initialized.Set();
 
-        initialized.WaitOne(TimeSpan.FromSeconds(5))
+        initialized.WaitOne(TimeSpan.FromSeconds(15))
             .Should()
             .BeTrue("the bindingService should be initialized");
 

@@ -6,6 +6,13 @@ namespace SpecFlowConnector.SpecFlowProxies;
 
 public abstract class BindingRegistryFactory : IBindingRegistryFactory
 {
+    protected ILogger Log;
+
+    protected BindingRegistryFactory(ILogger log)
+    {
+        Log = log;
+    }
+
     public IBindingRegistry GetBindingRegistry(AssemblyLoadContext assemblyLoadContext,
         Assembly testAssembly, Option<FileDetails> configFile) =>
         CreateObjectContainer(

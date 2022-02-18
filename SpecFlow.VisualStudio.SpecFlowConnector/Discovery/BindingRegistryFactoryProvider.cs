@@ -30,17 +30,18 @@ public class BindingRegistryFactoryProvider
             .Reduce(() =>
             {
                 _analytics.AddAnalyticsProperty("SFFile", "Not found");
-                return new BindingRegistryFactoryBeforeV300213();
+                return new BindingRegistryFactoryBeforeV300225(_log);
             });
     }
 
     private IBindingRegistryFactory GetFactory(int versionNumber) =>
         versionNumber switch
         {
-            >= 3_09_022 => new BindingRegistryFactoryVLatest(),
-            >= 3_07_013 => new BindingRegistryFactoryBeforeV309022(),
-            >= 3_00_213 => new BindingRegistryFactoryBeforeV307013(),
-            _ => new BindingRegistryFactoryBeforeV300213()
+            >= 3_09_022 => new BindingRegistryFactoryVLatest(_log),
+            >= 3_07_013 => new BindingRegistryFactoryBeforeV309022(_log),
+            >= 3_01_062 => new BindingRegistryFactoryBeforeV307013(_log),
+            >= 3_00_225 => new BindingRegistryFactoryBeforeV301062(_log),
+            _ => new BindingRegistryFactoryBeforeV300225(_log)
         };
 
     private Option<FileVersionInfo> GetSpecFlowVersion()

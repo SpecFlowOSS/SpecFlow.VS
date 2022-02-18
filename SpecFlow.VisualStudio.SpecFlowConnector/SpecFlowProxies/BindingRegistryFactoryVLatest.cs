@@ -7,6 +7,10 @@ namespace SpecFlowConnector.SpecFlowProxies;
 
 public class BindingRegistryFactoryVLatest : BindingRegistryFactory
 {
+    public BindingRegistryFactoryVLatest(ILogger log) : base(log)
+    {
+    }
+
     protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
         new SpecFlowDependencyProviderVLatest(assemblyLoadContext);
 
