@@ -16,8 +16,15 @@ public static class JsonSerialization
 
     public static Option<TResult> DeserializeObject<TResult>(string json)
     {
-        var deserializeObject = JsonSerializer.Deserialize<TResult>(json, GetJsonSerializerSettings());
-        return deserializeObject;
+        try
+        {
+            var deserializeObject = JsonSerializer.Deserialize<TResult>(json, GetJsonSerializerSettings());
+            return deserializeObject;
+        }
+        catch (Exception)
+        {
+            return None.Value;
+        }
     }
 
     public static JsonSerializerOptions GetJsonSerializerSettings() =>

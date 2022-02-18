@@ -86,18 +86,18 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
             .Tie(lib => _log.Info($"Found runtime library:{lib}"))
             .Or(() =>
             {
+                return GetRequestedLibrary(assemblyName)
+                    .Map(LoadFromAssembly)
+                    .Tie(lib => _log.Info($"Found requested library:{lib}"));
+            })
+            .Or(() =>
+            {
                 return _dependencyContext.CompileLibraries.Where(
                         compileLibrary =>
                             string.Equals(compileLibrary.Name, assemblyName.Name, StringComparison.OrdinalIgnoreCase))
                     .SelectOptional(LoadFromAssembly)
                     .FirstOrNone()
                     .Tie(lib => _log.Info($"Found compilation library:{lib}"));
-            })
-            .Or(() =>
-            {
-                return GetFallbackCompilationLibrary(assemblyName)
-                    .Map(LoadFromAssembly)
-                    .Tie(lib => _log.Info($"Found fallback library:{lib}"));
             })
             .Reduce(() => null!);
     }
@@ -142,7 +142,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
         return runtimeAssetGroups.GetDefaultAssets();
     }
 
-    private CompilationLibrary GetFallbackCompilationLibrary(AssemblyName assemblyName)
+    private CompilationLibrary GetRequestedLibrary(AssemblyName assemblyName)
     {
         // This reference might help finding dependencies that are otherwise not listed in the
         // deps.json file of the test assembly. E.g. Microsoft.AspNetCore.Http.Features in the SpecFlow ASP.NET MVC sample

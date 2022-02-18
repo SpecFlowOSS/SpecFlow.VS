@@ -21,7 +21,7 @@ public class ApprovalTestBase
                                          None<FileDetails>.Value;
 
         var psiEx = new ProcessStartInfoEx(
-            targetFolder,
+            targetAssemblyFile.DirectoryName.Reduce("Unknown directory"),
             connectorFile,
             string.Empty
         );

@@ -22,7 +22,6 @@ public class Runner
                 .Tie(DumpOptions)
                 .Map(options =>
                     ReflectionExecutor.Execute((DiscoveryOptions) options, testAssemblyFactory, _log, analytics))
-                //.Map(result=>result.MapLeft(errorMessage => new Exception(errorMessage)))
                 .Map(result => result.Reduce(errorMessage => new DiscoveryResult(ImmutableArray<StepDefinition>.Empty,
                     ImmutableSortedDictionary<string, string>.Empty,
                     ImmutableSortedDictionary<string, string>.Empty,
@@ -62,8 +61,8 @@ public class ReflectionExecutor
     {
         _log.Info($"Loading {options.AssemblyFile}");
         var testAssemblyContext = new TestAssemblyLoadContext(options.AssemblyFile, testAssemblyFactory, _log);
-
         analytics.AddAnalyticsProperty("ImageRuntimeVersion", testAssemblyContext.TestAssembly.ImageRuntimeVersion);
+
         testAssemblyContext.TestAssembly.CustomAttributes
             .Where(a => a.AttributeType == typeof(TargetFrameworkAttribute))
             .FirstOrNone()
