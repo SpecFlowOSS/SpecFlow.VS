@@ -23,7 +23,7 @@ public class BindingRegistryFactoryBeforeV201000 : BindingRegistryFactoryBeforeV
     }
 
     protected override object CreateObjectContainer(Assembly testAssembly, object containerBuilder,
-        IRuntimeConfigurationProvider configurationProvider)
+        IRuntimeConfigurationProvider configurationProvider, object dependencyProvider)
     {
         return containerBuilder.ReflectionCallMethod<object>(
             "CreateContainer", new[] {typeof(IRuntimeConfigurationProvider)}, new object[] {null!});

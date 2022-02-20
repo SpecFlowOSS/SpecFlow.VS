@@ -11,7 +11,7 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory
     {
     }
 
-    protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
+    protected override object CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
         new SpecFlowDependencyProviderVLatest(assemblyLoadContext);
 
     protected override object CreateConfigurationLoader(Option<FileDetails> configFile) =>
@@ -25,29 +25,33 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory
         CreateConfigurationProvider(IConfigurationLoader configurationLoader) =>
         new DefaultRuntimeConfigurationProvider(configurationLoader);
 
-    protected override object CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider) =>
+    protected override object CreateContainerBuilder(object dependencyProvider) =>
+        CreateContainerBuilder((IDefaultDependencyProvider) dependencyProvider);
+
+    protected virtual object CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider) =>
         new ContainerBuilderThatResetsTraceListener(dependencyProvider);
 
     protected override object CreateObjectContainer(Assembly testAssembly, object containerBuilder,
-        IRuntimeConfigurationProvider configurationProvider) =>
-        CreateObjectContainer(testAssembly, (ContainerBuilder) containerBuilder, configurationProvider);
+        IRuntimeConfigurationProvider configurationProvider, object dependencyProvider) =>
+        CreateObjectContainer(testAssembly, (ContainerBuilder) containerBuilder, configurationProvider,
+            (IDefaultDependencyProvider) dependencyProvider);
 
     protected virtual object CreateObjectContainer(Assembly testAssembly, ContainerBuilder containerBuilder,
-        IRuntimeConfigurationProvider configurationProvider) =>
+        IRuntimeConfigurationProvider configurationProvider, IDefaultDependencyProvider dependencyProvider) =>
         containerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
 
-    protected override void CreateTestRunner(object globalContainer, Assembly testAssembly)
+    protected override object CreateTestRunner(object globalContainer, Assembly testAssembly)
         => CreateTestRunner((IObjectContainer) globalContainer, testAssembly);
 
-    protected virtual void CreateTestRunner(IObjectContainer globalContainer, Assembly testAssembly)
+    protected virtual ITestRunner CreateTestRunner(IObjectContainer globalContainer, Assembly testAssembly)
     {
         var testRunnerManager = (TestRunnerManager) globalContainer.Resolve<ITestRunnerManager>();
 
         testRunnerManager.Initialize(testAssembly);
-        testRunnerManager.CreateTestRunner(0);
+        return testRunnerManager.CreateTestRunner(0);
     }
 
-    protected override IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, object globalContainer)
+    protected override object ResolveBindingRegistry(Assembly testAssembly, object globalContainer, object testRunner)
         => ResolveBindingRegistry(testAssembly, (IObjectContainer) globalContainer);
 
     protected virtual IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, IObjectContainer globalContainer)

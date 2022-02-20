@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable disable
+using System;
 using System.Linq;
 using TechTalk.SpecFlow.Bindings.Discovery;
 using TechTalk.SpecFlow.Bindings.Reflection;

@@ -51,6 +51,7 @@ public class GeneratedProjectTests : ApprovalTestBase
     [InlineData("DS_2.2.1_nunit_bt_992117478")]
     [InlineData("DS_2.1.0_nunit_bt_992117478")]
     [InlineData("DS_2.0.0_nunit_bt_992117478")]
+    [InlineData("DS_1.9.0_nunit_bt_992117478")]
     public void Approval(string testName)
     {
         //arrange

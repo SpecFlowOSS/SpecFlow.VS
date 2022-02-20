@@ -8,6 +8,6 @@ public class BindingRegistryFactoryBeforeV309022 : BindingRegistryFactoryVLatest
     {
     }
 
-    protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
+    protected override object CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
         new SpecFlowDependencyProviderBeforeV309022(assemblyLoadContext);
 }

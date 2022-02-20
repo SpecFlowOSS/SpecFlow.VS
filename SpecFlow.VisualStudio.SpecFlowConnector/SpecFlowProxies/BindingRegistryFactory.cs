@@ -1,5 +1,4 @@
 ﻿using TechTalk.SpecFlow.Configuration;
-using TechTalk.SpecFlow.Infrastructure;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
@@ -14,34 +13,35 @@ public abstract class BindingRegistryFactory : IBindingRegistryFactory
 
     public IBindingRegistryAdapter GetBindingRegistry(AssemblyLoadContext assemblyLoadContext,
         Assembly testAssembly, Option<FileDetails> configFile) =>
-        CreateObjectContainer(
-                testAssembly,
-                assemblyLoadContext
-                    .Map(CreateDependencyProvider)
-                    .Map(CreateContainerBuilder),
-                configFile
-                    .Map<Option<FileDetails>,
-                        object>(CreateConfigurationLoader)
-                    .Map(CreateConfigurationProvider)
-            )
-            .Tie(container => CreateTestRunner(container, testAssembly))
-            .Map(container => ResolveBindingRegistry(testAssembly, container))
-            .Map(AdaptBindingRegistry);
+        CreateDependencyProvider(assemblyLoadContext)
+            .Map(dependencyProvider => CreateObjectContainer(
+                    testAssembly,
+                    CreateContainerBuilder(dependencyProvider),
+                    configFile
+                        .Map<Option<FileDetails>, object>(CreateConfigurationLoader)
+                        .Map(CreateConfigurationProvider),
+                    dependencyProvider)
+                .Map(container =>
+                CreateTestRunner(container, testAssembly)
+                        .Map(testRunner => ResolveBindingRegistry(testAssembly, container, testRunner))
+                )
+                .Map(AdaptBindingRegistry)
+            );
 
     protected abstract object CreateObjectContainer(Assembly testAssembly, object containerBuilder,
-        IRuntimeConfigurationProvider configurationProvider);
+        IRuntimeConfigurationProvider configurationProvider, object dependencyProvider);
 
-    protected abstract IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext);
+    protected abstract object CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext);
 
-    protected abstract object CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider);
+    protected abstract object CreateContainerBuilder(object dependencyProvider);
 
     protected abstract object CreateConfigurationLoader(Option<FileDetails> configFile);
 
     protected abstract IRuntimeConfigurationProvider CreateConfigurationProvider(
         object configurationLoader);
 
-    protected abstract void CreateTestRunner(object globalContainer, Assembly testAssembly);
-    protected abstract object ResolveBindingRegistry(Assembly testAssembly, object globalContainer);
+    protected abstract object CreateTestRunner(object globalContainer, Assembly testAssembly);
+    protected abstract object ResolveBindingRegistry(Assembly testAssembly, object globalContainer, object testRunner);
 
     protected abstract IBindingRegistryAdapter AdaptBindingRegistry(object bindingRegistry);
 }
