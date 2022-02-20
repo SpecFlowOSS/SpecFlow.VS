@@ -1,5 +1,4 @@
-﻿using TechTalk.SpecFlow.Bindings;
-using TechTalk.SpecFlow.Configuration;
+﻿using TechTalk.SpecFlow.Configuration;
 using TechTalk.SpecFlow.Infrastructure;
 
 namespace SpecFlowConnector.SpecFlowProxies;
@@ -13,7 +12,7 @@ public abstract class BindingRegistryFactory : IBindingRegistryFactory
         Log = log;
     }
 
-    public IBindingRegistry GetBindingRegistry(AssemblyLoadContext assemblyLoadContext,
+    public IBindingRegistryAdapter GetBindingRegistry(AssemblyLoadContext assemblyLoadContext,
         Assembly testAssembly, Option<FileDetails> configFile) =>
         CreateObjectContainer(
                 testAssembly,
@@ -26,14 +25,15 @@ public abstract class BindingRegistryFactory : IBindingRegistryFactory
                     .Map(CreateConfigurationProvider)
             )
             .Tie(container => CreateTestRunner(container, testAssembly))
-            .Map(container => ResolveBindingRegistry(testAssembly, container));
+            .Map(container => ResolveBindingRegistry(testAssembly, container))
+            .Map(AdaptBindingRegistry);
 
-    protected abstract object CreateObjectContainer(Assembly testAssembly, ContainerBuilder containerBuilder,
+    protected abstract object CreateObjectContainer(Assembly testAssembly, object containerBuilder,
         IRuntimeConfigurationProvider configurationProvider);
 
     protected abstract IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext);
 
-    protected abstract ContainerBuilder CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider);
+    protected abstract object CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider);
 
     protected abstract object CreateConfigurationLoader(Option<FileDetails> configFile);
 
@@ -41,5 +41,7 @@ public abstract class BindingRegistryFactory : IBindingRegistryFactory
         object configurationLoader);
 
     protected abstract void CreateTestRunner(object globalContainer, Assembly testAssembly);
-    protected abstract IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, object globalContainer);
+    protected abstract object ResolveBindingRegistry(Assembly testAssembly, object globalContainer);
+
+    protected abstract IBindingRegistryAdapter AdaptBindingRegistry(object bindingRegistry);
 }

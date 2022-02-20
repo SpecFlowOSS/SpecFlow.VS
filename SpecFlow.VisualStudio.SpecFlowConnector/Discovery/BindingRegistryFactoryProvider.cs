@@ -42,7 +42,8 @@ public class BindingRegistryFactoryProvider
             >= 3_01_062 => new BindingRegistryFactoryBeforeV307013(_log),
             >= 3_00_225 => new BindingRegistryFactoryBeforeV301062(_log),
             >= 2_02_000 => new BindingRegistryFactoryBeforeV300225(_log),
-            _ => new BindingRegistryFactoryBeforeV202000(_log)
+            >= 2_01_000 => new BindingRegistryFactoryBeforeV202000(_log),
+            _ => new BindingRegistryFactoryBeforeV201000(_log)
         };
 
     private Option<FileVersionInfo> GetSpecFlowVersion()

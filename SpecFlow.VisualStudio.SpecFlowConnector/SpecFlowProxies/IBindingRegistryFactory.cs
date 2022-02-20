@@ -1,9 +1,9 @@
-﻿using TechTalk.SpecFlow.Bindings;
-
-namespace SpecFlowConnector.SpecFlowProxies;
+﻿namespace SpecFlowConnector.SpecFlowProxies;
 
 public interface IBindingRegistryFactory
 {
-    IBindingRegistry GetBindingRegistry(AssemblyLoadContext assemblyLoadContext,
-        Assembly testAssembly, Option<FileDetails> configFile);
+    IBindingRegistryAdapter GetBindingRegistry(
+        AssemblyLoadContext assemblyLoadContext,
+        Assembly testAssembly,
+        Option<FileDetails> configFile);
 }

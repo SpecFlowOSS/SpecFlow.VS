@@ -21,8 +21,9 @@ public class SpecFlowDiscoverer
         var typeNames = ImmutableSortedDictionary.CreateBuilder<string, string>();
         var sourcePaths = ImmutableSortedDictionary.CreateBuilder<string, string>();
 
-        var stepDefinitions = new BindingRegistryAdapterAdapter(bindingRegistryFactory)
-            .GetStepDefinitions(assemblyLoadContext, configFile, testAssembly)
+        var stepDefinitions = bindingRegistryFactory
+            .GetBindingRegistry(assemblyLoadContext, testAssembly, configFile)
+            .GetStepDefinitions()
             .Select(sdb => CreateStepDefinition(sdb,
                 method => GetParamTypes(method, parameterTypeName => GetKey(typeNames, parameterTypeName)),
                 sourcePath => GetKey(sourcePaths, sourcePath))

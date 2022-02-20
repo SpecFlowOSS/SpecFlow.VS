@@ -19,16 +19,20 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory
 
     protected override IRuntimeConfigurationProvider
         CreateConfigurationProvider(object configurationLoader) =>
-        CreateConfigurationProvider((IConfigurationLoader)configurationLoader);
+        CreateConfigurationProvider((IConfigurationLoader) configurationLoader);
 
     protected virtual IRuntimeConfigurationProvider
         CreateConfigurationProvider(IConfigurationLoader configurationLoader) =>
         new DefaultRuntimeConfigurationProvider(configurationLoader);
 
-    protected override ContainerBuilder CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider) =>
+    protected override object CreateContainerBuilder(IDefaultDependencyProvider dependencyProvider) =>
         new ContainerBuilderThatResetsTraceListener(dependencyProvider);
 
-    protected override object CreateObjectContainer(Assembly testAssembly, ContainerBuilder containerBuilder,
+    protected override object CreateObjectContainer(Assembly testAssembly, object containerBuilder,
+        IRuntimeConfigurationProvider configurationProvider) =>
+        CreateObjectContainer(testAssembly, (ContainerBuilder) containerBuilder, configurationProvider);
+
+    protected virtual object CreateObjectContainer(Assembly testAssembly, ContainerBuilder containerBuilder,
         IRuntimeConfigurationProvider configurationProvider) =>
         containerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
 
@@ -48,4 +52,10 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory
 
     protected virtual IBindingRegistry ResolveBindingRegistry(Assembly testAssembly, IObjectContainer globalContainer)
         => globalContainer.Resolve<IBindingRegistry>();
+
+    protected override IBindingRegistryAdapter AdaptBindingRegistry(object bindingRegistry)
+        => AdaptBindingRegistry((IBindingRegistry) bindingRegistry);
+
+    protected virtual IBindingRegistryAdapter AdaptBindingRegistry(IBindingRegistry bindingRegistry)
+        => new BindingRegistryAdapterVLatest(bindingRegistry);
 }
