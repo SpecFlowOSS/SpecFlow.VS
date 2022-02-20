@@ -1,5 +1,6 @@
 ﻿using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Bindings.Discovery;
+using TechTalk.SpecFlow.Infrastructure;
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
@@ -9,10 +10,16 @@ public class BindingRegistryFactoryBeforeV301062 : BindingRegistryFactoryBeforeV
     {
     }
 
-    protected override ITestRunner CreateTestRunner(IObjectContainer globalContainer, Assembly testAssembly)
+    protected override object PrepareTestRunnerCreation(object globalContainer, AssemblyLoadContext assemblyLoadContext)
     {
-        globalContainer.ReflectionRegisterTypeAs(typeof(RuntimeBindingRegistryBuilderV301062Patch),
+        globalContainer.ReflectionRegisterTypeAs(
+            typeof(RuntimeBindingRegistryBuilderV301062Patch),
             typeof(IRuntimeBindingRegistryBuilder));
-        return base.CreateTestRunner(globalContainer, testAssembly);
+
+        globalContainer.ReflectionRegisterTypeAs(
+            typeof(BindingAssemblyContextLoader),
+            typeof(IBindingAssemblyLoader));
+
+        return globalContainer;
     }
 }

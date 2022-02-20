@@ -1,6 +1,4 @@
-﻿using TechTalk.SpecFlow.Infrastructure;
-
-namespace SpecFlowConnector.SpecFlowProxies;
+﻿namespace SpecFlowConnector.SpecFlowProxies;
 
 public class BindingRegistryFactoryBeforeV307013 : BindingRegistryFactoryBeforeV309022
 {
@@ -8,6 +6,11 @@ public class BindingRegistryFactoryBeforeV307013 : BindingRegistryFactoryBeforeV
     {
     }
 
-    protected override object CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
-        new SpecFlowDependencyProviderBeforeV307013(assemblyLoadContext);
+    protected override object CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext)
+        => new SpecFlowDependencyProviderBeforeV307013(assemblyLoadContext);
+
+    protected override object PrepareTestRunnerCreation(
+        IObjectContainer globalContainer,
+        AssemblyLoadContext assemblyLoadContext)
+        => globalContainer;
 }

@@ -22,8 +22,11 @@ public class BindingRegistryFactoryBeforeV201000 : BindingRegistryFactoryBeforeV
                ?? throw new TypeLoadException("Couldn't load TechTalk.SpecFlow.Infrastructure.TestRunContainerBuilder");
     }
 
-    protected override object CreateObjectContainer(Assembly testAssembly, object containerBuilder,
-        IRuntimeConfigurationProvider configurationProvider, object dependencyProvider)
+    protected override object CreateObjectContainer(
+        Assembly testAssembly,
+        object containerBuilder,
+        IRuntimeConfigurationProvider configurationProvider, 
+        object dependencyProvider)
     {
         return containerBuilder.ReflectionCallMethod<object>(
             "CreateContainer", new[] {typeof(IRuntimeConfigurationProvider)}, new object[] {null!});

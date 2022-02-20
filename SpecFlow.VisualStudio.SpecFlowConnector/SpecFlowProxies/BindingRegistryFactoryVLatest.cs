@@ -40,6 +40,17 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory
         IRuntimeConfigurationProvider configurationProvider, IDefaultDependencyProvider dependencyProvider) =>
         containerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
 
+    protected override object PrepareTestRunnerCreation(object globalContainer, AssemblyLoadContext assemblyLoadContext) 
+        => PrepareTestRunnerCreation((IObjectContainer)globalContainer, assemblyLoadContext);
+
+    protected virtual object PrepareTestRunnerCreation(IObjectContainer globalContainer,
+        AssemblyLoadContext assemblyLoadContext)
+    {
+        globalContainer.RegisterTypeAs<BindingAssemblyContextLoader, IBindingAssemblyLoader>();
+
+        return globalContainer;
+    }
+
     protected override object CreateTestRunner(object globalContainer, Assembly testAssembly)
         => CreateTestRunner((IObjectContainer) globalContainer, testAssembly);
 

@@ -33,11 +33,15 @@ public class BindingRegistryFactoryBeforeV300225 : BindingRegistryFactoryBeforeV
         return globalContainer;
     }
 
+    protected override object PrepareTestRunnerCreation(object globalContainer, AssemblyLoadContext assemblyLoadContext)
+    {
+        globalContainer.ReflectionRegisterInstanceAs(assemblyLoadContext);
+
+        return base.PrepareTestRunnerCreation(globalContainer, assemblyLoadContext);
+    }
+
     protected override object CreateTestRunner(object globalContainer, Assembly testAssembly)
     {
-        globalContainer.ReflectionRegisterTypeAs(typeof(RuntimeBindingRegistryBuilderV301062Patch),
-            typeof(IRuntimeBindingRegistryBuilder));
-
         var testRunnerManager = (TestRunnerManager) globalContainer.ReflectionResolve<ITestRunnerManager>();
 
         testRunnerManager.Initialize(testAssembly);

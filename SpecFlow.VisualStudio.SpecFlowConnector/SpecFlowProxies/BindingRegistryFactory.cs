@@ -21,8 +21,9 @@ public abstract class BindingRegistryFactory : IBindingRegistryFactory
                         .Map<Option<FileDetails>, object>(CreateConfigurationLoader)
                         .Map(CreateConfigurationProvider),
                     dependencyProvider)
+                .Map(container=>PrepareTestRunnerCreation(container, assemblyLoadContext))
                 .Map(container =>
-                CreateTestRunner(container, testAssembly)
+                    CreateTestRunner(container, testAssembly)
                         .Map(testRunner => ResolveBindingRegistry(testAssembly, container, testRunner))
                 )
                 .Map(AdaptBindingRegistry)
@@ -39,6 +40,8 @@ public abstract class BindingRegistryFactory : IBindingRegistryFactory
 
     protected abstract IRuntimeConfigurationProvider CreateConfigurationProvider(
         object configurationLoader);
+
+    protected abstract object PrepareTestRunnerCreation(object globalContainer, AssemblyLoadContext assemblyLoadContext);
 
     protected abstract object CreateTestRunner(object globalContainer, Assembly testAssembly);
     protected abstract object ResolveBindingRegistry(Assembly testAssembly, object globalContainer, object testRunner);

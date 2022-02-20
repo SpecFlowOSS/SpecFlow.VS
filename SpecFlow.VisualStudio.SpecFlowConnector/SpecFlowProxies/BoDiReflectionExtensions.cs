@@ -2,6 +2,16 @@
 
 public static class BoDiReflectionExtensions
 {
+    //public void RegisterInstanceAs(object instance, Type interfaceType, string name = null, bool dispose = false)
+    public static void ReflectionRegisterInstanceAs<T>(this object container, T instance)
+    {
+        if (instance == null) throw new ArgumentNullException(nameof(instance));
+        container.ReflectionCallMethod(
+            nameof(IObjectContainer.RegisterInstanceAs),
+            new[] { typeof(T), typeof(Type), typeof(string), typeof(bool) },
+            instance, typeof(T), null!, false);
+    }
+
     public static T ReflectionResolve<T>(this object container)
     {
         return container.ReflectionCallMethod<T>(nameof(IObjectContainer.Resolve),
