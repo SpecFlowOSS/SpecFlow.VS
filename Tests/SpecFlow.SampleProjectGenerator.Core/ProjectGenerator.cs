@@ -194,7 +194,7 @@ public abstract class ProjectGenerator : IProjectGenerator
     {
         ExecNuGetInstall(_options.ExternalBindingPackageName, packagesFolder);
         var projectChanger = CreateProjectChanger(projectFilePath);
-        InstallNuGetPackage(projectChanger, packagesFolder, _options.ExternalBindingPackageName);
+        InstallNuGetPackage(projectChanger, packagesFolder, _options.ExternalBindingPackageName, packageVersion:"1.0.0");
         projectChanger.SetSpecFlowConfig("stepAssemblies/stepAssembly", "assembly",
             _options.ExternalBindingPackageName);
         projectChanger.Save();
@@ -204,11 +204,15 @@ public abstract class ProjectGenerator : IProjectGenerator
     {
         ExecNuGetInstall(_options.PluginName, packagesFolder);
         var projectChanger = CreateProjectChanger(projectFilePath);
-        InstallNuGetPackage(projectChanger, packagesFolder, _options.PluginName);
-        projectChanger.SetSpecFlowConfig("plugins/add", "name", _options.PluginName.Replace(".SpecFlowPlugin", ""));
-        projectChanger.SetSpecFlowConfig("plugins/add", "type",
-            _options.AddRuntimePlugin && _options.AddGeneratorPlugin ? "GeneratorAndRuntime" :
-            _options.AddGeneratorPlugin ? "Generator" : "Runtime");
+        InstallNuGetPackage(projectChanger, packagesFolder, _options.PluginName, packageVersion: "1.0.0");
+        if (_options.SpecFlowVersion.Major < 3)
+        {
+            projectChanger.SetSpecFlowConfig("plugins/add", "name", _options.PluginName.Replace(".SpecFlowPlugin", ""));
+            projectChanger.SetSpecFlowConfig("plugins/add", "type",
+                _options.AddRuntimePlugin && _options.AddGeneratorPlugin ? "GeneratorAndRuntime" :
+                _options.AddGeneratorPlugin ? "Generator" : "Runtime");
+        }
+
         projectChanger.Save();
     }
 
