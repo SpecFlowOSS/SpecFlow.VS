@@ -4,6 +4,6 @@
     "ScenarioPerFeatureFileCount": 1,
     "NewProjectFormat": true,
     "TargetFramework": "net6.0",
-    "SpecFlowPackageVersion": "3.0.225"
+    "SpecFlowPackageVersion": "3.9.40"
   }
 }

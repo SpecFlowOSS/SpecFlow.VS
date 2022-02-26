@@ -9,7 +9,7 @@
     "SFFileVersion": "3.9.40.46609",
     "SFProductVersion": "3.9.40+11b6bbec89",
     "SourcePaths": "1",
-    "StepDefinitions": "3",
+    "StepDefinitions": "4",
     "TargetFramework": ".NETCoreApp,Version=v6.0",
     "TypeNames": "0"
   }
