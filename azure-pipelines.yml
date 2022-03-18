@@ -91,7 +91,7 @@ steps:
   displayName: Run Connector Tests
   inputs:
     command: test
-    projects: '**/*Connector*Tests/*.csproj'
+    projects: '**/*Connector**Tests/*.csproj'
     arguments: '--configuration $(BuildConfiguration) --no-build'
     testRunTitle: Connector Tests
   condition: succeededOrFailed()
