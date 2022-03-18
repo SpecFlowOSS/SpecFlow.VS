@@ -21,6 +21,7 @@ public class GeneratedProjectTests : ApprovalTestBase
     }
 
     [Theory]
+    [InlineData("DS_3.9.40_nunit_nprj_net452_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net461_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net472_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_bt_992117478")]
