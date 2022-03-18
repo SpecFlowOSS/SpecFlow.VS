@@ -6,4 +6,5 @@ Assembly TestAssemblyFactory(AssemblyLoadContext context, string testAssemblyPat
 }
 
 return new Runner(log)
-    .Run(args, TestAssemblyFactory);
+    .Run(args, TestAssemblyFactory)
+    .Map(result=>(int)result);

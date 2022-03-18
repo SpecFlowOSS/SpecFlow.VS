@@ -6,12 +6,19 @@ public class Runner
 {
     private readonly ILogger _log;
 
+    public enum ExecutionResult
+    {
+        Succeed = 0,
+        ArgumentError = 3,
+        GenericError = 4
+    };
+
     public Runner(ILogger log)
     {
         _log = log;
     }
 
-    public int Run(string[] args, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory)
+    public ExecutionResult Run(string[] args, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory)
     {
         try
         {
@@ -30,7 +37,7 @@ public class Runner
                 .Map(JsonSerialization.SerializeObject)
                 .Map(JsonSerialization.MarkResult)
                 .Tie(PrintResult)
-                .Map(_ => 0);
+                .Map(_=>ExecutionResult.Succeed);
         }
         catch (Exception ex)
         {
@@ -40,16 +47,18 @@ public class Runner
 
     public void DumpOptions(ConnectorOptions options) => _log.Info(options.ToString());
 
-
     private void PrintResult(string result)
     {
         _log.Info(result);
     }
-
-    private int HandleException(Exception ex)
+ 
+    private ExecutionResult HandleException(Exception ex)
     {
         return ex.Tie(e => _log.Error(e.ToString()))
-            .Map(e => e is ArgumentException ? 3 : 4);
+            .Map(e => e is ArgumentException 
+                        ? ExecutionResult.ArgumentError 
+                        : ExecutionResult.GenericError
+            );
     }
 }
 

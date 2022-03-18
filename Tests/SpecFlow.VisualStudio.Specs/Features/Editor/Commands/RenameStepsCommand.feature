@@ -115,7 +115,7 @@ Scenario: Multiple step definitions declared for the method
 		}
 		"""
 	And the project is built and the initial binding discovery is performed
-	When I invoke the "Rename Step" command
+	When I invoke the "Rename Step" command without waiting for the tag changes
 	Then a jump list "Choose step definition to rename" is opened with the following items
 		| step type | step definition |
 		| Given     | I press add     |

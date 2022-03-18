@@ -290,7 +290,7 @@ Scenario: Formatting of Descriptions and Comments are not changed
 
 		    Given I have entered 50 into the calculator
 		"""
-	When I invoke the "Auto Format Document" command
+	When I invoke the "Auto Format Document" command without waiting for the tag changes
 	Then the editor should be updated to
 		"""
 		Feature: Addition
