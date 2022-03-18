@@ -1,6 +1,5 @@
 ﻿namespace SpecFlow.SampleProjectGenerator;
 
-
 public record ProcessStartInfoEx(
     string WorkingDirectory,
     string ExecutablePath,

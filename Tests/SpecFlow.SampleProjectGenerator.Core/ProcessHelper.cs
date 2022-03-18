@@ -1,6 +1,4 @@
 ﻿namespace SpecFlow.SampleProjectGenerator;
-using System.Text;
-
 
 public class ProcessHelper
 {

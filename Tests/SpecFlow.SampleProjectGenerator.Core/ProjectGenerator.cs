@@ -26,7 +26,6 @@ public abstract class ProjectGenerator : IProjectGenerator
     public void Generate()
     {
         _consoleWriteLine(_options.TargetFolder);
-        _consoleWriteLine(TargetFolder);
         if (!_options.Force &&
             Directory.Exists(Path.Combine(_options.TargetFolder, ".git")) &&
             File.Exists(Path.Combine(_options.TargetFolder, "DeveroomSample.csproj")))
@@ -91,17 +90,14 @@ public abstract class ProjectGenerator : IProjectGenerator
         }
 
         GitInit();
-        _consoleWriteLine(string.Join(",", Directory.GetFiles(TargetFolder, "*.*", SearchOption.AllDirectories)));
     }
 
     private void EnsureEnvironmentVariables()
     {
         if (_options.SpecFlowVersion.Major == 3 && _options.SpecFlowVersion.Minor < 2)
-        {
             //MSBUILDSINGLELOADCONTEXT is required for some SpecFlow versions.
             //See https://stackoverflow.com/questions/60755395/specflow-generatefeaturefilecodebehindtask-has-failed-unexpectedly
             Environment.SetEnvironmentVariable("MSBUILDSINGLELOADCONTEXT", "1");
-        }
     }
 
     protected virtual void SetTargetFramework(string projectFilePath)
@@ -116,11 +112,7 @@ public abstract class ProjectGenerator : IProjectGenerator
         FeatureFiles.AddRange(Directory.GetFiles(_options.TargetFolder, "*.feature", SearchOption.AllDirectories));
         var projectFilePath = Directory.GetFiles(TargetFolder, "*.csproj").FirstOrDefault();
         if (projectFilePath == null)
-        {
-            _consoleWriteLine(string.Join(",", Directory.GetFiles(TargetFolder, "*.*", SearchOption.AllDirectories)));
             throw new Exception("Unable to detect project file");
-        }
-
         var projectChanger = CreateProjectChanger(projectFilePath);
         InstalledNuGetPackages.AddRange(projectChanger.GetInstalledNuGetPackages(GetPackagesFolder()));
     }
@@ -226,11 +218,8 @@ public abstract class ProjectGenerator : IProjectGenerator
 
     private bool GitReset()
     {
-        ExecGit("status");
-        ExecGit("log");
         var exitCode = ExecGit("reset", "--hard");
         ExecGit("clean", "-fdx", "-e", "packages");
-        ExecGit("log");
         if (exitCode != 0)
             _consoleWriteLine($"Git status exit code: {exitCode}");
         return exitCode == 0;
@@ -244,12 +233,8 @@ public abstract class ProjectGenerator : IProjectGenerator
 
     private void GitCommitAll()
     {
-        ExecGit("status");
-        ExecGit("log");
         ExecGit("add", ".");
         ExecGit("-c user.name='SpecFlow'", "-c user.email='specflow@tricentis.com'", "commit", "-q", "-m", "init");
-        ExecGit("status");
-        ExecGit("log");
     }
 
     private void InstallNUnit(string packagesFolder, string projectFilePath)
