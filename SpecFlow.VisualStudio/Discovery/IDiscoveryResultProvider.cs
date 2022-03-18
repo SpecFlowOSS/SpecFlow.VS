@@ -18,12 +18,12 @@ public class DiscoveryResultProvider : IDiscoveryResultProvider
 
     public DiscoveryResult RunDiscovery(string testAssemblyPath, string configFilePath, ProjectSettings projectSettings)
     {
-        //if (projectSettings.SpecFlowVersion.Version.Major >= 3)
+        if (projectSettings.SpecFlowVersion.Version > new Version(3, 0, 225) )
         {
             DiscoveryResult result = RunDiscovery(testAssemblyPath, configFilePath, projectSettings,
                 OutProcSpecFlowConnectorFactory.CreateGeneric(_projectScope));
 
-          //  if (!result.IsFailed)
+            if (!result.IsFailed)
                 return result;
         }
 
