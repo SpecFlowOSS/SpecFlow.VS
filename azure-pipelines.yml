@@ -35,7 +35,7 @@ steps:
   displayName: 'Install nuget packages'
   inputs:
     command: 'custom'
-    arguments: 'install .\Tests\SpecFlowPackages\Packages.config'
+    arguments: 'install .\Tests\ExternalPackages\PackagesForTests\Packages.config'
 
 - task: DotNetCoreCLI@2
   displayName: Run Unit Tests
@@ -50,7 +50,7 @@ steps:
   displayName: Run Connector Tests
   inputs:
     command: test
-    projects: '**/*Connector*Tests/*.csproj'
+    projects: '**/*Connector**Tests/*.csproj'
     arguments: '--configuration $(BuildConfiguration) --no-build'
     testRunTitle: Connector Tests
   condition: succeededOrFailed()
