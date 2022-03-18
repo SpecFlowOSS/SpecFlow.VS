@@ -27,11 +27,10 @@ public class Runner
                     ImmutableSortedDictionary<string, string>.Empty,
                     analytics,
                     errorMessage)))
-                .Map<Exception, DiscoveryResult, string>(JsonSerialization.SerializeObject)
+                .Map(JsonSerialization.SerializeObject)
                 .Map(JsonSerialization.MarkResult)
                 .Tie(PrintResult)
-                .Map<Exception, string, int>(_ => 0)
-                .Reduce(HandleException);
+                .Map(_ => 0);
         }
         catch (Exception ex)
         {

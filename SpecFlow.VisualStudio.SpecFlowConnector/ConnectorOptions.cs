@@ -2,10 +2,10 @@
 
 public record ConnectorOptions(bool DebugMode)
 {
-    public static Either<Exception, ConnectorOptions> Parse(string[] args)
+    public static ConnectorOptions Parse(string[] args)
     {
         if (args.Length == 0)
-            return new ArgumentException("Command is missing!");
+            throw new ArgumentException("Command is missing!");
 
         var commandArgsList = args.Skip(1).ToList();
         int debugArgIndex = commandArgsList.IndexOf("--debug");
@@ -22,7 +22,7 @@ public record ConnectorOptions(bool DebugMode)
         return commandName switch
         {
             DiscoveryCommand.CommandName => DiscoveryOptions.Parse(commandArgs, debugMode),
-            _ => new ArgumentException($"Invalid command: {commandName}")
+            _ => throw new ArgumentException($"Invalid command: {commandName}")
         };
     }
 }
