@@ -4,6 +4,6 @@
     "ScenarioPerFeatureFileCount": 1,
     "NewProjectFormat": true,
     "TargetFramework": "net452",
-    "SpecFlowPackageVersion": "3.9.40"
+    "SpecFlowPackageVersion": "3.1.97"
   }
 }
