@@ -5,8 +5,8 @@
     "NewProjectFormat": true,
     "TargetFramework": "net6.0",
     "SpecFlowPackageVersion": "3.9.40",
-		"AddRuntimePlugin": true,
-		"PluginName": "Deveroom.SampleSpecFlow3940.SpecFlowPlugin",
-		"FallbackNuGetPackageSource": "c:\\git\\SpecFlow.VS\\Tests\\ExternalPackages"
+    "AddRuntimePlugin": true,
+    "PluginName": "Deveroom.SampleSpecFlow3940.SpecFlowPlugin",
+    "FallbackNuGetPackageSource": "{ExternalPackages}"
   }
 }
