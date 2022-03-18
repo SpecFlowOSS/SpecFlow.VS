@@ -53,7 +53,7 @@ steps:
     displayName: Run Connector Tests ${{thing}}
     inputs:
       command: test
-      projects: '**/SpecFlow.VisualStudio.SpecFlowConnector.Tests/*.csproj'
+      projects: '**/*Connector*Tests/*.csproj'
       arguments: '--configuration $(BuildConfiguration) --no-build'
       testRunTitle: Connector Tests ${{thing}}
     condition: succeededOrFailed()
