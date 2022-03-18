@@ -21,9 +21,6 @@ public class GeneratedProjectTests : ApprovalTestBase
     }
 
     [Theory]
-    [InlineData("DS_2.3.2_nunit_1194832604")]
-    //[InlineData("DS_3.9.40_nunit_nprj_net35_bt_992117478")]
-    //[InlineData("DS_3.9.40_nunit_nprj_net452_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net461_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net472_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_bt_992117478")]
@@ -36,6 +33,8 @@ public class GeneratedProjectTests : ApprovalTestBase
     [InlineData("DS_3.9.40_nunit_nprj_netcoreapp31_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net5.0_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net6.0_bt_992117478")]
+    [InlineData("DS_3.9.40_nunit_nprj_net6.0_extbnd_bt_992117478")]
+    [InlineData("DS_3.9.40_nunit_nprj_net6.0_plug(r)_bt_992117478")]
     [InlineData("DS_3.9.22_nunit_nprj_net6.0_bt_992117478")]
     [InlineData("DS_3.9.8_nunit_nprj_net6.0_bt_992117478")]
     [InlineData("DS_3.8.14_nunit_nprj_net6.0_bt_992117478")]

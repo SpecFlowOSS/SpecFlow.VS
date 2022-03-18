@@ -1,9 +1,16 @@
-﻿using TechTalk.SpecFlow.Infrastructure;
-
-namespace SpecFlowConnector.SpecFlowProxies;
+﻿namespace SpecFlowConnector.SpecFlowProxies;
 
 public class BindingRegistryFactoryBeforeV307013 : BindingRegistryFactoryBeforeV309022
 {
-    protected override IDefaultDependencyProvider CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext) =>
-        new SpecFlowDependencyProviderBeforeV307013(assemblyLoadContext);
+    public BindingRegistryFactoryBeforeV307013(ILogger log) : base(log)
+    {
+    }
+
+    protected override object CreateDependencyProvider(AssemblyLoadContext assemblyLoadContext)
+        => new SpecFlowDependencyProviderBeforeV307013(assemblyLoadContext);
+
+    protected override object PrepareTestRunnerCreation(
+        IObjectContainer globalContainer,
+        AssemblyLoadContext assemblyLoadContext)
+        => globalContainer;
 }

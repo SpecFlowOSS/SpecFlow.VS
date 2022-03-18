@@ -5,33 +5,40 @@ namespace SpecFlowConnector;
 public class Runner
 {
     private readonly ILogger _log;
+    readonly AnalyticsContainer _analytics;
+
+    public enum ExecutionResult
+    {
+        Succeed = 0,
+        ArgumentError = 3,
+        GenericError = 4
+    };
 
     public Runner(ILogger log)
     {
         _log = log;
+        _analytics = new AnalyticsContainer();
+        _analytics.AddAnalyticsProperty("Connector", GetType().Assembly.ToString());
     }
 
-    public int Run(string[] args, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory)
+    public ExecutionResult Run(string[] args, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory)
     {
         try
         {
-            var analytics = new AnalyticsContainer();
-            analytics.AddAnalyticsProperty("Connector", GetType().Assembly.ToString());
             return args
                 .Map(ConnectorOptions.Parse)
                 .Tie(DumpOptions)
                 .Map(options =>
-                    ReflectionExecutor.Execute((DiscoveryOptions) options, testAssemblyFactory, _log, analytics))
+                    ReflectionExecutor.Execute((DiscoveryOptions) options, testAssemblyFactory, _log, _analytics))
                 .Map(result => result.Reduce(errorMessage => new DiscoveryResult(ImmutableArray<StepDefinition>.Empty,
                     ImmutableSortedDictionary<string, string>.Empty,
                     ImmutableSortedDictionary<string, string>.Empty,
-                    analytics,
+                    _analytics,
                     errorMessage)))
-                .Map<Exception, DiscoveryResult, string>(JsonSerialization.SerializeObject)
+                .Map(JsonSerialization.SerializeObject)
                 .Map(JsonSerialization.MarkResult)
                 .Tie(PrintResult)
-                .Map<Exception, string, int>(_ => 0)
-                .Reduce(HandleException);
+                .Map(_=>ExecutionResult.Succeed);
         }
         catch (Exception ex)
         {
@@ -41,16 +48,18 @@ public class Runner
 
     public void DumpOptions(ConnectorOptions options) => _log.Info(options.ToString());
 
-
     private void PrintResult(string result)
     {
         _log.Info(result);
     }
-
-    private int HandleException(Exception ex)
+ 
+    private ExecutionResult HandleException(Exception ex)
     {
         return ex.Tie(e => _log.Error(e.ToString()))
-            .Map(e => e is ArgumentException ? 3 : 4);
+            .Map(e => e is ArgumentException 
+                        ? ExecutionResult.ArgumentError 
+                        : ExecutionResult.GenericError
+            );
     }
 }
 
@@ -98,7 +107,11 @@ public class ReflectionExecutor
         var analytics = new AnalyticsContainer(analyticsProperties);
         var log = new StringWriterLogger();
         return JsonSerialization.DeserializeObject<DiscoveryOptions>(optionsJson)
-            .Map(options => Execute(log, options, testAssembly, assemblyLoadContext, analytics)
+            .Map(options => EitherAdapters.Try(
+                    () => new CommandFactory(log, options, testAssembly, analytics)
+                    .Map(factory => factory.CreateCommand())
+                    .Map(cmd => cmd.Execute(assemblyLoadContext))
+                )
                 .Reduce(ex =>
                 {
                     var errorMessage = ex.ToString();
@@ -114,21 +127,5 @@ public class ReflectionExecutor
             )
             .Reduce($"Unable to deserialize {optionsJson}");
     }
-
-    private Either<Exception, DiscoveryResult> Execute(ILogger log, DiscoveryOptions options, Assembly testAssembly,
-        AssemblyLoadContext assemblyLoadContext, IAnalyticsContainer analytics)
-    {
-        try
-        {
-            return new CommandFactory(log, options, testAssembly, analytics)
-                .Map(factory => factory.CreateCommand())
-                .Map(cmd => cmd.Execute(assemblyLoadContext));
-        }
-        catch (Exception ex)
-        {
-            return ex;
-        }
-    }
-
     public record RunnerResult(DiscoveryResult? DiscoveryResult, string Log);
 }

@@ -64,7 +64,7 @@ public class ApprovalTestBase
         var resultCode = consoleRunner.Run(
             psiEx.Arguments.Split(' '),
             (ctx, path) => testAssembly ??= ctx.LoadFromAssemblyPath(path));
-        var result = new ProcessResult(resultCode, logger[LogLevel.Info], logger[LogLevel.Error], TimeSpan.Zero);
+        var result = new ProcessResult((int)resultCode, logger[LogLevel.Info], logger[LogLevel.Error], TimeSpan.Zero);
         return result;
     }
 

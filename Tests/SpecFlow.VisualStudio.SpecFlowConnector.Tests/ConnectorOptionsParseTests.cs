@@ -9,25 +9,25 @@ public class ConnectorOptionsParseTests
         {
             new("discovery assembly",
                 (new[] {"discovery", "../targetAssembly.dll"},
-                    @"Right(System.Exception, SpecFlowConnector.ConnectorOptions)DiscoveryOptions { DebugMode = False, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFile = , ConnectorFolder = <<connectorPath>> }")),
+                    @"DiscoveryOptions { DebugMode = False, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFile = , ConnectorFolder = <<connectorPath>> }")),
             new("discovery assembly with configuration",
                 (new[] {"discovery", "../targetAssembly.dll", "../configuration.json"},
-                    @"Right(System.Exception, SpecFlowConnector.ConnectorOptions)DiscoveryOptions { DebugMode = False, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFile = <<targetPath>>\configuration.json, ConnectorFolder = <<connectorPath>> }")),
+                    @"DiscoveryOptions { DebugMode = False, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFile = <<targetPath>>\configuration.json, ConnectorFolder = <<connectorPath>> }")),
             new("Missing arguments",
                 (Array.Empty<string>(),
-                    @"Left(System.Exception, SpecFlowConnector.ConnectorOptions)System.ArgumentException: Command is missing!")),
+                    @"ArgumentException: Command is missing!")),
             new("Invalid command",
                 (new[] {"xxx"},
-                    @"Left(System.Exception, SpecFlowConnector.ConnectorOptions)System.ArgumentException: Invalid command: xxx")),
+                    @"ArgumentException: Invalid command: xxx")),
             new("debug",
                 (new[] {"discovery", "--debug", "../targetAssembly.dll"},
-                    @"Right(System.Exception, SpecFlowConnector.ConnectorOptions)DiscoveryOptions { DebugMode = True, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFile = , ConnectorFolder = <<connectorPath>> }")),
+                    @"DiscoveryOptions { DebugMode = True, AssemblyFile = <<targetPath>>\targetAssembly.dll, ConfigFile = , ConnectorFolder = <<connectorPath>> }")),
             new("debug must be after command",
                 (new[] {"--debug", "yyy"},
-                    "Left(System.Exception, SpecFlowConnector.ConnectorOptions)System.ArgumentException: Invalid command: --debug")),
+                    "ArgumentException: Invalid command: --debug")),
             new("discovery command without arguments",
                 (new[] {"discovery"},
-                    "Left(System.Exception, SpecFlowConnector.ConnectorOptions)System.InvalidOperationException: Usage: discovery <test-assembly-path> [<configuration-file-path>]"))
+                    "InvalidOperationException: Usage: discovery <test-assembly-path> [<configuration-file-path>]"))
         };
 
     private readonly ITestOutputHelper _testOutputHelper;
@@ -45,18 +45,26 @@ public class ConnectorOptionsParseTests
         NamerFactory.AdditionalInformation = @case.Label.Replace(' ', '_');
 
         //act
-        Either<Exception, ConnectorOptions> result = ConnectorOptions.Parse(@case.Data.args);
+        string resultAsString;
+        try
+        {
+            var result = ConnectorOptions.Parse(@case.Data.args);
+            resultAsString = result.ToString();
+        }
+        catch (Exception e)
+        {
+            resultAsString = e.GetType().Name +": "+ e.Message;
+        }
 
         //assert
-        string asString = $"{result}";
         _testOutputHelper.WriteLine("---------------------------result- ----------------------------------");
-        _testOutputHelper.WriteLine(asString);
-        asString = asString.Replace(FileDetails.FromPath("this").DirectoryName.Reduce("?"), "<<connectorPath>>");
-        asString = asString.Replace(FileDetails.FromPath("../this").DirectoryName.Reduce("?"), "<<targetPath>>");
+        _testOutputHelper.WriteLine(resultAsString);
+        resultAsString = resultAsString.Replace(FileDetails.FromPath("this").DirectoryName.Reduce("?"), "<<connectorPath>>");
+        resultAsString = resultAsString.Replace(FileDetails.FromPath("../this").DirectoryName.Reduce("?"), "<<targetPath>>");
         _testOutputHelper.WriteLine("--------------------------scrubbed-----------------------------------");
-        _testOutputHelper.WriteLine(asString);
+        _testOutputHelper.WriteLine(resultAsString);
         _testOutputHelper.WriteLine("--------------------------expected-----------------------------------");
         _testOutputHelper.WriteLine(@case.Data.expected);
-        Approvals.AssertText(@case.Data.expected, asString);
+        Approvals.AssertText(@case.Data.expected, resultAsString);
     }
 }

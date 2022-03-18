@@ -86,6 +86,9 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
             .Tie(lib => _log.Info($"Found runtime library:{lib}"))
             .Or(() =>
             {
+                if (assemblyName.Version == null)
+                    assemblyName.Version = new Version(0,0);
+
                 return GetRequestedLibrary(assemblyName)
                     .Map(LoadFromAssembly)
                     .Tie(lib => _log.Info($"Found requested library:{lib}"));

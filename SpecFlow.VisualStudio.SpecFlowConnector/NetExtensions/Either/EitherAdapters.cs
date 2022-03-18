@@ -32,4 +32,16 @@ public static class EitherAdapters
         either is Left<TLeft, TRight> left
             ? map(left)
             : (Right<TLeft, TRight>) either;
+
+    public static Either<Exception, T> Try<T>(this Func<T> act)
+    {
+        try
+        {
+            return act();
+        }
+        catch (Exception ex)
+        {
+            return ex;
+        }
+    }
 }

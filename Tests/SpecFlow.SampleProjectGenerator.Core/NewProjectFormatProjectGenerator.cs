@@ -42,7 +42,7 @@ public class NewProjectFormatProjectGenerator : ProjectGenerator
 
     protected override void BuildProject()
     {
-        var exitCode = ExecDotNet("restore");
+        var exitCode = ExecDotNet("restore", "-s c:\\git\\SpecFlow.VS\\Tests\\ExternalPackages");
         if (exitCode != 0)
         {
             _consoleWriteLine($"dotnet restore exit code: {exitCode}");

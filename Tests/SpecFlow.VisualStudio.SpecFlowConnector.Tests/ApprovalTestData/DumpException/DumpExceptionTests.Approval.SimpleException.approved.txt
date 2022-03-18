@@ -1,8 +1,0 @@
-﻿Error: Exception of type 'System.Exception' was thrown.
-Exception: System.Exception
-StackTrace of Exception:
-  at ... in ...
-  .
-  .
-  .
-  at ... in ...
