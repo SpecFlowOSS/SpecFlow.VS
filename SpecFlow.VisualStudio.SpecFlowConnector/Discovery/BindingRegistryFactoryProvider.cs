@@ -52,8 +52,7 @@ public class BindingRegistryFactoryProvider
         foreach (var otherSpecFlowFile in Directory.EnumerateFiles(
                      Path.GetDirectoryName(specFlowAssemblyPath)!, "TechTalk.SpecFlow*.dll"))
         {
-            var ver = GetSpecFlowVersion(otherSpecFlowFile);
-            if (ver.FileMajorPart >= 3) return ver;
+            return GetSpecFlowVersion(otherSpecFlowFile);
         }
 
         _log.Info($"Not found {specFlowAssemblyPath}");
