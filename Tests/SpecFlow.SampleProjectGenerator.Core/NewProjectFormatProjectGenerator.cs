@@ -42,7 +42,13 @@ public class NewProjectFormatProjectGenerator : ProjectGenerator
 
     protected override void BuildProject()
     {
-        var exitCode = ExecDotNet("restore", "-s c:\\git\\SpecFlow.VS\\Tests\\ExternalPackages");
+        var args = new List<string> { "restore" };
+        if (!string.IsNullOrWhiteSpace(_options.FallbackNuGetPackageSource)) {
+            args.Add("-s");
+            args.Add(_options.FallbackNuGetPackageSource);
+        }
+    
+        var exitCode = ExecDotNet(args.ToArray());
         if (exitCode != 0)
         {
             _consoleWriteLine($"dotnet restore exit code: {exitCode}");

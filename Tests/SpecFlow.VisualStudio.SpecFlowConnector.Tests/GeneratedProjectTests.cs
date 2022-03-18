@@ -21,6 +21,7 @@ public class GeneratedProjectTests : ApprovalTestBase
     }
 
     [Theory]
+    [InlineData("DS_3.1.97_nunit_nprj_net452_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net461_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_nprj_net472_bt_992117478")]
     [InlineData("DS_3.9.40_nunit_bt_992117478")]
@@ -52,6 +53,14 @@ public class GeneratedProjectTests : ApprovalTestBase
 
         testData.GeneratorOptions.IsBuilt = true;
         testData.GeneratorOptions._TargetFolder = Path.Combine(TempFolder, @"DeveroomTest\DS_{options}");
+        if (!string.IsNullOrWhiteSpace(testData.GeneratorOptions.FallbackNuGetPackageSource))
+        {
+            var path = Assembly.GetExecutingAssembly().Location;
+            path = Path.Combine(Assembly.GetExecutingAssembly().Location, "..\\..\\..\\..\\..", "ExternalPackages");
+            path = Path.GetFullPath(path);
+
+            testData.GeneratorOptions.FallbackNuGetPackageSource = testData.GeneratorOptions.FallbackNuGetPackageSource.Replace("{ExternalPackages}", path);
+        }
         var projectGenerator = testData.GeneratorOptions.CreateProjectGenerator(s => _testOutputHelper.WriteLine(s));
 
         projectGenerator.Generate();

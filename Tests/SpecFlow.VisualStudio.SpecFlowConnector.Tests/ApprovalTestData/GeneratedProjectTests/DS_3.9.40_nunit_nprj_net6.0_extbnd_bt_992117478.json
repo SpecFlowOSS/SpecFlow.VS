@@ -6,8 +6,8 @@
     "NewProjectFormat": true,
     "TargetFramework": "net6.0",
     "SpecFlowPackageVersion": "3.9.40",
-		"AddExternalBindingPackage": true,
-		"ExternalBindingPackageName": "Deveroom.SampleSpecFlow3940.ExternalBindings",
-		"FallbackNuGetPackageSource": "c:\\git\\SpecFlow.VS\\Tests\\ExternalPackages"
+    "AddExternalBindingPackage": true,
+    "ExternalBindingPackageName": "Deveroom.SampleSpecFlow3940.ExternalBindings",
+    "FallbackNuGetPackageSource": "{ExternalPackages}"
   }
 }
