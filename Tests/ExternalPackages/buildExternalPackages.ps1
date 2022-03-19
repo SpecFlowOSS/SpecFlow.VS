@@ -13,3 +13,8 @@ function BuildExternalPackage ([string]$packageFolder)
 }
 
 Get-ChildItem -Directory | ForEach-Object { BuildExternalPackage $_ }
+
+pushd .
+cd PackagesForTests
+nuget install
+popd

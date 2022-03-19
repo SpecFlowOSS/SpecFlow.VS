@@ -46,7 +46,7 @@ steps:
   displayName: 'Install nuget packages'
   inputs:
     command: 'custom'
-    arguments: 'install .\Tests\SpecFlowPackages\Packages.config'
+    arguments: 'install .\Tests\ExternalPackages\PackagesForTests\Packages.config'
     
 - ${{each thing in parameters.thingsArray}}:
   - task: DotNetCoreCLI@2
