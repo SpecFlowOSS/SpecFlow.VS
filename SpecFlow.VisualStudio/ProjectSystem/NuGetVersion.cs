@@ -5,7 +5,7 @@ namespace SpecFlow.VisualStudio.ProjectSystem;
 
 public record NuGetVersion
 {
-    public NuGetVersion(string versionSpecifier, [NotNull] string requestedRange)
+    public NuGetVersion(string versionSpecifier, string requestedRange)
     {
         if (versionSpecifier == null) throw new ArgumentNullException(nameof(versionSpecifier));
         RequestedRange = requestedRange;
@@ -32,7 +32,7 @@ public record NuGetVersion
     /// </remarks>
     public string RequestedRange { get; }
 
-    public bool IsFloating => Regex.IsMatch(RequestedRange, @"\*");
+    public bool IsFloating => RequestedRange != null && Regex.IsMatch(RequestedRange, @"\*");
 
     public override string ToString()
     {
