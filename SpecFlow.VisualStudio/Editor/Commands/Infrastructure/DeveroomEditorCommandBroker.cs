@@ -13,6 +13,7 @@ public class DeveroomFeatureEditorCommandBroker : DeveroomEditorCommandBroker<ID
         [ImportMany] IEnumerable<IDeveroomFeatureEditorCommand> commands, IDeveroomLogger logger)
         : base(adaptersFactory, commands, logger)
     {
+        Debug.Assert(_commands.Count == 8, "There have to be 8 feature file editor SpecFlow commands");
     }
 }
 
@@ -26,6 +27,7 @@ public class DeveroomCodeEditorCommandBroker : DeveroomEditorCommandBroker<IDeve
         [ImportMany] IEnumerable<IDeveroomCodeEditorCommand> commands, IDeveroomLogger logger)
         : base(adaptersFactory, commands, logger)
     {
+        Debug.Assert(_commands.Count == 2, "There have to be 2 code file editor SpecFlow commands");
     }
 }
 
@@ -33,7 +35,7 @@ public abstract class DeveroomEditorCommandBroker<TCommand> : IVsTextViewCreatio
     where TCommand : IDeveroomEditorCommand
 {
     private readonly IVsEditorAdaptersFactoryService _adaptersFactory;
-    private readonly List<TCommand> _commands;
+    protected readonly List<TCommand> _commands;
     private readonly Lazy<Dictionary<DeveroomEditorCommandTargetKey, IDeveroomEditorCommand[]>> _editorCommandRegistry;
     private readonly IDeveroomLogger _logger;
 
@@ -43,7 +45,6 @@ public abstract class DeveroomEditorCommandBroker<TCommand> : IVsTextViewCreatio
         _adaptersFactory = adaptersFactory;
         _logger = logger;
         _commands = commands.ToList();
-        Debug.Assert(_commands.Count == 8, "There have to be 8 commands");
         _editorCommandRegistry =
             new Lazy<Dictionary<DeveroomEditorCommandTargetKey, IDeveroomEditorCommand[]>>(BuildRegistry,
                 LazyThreadSafetyMode.ExecutionAndPublication);
