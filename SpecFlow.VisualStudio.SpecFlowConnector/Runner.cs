@@ -28,13 +28,7 @@ public class Runner
             return args
                 .Map(ConnectorOptions.Parse)
                 .Tie(DumpOptions)
-                .Map(options =>
-                    ReflectionExecutor.Execute((DiscoveryOptions) options, testAssemblyFactory, _log, _analytics))
-                .Map(result => result.Reduce(errorMessage => new DiscoveryResult(ImmutableArray<StepDefinition>.Empty,
-                    ImmutableSortedDictionary<string, string>.Empty,
-                    ImmutableSortedDictionary<string, string>.Empty,
-                    _analytics,
-                    errorMessage)))
+                .Map(options => ExecuteDiscovery((DiscoveryOptions)options, testAssemblyFactory))
                 .Map(JsonSerialization.SerializeObject)
                 .Map(JsonSerialization.MarkResult)
                 .Tie(PrintResult)
@@ -47,6 +41,9 @@ public class Runner
     }
 
     public void DumpOptions(ConnectorOptions options) => _log.Info(options.ToString());
+
+    public ConnectorResult ExecuteDiscovery(DiscoveryOptions options, Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory)
+        => ReflectionExecutor.Execute(options, testAssemblyFactory, _log, _analytics);
 
     private void PrintResult(string result)
     {
@@ -65,7 +62,7 @@ public class Runner
 
 public class ReflectionExecutor
 {
-    public static Either<string, DiscoveryResult> Execute(DiscoveryOptions options,
+    public static ConnectorResult Execute(DiscoveryOptions options,
         Func<AssemblyLoadContext, string, Assembly> testAssemblyFactory, ILogger _log, IAnalyticsContainer analytics)
     {
         _log.Info($"Loading {options.AssemblyFile}");
@@ -79,27 +76,46 @@ public class ReflectionExecutor
                 .AddAnalyticsProperty("TargetFramework", tf.ConstructorArguments.First().ToString().Trim('\"'))
             );
 
-        return typeof(ReflectionExecutor)
-            .Map(t => (typeName: t.FullName!, assembly: testAssemblyContext.LoadFromAssemblyPath(t.Assembly.Location)))
-            .Map(x => x.assembly.GetType(x.typeName)!)
+        return TypeFromAssemblyLoadContext(typeof(ReflectionExecutor), testAssemblyContext)
             .Map(CreateInstance)
             .Map(instance => instance.ReflectionCallMethod<string>(
                     nameof(Execute),
                     JsonSerialization.SerializeObject(options), testAssemblyContext.TestAssembly, testAssemblyContext,
                     analytics)
                 .Map(s => JsonSerialization.DeserializeObject<RunnerResult>(s)
-                    .Reduce(new RunnerResult(null!, $"Unable to deserialize{s}")))
+                    .Reduce(new RunnerResult(_log.ToString()!, analytics.ToImmutable(), null!, $"Unable to parse JSON text:{s}")))
                 .Map(result =>
                 {
-                    var (discoveryResult, log) = result;
+                    var (log, analyticsProperties, discoveryResult, errorMessage) = result;
                     _log.Info(log);
-                    return discoveryResult ?? (Either<string, DiscoveryResult>) log;
+                    if (discoveryResult != null)
+                    {
+                        return new ConnectorResult(
+                            discoveryResult.StepDefinitions,
+                            discoveryResult.SourceFiles,
+                            discoveryResult.TypeNames,
+                            analyticsProperties,
+                            errorMessage);
+                    }
+                    return new ConnectorResult(ImmutableArray<StepDefinition>.Empty,
+                    ImmutableSortedDictionary<string, string>.Empty,
+                    ImmutableSortedDictionary<string, string>.Empty,
+                    analytics.ToImmutable(),
+                    log);
                 }))
-            .Reduce(reflectedType => $"Could not create instance from:{reflectedType}");
+            .Reduce(new ConnectorResult(ImmutableArray<StepDefinition>.Empty,
+                    ImmutableSortedDictionary<string, string>.Empty,
+                    ImmutableSortedDictionary<string, string>.Empty,
+                    analytics.ToImmutable(),
+                    $"Could not create instance from: {typeof(ReflectionExecutor)}")
+            );
     }
 
-    private static Either<Type, object> CreateInstance(Type reflectedType) =>
-        Activator.CreateInstance(reflectedType) ?? reflectedType;
+    public static Type TypeFromAssemblyLoadContext(Type reType, TestAssemblyLoadContext testAssemblyContext) 
+        => testAssemblyContext.LoadFromAssemblyPath(reType.Assembly.Location).GetType(reType.FullName!)!;
+
+    private static Option<object> CreateInstance(Type reflectedType) =>
+        Activator.CreateInstance(reflectedType);
 
     public string Execute(string optionsJson, Assembly testAssembly,
         AssemblyLoadContext assemblyLoadContext, IDictionary<string, string> analyticsProperties)
@@ -112,20 +128,21 @@ public class ReflectionExecutor
                     .Map(factory => factory.CreateCommand())
                     .Map(cmd => cmd.Execute(assemblyLoadContext))
                 )
+                .Map(dr => new RunnerResult(log.ToString(), analytics.ToImmutable(), dr, null))
                 .Reduce(ex =>
                 {
                     var errorMessage = ex.ToString();
                     log.Error(errorMessage);
-                    return new DiscoveryResult(ImmutableArray<StepDefinition>.Empty,
-                        ImmutableSortedDictionary<string, string>.Empty,
-                        ImmutableSortedDictionary<string, string>.Empty,
+                    return new RunnerResult(
+                        log.ToString(),
                         analytics,
+                        null,
                         errorMessage);
                 })
-                .Map(dr => new RunnerResult(dr, log.ToString()))
-                .Map(JsonSerialization.SerializeObject)
+                
             )
-            .Reduce($"Unable to deserialize {optionsJson}");
+            .Reduce(new RunnerResult(log.ToString(), analytics, null, $"Unable to deserialize {optionsJson}"))
+            .Map(JsonSerialization.SerializeObject);
     }
-    public record RunnerResult(DiscoveryResult? DiscoveryResult, string Log);
+    public record RunnerResult(string Log, ImmutableSortedDictionary<string, string> AnalyticsProperties, DiscoveryResult? DiscoveryResult, string? errorMessage);
 }

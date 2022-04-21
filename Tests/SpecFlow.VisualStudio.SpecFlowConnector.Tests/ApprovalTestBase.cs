@@ -120,7 +120,7 @@ public class ApprovalTestBase
     private static string ScrubVolatileParts(string content)
     {
         return content
-            .Map(r => JsonSerialization.DeserializeObject<DiscoveryResult>(r)
+            .Map(r => JsonSerialization.DeserializeObject<ConnectorResult>(r)
                 .Map(dr => dr with {StepDefinitions = ImmutableArray<StepDefinition>.Empty})
                 .Map(dr => dr with {SourceFiles = ImmutableSortedDictionary<string, string>.Empty})
                 .Map(dr => dr with {TypeNames = ImmutableSortedDictionary<string, string>.Empty})

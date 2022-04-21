@@ -31,16 +31,14 @@ public class SpecFlowDiscoverer
             .OrderBy(sd => sd.SourceLocation)
             .ToImmutableArray();
 
-        _analytics.AddAnalyticsProperty("StepDefinitions", stepDefinitions.Length.ToString());
-        _analytics.AddAnalyticsProperty("SourcePaths", sourcePaths.Count.ToString());
         _analytics.AddAnalyticsProperty("TypeNames", typeNames.Count.ToString());
+        _analytics.AddAnalyticsProperty("SourcePaths", sourcePaths.Count.ToString());
+        _analytics.AddAnalyticsProperty("StepDefinitions", stepDefinitions.Length.ToString());
 
         return new DiscoveryResult(
             stepDefinitions,
             sourcePaths.ToImmutable(),
-            typeNames.ToImmutable(),
-            _analytics.ToImmutable(),
-            null!
+            typeNames.ToImmutable()
         );
     }
 
