@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(SolutionDir)\Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="ApprovalTestData\**" />
@@ -29,8 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SpecFlow.VisualStudio.SpecFlowConnector\SpecFlow.VisualStudio.SpecFlowConnector.csproj" />
-    <ProjectReference Include="..\SpecFlow.SampleProjectGenerator.Core\SpecFlow.SampleProjectGenerator.Core.csproj" />
+    <ProjectReference Include="..\..\..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.General\SpecFlow.VisualStudio.SpecFlowConnector.general.csproj" />
+    <ProjectReference Include="..\..\SpecFlow.SampleProjectGenerator.Core\SpecFlow.SampleProjectGenerator.Core.csproj" />
   </ItemGroup>
+
 
 </Project>
