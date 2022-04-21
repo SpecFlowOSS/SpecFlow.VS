@@ -50,9 +50,9 @@ Copy-Item bin\$configuration\net6.0\publish\ $outputFolder\V3-net6.0\ -Recurse
 
 cd ..
 
-# build generic any cpu
+# build general any cpu
 pushd
-cd ..\SpecFlow.VisualStudio.SpecFlowConnector
+cd SpecFlow.VisualStudio.SpecFlowConnector.General
 
 dotnet publish -f net6.0 -c $configuration
 

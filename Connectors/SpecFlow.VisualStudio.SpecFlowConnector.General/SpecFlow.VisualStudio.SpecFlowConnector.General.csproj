@@ -5,7 +5,7 @@
     <AssemblyName>specflow-vs</AssemblyName>
     <TargetFramework>net6.0</TargetFramework>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(SolutionDir)\Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\Key.snk</AssemblyOriginatorKeyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RootNamespace>SpecFlowConnector</RootNamespace>
     <_OutputCopyLocation>$(SolutionDir)Connectors\bin\$(configuration)\General-$(TargetFramework)</_OutputCopyLocation>
