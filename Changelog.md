@@ -2,6 +2,10 @@
 
 * Improove step definition discovery
 
+# v2022.1.9 - 2022-04-11
+
+* Fix: Extension does not work with Visual Studio 2022 17.2.0 Preview 2.1
+
 # v2022.1.4 - 2022-01-25
 
 * Fix: (#40) Typing performance issue
