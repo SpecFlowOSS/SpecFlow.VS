@@ -20,11 +20,23 @@ public class DiscoveryResultProvider : IDiscoveryResultProvider
     {
         if (projectSettings.SpecFlowVersion.Version > new Version(3, 0, 225) )
         {
-            DiscoveryResult result = RunDiscovery(testAssemblyPath, configFilePath, projectSettings,
+            DiscoveryResult genericConnectorResult = RunDiscovery(testAssemblyPath, configFilePath, projectSettings,
                 OutProcSpecFlowConnectorFactory.CreateGeneric(_projectScope));
 
-            if (!result.IsFailed)
-                return result;
+            if (!genericConnectorResult.IsFailed)
+                return genericConnectorResult;
+
+            var retryResult = RunDiscovery(testAssemblyPath, configFilePath, projectSettings, GetConnector(projectSettings));
+
+            if (retryResult.IsFailed)
+            {
+                // Fails both with the generic and with the Vx connector, so we should rather report the 
+                // error in the generic connector.
+                return genericConnectorResult;
+            }
+
+            Logger.LogInfo("The binding discovery has failed with the generic discovery connector, but succeeded with the legacy connectors.");
+            return retryResult;
         }
 
         return RunDiscovery(testAssemblyPath, configFilePath, projectSettings, GetConnector(projectSettings));
