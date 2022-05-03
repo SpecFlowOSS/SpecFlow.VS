@@ -58,5 +58,5 @@ public class NewProjectFormatProjectGenerator : ProjectGenerator
         base.BuildProject();
     }
 
-    protected override int ExecBuild() => ExecDotNet("build");
+    protected override int ExecBuild() => ExecDotNet("build", "--no-restore");
 }
