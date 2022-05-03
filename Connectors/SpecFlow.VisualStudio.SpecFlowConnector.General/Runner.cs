@@ -141,7 +141,7 @@ public class ReflectionExecutor
                 })
                 
             )
-            .Reduce(new RunnerResult(log.ToString(), analytics, null, $"Unable to deserialize {optionsJson}"))
+            .Reduce(new RunnerResult(log.ToString(), analytics, null, $"Unable to deserialize discovery options:  {optionsJson}"))
             .Map(JsonSerialization.SerializeObject);
     }
     public record RunnerResult(string Log, ImmutableSortedDictionary<string, string> AnalyticsProperties, DiscoveryResult? DiscoveryResult, string? errorMessage);

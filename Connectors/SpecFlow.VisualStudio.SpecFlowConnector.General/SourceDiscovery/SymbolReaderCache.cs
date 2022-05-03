@@ -35,7 +35,6 @@ public class SymbolReaderCache
         return new Func<DeveroomSymbolReader>[]
         {
             () => DnLibDeveroomSymbolReader.Create(_log, path)
-            //path => new ComDeveroomSymbolReader(path),
         };
     }
 
