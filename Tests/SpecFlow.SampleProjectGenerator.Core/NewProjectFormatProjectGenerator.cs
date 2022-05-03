@@ -45,7 +45,7 @@ public class NewProjectFormatProjectGenerator : ProjectGenerator
         var args = new List<string> { "restore" };
         if (!string.IsNullOrWhiteSpace(_options.FallbackNuGetPackageSource)) {
             args.Add("-s");
-            args.Add($"\"{_options.FallbackNuGetPackageSource};https://api.nuget.org/v3/index.json\"");
+            args.Add($"\"https://api.nuget.org/v3/index.json;{_options.FallbackNuGetPackageSource}\"");
         }
     
         var exitCode = ExecDotNet(args.ToArray());
