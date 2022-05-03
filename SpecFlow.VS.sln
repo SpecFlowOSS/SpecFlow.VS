@@ -72,7 +72,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecF
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.V3.Tests", "Tests\Connector\SpecFlow.VisualStudio.SpecFlowConnector.V3.Tests\SpecFlow.VisualStudio.SpecFlowConnector.V3.Tests.csproj", "{8B5284CE-0406-40A1-B49F-196CA5C71201}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.General", "Connectors\SpecFlow.VisualStudio.SpecFlowConnector.General\SpecFlow.VisualStudio.SpecFlowConnector.General.csproj", "{B1CC6338-BA6D-4268-BA34-204082046AD9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.Generic", "Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Generic\SpecFlow.VisualStudio.SpecFlowConnector.Generic.csproj", "{B1CC6338-BA6D-4268-BA34-204082046AD9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpecFlow.VisualStudio.SpecFlowConnector.Tests", "Tests\Connector\SpecFlow.VisualStudio.SpecFlowConnector.Tests\SpecFlow.VisualStudio.SpecFlowConnector.Tests.csproj", "{2CB993A2-0A17-4B8F-AF3D-885913DBF170}"
 EndProject

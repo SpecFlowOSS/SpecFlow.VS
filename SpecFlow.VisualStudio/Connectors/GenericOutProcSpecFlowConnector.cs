@@ -2,7 +2,7 @@
 
 public class GenericOutProcSpecFlowConnector : OutProcSpecFlowConnector
 {
-    private const string Connector = @"General-net6.0\specflow-vs.dll";
+    private const string Connector = @"Generic-net6.0\specflow-vs.dll";
 
     public GenericOutProcSpecFlowConnector(
         DeveroomConfiguration configuration,

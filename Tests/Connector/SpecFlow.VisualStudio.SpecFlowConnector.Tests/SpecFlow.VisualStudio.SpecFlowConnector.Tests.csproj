@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.General\SpecFlow.VisualStudio.SpecFlowConnector.general.csproj" />
+    <ProjectReference Include="..\..\..\Connectors\SpecFlow.VisualStudio.SpecFlowConnector.Generic\SpecFlow.VisualStudio.SpecFlowConnector.Generic.csproj" />
     <ProjectReference Include="..\..\SpecFlow.SampleProjectGenerator.Core\SpecFlow.SampleProjectGenerator.Core.csproj" />
   </ItemGroup>
 
