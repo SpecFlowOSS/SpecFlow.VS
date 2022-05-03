@@ -56,7 +56,7 @@ public class GeneratedProjectTests : ApprovalTestBase
         if (!string.IsNullOrWhiteSpace(testData.GeneratorOptions.FallbackNuGetPackageSource))
         {
             var path = Assembly.GetExecutingAssembly().Location;
-            path = Path.Combine(Assembly.GetExecutingAssembly().Location, "..\\..\\..\\..\\..", "ExternalPackages");
+            path = Path.Combine(Assembly.GetExecutingAssembly().Location, "..\\..\\..\\..\\..\\..", "ExternalPackages");
             path = Path.GetFullPath(path);
 
             testData.GeneratorOptions.FallbackNuGetPackageSource = testData.GeneratorOptions.FallbackNuGetPackageSource.Replace("{ExternalPackages}", path);
