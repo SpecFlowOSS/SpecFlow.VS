@@ -46,6 +46,8 @@ public class NewProjectFormatProjectGenerator : ProjectGenerator
         if (!string.IsNullOrWhiteSpace(_options.FallbackNuGetPackageSource)) {
             args.Add("-s");
             args.Add(_options.FallbackNuGetPackageSource);
+            args.Add("-s");
+            args.Add("https://api.nuget.org/v3/index.json");
         }
     
         var exitCode = ExecDotNet(args.ToArray());
