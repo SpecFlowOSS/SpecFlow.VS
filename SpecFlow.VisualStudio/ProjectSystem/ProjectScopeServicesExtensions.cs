@@ -13,8 +13,9 @@ public static class ProjectScopeServicesExtensions
     {
         return projectScope.Properties.GetOrCreateSingletonProperty(() =>
         {
+            var ideScope = projectScope.IdeScope;
             var discoveryResultProvider = new DiscoveryResultProvider(projectScope);
-            var bindingRegistryCache = new ProjectBindingRegistryCache(projectScope.IdeScope);
+            var bindingRegistryCache = new ProjectBindingRegistryCache(ideScope);
             IDiscoveryService discoveryService =
                 new DiscoveryService(projectScope, discoveryResultProvider, bindingRegistryCache);
             discoveryService.TriggerDiscovery("ProjectScopeServicesExtensions.GetDiscoveryService");

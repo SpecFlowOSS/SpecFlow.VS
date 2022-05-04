@@ -1,7 +1,4 @@
 ﻿#nullable disable
-using System.Text;
-using System.Text.RegularExpressions;
-
 namespace SpecFlow.SampleProjectGenerator;
 
 public class SpecFlowAssetGenerator

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Immutable;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 namespace SpecFlow.SampleProjectGenerator;
 
@@ -38,6 +35,11 @@ public static class ToolLocator
     {
         var currentAssemblyFolder = Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath);
         if (currentAssemblyFolder != null)
+            yield return Path.Combine(currentAssemblyFolder, $"Tools-{tool}");
+
+        var currentAssemblyLocation =
+            Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
+        if (currentAssemblyLocation != null)
             yield return Path.Combine(currentAssemblyFolder, $"Tools-{tool}");
 
         var path = Environment.GetEnvironmentVariable("PATH");

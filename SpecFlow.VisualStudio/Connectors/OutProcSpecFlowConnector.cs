@@ -13,13 +13,15 @@ public class OutProcSpecFlowConnector
     private readonly DeveroomConfiguration _configuration;
     private readonly string _extensionFolder;
     private readonly IDeveroomLogger _logger;
+    private readonly IMonitoringService _monitoringService;
     private readonly ProcessorArchitectureSetting _processorArchitecture;
     private readonly NuGetVersion _specFlowVersion;
     private readonly TargetFrameworkMoniker _targetFrameworkMoniker;
 
     public OutProcSpecFlowConnector(DeveroomConfiguration configuration, IDeveroomLogger logger,
         TargetFrameworkMoniker targetFrameworkMoniker, string extensionFolder,
-        ProcessorArchitectureSetting processorArchitecture, NuGetVersion specFlowVersion)
+        ProcessorArchitectureSetting processorArchitecture, NuGetVersion specFlowVersion,
+        IMonitoringService monitoringService)
     {
         _configuration = configuration;
         _logger = logger;
@@ -27,6 +29,7 @@ public class OutProcSpecFlowConnector
         _extensionFolder = extensionFolder;
         _processorArchitecture = processorArchitecture;
         _specFlowVersion = specFlowVersion;
+        _monitoringService = monitoringService;
     }
 
     private bool DebugConnector => _configuration.DebugConnector ||
@@ -46,18 +49,18 @@ public class OutProcSpecFlowConnector
         if (!File.Exists(connectorPath))
             return new DiscoveryResult
             {
-                ErrorMessage = $"Error during binding discovery. Unable to find connector: {connectorPath}"
+                ErrorMessage = $"Error during binding discovery. Unable to find connector: {connectorPath}",
+                AnalyticsProperties = new Dictionary<string, object>()
             };
 
         var result = ProcessHelper.RunProcess(workingDirectory, connectorPath, arguments, encoding: Encoding.UTF8);
+
         if (result.ExitCode != 0)
         {
             var errorMessage = result.HasErrors ? result.StandardError : "Unknown error.";
 
-            return new DiscoveryResult
-            {
-                ErrorMessage = GetDetailedErrorMessage(result, errorMessage, BindingDiscoveryCommandName)
-            };
+            return Deserialize(result,
+                dr => GetDetailedErrorMessage(result, errorMessage + dr.ErrorMessage, BindingDiscoveryCommandName));
         }
 
         _logger.LogVerbose($"{workingDirectory}>{connectorPath} {string.Join(" ", arguments)}");
@@ -66,10 +69,48 @@ public class OutProcSpecFlowConnector
         _logger.LogVerbose(result.StandardOut);
 #endif
 
-        var discoveryResult = JsonSerialization.DeserializeObjectWithMarker<DiscoveryResult>(result.StandardOut);
-        if (discoveryResult.IsFailed)
-            discoveryResult.ErrorMessage =
-                GetDetailedErrorMessage(result, discoveryResult.ErrorMessage, BindingDiscoveryCommandName);
+        var discoveryResult = Deserialize(result, dr => dr.IsFailed
+            ? GetDetailedErrorMessage(result, dr.ErrorMessage, BindingDiscoveryCommandName)
+            : dr.ErrorMessage
+        );
+
+        return discoveryResult;
+    }
+
+    private DiscoveryResult Deserialize(ProcessHelper.RunProcessResult result,
+        Func<DiscoveryResult, string> formatErrorMessage)
+    {
+        DiscoveryResult discoveryResult;
+        try
+        {
+            discoveryResult = JsonSerialization.DeserializeObjectWithMarker<DiscoveryResult>(result.StandardOut)
+                              ?? new DiscoveryResult
+                              {
+                                  ErrorMessage = $"Cannot deserialize: {result.StandardOut}"
+                              };
+        }
+        catch (Exception e)
+        {
+            discoveryResult = new DiscoveryResult
+            {
+                ErrorMessage = e.ToString()
+            };
+        }
+
+        discoveryResult.ErrorMessage = formatErrorMessage(discoveryResult);
+        discoveryResult.AnalyticsProperties ??= new Dictionary<string, object>();
+
+        discoveryResult.AnalyticsProperties["ProjectTargetFramework"] = _targetFrameworkMoniker;
+        discoveryResult.AnalyticsProperties["ProjectSpecFlowVersion"] = _specFlowVersion;
+        discoveryResult.AnalyticsProperties["ConnectorArguments"] = result.Arguments;
+        discoveryResult.AnalyticsProperties["ConnectorExitCode"] = result.ExitCode;
+        if (!string.IsNullOrEmpty(discoveryResult.SpecFlowVersion))
+            discoveryResult.AnalyticsProperties["SpecFlowVersion"] = discoveryResult.SpecFlowVersion;
+
+        if (!string.IsNullOrEmpty(discoveryResult.ErrorMessage))
+            discoveryResult.AnalyticsProperties["Error"] = discoveryResult.ErrorMessage;
+
+        _monitoringService.TransmitEvent(new DiscoveryResultEvent(discoveryResult));
 
         return discoveryResult;
     }
@@ -122,7 +163,7 @@ public class OutProcSpecFlowConnector
         return generationResult;
     }
 
-    private string GetConnectorPath(List<string> arguments)
+    protected virtual string GetConnectorPath(List<string> arguments)
     {
         var connectorsFolder = GetConnectorsFolder();
 
@@ -151,7 +192,7 @@ public class OutProcSpecFlowConnector
         return Path.Combine(programFiles, "dotnet");
     }
 
-    private string GetDotNetExecCommand(List<string> arguments, string executableFolder, string executableFile)
+    protected string GetDotNetExecCommand(List<string> arguments, string executableFolder, string executableFile)
     {
         arguments.Add("exec");
         arguments.Add(Path.Combine(executableFolder, executableFile));
@@ -160,7 +201,7 @@ public class OutProcSpecFlowConnector
 
     private string GetDotNetCommand() => Path.Combine(GetDotNetInstallLocation(), "dotnet.exe");
 
-    private string GetConnectorsFolder()
+    protected string GetConnectorsFolder()
     {
         var connectorsFolder = Path.Combine(_extensionFolder, "Connectors");
         if (Directory.Exists(connectorsFolder))

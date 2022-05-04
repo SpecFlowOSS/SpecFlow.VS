@@ -42,7 +42,13 @@ public class NewProjectFormatProjectGenerator : ProjectGenerator
 
     protected override void BuildProject()
     {
-        var exitCode = ExecDotNet("restore");
+        var args = new List<string> { "restore" };
+        if (!string.IsNullOrWhiteSpace(_options.FallbackNuGetPackageSource)) {
+            args.Add("-s");
+            args.Add($"\"https://api.nuget.org/v3/index.json;{_options.FallbackNuGetPackageSource}\"");
+        }
+    
+        var exitCode = ExecDotNet(args.ToArray());
         if (exitCode != 0)
         {
             _consoleWriteLine($"dotnet restore exit code: {exitCode}");
@@ -52,5 +58,5 @@ public class NewProjectFormatProjectGenerator : ProjectGenerator
         base.BuildProject();
     }
 
-    protected override int ExecBuild() => ExecDotNet("build");
+    protected override int ExecBuild() => ExecDotNet("build", "--no-restore");
 }

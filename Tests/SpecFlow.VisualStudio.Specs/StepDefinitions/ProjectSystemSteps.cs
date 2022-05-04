@@ -288,11 +288,21 @@ public class ProjectSystemSteps : Steps
         PerformCommand(commandName);
     }
 
+    [When(@"I invoke the ""(.*)"" command without waiting for the tag changes")]
+    public void WhenIInvokeTheCommandWithoutWaitingForTagger(string commandName)
+    {
+        PerformCommand(commandName, waitForTager:false);
+    }
+
     private void PerformCommand(string commandName, string parameter = null,
-        DeveroomEditorCommandTargetKey? commandTargetKey = null)
+        DeveroomEditorCommandTargetKey? commandTargetKey = null, bool waitForTager = true)
     {
         ActionsMock.ResetMock();
         var taggerProvider = CreateTaggerProvider();
+        ManualResetEvent tagged = new ManualResetEvent(false);
+        var tagger = taggerProvider.CreateTagger<DeveroomTag>(_ideScope.CurrentTextView.TextBuffer);
+        tagger.TagsChanged += (object sender, SnapshotSpanEventArgs e) => { tagged.Set(); };
+
         var aggregatorFactoryService = new StubBufferTagAggregatorFactoryService(taggerProvider);
         switch (commandName)
         {
@@ -303,7 +313,7 @@ public class ProjectSystemSteps : Steps
                     aggregatorFactoryService,
                     taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
-                break;
+                return;
             }
             case "Find Step Definition Usages":
             {
@@ -313,11 +323,11 @@ public class ProjectSystemSteps : Steps
                     taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
                 Wait.For(() => ActionsMock.IsComplete.Should().BeTrue());
-                break;
+                return;
             }
             case "Comment":
             {
-                _invokedCommand = new CommentCommand(
+               _invokedCommand = new CommentCommand(
                     _ideScope,
                     aggregatorFactoryService,
                     taggerProvider);
@@ -331,6 +341,7 @@ public class ProjectSystemSteps : Steps
                     aggregatorFactoryService,
                     taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
+                
                 break;
             }
             case "Auto Format Document":
@@ -371,7 +382,7 @@ public class ProjectSystemSteps : Steps
             {
                 _invokedCommand = new DefineStepsCommand(_ideScope, aggregatorFactoryService, taggerProvider);
                 _invokedCommand.PreExec(_wpfTextView, _invokedCommand.Targets.First());
-                break;
+                return;
             }
             case "Complete":
             case "Filter Completion":
@@ -382,10 +393,13 @@ public class ProjectSystemSteps : Steps
                     aggregatorFactoryService,
                     taggerProvider,
                     _completionBroker);
-                if (parameter == null)
-                    _invokedCommand.PreExec(_wpfTextView, commandTargetKey ?? _invokedCommand.Targets.First());
-                else
-                    _wpfTextView.SimulateTypeText((CompleteCommand) _invokedCommand, parameter, taggerProvider);
+                    if (parameter == null)
+                    {
+                        _invokedCommand.PreExec(_wpfTextView, commandTargetKey ?? _invokedCommand.Targets.First());
+                        return;
+                    }
+                    else
+                        _wpfTextView.SimulateTypeText((CompleteCommand)_invokedCommand, parameter, taggerProvider);
                 break;
             }
             case "Rename Step":
@@ -401,6 +415,8 @@ public class ProjectSystemSteps : Steps
             default:
                 throw new NotImplementedException(commandName);
         }
+        if (waitForTager)
+            tagged.WaitOne(TimeSpan.FromSeconds(5)).Should().BeTrue($"{commandName}({parameter}) haven't triggered a text change");
     }
 
     private StubBufferTagAggregatorFactoryService CreateAggregatorFactory() => new(CreateTaggerProvider());
@@ -731,7 +747,7 @@ public class ProjectSystemSteps : Steps
     {
         _ideScope.StubWindowManager.RegisterWindowAction<RenameStepViewModel>(
             viewModel => { viewModel.StepText = renamedStep; });
-        WhenIInvokeTheCommand(_commandToInvokeDeferred);
+        PerformCommand(_commandToInvokeDeferred, waitForTager: false);
         await WhenTheCommandIsFinished();
 
         _projectScope.StubIdeScope.AnalyticsTransmitter

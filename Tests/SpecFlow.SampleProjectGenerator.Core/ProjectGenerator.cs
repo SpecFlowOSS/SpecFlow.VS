@@ -1,7 +1,5 @@
 ﻿#nullable disable
 
-using System.Diagnostics;
-
 namespace SpecFlow.SampleProjectGenerator;
 
 public abstract class ProjectGenerator : IProjectGenerator
@@ -84,12 +82,22 @@ public abstract class ProjectGenerator : IProjectGenerator
 
         if (_options.IsBuilt)
         {
+            EnsureEnvironmentVariables();
+
             BuildProject();
 
             File.WriteAllText(Path.Combine(_options.TargetFolder, ".gitignore"), "");
         }
 
         GitInit();
+    }
+
+    private void EnsureEnvironmentVariables()
+    {
+        if (_options.SpecFlowVersion.Major == 3 && _options.SpecFlowVersion.Minor < 2)
+            //MSBUILDSINGLELOADCONTEXT is required for some SpecFlow versions.
+            //See https://stackoverflow.com/questions/60755395/specflow-generatefeaturefilecodebehindtask-has-failed-unexpectedly
+            Environment.SetEnvironmentVariable("MSBUILDSINGLELOADCONTEXT", "1");
     }
 
     protected virtual void SetTargetFramework(string projectFilePath)
@@ -186,7 +194,7 @@ public abstract class ProjectGenerator : IProjectGenerator
     {
         ExecNuGetInstall(_options.ExternalBindingPackageName, packagesFolder);
         var projectChanger = CreateProjectChanger(projectFilePath);
-        InstallNuGetPackage(projectChanger, packagesFolder, _options.ExternalBindingPackageName);
+        InstallNuGetPackage(projectChanger, packagesFolder, _options.ExternalBindingPackageName, packageVersion:"1.0.0");
         projectChanger.SetSpecFlowConfig("stepAssemblies/stepAssembly", "assembly",
             _options.ExternalBindingPackageName);
         projectChanger.Save();
@@ -196,11 +204,15 @@ public abstract class ProjectGenerator : IProjectGenerator
     {
         ExecNuGetInstall(_options.PluginName, packagesFolder);
         var projectChanger = CreateProjectChanger(projectFilePath);
-        InstallNuGetPackage(projectChanger, packagesFolder, _options.PluginName);
-        projectChanger.SetSpecFlowConfig("plugins/add", "name", _options.PluginName.Replace(".SpecFlowPlugin", ""));
-        projectChanger.SetSpecFlowConfig("plugins/add", "type",
-            _options.AddRuntimePlugin && _options.AddGeneratorPlugin ? "GeneratorAndRuntime" :
-            _options.AddGeneratorPlugin ? "Generator" : "Runtime");
+        InstallNuGetPackage(projectChanger, packagesFolder, _options.PluginName, packageVersion: "1.0.0");
+        if (_options.SpecFlowVersion.Major < 3)
+        {
+            projectChanger.SetSpecFlowConfig("plugins/add", "name", _options.PluginName.Replace(".SpecFlowPlugin", ""));
+            projectChanger.SetSpecFlowConfig("plugins/add", "type",
+                _options.AddRuntimePlugin && _options.AddGeneratorPlugin ? "GeneratorAndRuntime" :
+                _options.AddGeneratorPlugin ? "Generator" : "Runtime");
+        }
+
         projectChanger.Save();
     }
 
@@ -208,7 +220,6 @@ public abstract class ProjectGenerator : IProjectGenerator
     {
         var exitCode = ExecGit("reset", "--hard");
         ExecGit("clean", "-fdx", "-e", "packages");
-        ExecGit("status");
         if (exitCode != 0)
             _consoleWriteLine($"Git status exit code: {exitCode}");
         return exitCode == 0;
@@ -223,7 +234,7 @@ public abstract class ProjectGenerator : IProjectGenerator
     private void GitCommitAll()
     {
         ExecGit("add", ".");
-        ExecGit("commit", "-q", "-m", "init");
+        ExecGit("-c user.name='SpecFlow'", "-c user.email='specflow@tricentis.com'", "commit", "-q", "-m", "init");
     }
 
     private void InstallNUnit(string packagesFolder, string projectFilePath)
@@ -430,24 +441,10 @@ public abstract class ProjectGenerator : IProjectGenerator
     {
         var arguments = string.Join(" ", args);
         _consoleWriteLine($"{tool} {arguments}");
-        var process = new Process
-        {
-            StartInfo = new ProcessStartInfo
-            {
-                WorkingDirectory = workingDirectory,
-                FileName = tool,
-                Arguments = arguments,
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                RedirectStandardError = true
-            }
-        };
-        process.Start();
-        var output = process.StandardError.ReadToEnd();
-        if (!string.IsNullOrWhiteSpace(output))
-            _consoleWriteLine(output);
-        process.WaitForExit();
 
-        return process.ExitCode;
+        var psi = new ProcessStartInfoEx(workingDirectory, tool, arguments);
+        var ph = new ProcessHelper();
+        ProcessResult result = ph.RunProcess(psi, _consoleWriteLine);
+        return result.ExitCode;
     }
 }

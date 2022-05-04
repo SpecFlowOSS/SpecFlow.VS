@@ -35,16 +35,25 @@ steps:
   displayName: 'Install nuget packages'
   inputs:
     command: 'custom'
-    arguments: 'install .\Tests\SpecFlowPackages\Packages.config'
+    arguments: 'install .\Tests\ExternalPackages\PackagesForTests\Packages.config'
 
 - task: DotNetCoreCLI@2
   displayName: Run Unit Tests
   inputs:
     command: test
-    projects: '**/*[Tt]ests/*.csproj'
+    projects: '**/SpecFlow.VisualStudio.Tests/*.csproj'
     arguments: '--configuration $(BuildConfiguration) --no-build --collect "Code coverage"'
     testRunTitle: Unit Tests
     publishTestResults: true
+
+- task: DotNetCoreCLI@2
+  displayName: Run Connector Tests
+  inputs:
+    command: test
+    projects: '**/*Connector**Tests/*.csproj'
+    arguments: '--configuration $(BuildConfiguration) --no-build'
+    testRunTitle: Connector Tests
+  condition: succeededOrFailed()
 
 - task: DotNetCoreCLI@2
   displayName: Run SpecFlow Scenarios

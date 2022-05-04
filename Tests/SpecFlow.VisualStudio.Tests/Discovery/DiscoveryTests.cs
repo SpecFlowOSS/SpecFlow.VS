@@ -4,22 +4,20 @@ namespace SpecFlow.VisualStudio.Tests.Discovery;
 
 public class DiscoveryTests
 {
+    public static IEnumerable<LabeledTestData<Action<Sut>>> TriggersCacheUpdateOnEventsData =
+        new LabeledTestData<Action<Sut>>[]
+        {
+            new("WeakSettingsInitialized",
+                sut => sut.ProjectScope.StubProjectSettingsProvider.InvokeWeakSettingsInitializedEvent()),
+            new("ProjectsBuilt", sut => sut.ProjectScope.StubIdeScope.TriggerProjectsBuilt())
+        };
+
     private readonly ITestOutputHelper _testOutputHelper;
 
     public DiscoveryTests(ITestOutputHelper testOutputHelper)
     {
         _testOutputHelper = testOutputHelper;
     }
-
-    public static Dictionary<string, Action<Sut>> EventInvokers => new()
-    {
-        ["WeakSettingsInitialized"] = sut =>
-            sut.ProjectScope.StubProjectSettingsProvider.InvokeWeakSettingsInitializedEvent(),
-        ["ProjectsBuilt"] = sut => sut.ProjectScope.StubIdeScope.TriggerProjectsBuilt()
-    };
-
-    public static IEnumerable<object[]> TriggersCacheUpdateOnEventsData =>
-        EventInvokers.Select(ei => new object[] {ei.Key, ei.Value});
 
     private Sut ArrangeSut()
     {
@@ -56,15 +54,15 @@ public class DiscoveryTests
     }
 
     [Theory]
-    [MemberData(nameof(TriggersCacheUpdateOnEventsData))]
-    public void TriggersCacheUpdateOnEvents(string _, Action<Sut> triggerEvent)
+    [LabeledMemberData(nameof(TriggersCacheUpdateOnEventsData))]
+    public void TriggersCacheUpdateOnEvents(LabeledTestData<Action<Sut>> triggerEvent)
     {
         //arrange
         using var sut = ArrangeSut();
         sut.BuildDiscoveryService();
 
         //act
-        triggerEvent(sut);
+        triggerEvent.Data(sut);
 
         //assert
         sut.BindingRegistryCache.Verify(c =>
@@ -73,17 +71,17 @@ public class DiscoveryTests
     }
 
     [Theory]
-    [MemberData(nameof(TriggersCacheUpdateOnEventsData))]
-    public void DoNotTriggersCacheUpdateOnEventsForTheSameProject(string _, Action<Sut> triggerEvent)
+    [LabeledMemberData(nameof(TriggersCacheUpdateOnEventsData))]
+    public void DoNotTriggersCacheUpdateOnEventsForTheSameProject(LabeledTestData<Action<Sut>> triggerEvent)
     {
         //arrange
         using var sut = ArrangeSut();
         sut.BuildDiscoveryService();
 
         //act
-        triggerEvent(sut);
+        triggerEvent.Data(sut);
         var bindingRegistry = sut.BindingRegistryCache.Value;
-        triggerEvent(sut);
+        triggerEvent.Data(sut);
 
         //assert
         sut.BindingRegistryCache.Verify(c =>

@@ -41,4 +41,5 @@ public interface IMonitoringService
     void MonitorLinkClicked(string source, string url, Dictionary<string, object> additionalProps = null);
 
     void MonitorUpgradeDialogDismissed(Dictionary<string, object> additionalProps);
+    void TransmitEvent(IAnalyticsEvent runtimeEvent);
 }
