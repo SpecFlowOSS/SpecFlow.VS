@@ -1,5 +1,6 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Fix: Binding discovery fails for SpecFlow v3.10 beta
 * Improove step definition discovery
 
 # v2022.1.9 - 2022-04-11

@@ -59,7 +59,12 @@ public class BindingRegistryFactoryVLatest : BindingRegistryFactory
         var testRunnerManager = (TestRunnerManager) globalContainer.Resolve<ITestRunnerManager>();
 
         testRunnerManager.Initialize(testAssembly);
-        return testRunnerManager.CreateTestRunner(0);
+        return InvokeCreateTestRunner(testRunnerManager);
+    }
+
+    protected virtual ITestRunner InvokeCreateTestRunner(TestRunnerManager testRunnerManager)
+    {
+        return testRunnerManager.ReflectionCallMethod<ITestRunner>(nameof(TestRunnerManager.CreateTestRunner), "");
     }
 
     protected override object ResolveBindingRegistry(Assembly testAssembly, object globalContainer, object testRunner)
