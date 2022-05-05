@@ -2,7 +2,7 @@
 
 namespace SpecFlowConnector.SpecFlowProxies;
 
-public class BindingRegistryFactoryBeforeV309022 : BindingRegistryFactoryVLatest
+public class BindingRegistryFactoryBeforeV309022 : BindingRegistryFactoryBeforeV310000
 {
     public BindingRegistryFactoryBeforeV309022(ILogger log) : base(log)
     {
