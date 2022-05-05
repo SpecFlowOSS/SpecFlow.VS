@@ -262,7 +262,7 @@ public abstract class ProjectGenerator : IProjectGenerator
         InstallNuGetPackage(projectChanger, packagesFolder, "xunit.assert", "netstandard1.1");
         InstallNuGetPackage(projectChanger, packagesFolder, "xunit.extensibility.core", "netstandard1.1");
         InstallNuGetPackage(projectChanger, packagesFolder, "xunit.extensibility.execution", "net452");
-        InstallNuGetPackage(projectChanger, packagesFolder, "xunit.runner.visualstudio", "net20");
+        InstallNuGetPackage(projectChanger, packagesFolder, "xunit.runner.visualstudio", "net472");
         projectChanger.Save();
     }
 
