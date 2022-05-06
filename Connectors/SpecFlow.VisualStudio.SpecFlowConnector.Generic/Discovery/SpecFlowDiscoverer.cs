@@ -54,7 +54,7 @@ public class SpecFlowDiscoverer
             getParameterTypes(sdb.Method),
             GetScope(sdb),
             GetSourceExpression(sdb),
-            GetError(sdb),
+            GetErrorMessage(sdb),
             sourceLocation.Reduce((string) null!)
         );
 
@@ -118,8 +118,8 @@ public class SpecFlowDiscoverer
             })
             .Reduce((string) null!);
 
-    private static string? GetError(StepDefinitionBindingAdapter sdb)
-        => sdb.GetProperty<string>("Error").Reduce((string) null!);
+    private static string? GetErrorMessage(StepDefinitionBindingAdapter sdb)
+        => sdb.GetProperty<string>("ErrorMessage").Reduce((string)null!);
 
     private Option<string>
         GetSourceLocation(BindingMethodAdapter bindingMethod, Func<string, string> getSourcePathId) =>
