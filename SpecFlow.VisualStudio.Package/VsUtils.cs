@@ -206,13 +206,57 @@ public static class VsUtils
                 return null;
             var outputPath = GetOutputPath(project);
             if (outputPath == null)
+            {
+                var outputAssemblyPath = GetOutputAssemblyPathFromOutputGroups(project, outputFileName, projectFolder);
+                if (outputAssemblyPath != null)
+                    return outputAssemblyPath;
                 return null;
+            }
 
             return Path.Combine(projectFolder, outputPath, outputFileName);
         }
         catch (Exception ex)
         {
             Debug.WriteLine(ex, $"{nameof(VsUtils)}.{nameof(GetOutputAssemblyPath)}");
+            return null;
+        }
+    }
+
+    private static string GetOutputAssemblyPathFromOutputGroups(Project project, string outputFileName, string projectFolder)
+    {
+        try
+        {
+            DumpOutputGroups(project.ConfigurationManager.ActiveConfiguration.OutputGroups);
+            var primaryOutputGroup = project.ConfigurationManager.ActiveConfiguration.OutputGroups.Item("Built");
+            if (primaryOutputGroup == null)
+                return null;
+            var fileUrls = (primaryOutputGroup.FileURLs as object[])?.OfType<string>();
+            if (fileUrls == null)
+                return null;
+            string GetUriPath(string url)
+            {
+                if (url.StartsWith("file://") && Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                    return uri.LocalPath;
+                return url;
+            }
+            var filePath = fileUrls.Select(GetUriPath).FirstOrDefault(path => path.EndsWith(Path.DirectorySeparatorChar + outputFileName));
+            if (filePath == null)
+                return null;
+
+            var objPathSegment = @"\obj\";
+            var objIndex = filePath.LastIndexOf(objPathSegment, StringComparison.CurrentCultureIgnoreCase);
+            if (objIndex >= 0)
+            {
+                filePath = filePath
+                    .Remove(objIndex, objPathSegment.Length)
+                    .Insert(objIndex, @"\bin\");
+            }
+
+            return filePath;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex, $"{nameof(VsUtils)}.{nameof(GetOutputAssemblyPathFromOutputGroups)}");
             return null;
         }
     }
