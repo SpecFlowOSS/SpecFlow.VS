@@ -153,7 +153,10 @@ public static class VsUtils
         {
             if (project.ConfigurationManager.ActiveConfiguration.Properties == null)
                 return null;
-            return project.ConfigurationManager.ActiveConfiguration.Properties.Item("PlatformTarget").Value.ToString();
+            var platformTargetName = project.ConfigurationManager.ActiveConfiguration.Properties.Item("PlatformTarget").Value.ToString();
+            if (string.IsNullOrEmpty(platformTargetName))
+                return null;
+            return platformTargetName;
         }
         catch (Exception ex)
         {
