@@ -268,6 +268,31 @@ public static class VsUtils
         Debug.WriteLine(result);
     }
 
+    private static void DumpOutputGroups(OutputGroups outputGroups)
+    {
+        void DumpOutputGroup(OutputGroup outputGroup)
+        {
+            var canonicalName = outputGroup.CanonicalName;
+            var displayName = outputGroup.DisplayName;
+            var description = outputGroup.Description;
+            var fileCount = outputGroup.FileCount;
+            var fileNames = outputGroup.FileNames as object[];
+            var fileUrls = outputGroup.FileURLs as object[];
+
+            string GetArrayValue(object[] array)
+                => array == null ? "" : string.Join(Environment.NewLine, array.Select((o, i) => $"[{i}]: {o}"));
+
+            Debug.WriteLine($"Output group: {canonicalName}, {displayName}, {description}, {fileCount}");
+            Debug.WriteLine($"File names: {Environment.NewLine}{GetArrayValue(fileNames)}");
+            Debug.WriteLine($"File URLs: {Environment.NewLine}{GetArrayValue(fileUrls)}");
+        }
+
+        foreach (OutputGroup outputGroup in outputGroups)
+        {
+            DumpOutputGroup(outputGroup);
+        }
+    }
+
     public static T SafeResolveMefDependency<T>(DTE dte) where T : class
     {
         try
