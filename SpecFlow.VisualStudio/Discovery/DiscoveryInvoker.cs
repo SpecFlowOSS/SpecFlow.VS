@@ -26,7 +26,7 @@ internal class DiscoveryInvoker
     public ConfigSource GetTestAssemblySource(ProjectSettings projectSettings) =>
         projectSettings.IsSpecFlowTestProject
             ? ConfigSource.TryGetConfigSource(projectSettings.OutputAssemblyPath, _fileSystem, _logger)
-            : ConfigSource.Invalid;
+            : ConfigSource.CreateInvalid("The project is not detected to be a SpecFlow project, therefore some SpecFlow Visual Studio Extension features are disabled.");
 
     public ProjectBindingRegistry InvokeDiscoveryWithTimer()
     {
@@ -80,11 +80,10 @@ internal class DiscoveryInvoker
         public IDiscovery AndBindingSourceIsValid()
         {
             _testAssemblySource = _invoker.GetTestAssemblySource(_projectSettings);
-            if (_testAssemblySource != ConfigSource.Invalid)
+            if (_testAssemblySource.IsValid)
                 return this;
 
-            var message =
-                "Test assembly not found. Please build the project to enable the SpecFlow Visual Studio Extension features.";
+            var message = _testAssemblySource.ErrorMessage ?? "Invalid test assembly source.";
             _logger.LogInfo(message);
             _errorListServices.AddErrors(new[]
             {
