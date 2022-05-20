@@ -153,7 +153,10 @@ public static class VsUtils
         {
             if (project.ConfigurationManager.ActiveConfiguration.Properties == null)
                 return null;
-            return project.ConfigurationManager.ActiveConfiguration.Properties.Item("PlatformTarget").Value.ToString();
+            var platformTargetName = project.ConfigurationManager.ActiveConfiguration.Properties.Item("PlatformTarget").Value.ToString();
+            if (string.IsNullOrEmpty(platformTargetName))
+                return null;
+            return platformTargetName;
         }
         catch (Exception ex)
         {
@@ -206,13 +209,57 @@ public static class VsUtils
                 return null;
             var outputPath = GetOutputPath(project);
             if (outputPath == null)
+            {
+                var outputAssemblyPath = GetOutputAssemblyPathFromOutputGroups(project, outputFileName, projectFolder);
+                if (outputAssemblyPath != null)
+                    return outputAssemblyPath;
                 return null;
+            }
 
             return Path.Combine(projectFolder, outputPath, outputFileName);
         }
         catch (Exception ex)
         {
             Debug.WriteLine(ex, $"{nameof(VsUtils)}.{nameof(GetOutputAssemblyPath)}");
+            return null;
+        }
+    }
+
+    private static string GetOutputAssemblyPathFromOutputGroups(Project project, string outputFileName, string projectFolder)
+    {
+        try
+        {
+            DumpOutputGroups(project.ConfigurationManager.ActiveConfiguration.OutputGroups);
+            var primaryOutputGroup = project.ConfigurationManager.ActiveConfiguration.OutputGroups.Item("Built");
+            if (primaryOutputGroup == null)
+                return null;
+            var fileUrls = (primaryOutputGroup.FileURLs as object[])?.OfType<string>();
+            if (fileUrls == null)
+                return null;
+            string GetUriPath(string url)
+            {
+                if (url.StartsWith("file://") && Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                    return uri.LocalPath;
+                return url;
+            }
+            var filePath = fileUrls.Select(GetUriPath).FirstOrDefault(path => path.EndsWith(Path.DirectorySeparatorChar + outputFileName));
+            if (filePath == null)
+                return null;
+
+            var objPathSegment = @"\obj\";
+            var objIndex = filePath.LastIndexOf(objPathSegment, StringComparison.CurrentCultureIgnoreCase);
+            if (objIndex >= 0)
+            {
+                filePath = filePath
+                    .Remove(objIndex, objPathSegment.Length)
+                    .Insert(objIndex, @"\bin\");
+            }
+
+            return filePath;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex, $"{nameof(VsUtils)}.{nameof(GetOutputAssemblyPathFromOutputGroups)}");
             return null;
         }
     }
@@ -266,6 +313,31 @@ public static class VsUtils
 
         result.AppendLine("END PROPS: " + category);
         Debug.WriteLine(result);
+    }
+
+    private static void DumpOutputGroups(OutputGroups outputGroups)
+    {
+        void DumpOutputGroup(OutputGroup outputGroup)
+        {
+            var canonicalName = outputGroup.CanonicalName;
+            var displayName = outputGroup.DisplayName;
+            var description = outputGroup.Description;
+            var fileCount = outputGroup.FileCount;
+            var fileNames = outputGroup.FileNames as object[];
+            var fileUrls = outputGroup.FileURLs as object[];
+
+            string GetArrayValue(object[] array)
+                => array == null ? "" : string.Join(Environment.NewLine, array.Select((o, i) => $"[{i}]: {o}"));
+
+            Debug.WriteLine($"Output group: {canonicalName}, {displayName}, {description}, {fileCount}");
+            Debug.WriteLine($"File names: {Environment.NewLine}{GetArrayValue(fileNames)}");
+            Debug.WriteLine($"File URLs: {Environment.NewLine}{GetArrayValue(fileUrls)}");
+        }
+
+        foreach (OutputGroup outputGroup in outputGroups)
+        {
+            DumpOutputGroup(outputGroup);
+        }
     }
 
     public static T SafeResolveMefDependency<T>(DTE dte) where T : class

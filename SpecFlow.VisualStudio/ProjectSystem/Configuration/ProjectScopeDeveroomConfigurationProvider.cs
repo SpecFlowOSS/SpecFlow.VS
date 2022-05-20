@@ -114,7 +114,7 @@ public class ProjectScopeDeveroomConfigurationProvider : IDeveroomConfigurationP
             if (configFilePath == null)
                 return null;
 
-            return new ConfigSource(configFilePath, FileSystem.File.GetLastWriteTimeUtc(configFilePath));
+            return ConfigSource.CreateValid(configFilePath, FileSystem.File.GetLastWriteTimeUtc(configFilePath));
         }
         catch (Exception ex)
         {
