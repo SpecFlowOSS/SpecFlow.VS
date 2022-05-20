@@ -1,5 +1,8 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Fix: (#81) Test assembly not found issue
+* Pereparation for Cucumber Expressions support
+
 # v2022.1.56 - 2022-05-05
 
 * Fix: Binding discovery fails for SpecFlow v3.10 beta
