@@ -55,6 +55,15 @@ public class OutProcSpecFlowConnector
 
         var result = ProcessHelper.RunProcess(workingDirectory, connectorPath, arguments, encoding: Encoding.UTF8);
 
+        _logger.LogVerbose($"{workingDirectory}>{connectorPath} {string.Join(" ", arguments)}");
+        _logger.LogVerbose($"Exit code: {result.ExitCode}");
+        if (result.HasErrors)
+            _logger.LogVerbose(result.StandardError);
+
+#if DEBUG
+        _logger.LogVerbose(result.StandardOut);
+#endif
+
         if (result.ExitCode != 0)
         {
             var errorMessage = result.HasErrors ? result.StandardError : "Unknown error.";
@@ -62,12 +71,6 @@ public class OutProcSpecFlowConnector
             return Deserialize(result,
                 dr => GetDetailedErrorMessage(result, errorMessage + dr.ErrorMessage, BindingDiscoveryCommandName));
         }
-
-        _logger.LogVerbose($"{workingDirectory}>{connectorPath} {string.Join(" ", arguments)}");
-
-#if DEBUG
-        _logger.LogVerbose(result.StandardOut);
-#endif
 
         var discoveryResult = Deserialize(result, dr => dr.IsFailed
             ? GetDetailedErrorMessage(result, dr.ErrorMessage, BindingDiscoveryCommandName)
