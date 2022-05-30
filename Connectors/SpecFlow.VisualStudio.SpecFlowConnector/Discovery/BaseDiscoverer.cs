@@ -98,7 +98,7 @@ public abstract class BaseDiscoverer : RemoteContextObject, ISpecFlowDiscoverer,
 
     private string GetError(IStepDefinitionBinding sdb)
     {
-        const string propertyName = "Error";
+        const string propertyName = "ErrorMessage";
         return sdb.ReflectionHasProperty(propertyName) ? sdb.ReflectionGetProperty<string>(propertyName) : null;
     }
 
