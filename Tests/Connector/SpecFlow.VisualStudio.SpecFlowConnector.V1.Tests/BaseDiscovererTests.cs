@@ -43,7 +43,7 @@ public class BaseDiscovererTests
             new StepDefinitionBindingWithSourceAndError(type, regex, new RuntimeBindingMethod(methodInfo), scope)
             {
                 SourceExpression = sourceExpression,
-                Error = error
+                ErrorMessage = error
             });
     }
 
@@ -413,6 +413,6 @@ public class BaseDiscovererTests
         }
 
         public string SourceExpression { get; set; }
-        public string Error { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }
