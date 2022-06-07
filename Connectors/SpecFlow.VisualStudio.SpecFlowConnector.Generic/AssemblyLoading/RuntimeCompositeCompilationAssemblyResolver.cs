@@ -16,12 +16,13 @@ public class RuntimeCompositeCompilationAssemblyResolver : ICompilationAssemblyR
         foreach (ICompilationAssemblyResolver resolver in _resolvers)
             try
             {
-                if (resolver.TryResolveAssemblyPaths(library, assemblies) &&
-                    assemblies.Any(a => !IsRefsPath(a)))
-                {
-                    _log.Info($"Resolved with {resolver}");
-                    return true;
-                }
+                var resolverAssemblies = new List<string>();
+                resolver.TryResolveAssemblyPaths(library, resolverAssemblies);
+                assemblies.AddRange(resolverAssemblies.Where(a=>!IsRefsPath(a)));
+                if (!assemblies.Any()) continue;
+
+                _log.Info($"Resolved with {resolver}");
+                return true;
             }
             catch (Exception ex)
             {

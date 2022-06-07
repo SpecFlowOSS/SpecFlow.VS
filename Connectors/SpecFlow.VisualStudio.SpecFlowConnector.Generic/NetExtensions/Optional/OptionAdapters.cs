@@ -8,4 +8,9 @@ public static class OptionAdapters
             : none();
 
     public static Option<T> AsOption<T>(this T? @this) => @this;
+
+    public static Option<T> Validate<T>(this T @this, Func<T, bool> predicate) =>
+        predicate(@this)
+            ? @this
+            : None.Value;
 }

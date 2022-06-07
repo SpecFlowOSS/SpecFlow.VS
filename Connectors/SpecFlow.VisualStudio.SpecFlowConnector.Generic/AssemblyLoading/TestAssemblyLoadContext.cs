@@ -28,7 +28,9 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
             new ReferenceAssemblyPathResolver(),
             new PackageCompilationAssemblyResolver(),
             new AspNetCoreAssemblyResolver(),
-            new NugetCacheAssemblyResolver()
+            new NugetCacheAssemblyResolver(),
+            new NetCoreAssemblyResolver(), 
+            new NetStandardAssemblyResolver()
         }, _log);
     }
 
@@ -178,13 +180,6 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
     {
         var assemblies = new List<string>();
         _assemblyResolver.TryResolveAssemblyPaths(library, assemblies);
-        return assemblies.FirstOrDefault(a => !IsRefsPath(a));
-    }
-
-    private static bool IsRefsPath(string resolvedAssemblyPath)
-    {
-        var directory = Path.GetDirectoryName(resolvedAssemblyPath);
-        return !string.IsNullOrEmpty(directory) &&
-               "refs".Equals(Path.GetFileName(directory), StringComparison.OrdinalIgnoreCase);
+        return assemblies.FirstOrDefault();
     }
 }

@@ -1,14 +1,13 @@
 ﻿namespace SpecFlowConnector.AssemblyLoading;
 
-public class AspNetCoreAssemblyResolver : DotNetResolver
+public class NetCoreAssemblyResolver : DotNetResolver
 {
     protected override bool CanHandleLibraryName(string libraryName) =>
-        libraryName.StartsWith("Microsoft.AspNetCore") || libraryName.StartsWith("Microsoft.Extensions");
+        libraryName.StartsWith("System");
 
     protected override string RootDirectory(string programFiles) => Path.Combine(
         programFiles,
         "dotnet",
         "shared",
-        "Microsoft.AspNetCore.App");
-
+        "Microsoft.NETCore.App");
 }
