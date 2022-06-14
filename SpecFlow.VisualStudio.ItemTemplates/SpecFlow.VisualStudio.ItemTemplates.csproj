@@ -18,10 +18,34 @@
 
   <ItemGroup>
     <Compile Remove="Hooks\Hooks1.cs" />
+    <None Remove="FeatureFile_French\FeatureFile_French_CSharp.vstemplate" />
+    <None Remove="FeatureFile_French\FeatureFile_French_VB.vstemplate" />
+    <None Remove="FeatureFile_German\FeatureFile_German_CSharp.vstemplate" />
+    <None Remove="FeatureFile_German\FeatureFile_German_VB.vstemplate" />
+    <None Remove="FeatureFile_Nederlands\FeatureFile_Nederlands_CSharp.vstemplate" />
+    <None Remove="FeatureFile_Nederlands\FeatureFile_Nederlands_VB.vstemplate" />
     <None Include="Hooks\Hooks1.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <VSTemplate Include="FeatureFile_Nederlands\FeatureFile_Nederlands_CSharp.vstemplate">
+      <OutputSubPath>SpecFlow</OutputSubPath>
+    </VSTemplate>
+    <VSTemplate Include="FeatureFile_Nederlands\FeatureFile_Nederlands_VB.vstemplate">
+      <OutputSubPath>SpecFlow</OutputSubPath>
+    </VSTemplate>
+    <VSTemplate Include="FeatureFile_German\FeatureFile_German_CSharp.vstemplate">
+      <OutputSubPath>SpecFlow</OutputSubPath>
+    </VSTemplate>
+    <VSTemplate Include="FeatureFile_German\FeatureFile_German_VB.vstemplate">
+      <OutputSubPath>SpecFlow</OutputSubPath>
+    </VSTemplate>
+    <VSTemplate Include="FeatureFile_French\FeatureFile_French_CSharp.vstemplate">
+      <OutputSubPath>SpecFlow</OutputSubPath>
+    </VSTemplate>
+    <VSTemplate Include="FeatureFile_French\FeatureFile_French_VB.vstemplate">
+      <OutputSubPath>SpecFlow</OutputSubPath>
+    </VSTemplate>
     <VSTemplate Include="SpecFlowConfig\SpecFlowConfig_VB.vstemplate">
       <OutputSubPath>SpecFlow</OutputSubPath>
     </VSTemplate>
