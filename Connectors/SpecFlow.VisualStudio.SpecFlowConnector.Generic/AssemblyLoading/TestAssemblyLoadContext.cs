@@ -29,7 +29,7 @@ public class TestAssemblyLoadContext : AssemblyLoadContext
             new PackageCompilationAssemblyResolver(),
             new AspNetCoreAssemblyResolver(),
             new NugetCacheAssemblyResolver(),
-            new NetCoreAssemblyResolver(), 
+            //new NetCoreAssemblyResolver(), 
             new NetStandardAssemblyResolver()
         }, _log);
     }
