@@ -22,6 +22,7 @@ public class ConnectorInvestigation : ApprovalTestBase
     //[Theory(Skip = "Use for investigation")]
     //[InlineData("SpecFlow.VisualStudio.Specs")]
     [InlineData("Microsoft.AspNetCore.Mvc.Core")]
+    [InlineData("Microsoft.AspNetCore.Mvc.Testing_6.0.5")]
     public void Approval(string testName)
     {
         //arrange

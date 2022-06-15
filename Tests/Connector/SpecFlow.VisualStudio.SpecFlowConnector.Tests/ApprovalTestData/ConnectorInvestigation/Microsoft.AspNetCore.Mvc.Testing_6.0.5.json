@@ -1,0 +1,5 @@
+{
+  "TargetFolder": "$(ApprovalTestData)\\Microsoft.AspNetCore.Mvc.Testing_6.0.5",
+  "TestAssembly": "SpecFlowProject.dll",
+  "ConfigFile": null
+}
