@@ -1,5 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
+# v2022.1.66 - 2022-05-30
+
 * Fix: (#81) Test assembly not found issue
 * Pereparation for Cucumber Expressions support
 
