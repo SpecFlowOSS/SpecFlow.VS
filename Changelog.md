@@ -1,5 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Pereparation for Cucumber Expressions support in SpecFlow v4
+
 # v2022.1.66 - 2022-05-30
 
 * Fix: (#81) Test assembly not found issue
