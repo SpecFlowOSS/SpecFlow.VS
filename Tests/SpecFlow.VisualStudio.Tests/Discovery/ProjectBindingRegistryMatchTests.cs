@@ -54,6 +54,20 @@ public class ProjectBindingRegistryMatchTests : ProjectBindingRegistryTestsBase
     }
 
     [Fact]
+    public void Matches_parameters_with_multiple_capture_groups_used_by_cukeex_string_param()
+    {
+        _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my (?:(cool)|(bad)) step",
+            parameterTypes: GetParameterTypes("string")));
+        var sut = CreateSut();
+
+        var result = sut.MatchStep(CreateStep(text: "my cool step"), StubGherkinDocument.Instance);
+        var matchItem = AssertSingleDefined(result);
+        matchItem.ParameterMatch.StepTextParameters.Should().HaveCount(1);
+        matchItem.ParameterMatch.StepTextParameters.First().Index.Should().Be(3);
+        matchItem.ParameterMatch.StepTextParameters.First().Length.Should().Be(4);
+    }
+
+    [Fact]
     public void Matches_DataTable()
     {
         _stepDefinitionBindings.Add(CreateStepDefinitionBinding("my step",

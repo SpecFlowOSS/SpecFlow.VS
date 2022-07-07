@@ -71,9 +71,8 @@ public class ProjectStepDefinitionBinding
     private ParameterMatch MatchParameter(Step step, Match match)
     {
         var parameterCount = Implementation.ParameterTypes?.Length ?? 0;
-        //if (match.Groups.Count == 1 && parameterCount == 0 && step.Argument == null)
-        //    return ParameterMatch.NotMatch;
         var matchedStepParameters = match.Groups.OfType<Group>().Skip(1)
+            .Where(g => g.Success)
             .Select(g => new MatchedStepTextParameter(g.Index, g.Length)).ToArray();
         var expectedParameterCount = matchedStepParameters.Length + (step.Argument == null ? 0 : 1);
         if (parameterCount != expectedParameterCount) //handle parameter error
