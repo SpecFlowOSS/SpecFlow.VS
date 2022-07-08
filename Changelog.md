@@ -1,8 +1,10 @@
 ﻿# v$vNext$ - $buildDate$
 
+* Hotfix for loading SpecFlow v4 beta projects
+
 # v2022.1.73 - 2022-07-08
 
-* Pereparation for Cucumber Expressions support in SpecFlow v4
+* Pereparation for Cucumber Expressions support in SpecFlow v4 beta
 
 # v2022.1.66 - 2022-05-30
 

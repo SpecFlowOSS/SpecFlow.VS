@@ -17,9 +17,14 @@ public class SpecFlowV3BaseDiscoverer : BaseDiscoverer
         var globalContainer = CreateGlobalContainer(configurationLoader, testAssembly);
         var testRunnerManager = (TestRunnerManager) globalContainer.Resolve<ITestRunnerManager>();
         testRunnerManager.Initialize(testAssembly);
-        testRunnerManager.CreateTestRunner(0);
+        EnsureTestRunnerCreated(testRunnerManager);
 
         return globalContainer.Resolve<IBindingRegistry>();
+    }
+
+    protected virtual void EnsureTestRunnerCreated(TestRunnerManager testRunnerManager)
+    {
+        testRunnerManager.CreateTestRunner(0);
     }
 
     protected virtual IObjectContainer CreateGlobalContainer(IConfigurationLoader configurationLoader,

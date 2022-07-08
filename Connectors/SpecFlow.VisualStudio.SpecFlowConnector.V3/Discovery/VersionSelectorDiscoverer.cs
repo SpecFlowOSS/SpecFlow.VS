@@ -1,5 +1,6 @@
 ﻿#nullable disable
 using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V38;
+using SpecFlow.VisualStudio.SpecFlowConnector.Discovery.V40;
 
 namespace SpecFlow.VisualStudio.SpecFlowConnector.Discovery;
 
@@ -43,7 +44,9 @@ public class VersionSelectorDiscoverer : ISpecFlowDiscoverer
                 (specFlowVersion.FileMajorPart * 100 + specFlowVersion.FileMinorPart) * 1000 +
                 specFlowVersion.FileBuildPart;
 
-            if (versionNumber >= 3_09_022)
+            if (versionNumber >= 4_00_000)
+                discovererType = typeof(SpecFlowV40Discoverer);
+            else if (versionNumber >= 3_09_022)
                 discovererType = typeof(SpecFlowV38Discoverer);
             else
                 throw new NotSupportedException(
