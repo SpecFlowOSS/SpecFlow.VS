@@ -1,5 +1,7 @@
 ﻿# v$vNext$ - $buildDate$
 
+# v2022.1.73 - 2022-07-08
+
 * Pereparation for Cucumber Expressions support in SpecFlow v4
 
 # v2022.1.66 - 2022-05-30
